@@ -1,0 +1,316 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String
+  role          String    @default("STUDENT") // ADMIN, TEACHER, STUDENT
+  status        String    @default("ACTIVE")  // ACTIVE, SUSPENDED, BLOCKED
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Onboarding data (JSON string)
+  onboardingData String?
+
+  // For Students
+  levelId       String?
+  level         Level?    @relation("StudentLevel", fields: [levelId], references: [id])
+  paymentPlans  PaymentPlan[]
+
+  // For Teachers
+  assignedLevels Level[]  @relation("TeacherLevels")
+  schedules      TeacherSchedule[] @relation("TeacherSchedules")
+  restrictedDocs TrainingDocument[] @relation("DocAllowedTeachers")
+  
+  progress      Progress[]
+  posts         Post[]
+  comments      Comment[]
+
+  // For Appointments
+  appointmentsAsStudent Appointment[] @relation("StudentAppointments")
+  appointmentsAsAdmin   Appointment[] @relation("AdminAppointments")
+
+  // Attendance, Grades, Badges, Quizzes, Messages
+  attendances      Attendance[]   @relation("StudentAttendances")
+  gradesReceived   StudentGrade[] @relation("StudentGrades")
+  gradesGiven      StudentGrade[] @relation("TeacherGrades")
+  badges           StudentBadge[]
+  quizAttempts     QuizAttempt[]
+  sentMessages     Message[]      @relation("MessageSender")
+  receivedMessages Message[]      @relation("MessageReceiver")
+}
+
+model Level {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Float    @default(0) // Total price for the level
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  students    User[]   @relation("StudentLevel")
+  teachers    User[]   @relation("TeacherLevels")
+  modules     Module[]
+  schedules   TeacherSchedule[] @relation("ScheduleLevel")
+}
+
+model Module {
+  id          String   @id @default(uuid())
+  title       String
+  order       Int      @default(0)
+  levelId     String
+  level       Level    @relation(fields: [levelId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lessons     Lesson[]
+}
+
+model Lesson {
+  id          String   @id @default(uuid())
+  title       String
+  contentUrl  String?  // Video URL or PDF URL
+  type        String   @default("VIDEO") // VIDEO, PDF, QUIZ
+  order       Int      @default(0)
+  moduleId    String
+  module      Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  progress    Progress[]
+}
+
+model Progress {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId  String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completed Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, lessonId])
+}
+
+model PaymentPlan {
+  id            String   @id @default(uuid())
+  studentId     String
+  student       User     @relation(fields: [studentId], references: [id])
+  totalAmount   Float
+  amountPaid    Float    @default(0)
+  status        String   @default("PARTIAL") // PAID, PARTIAL, OVERDUE
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  transactions  Transaction[]
+}
+
+model Transaction {
+  id            String      @id @default(uuid())
+  planId        String
+  paymentPlan   PaymentPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  amount        Float
+  method        String      @default("PAWAPAY")
+  referenceId   String?     @unique // External reference ID from Pawapay
+  provider      String?     // ORANGE, MTN, MOOV, WAVE
+  failureReason String?     // Error message from Pawapay
+  status        String      @default("PENDING") // COMPLETED, FAILED, PENDING
+  date          DateTime    @default(now())
+}
+
+// FORUM / COMMUNITY MODELS
+model Post {
+  id        String    @id @default(uuid())
+  title     String
+  content   String
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  comments  Comment[]
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  content   String
+  postId    String
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Appointment {
+  id          String   @id @default(uuid())
+  title       String?
+  studentId   String
+  student     User     @relation("StudentAppointments", fields: [studentId], references: [id], onDelete: Cascade)
+  adminId     String?
+  admin       User?    @relation("AdminAppointments", fields: [adminId], references: [id], onDelete: SetNull)
+  date        DateTime
+  startTime   DateTime
+  endTime     DateTime
+  status      String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED, COMPLETED
+  reason      String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SystemSettings {
+  id                     String   @id @default("default")
+  currentSessionName     String   @default("Avril - Juin 2026")
+  currentSessionStart    String   @default("11 Avril 2026")
+  currentSessionDuration String   @default("2 Mois")
+  updatedAt              DateTime @updatedAt
+}
+
+model TeacherSchedule {
+  id           String    @id @default(uuid())
+  teacherId    String
+  teacher      User      @relation("TeacherSchedules", fields: [teacherId], references: [id], onDelete: Cascade)
+  levelId      String?
+  level        Level?    @relation("ScheduleLevel", fields: [levelId], references: [id], onDelete: SetNull)
+  dayOfWeek    String    // Lundi, Mardi, etc. (used for recurring)
+  startTime    String    // "16:00"
+  endTime      String    // "18:00"
+  location     String?   // class room or center
+  type         String    @default("COURS") // COURS, CLUB
+  isRecurring  Boolean   @default(true)
+  specificDate String?   // "2026-05-14" — null for recurring events
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  attendances  Attendance[]
+}
+
+model TrainingDocument {
+  id              String   @id @default(uuid())
+  title           String
+  description     String?
+  fileUrl         String
+  category        String   @default("GENERAL") // GENERAL, GRAMMAR, VOCABULARY, PRONUNCIATION
+  isRestricted    Boolean  @default(false)      // false = all teachers, true = only allowedTeachers
+  allowedTeachers User[]   @relation("DocAllowedTeachers")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ======= ATTENDANCE =======
+model Attendance {
+  id          String   @id @default(uuid())
+  studentId   String
+  student     User     @relation("StudentAttendances", fields: [studentId], references: [id], onDelete: Cascade)
+  scheduleId  String
+  schedule    TeacherSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  date        String   // "2026-04-15"
+  status      String   @default("PRESENT") // PRESENT, ABSENT, LATE, EXCUSED
+  note        String?
+  createdAt   DateTime @default(now())
+
+  @@unique([studentId, scheduleId, date])
+}
+
+// ======= STUDENT GRADES / FEEDBACK =======
+model StudentGrade {
+  id          String   @id @default(uuid())
+  studentId   String
+  student     User     @relation("StudentGrades", fields: [studentId], references: [id], onDelete: Cascade)
+  teacherId   String
+  teacher     User     @relation("TeacherGrades", fields: [teacherId], references: [id], onDelete: Cascade)
+  levelId     String
+  score       Float?   // 0-100
+  category    String   @default("GENERAL") // GENERAL, GRAMMAR, VOCABULARY, SPEAKING, LISTENING
+  feedback    String?
+  date        String   // "2026-04-15"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ======= GAMIFICATION =======
+model Badge {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  icon        String   @default("🏅") // emoji or icon name
+  color       String   @default("#FFD700")
+  criteria    String?  // JSON: {"type": "attendance", "threshold": 10}
+  createdAt   DateTime @default(now())
+
+  students    StudentBadge[]
+}
+
+model StudentBadge {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  earnedAt  DateTime @default(now())
+
+  @@unique([userId, badgeId])
+}
+
+// ======= QUIZ SYSTEM =======
+model Quiz {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  levelId     String?
+  category    String   @default("GENERAL") // GRAMMAR, VOCABULARY, LISTENING, GENERAL
+  timeLimit   Int?     // minutes
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  questions   QuizQuestion[]
+  attempts    QuizAttempt[]
+}
+
+model QuizQuestion {
+  id            String   @id @default(uuid())
+  quizId        String
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  question      String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctAnswer String   // "A", "B", "C", "D"
+  explanation   String?
+  order         Int      @default(0)
+}
+
+model QuizAttempt {
+  id          String   @id @default(uuid())
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score       Float    // percentage 0-100
+  answers     String   // JSON: {"q1": "A", "q2": "C", ...}
+  timeTaken   Int?     // seconds
+  completedAt DateTime @default(now())
+}
+
+// ======= INTERNAL MESSAGING =======
+model Message {
+  id          String   @id @default(uuid())
+  senderId    String
+  sender      User     @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId  String
+  receiver    User     @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  content     String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
