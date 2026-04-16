@@ -55,6 +55,8 @@ export default auth((req) => {
     return NextResponse.next();
 });
 
+export const runtime = "nodejs";
+
 export const config = {
-    matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+    matcher: ['/dashboard/:path*', '/login'],
 };
