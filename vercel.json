@@ -1,5 +1,9 @@
 {
     "framework": "nextjs",
+    "crons": [{
+        "path": "/api/cron/reminders",
+        "schedule": "0 * * * *"
+    }],
     "installCommand": "npm install --legacy-peer-deps",
     "buildCommand": "npx prisma generate && next build"
 }

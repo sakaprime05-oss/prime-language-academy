@@ -60,8 +60,9 @@ export default function LoginForm() {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-[10px] font-black px-1 text-[var(--foreground)]/70 uppercase tracking-[0.2em] flex justify-between">
+                    <label className="text-[10px] font-black px-1 text-[var(--foreground)]/70 uppercase tracking-[0.2em] flex justify-between items-center w-full">
                         <span>Mot de passe</span>
+                        <a href="/forgot-password" className="text-[var(--primary)] hover:underline normal-case tracking-normal">Oublié ?</a>
                     </label>
                     <input
                         type="password"

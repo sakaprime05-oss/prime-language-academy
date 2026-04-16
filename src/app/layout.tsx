@@ -14,9 +14,31 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Prime Academy | Plateforme d'Excellence",
-  description: "Système de gestion pédagogique haute performance pour Prime Language Academy.",
+  description: "Système de gestion pédagogique haute performance pour Prime Language Academy. Parlez anglais. Vivez des opportunités.",
   manifest: "/manifest.json",
   themeColor: "#4f46e5",
+  openGraph: {
+    title: "Prime Language Academy",
+    description: "Parlez anglais. Vivez des opportunités. Rejoignez le centre linguistique de référence en Côte d'Ivoire.",
+    url: "https://primelanguageacademy.com",
+    siteName: "Prime Language Academy",
+    images: [
+      {
+        url: "https://primelanguageacademy.com/icon-512x512.png",
+        width: 512,
+        height: 512,
+        alt: "Prime Language Academy Logo",
+      },
+    ],
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Prime Language Academy",
+    description: "Parlez anglais. Vivez des opportunités.",
+    images: ["https://primelanguageacademy.com/icon-512x512.png"],
+  },
 };
 
 export default function RootLayout({
