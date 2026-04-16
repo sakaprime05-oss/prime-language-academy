@@ -1,8 +1,5 @@
 {
     "framework": "nextjs",
-    "github": {
-        "silent": true
-    },
-    "installCommand": "npm install",
-    "buildCommand": "npx prisma generate && npx prisma db push && next build"
+    "installCommand": "npm install --legacy-peer-deps",
+    "buildCommand": "npx prisma generate && next build"
 }

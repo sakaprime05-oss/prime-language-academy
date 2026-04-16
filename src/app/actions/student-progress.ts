@@ -56,7 +56,7 @@ export async function getStudentProgressData(userId: string) {
         }
     }) as any;
 
-    if (!user || !user.level) return { percentage: 0, levelName: "", currentLesson: null, modules: [] };
+    if (!user || !user.level) return { percentage: 0, levelName: "", currentLesson: null, modules: [], completedLessonIds: [] };
 
     const allLessons = user.level.modules.flatMap((m: any) => m.lessons);
     const completedLessonIds = new Set(user.progress.map((p: any) => p.lessonId));
