@@ -202,6 +202,16 @@ export default function PlacementTest() {
                 </button>
               ))}
             </div>
+            
+            <div className="mt-6 pt-6 border-t border-[var(--foreground)]/5">
+               <button
+                type="button"
+                onClick={() => router.push("/")}
+                className="text-xs font-bold text-[var(--foreground)]/40 hover:text-[var(--foreground)] transition-colors underline underline-offset-4"
+              >
+                Quitter et retourner à l'accueil
+              </button>
+            </div>
           </div>
         </div>
       </div>

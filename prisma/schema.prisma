@@ -46,6 +46,9 @@ model User {
   quizAttempts     QuizAttempt[]
   sentMessages     Message[]      @relation("MessageSender")
   receivedMessages Message[]      @relation("MessageReceiver")
+
+  // For Blog
+  articles         Article[]      @relation("ArticleAuthor")
 }
 
 model PasswordResetToken {
@@ -325,4 +328,19 @@ model Message {
   content     String
   isRead      Boolean  @default(false)
   createdAt   DateTime @default(now())
+}
+
+// ======= BLOG =======
+model Article {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  category    String   @default("GENERAL")
+  content     String   // Will store HTML or Markdown
+  published   Boolean  @default(false)
+  coverImage  String?
+  authorId    String
+  author      User     @relation("ArticleAuthor", fields: [authorId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
