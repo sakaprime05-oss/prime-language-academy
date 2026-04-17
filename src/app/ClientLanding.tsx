@@ -6,7 +6,7 @@ import PricingSection from "./(landing)/PricingSection";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
-export default function ClientLanding({ session, systemSettings }: { session: any, systemSettings: any }) {
+export default function ClientLanding({ session, systemSettings, latestArticles = [] }: { session: any, systemSettings: any, latestArticles?: any[] }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -240,6 +240,65 @@ export default function ClientLanding({ session, systemSettings }: { session: an
           <PricingSection />
         </div>
       </section>
+
+      {/* ═══════════ LATEST ARTICLES (BLOG) ═══════════ */}
+      {latestArticles && latestArticles.length > 0 && (
+        <section className="py-32 px-6">
+          <div className="max-w-7xl mx-auto space-y-16">
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center space-y-6"
+            >
+              <div className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.3em]">
+                Ressources & Actualités
+              </div>
+              <h2 className="text-4xl md:text-6xl font-black text-[var(--foreground)] tracking-tight">Le Blog <span className="text-primary italic">PLA</span></h2>
+              <p className="text-[var(--foreground)]/50 font-medium text-lg max-w-2xl mx-auto">
+                Découvrez nos derniers articles sur l'importance du bilinguisme et nos conseils d'apprentissage.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {latestArticles.map((article: any, idx: number) => (
+                <motion.article 
+                  key={article.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  className="glass-card border-white/10 dark:border-white/5 p-8 flex flex-col justify-between group hover:border-primary/30 transition-all rounded-[2rem]"
+                >
+                  <div className="space-y-4 mb-6">
+                    <span className="inline-block px-3 py-1 bg-[var(--foreground)]/5 text-[var(--foreground)]/70 rounded-full text-[10px] font-black uppercase tracking-widest">
+                      {article.category}
+                    </span>
+                    <Link href={`/blog/${article.slug}`}>
+                      <h3 className="text-xl font-black text-[var(--foreground)] leading-tight group-hover:text-primary transition-colors line-clamp-3">
+                        {article.title}
+                      </h3>
+                    </Link>
+                  </div>
+                  <p className="text-sm text-[var(--foreground)]/50 font-medium line-clamp-3 mb-6">
+                    {article.content}
+                  </p>
+                  <Link href={`/blog/${article.slug}`} className="text-sm font-black text-[var(--foreground)] group-hover:text-primary transition-colors flex items-center gap-2 mt-auto">
+                    Lire la suite <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                  </Link>
+                </motion.article>
+              ))}
+            </div>
+
+            <div className="text-center pt-8">
+              <Link href="/blog" className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-[var(--foreground)]/5 font-bold hover:bg-[var(--foreground)]/10 text-[var(--foreground)] transition-all">
+                Voir tous les articles
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ═══════════ CTA FINAL ═══════════ */}
       <section className="py-32 px-6 relative overflow-hidden">
