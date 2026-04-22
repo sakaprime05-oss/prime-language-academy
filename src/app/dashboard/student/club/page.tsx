@@ -1,10 +1,28 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getStudentPhase } from "@/app/actions/student-phase";
 
 export default async function EnglishClubPage() {
     const session = await auth();
     if (!session || session.user?.role !== "STUDENT") redirect("/login");
+
+    const phase = await getStudentPhase();
+
+    if (phase === "TRAINING") {
+        return (
+            <div className="p-8 text-center max-w-2xl mx-auto rounded-3xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 animate-in fade-in slide-in-from-bottom-4 mt-10">
+                <div className="text-6xl mb-6 text-secondary">🔒</div>
+                <h1 className="text-2xl font-black mb-4">Club d'Anglais Verrouillé</h1>
+                <p className="text-[var(--foreground)]/70 mb-8 font-medium">
+                    Conformément au programme, le Club d'Anglais sera débloqué automatiquement après vos 2 mois de Formation Régulière (Structure). Concentrez-vous sur vos cours fondamentaux pour l'instant !
+                </p>
+                <Link href="/dashboard/student/courses" className="bg-secondary/20 text-secondary font-black py-4 px-8 rounded-xl shadow-lg hover:bg-secondary/30 transition-colors inline-block">
+                    Retour aux leçons régulières
+                </Link>
+            </div>
+        );
+    }
 
     const activities = [
         { name: "Débats", icon: "🗣️", desc: "Échangez sur des sujets d'actualité pour forger votre argumentation." },

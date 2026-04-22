@@ -1,39 +1,97 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Simulation de l'appel à l'API Pawapay pour initier un paiement
+/**
+ * PayTech payment token request endpoint
+ * Used by the PayTech Web SDK (OPEN_IN_POPUP mode)
+ * The frontend SDK calls this URL which then calls PayTech and returns the token
+ */
 export async function POST(req: Request) {
     try {
-        const { studentId, planId, amount, phone } = await req.json();
+        const body = await req.json();
+        const { planId, amount, studentName, studentEmail, targetPayment, phone } = body;
 
-        if (!studentId || !planId || !amount || !phone) {
+        if (!planId || !amount) {
             return NextResponse.json({ error: "Données manquantes" }, { status: 400 });
         }
 
-        // Créer une transaction en attente dans la BDD
+        const apiKey = process.env.PAYTECH_API_KEY;
+        const apiSecret = process.env.PAYTECH_API_SECRET;
+        const env = process.env.PAYTECH_ENV || "test";
+        const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+
+        if (!apiKey || !apiSecret) {
+            return NextResponse.json({ error: "Configuration paiement manquante" }, { status: 500 });
+        }
+
+        const refCommand = `PRIME-${planId}-${Date.now()}`;
+
+        // Create pending transaction
         const transaction = await prisma.transaction.create({
             data: {
                 planId,
-                amount,
-                method: "PAWAPAY",
+                amount: parseFloat(amount),
+                method: "PAYTECH",
                 status: "PENDING",
-                // Dans un cas réel, cette référence viendrait de la réponse de l'API Pawapay
-                referenceId: `PWP-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-            },
+                referenceId: refCommand,
+            }
         });
 
-        // Appel théorique à l'API Pawapay
-        // const response = await fetch("https://api.pawapay.io/v1/deposits", { ... })
-
-        return NextResponse.json({
-            success: true,
-            message: "Paiement initié avec succès",
+        const customField = JSON.stringify({
             transactionId: transaction.id,
-            paymentUrl: "/dashboard/student", // URL de redirection (simulée)
+            planId,
+            email: studentEmail || "",
+        });
+
+        const paymentBody: Record<string, string> = {
+            item_name: "Frais de scolarité - Prime Language Academy",
+            item_price: String(Math.round(parseFloat(amount))),
+            currency: "XOF",
+            ref_command: refCommand,
+            command_name: `Paiement scolarité - ${studentName || "Étudiant"}`,
+            env,
+            ipn_url: `${baseUrl}/api/payments/paytech/ipn`,
+            success_url: `${baseUrl}/dashboard/student/payments?status=success`,
+            cancel_url: `${baseUrl}/dashboard/student/payments?status=cancel`,
+            custom_field: customField,
+        };
+
+        if (targetPayment) {
+            paymentBody.target_payment = targetPayment;
+        }
+
+        const paytechResponse = await fetch("https://paytech.sn/api/payment/request-payment", {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "API_KEY": apiKey,
+                "API_SECRET": apiSecret,
+            },
+            body: JSON.stringify(paymentBody),
+        });
+
+        const data = await paytechResponse.json();
+
+        if (data.success !== 1) {
+            await prisma.transaction.update({
+                where: { id: transaction.id },
+                data: { status: "FAILED", failureReason: data.message || "PayTech API Error" }
+            });
+            return NextResponse.json({ success: 0, message: data.message || "Erreur PayTech" }, { status: 400 });
+        }
+
+        // Return PayTech token/redirect_url to the client
+        return NextResponse.json({
+            success: 1,
+            token: data.token,
+            redirect_url: data.redirect_url,
+            redirectUrl: data.redirectUrl || data.redirect_url,
+            transactionId: transaction.id,
         });
 
     } catch (error) {
-        console.error("Erreur lors de l'initiation du paiement:", error);
+        console.error("PayTech request-payment error:", error);
         return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
     }
 }

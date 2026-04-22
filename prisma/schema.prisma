@@ -131,12 +131,16 @@ model Transaction {
   planId        String
   paymentPlan   PaymentPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
   amount        Float
-  method        String      @default("PAWAPAY")
+  method        String      @default("PAYTECH")
   referenceId   String?     @unique // External reference ID from Pawapay
   provider      String?     // ORANGE, MTN, MOOV, WAVE
   failureReason String?     // Error message from Pawapay
   status        String      @default("PENDING") // COMPLETED, FAILED, PENDING
   date          DateTime    @default(now())
+
+  // MANUAL PAYMENT FIELDS
+  senderPhone   String?     // Numéro de téléphone de l'expéditeur
+  proof         String?     // N° de transaction secret ou référence SMS
 }
 
 // FORUM / COMMUNITY MODELS

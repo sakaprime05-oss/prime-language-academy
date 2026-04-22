@@ -5,10 +5,28 @@ import { getQuizzes } from "@/app/actions/quizzes";
 import Link from "next/link";
 import LessonItem from "./LessonItem";
 import StudentQuizList from "./QuizList";
+import { getStudentPhase } from "@/app/actions/student-phase";
 
 export default async function StudentCoursesPage() {
     const session = await auth();
     if (!session || session.user?.role !== "STUDENT") redirect("/login");
+
+    const phase = await getStudentPhase();
+
+    if (phase === "CLUB") {
+        return (
+            <div className="p-8 text-center max-w-2xl mx-auto rounded-3xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 animate-in fade-in slide-in-from-bottom-4">
+                <div className="text-6xl mb-6">🎓</div>
+                <h1 className="text-2xl font-black mb-4">Programme Régulier Terminé !</h1>
+                <p className="text-[var(--foreground)]/70 mb-8 font-medium">
+                    Félicitations, vous avez complété vos 2 mois de structure fondamentale. Votre accès aux leçons régulières est désormais remplacé par l'accès privilégié au Club d'Anglais pour la pratique orale.
+                </p>
+                <Link href="/dashboard/student/club" className="bg-[var(--primary)] text-white font-black py-4 px-8 rounded-xl shadow-lg hover:opacity-90 transition-opacity inline-block">
+                    Rejoindre le Club d'Anglais
+                </Link>
+            </div>
+        );
+    }
 
     const progressData = await getStudentProgressData(session.user.id);
     const studentId = session.user.id!;

@@ -109,13 +109,14 @@ export default async function StudentPaymentsPage() {
                                     <div className="flex items-center gap-4">
                                         {t.status === 'COMPLETED' && (
                                             <Link 
-                                                href={`/dashboard/student/payments/receipt/${t.id}`}
+                                                href={`/api/invoice/${t.id}`}
                                                 target="_blank"
-                                                className="hidden sm:flex text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 hover:underline items-center gap-1 bg-emerald-500/10 px-3 py-1.5 rounded-full transition-colors"
-                                                title="Télécharger le reçu"
+                                                download
+                                                className="hidden sm:flex text-[10px] font-black uppercase tracking-widest text-[#21286E] hover:text-[#E7162A] hover:underline items-center gap-1 bg-[#21286E]/10 px-3 py-1.5 rounded-full transition-colors"
+                                                title="Télécharger la Facture PDF"
                                             >
                                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                                <span>Reçu</span>
+                                                <span>Facture PDF</span>
                                             </Link>
                                         )}
                                         <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${t.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-500' : t.status === 'PENDING' ? 'bg-amber-500/10 text-amber-500' : 'bg-red-500/10 text-red-500'}`}>

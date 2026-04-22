@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  /* Premium Palette - Indigo & Violet */
-  --background: #fdfeff;
-  --foreground: #0f172a;
-  --surface: rgba(255, 255, 255, 0.7);
-  --surface-hover: rgba(241, 245, 249, 0.8);
+  /* Brand Palette - Deep Blue & Prime Red */
+  --background: #ffffff;
+  --foreground: #21286E;
+  --surface: rgba(255, 255, 255, 0.9);
+  --surface-hover: rgba(33, 40, 110, 0.05);
 
-  --primary: #4f46e5;
-  --primary-glow: rgba(79, 70, 229, 0.4);
-  --secondary: #8b5cf6;
-  --accent: #06b6d4;
+  --primary: #E7162A;
+  --primary-glow: rgba(231, 22, 42, 0.3);
+  --secondary: #21286E;
+  --accent: #E7162A;
 
   --glass-border: rgba(255, 255, 255, 0.4);
   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);

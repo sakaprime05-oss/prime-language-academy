@@ -48,31 +48,79 @@ export async function registerUser(formData: FormData) {
             });
         }
 
-        // Create student with assigned level
+        let onboardingParams: any = {};
+        try {
+            onboardingParams = JSON.parse(onboardingData);
+        } catch (e) { }
+
+        const totalAmount = level?.price || planPrices[planId] || 0;
+        const amountToPay = onboardingParams.paymentOption === "fractionne" ? (totalAmount * 0.2) : totalAmount;
+
+        // Create student with assigned level, status PENDING
         const user = await prisma.user.create({
             data: {
                 name,
                 email,
                 passwordHash: hashedPassword,
                 role: "STUDENT",
-                status: "ACTIVE",
+                status: "PENDING",
                 levelId: level?.id,
                 onboardingData,
-                // Create the payment plan immediately
                 paymentPlans: {
                     create: {
-                        totalAmount: level?.price || planPrices[planId] || 0,
+                        totalAmount,
                         amountPaid: 0,
                         status: "PARTIAL"
                     }
                 }
             },
+            include: { paymentPlans: true }
         });
 
+        const paymentPlan = user.paymentPlans[0];
+
+        // --- BYPASS PAYTECH FOR MANUAL PAYMENT ---
+        // (Comment everything out to keep it as backup)
+        // const refCommand = `PRIME-${paymentPlan.id}-${Date.now()}`;
+        //
+        // const customField = JSON.stringify({
+        //     transactionId: transaction.id,
+        //     planId: paymentPlan.id,
+        //     studentId: user.id,
+        //     email: user.email,
+        // });
+        //
+        // const apiKey = process.env.PAYTECH_API_KEY!;
+        // const apiSecret = process.env.PAYTECH_API_SECRET!;
+        // const env = process.env.PAYTECH_ENV || "test";
+        // const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+        //
+        // const paymentBody: Record<string, string> = { ... };
+
+        const refCommand = `PRIME-${paymentPlan.id}-${Date.now()}`;
+        
+        await prisma.transaction.create({
+            data: {
+                planId: paymentPlan.id,
+                amount: amountToPay,
+                method: "MANUAL",
+                status: "PENDING",
+                referenceId: refCommand,
+            }
+        });
+
+        const redirectUrl = "/dashboard/student/payments/manual";
+
+        // Notify user
         await sendWelcomeEmail(user.email, user.name || "Étudiant")
             .catch(err => console.error("Could not send welcome email", err));
 
-        return { success: true };
+        // Notify admin
+        const { sendAdminNewRegistrationEmail } = await import("@/lib/email");
+        await sendAdminNewRegistrationEmail(user.name || "Nouveau", user.email, level?.name || planId)
+            .catch(err => console.error("Could not send admin reg email", err));
+
+        return { success: true, redirectUrl };
     } catch (error) {
         console.error("Registration error:", error);
         return { error: "Une erreur est survenue lors de l'inscription." };

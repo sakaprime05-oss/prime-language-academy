@@ -25,6 +25,30 @@ export function AppointmentForm() {
             return;
         }
 
+        const [year, month, day] = dateStr.split("-").map(Number);
+        const [hours, minutes] = timeStr.split(":").map(Number);
+        
+        const selectedDate = new Date(year, month - 1, day);
+        const dayOfWeek = selectedDate.getDay();
+
+        if (dayOfWeek !== 2 && dayOfWeek !== 4) {
+            setError("Les rendez-vous sont uniquement disponibles les Mardis et Jeudis.");
+            setLoading(false);
+            return;
+        }
+
+        if (dayOfWeek === 2 && (hours < 10 || hours >= 14)) {
+            setError("Le Mardi, les consultations sont uniquement entre 10h00 et 14h00.");
+            setLoading(false);
+            return;
+        }
+
+        if (dayOfWeek === 4 && (hours < 9 || hours >= 14)) {
+            setError("Le Jeudi, les consultations sont uniquement entre 09h00 et 14h00.");
+            setLoading(false);
+            return;
+        }
+
         try {
             // Création des objets Date
             const [year, month, day] = dateStr.split("-").map(Number);
@@ -81,8 +105,11 @@ export function AppointmentForm() {
 
             <div className="flex flex-col gap-2">
                 <label htmlFor="time" className="text-sm font-bold text-[var(--foreground)]/70">
-                    Heure (créneaux de 30 min)
+                    Heure (Créneaux de 30 min)
                 </label>
+                <div className="text-xs text-[var(--foreground)]/50 font-medium mb-1">
+                    Horaires d'ouverture : Mardi (10h-14h) et Jeudi (09h-14h).
+                </div>
                 <input
                     type="time"
                     id="time"

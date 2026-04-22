@@ -1,22 +1,41 @@
+import nodemailer from "nodemailer";
+
 export async function sendEmail({ to, subject, html }: { to: string, subject: string, html: string }) {
-    // Dans un environnement réel, on utiliserait un service comme Resend, SendGrid, ou Nodemailer avec SMTP.
-    // Pour l'instant, nous allons simuler l'envoi d'e-mail dans la console.
+    const user = process.env.EMAIL_USER;
+    const pass = process.env.EMAIL_APP_PASSWORD;
 
-    console.log("=========================================");
-    console.log(`📧 ENVOI D'EMAIL SIMULÉ`);
-    console.log(`À      : ${to}`);
-    console.log(`Sujet  : ${subject}`);
-    console.log(`Contenu:`);
-    console.log(html);
-    console.log("=========================================");
+    if (!user || !pass) {
+        // Mode simulation si les credentials manquent
+        console.log("=========================================");
+        console.log(`📧 ENVOI D'EMAIL SIMULÉ (MANQUE IDENTIFIANTS GMAIL)`);
+        console.log(`À      : ${to}`);
+        console.log(`Sujet  : ${subject}`);
+        console.log("=========================================");
+        return true;
+    }
 
-    // TODO: Intégrer Resend ou Nodemailer
-    // Exemple avec Resend:
-    // import { Resend } from 'resend';
-    // const resend = new Resend(process.env.RESEND_API_KEY);
-    // await resend.emails.send({ from: 'Acme <onboarding@resend.dev>', to, subject, html });
+    try {
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: user,
+                pass: pass,
+            },
+        });
 
-    return true;
+        const info = await transporter.sendMail({
+            from: `"Prime Academy" <${user}>`,
+            to,
+            subject,
+            html,
+        });
+
+        console.log(`Émail envoyé avec succès à ${to} (MessageID: ${info.messageId})`);
+        return true;
+    } catch (error) {
+        console.error("Erreur d'envoi d'email (Nodemailer):", error);
+        return false;
+    }
 }
 
 export async function sendWelcomeEmail(to: string, name: string) {
@@ -102,4 +121,78 @@ export async function sendInvoiceEmail(to: string, name: string, amount: number,
         </div>
     `;
     return sendEmail({ to, subject, html });
+}
+
+export async function sendAdminNotificationEmail(studentName: string, amount: number, transactionId: string) {
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@primelanguageacademy.com"; // Configuration par défaut
+    const subject = "Nouvelle Inscription & Paiement Reçu 🚀";
+    const date = new Date().toLocaleDateString('fr-FR');
+    const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; background-color: #f9f9fb; padding: 40px; border-radius: 12px;">
+            <h2 style="color: #4f46e5;">Nouvelle Confirmation d'Inscription !</h2>
+            <p style="font-size: 16px; color: #4b5563;">
+                L'étudiant <strong>${studentName}</strong> vient de finaliser son inscription avec succès.
+            </p>
+            <div style="background-color: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; margin-top: 20px;">
+                <p><strong>Montant payé:</strong> ${amount.toLocaleString()} FCFA</p>
+                <p><strong>Date:</strong> ${date}</p>
+                <p><strong>Réf Transaction:</strong> ${transactionId}</p>
+            </div>
+            <p style="margin-top: 20px;">
+                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/admin" style="background-color: #4f46e5; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; display: inline-block;">
+                    Voir dans le Dashboard
+                </a>
+            </p>
+        </div>
+        </div>
+    `;
+    return sendEmail({ to: adminEmail, subject, html });
+}
+
+export async function sendAdminNewRegistrationEmail(studentName: string, studentEmail: string, planName: string) {
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@primelanguageacademy.com";
+    const subject = "⚠️ Nouvelle Inscription (En attente de paiement) !";
+    const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; background-color: #f9f9fb; padding: 40px; border-radius: 12px;">
+            <h2 style="color: #dba514;">Nouvel(le) étudiant(e) inscrit(e)</h2>
+            <p style="font-size: 16px; color: #4b5563;">
+                L'étudiant(e) <strong>${studentName}</strong> (${studentEmail}) vient de s'inscrire pour la formule <strong>${planName}</strong>.
+            </p>
+            <p style="font-size: 14px; margin-top: 15px;">
+                Il a été redirigé vers la page de paiement manuel. Vous devriez recevoir une soumission de preuve bientôt.
+            </p>
+            <p style="margin-top: 20px;">
+                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/admin/students" style="background-color: #dba514; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; display: inline-block;">
+                    Voir la liste des étudiants
+                </a>
+            </p>
+        </div>
+    `;
+    return sendEmail({ to: adminEmail, subject, html });
+}
+
+export async function sendAdminPaymentProofEmail(studentName: string, provider: string, phone: string, amount: number) {
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@primelanguageacademy.com";
+    const subject = "💰 Preuve de paiement soumise ! Action requise !";
+    const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; background-color: #f9f9fb; padding: 40px; border-radius: 12px; border: 2px solid #3b82f6;">
+            <h2 style="color: #3b82f6;">Preuve de Paiement Déposée</h2>
+            <p style="font-size: 16px; color: #4b5563;">
+                L'étudiant(e) <strong>${studentName}</strong> affirme avoir effectué le transfert pour ses frais (<strong>${amount.toLocaleString()} FCFA</strong>).
+            </p>
+            <div style="background-color: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; margin-top: 20px;">
+                <p><strong>Moyen :</strong> ${provider}</p>
+                <p><strong>Numéro d'envoi :</strong> ${phone}</p>
+            </div>
+            <p style="font-size: 14px; margin-top: 15px; font-weight: bold; color: #ef4444;">
+                Veuillez vérifier votre téléphone, puis valider ou rejeter la transaction dans votre tableau de bord.
+            </p>
+            <p style="margin-top: 20px;">
+                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/admin/payments" style="background-color: #3b82f6; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; display: inline-block;">
+                    Vérifier le Reçu
+                </a>
+            </p>
+        </div>
+    `;
+    return sendEmail({ to: adminEmail, subject, html });
 }

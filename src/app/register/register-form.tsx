@@ -140,8 +140,12 @@ function RegisterFormContent() {
             if (loginResult?.error) {
                 router.push("/login?registered=true");
             } else {
-                router.push("/dashboard");
-                router.refresh();
+                if (result.redirectUrl) {
+                    window.location.href = result.redirectUrl;
+                } else {
+                    router.push("/dashboard");
+                    router.refresh();
+                }
             }
         }
     };
