@@ -69,6 +69,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors duration-300`}
       >
+        <div className="bg-red-600 text-white text-[10px] py-1 text-center font-bold relative z-[1000]">
+          DEBUG DEPLOYMENT v1.1.2 - Hub d'Excellence 2026
+        </div>
         {children}
         <Toaster richColors position="top-right" />
       </body>
