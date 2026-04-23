@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Prime Academy | Plateforme d'Excellence",
+  title: "Prime Academy | Hub d'Excellence 2026",
   description: "Système de gestion pédagogique haute performance pour Prime Language Academy. Parlez anglais. Vivez des opportunités.",
   manifest: "/manifest.json",
   themeColor: "#4f46e5",
