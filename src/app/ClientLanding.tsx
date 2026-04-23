@@ -107,7 +107,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
           >
             Maîtrisez <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E7162A] via-pink-500 to-orange-400 drop-shadow-[0_0_30px_rgba(231,22,42,0.4)]">
-              l'Anglais.
+              l'Anglais (v1.1.2)
             </span>
           </motion.h1>
 
