@@ -13,6 +13,7 @@ const adminLinks = [
     { href: "/dashboard/admin/resources", label: "Doc. Formation", icon: WalletIcon },
     { href: "/dashboard/admin/payments", label: "Paiements", icon: WalletIcon },
     { href: "/dashboard/admin/appointments", label: "Rendez-vous", icon: ClockIcon },
+    { href: "/dashboard/admin/articles", label: "Gestion Blog", icon: BlogIcon },
     { href: "/dashboard/admin/settings", label: "Paramètres", icon: SettingsIcon },
 ];
 
@@ -87,4 +88,8 @@ function TeacherIcon(props: any) {
 
 function CalendarIcon(props: any) {
     return <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
+}
+
+function BlogIcon(props: any) {
+    return <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v12a2 2 0 01-2 2z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h5M7 12h10M7 16h10" /></svg>;
 }

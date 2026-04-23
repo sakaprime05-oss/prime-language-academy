@@ -86,6 +86,7 @@ function AdminMobileLinks() {
         { href: "/dashboard/admin/resources", label: "Documents" },
         { href: "/dashboard/admin/payments", label: "Paiements" },
         { href: "/dashboard/admin/appointments", label: "Rendez-vous" },
+        { href: "/dashboard/admin/articles", label: "Blog" },
         { href: "/dashboard/admin/settings", label: "Paramètres" },
     ];
     return (

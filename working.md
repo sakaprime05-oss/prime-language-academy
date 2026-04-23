@@ -28,6 +28,7 @@ Offrir un écosystème autonome où les étudiants peuvent s'inscrire, payer, su
 - **Authentification :** Next-Auth (v5.0.0-beta.30) avec `bcryptjs`
 - **Mails :** Nodemailer (v8.0.4) avec tâches planifiées (Vercel Cron)
 - **Paiements :** Intégration Custom / PawaPay (Orange, MTN, Moov, Wave)
+- **UI Framework :** shadcn/ui (Radix UI + Lucide)
 
 ## 5. Architecture du projet
 - `prisma/schema.prisma` : Modèle relationnel très riche (20+ entités).
@@ -45,6 +46,8 @@ Offrir un écosystème autonome où les étudiants peuvent s'inscrire, payer, su
 - **Quizz :** Modèles de questions/réponses et tracking de scores (`QuizAttempt`).
 - **Gestion Professeur :** Emplois du temps (`TeacherSchedule`), notation (`StudentGrade`), appels (`Attendance`).
 - **Finance :** Plans de paiement (`PaymentPlan`) et transactions ciblant les providers Mobile Money.
+- **Système de RDV Public :** Page `/rendez-vous` pour les visiteurs, avec API d'envoi d'emails de notification (`/api/public-appointment`).
+- **Modernisation UI :** Migration progressive vers shadcn/ui pour les formulaires et composants interactifs.
 
 ## 7. Modules incomplets ou manquants
 - **Messagerie Interne (`Message`) :** Le modèle DB existe, mais aucune action serveur (`message.ts` ou autre) ne semble présente dans l'arborescence actuelle concernant l'envoi direct entre utilisateurs.
@@ -101,3 +104,6 @@ Offrir un écosystème autonome où les étudiants peuvent s'inscrire, payer, su
 - *Date :* [17/04/2026]
 - *Action :* Génération du working.md initial via audit de l'arborescence, `package.json`, et `schema.prisma`.
 - *Status :* Projet compris, architecture validée. Prêt pour développements et bug hunting.
+- *Date :* [22/04/2026]
+- *Action :* Intégration de shadcn/ui, création du système de RDV public, refonte du formulaire RDV étudiant, et correction des bugs d'encodage/build.
+- *Status :* Système de RDV et UI modernisés. Build stabilisé.
