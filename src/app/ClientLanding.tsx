@@ -51,6 +51,9 @@ export default function ClientLanding({ session }: { session: any }) {
             <a href="#pourquoi-nous" className="hover:text-white transition-colors">Pourquoi Nous</a>
             <a href="#tarifs" className="hover:text-white transition-colors">Tarifs</a>
             <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
+            <Link href="/blog" className="hover:text-white transition-colors flex items-center gap-1">
+              Blog <span className="text-xs bg-[#E7162A]/20 text-[#E7162A] px-1.5 py-0.5 rounded ml-1 font-bold">NEW</span>
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             {session ? (
