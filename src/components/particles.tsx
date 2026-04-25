@@ -31,8 +31,8 @@ export function ParticlesBackground() {
           style={{
             width: p.size,
             height: p.size,
-            left: \`\${p.x}%\`,
-            top: \`\${p.y}%\`,
+            left: `${p.x}%`,
+            top: `${p.y}%`,
           }}
           animate={{
             y: [0, -100, -200, -300],
