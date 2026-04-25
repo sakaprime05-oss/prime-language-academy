@@ -29,7 +29,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     const student = transaction.paymentPlan.student;
 
     const data = {
-        from: "Prime Language Academy\nAbidjan, Angré 8e Tranche\nCôte d'Ivoire\ninfo@primelanguageacademy.com",
+        from: "Prime Language Academy\nAbidjan, Angré 8e Tranche\nCôte d'Ivoire\nTél: +225 01 61 33 78 64",
         to: `${student.name}\n${student.email}\nNiveau: ${student.level?.name || "Non défini"}`,
         logo: "https://primelanguageacademy.com/icon-512x512.png", // They need a real public URL for the logo, fallback if localhost
         number: transaction.id.split("-")[0].toUpperCase(),

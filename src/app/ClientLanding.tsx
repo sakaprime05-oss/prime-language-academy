@@ -435,7 +435,6 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
             <h4 className="font-black text-[#21286E] mb-8 uppercase text-xs tracking-[0.4em]">Contact Direct</h4>
             <ul className="space-y-6 text-sm text-[#21286E]/60 font-bold">
               <li>📍 Angré 8e Tranche, Abidjan</li>
-              <li>✉️ <a href="mailto:info@primelanguageacademy.com" className="hover:text-[#E7162A] transition-colors">info@primelanguageacademy.com</a></li>
               <li>📞 <a href="tel:+2250161337864" className="hover:text-[#E7162A] transition-colors">+225 01 61 33 78 64</a></li>
             </ul>
           </div>
