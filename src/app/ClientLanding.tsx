@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { CheckCircle2, Clock, MapPin, Phone, Shield, Target, GraduationCap, Zap, Star, Users, BrainCircuit, Globe2 } from "lucide-react";
 import { ParticlesBackground } from "@/components/particles";
