@@ -119,6 +119,81 @@ export default function ClientLanding({ session }: { session: any }) {
         </div>
       </header>
 
+      {/* NOTRE VISION : Language Mastery Academy */}
+      <section id="vision" className="py-24 px-4 bg-slate-950 relative overflow-hidden">
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#21286E]/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="max-w-4xl mx-auto space-y-12 relative z-10">
+          <div className="text-center space-y-4">
+            <Badge variant="secondary" className="bg-[#E7162A]/10 text-[#E7162A] hover:bg-[#E7162A]/20 px-4 py-1">Notre Identité</Badge>
+            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
+              LANGUAGE MASTERY ACADEMY
+            </h2>
+          </div>
+
+          <div className="prose prose-invert prose-lg max-w-none text-slate-300 leading-relaxed">
+            <p className="text-xl md:text-2xl text-white font-medium mb-12 text-center leading-relaxed">
+              L’ambition d’offrir une vraie maîtrise — <span className="text-[#E7162A]">pas seulement des notions.</span>
+            </p>
+            
+            <p className="mb-6">
+              C’est la volonté d’accompagner les professionnels, les étudiants, les entrepreneurs et les acteurs du changement, à devenir à l’aise, confiants et efficaces dans leur communication multilingue.
+            </p>
+            
+            <p className="mb-10">
+              Dans l’espace francophone africain, la maîtrise de langues étrangères reste un frein majeur pour beaucoup, alors même qu’elle est devenue une compétence clé dans le monde professionnel, académique et entrepreneurial. Language Mastery Academy est née d’un constat simple, mais profond : dans un environnement majoritairement francophone, apprendre une langue étrangère — notamment l’anglais — reste un défi majeur pour beaucoup, malgré les nombreuses tentatives et offres de formation existantes.
+            </p>
+            
+            <h3 className="text-2xl text-white font-bold mt-12 mb-6 flex items-center gap-3">
+              <span className="bg-[#E7162A] text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">?</span>
+              Pourquoi ?
+            </h3>
+            <p className="mb-4">Parce que ces offres ne prennent pas toujours en compte les réalités spécifiques des apprenants francophones :</p>
+            <ul className="list-none space-y-3 pl-0 my-6 bg-slate-900/50 p-6 rounded-xl border border-slate-800">
+              <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 rounded-full bg-[#E7162A] shrink-0" /> les blocages psychologiques liés à l’oral,</li>
+              <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 rounded-full bg-[#E7162A] shrink-0" /> la peur de faire des fautes,</li>
+              <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 rounded-full bg-[#E7162A] shrink-0" /> l’absence d’un cadre progressif,</li>
+              <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 rounded-full bg-[#E7162A] shrink-0" /> ou encore le manque d’une approche réellement pratique et adaptée.</li>
+            </ul>
+
+            <p className="mt-10 mb-10">
+              <strong className="text-white">Nous connaissons notre public.</strong> Nous savons que derrière chaque apprenant, il y a un professionnel, un entrepreneur, un étudiant ou un travailleur ambitieux, confronté à la mondialisation, à la compétitivité, et à la nécessité de communiquer efficacement.
+            </p>
+            
+            <h3 className="text-2xl text-white font-bold mt-12 mb-6">Une solution ciblée</h3>
+            <p className="mb-6">Language Mastery Academy a donc été pensée comme une solution ciblée :</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-8">
+              <div className="flex items-start gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" /> 
+                <span className="text-sm md:text-base font-medium">Une pédagogie claire et structurée</span>
+              </div>
+              <div className="flex items-start gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" /> 
+                <span className="text-sm md:text-base font-medium">Un accompagnement humain et motivant</span>
+              </div>
+              <div className="flex items-start gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" /> 
+                <span className="text-sm md:text-base font-medium">Des formats flexibles</span>
+              </div>
+              <div className="flex items-start gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" /> 
+                <span className="text-sm md:text-base font-medium">Priorité donnée à la maîtrise active de la langue</span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-slate-900 to-[#21286E]/20 border border-[#21286E]/30 p-8 md:p-12 rounded-[2rem] mt-16 text-center relative overflow-hidden group">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#E7162A] to-transparent opacity-50" />
+              <h3 className="text-3xl font-black text-white mb-6">Notre mission ?</h3>
+              <p className="text-lg md:text-xl text-slate-300 leading-relaxed max-w-2xl mx-auto">
+                Aider chaque apprenant à prendre confiance, progresser avec méthode, et s’exprimer avec impact dans une langue étrangère.
+                <br /><br />
+                <strong className="text-white block text-2xl mb-4">Nous ne formons pas juste à parler anglais.</strong>
+                <span className="text-[#E7162A] font-bold">Nous aidons à débloquer le potentiel</span> de celles et ceux qui veulent faire la différence.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* POURQUOI NOUS ? */}
       <section id="pourquoi-nous" className="py-24 px-4 bg-slate-900/50 border-t border-slate-800/50 relative">
         <div className="max-w-7xl mx-auto space-y-16">
