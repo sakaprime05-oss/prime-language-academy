@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { CheckCircle2, Clock, MapPin, Phone, Shield, Target, GraduationCap, Zap, Star, Users, BrainCircuit, Globe2 } from "lucide-react";
+import { ParticlesBackground } from "@/components/particles";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +28,8 @@ export default function ClientLanding({ session }: { session: any }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-[#E7162A]/30">
+    <div className="min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-[#E7162A]/30 relative overflow-hidden">
+      <ParticlesBackground />
       
       {/* NAVIGATION */}
       <nav className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/10 px-4 py-3">
@@ -79,16 +81,16 @@ export default function ClientLanding({ session }: { session: any }) {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#21286E]/20 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#E7162A]/10 rounded-full blur-[100px] pointer-events-none" />
         
-        <div className="max-w-5xl mx-auto relative z-10 space-y-8 flex flex-col items-center">
+        <div className="max-w-5xl mx-auto relative z-10 space-y-6 md:space-y-8 flex flex-col items-center">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
-            <Badge variant="outline" className="border-[#E7162A]/50 bg-[#E7162A]/10 text-[#E7162A] px-4 py-1.5 text-xs font-bold tracking-widest uppercase mb-4 shadow-[0_0_15px_rgba(231,22,42,0.2)]">
+            <Badge variant="outline" className="border-[#E7162A]/50 bg-[#E7162A]/10 text-[#E7162A] px-3 md:px-4 py-1.5 text-[10px] md:text-xs font-bold tracking-widest uppercase mb-2 md:mb-4 shadow-[0_0_15px_rgba(231,22,42,0.2)] text-center w-full block sm:inline-block max-w-[90vw] leading-relaxed">
               PROGRAMME OFFICIEL DE FORMATION : PRIME LANGUAGE ACADEMY (PLA)
             </Badge>
           </motion.div>
           
           <motion.h1 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-[1.1]"
+            className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-[1.1] md:leading-[1.1]"
           >
             Parlez anglais. <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E7162A] to-orange-500">
@@ -100,11 +102,11 @@ export default function ClientLanding({ session }: { session: any }) {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
             className="bg-slate-900/50 border border-slate-800 backdrop-blur-sm rounded-2xl p-4 md:p-6 inline-block mt-4"
           >
-            <div className="flex items-center gap-3 justify-center text-slate-300 font-medium md:text-lg">
+            <div className="flex flex-col sm:flex-row items-center gap-2 md:gap-3 justify-center text-slate-300 font-medium text-sm md:text-lg text-center">
               <motion.div animate={rotateAnim}>
-                <Clock className="text-[#E7162A] w-6 h-6" />
+                <Clock className="text-[#E7162A] w-5 h-5 md:w-6 md:h-6" />
               </motion.div>
-              <span>SESSION DE LANCEMENT : <strong className="text-white">21 JUIN – 19 AOUT 2026 (02 MOIS)</strong></span>
+              <span>SESSION DE LANCEMENT : <strong className="text-white block sm:inline mt-1 sm:mt-0">21 JUIN – 19 AOUT 2026 (02 MOIS)</strong></span>
             </div>
           </motion.div>
 
@@ -351,11 +353,11 @@ export default function ClientLanding({ session }: { session: any }) {
                 <Card className={`h-full flex flex-col bg-slate-900 border-slate-800 relative ${plan.highlight ? 'ring-2 ring-[#E7162A] shadow-[0_0_30px_rgba(231,22,42,0.15)]' : ''}`}>
                   {plan.highlight && <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#E7162A] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Le Summum</div>}
                   <CardHeader>
-                    <div className="flex justify-between items-start mb-2">
-                      <CardTitle className="text-2xl text-white">{plan.name}</CardTitle>
-                      <Badge variant="outline" className="text-slate-400 border-slate-700">{plan.freq}</Badge>
+                    <div className="flex justify-between items-start mb-4">
+                      <CardTitle className="text-xl lg:text-2xl text-white">{plan.name}</CardTitle>
+                      <Badge variant="outline" className="text-slate-400 border-slate-700 text-xs text-center">{plan.freq}</Badge>
                     </div>
-                    <div className="text-3xl font-black text-white">{plan.price}</div>
+                    <div className="text-2xl lg:text-3xl font-black text-white">{plan.price}</div>
                   </CardHeader>
                   <CardContent className="flex-1 space-y-4">
                     <div>

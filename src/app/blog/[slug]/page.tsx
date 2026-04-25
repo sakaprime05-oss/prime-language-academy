@@ -8,6 +8,7 @@ import { Calendar, User, ArrowLeft, Share2, BookOpen } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import Image from "next/image";
+import { ParticlesBackground } from "@/components/particles";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const { slug } = await params;
@@ -27,7 +28,8 @@ export default async function SingleArticlePage({ params }: { params: { slug: st
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-[#E7162A]/30 overflow-x-hidden">
+    <div className="min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-[#E7162A]/30 overflow-x-hidden relative">
+      <ParticlesBackground />
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/10 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
