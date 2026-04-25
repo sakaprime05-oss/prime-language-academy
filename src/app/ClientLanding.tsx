@@ -3,17 +3,33 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { CheckCircle2, Clock, MapPin, Phone, Shield, Target, GraduationCap, Zap } from "lucide-react";
+import { CheckCircle2, Clock, MapPin, Phone, Shield, Target, GraduationCap, Zap, Star, Users, BrainCircuit, Globe2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export default function ClientLanding({ session }: { session: any }) {
+  // Animation variants for "Lottie-style" continuous icon animations
+  const bounceAnim = {
+    y: [0, -8, 0],
+    transition: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+  };
+  
+  const pulseAnim = {
+    scale: [1, 1.1, 1],
+    transition: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+  };
+
+  const rotateAnim = {
+    rotate: [0, 10, -10, 0],
+    transition: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-[#E7162A]/30">
       
-      {/* NAVIGATION - Glassmorphism */}
+      {/* NAVIGATION */}
       <nav className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/10 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
@@ -32,8 +48,8 @@ export default function ClientLanding({ session }: { session: any }) {
           </Link>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
             <a href="#mission" className="hover:text-white transition-colors">Mission</a>
+            <a href="#pourquoi-nous" className="hover:text-white transition-colors">Pourquoi Nous</a>
             <a href="#tarifs" className="hover:text-white transition-colors">Tarifs</a>
-            <a href="#organisation" className="hover:text-white transition-colors">Organisation</a>
             <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
           </div>
           <div className="flex items-center gap-4">
@@ -46,7 +62,7 @@ export default function ClientLanding({ session }: { session: any }) {
                 <Link href="/login" className="text-sm font-medium text-slate-300 hover:text-white hidden sm:block">
                   Connexion
                 </Link>
-                <Button asChild className="bg-[#E7162A] hover:bg-[#E7162A]/90 text-white font-bold shadow-[0_0_15px_rgba(231,22,42,0.3)]">
+                <Button asChild className="bg-[#E7162A] hover:bg-[#E7162A]/90 text-white font-bold shadow-[0_0_15px_rgba(231,22,42,0.3)] hover:shadow-[0_0_25px_rgba(231,22,42,0.5)] transition-shadow">
                   <Link href="/register">S'inscrire</Link>
                 </Button>
               </>
@@ -55,27 +71,20 @@ export default function ClientLanding({ session }: { session: any }) {
         </div>
       </nav>
 
-      {/* HERO SECTION - Modern Gradient & Typography */}
+      {/* HERO SECTION */}
       <header className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-4 flex flex-col justify-center items-center text-center overflow-hidden">
-        {/* Abstract Background Elements */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#21286E]/20 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#E7162A]/10 rounded-full blur-[100px] pointer-events-none" />
         
         <div className="max-w-5xl mx-auto relative z-10 space-y-8 flex flex-col items-center">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Badge variant="outline" className="border-[#E7162A]/50 bg-[#E7162A]/10 text-[#E7162A] px-4 py-1.5 text-xs font-bold tracking-widest uppercase mb-4">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
+            <Badge variant="outline" className="border-[#E7162A]/50 bg-[#E7162A]/10 text-[#E7162A] px-4 py-1.5 text-xs font-bold tracking-widest uppercase mb-4 shadow-[0_0_15px_rgba(231,22,42,0.2)]">
               PROGRAMME OFFICIEL DE FORMATION : PRIME LANGUAGE ACADEMY (PLA)
             </Badge>
           </motion.div>
           
           <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
             className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-[1.1]"
           >
             Parlez anglais. <br />
@@ -85,32 +94,67 @@ export default function ClientLanding({ session }: { session: any }) {
           </motion.h1>
 
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
             className="bg-slate-900/50 border border-slate-800 backdrop-blur-sm rounded-2xl p-4 md:p-6 inline-block mt-4"
           >
             <div className="flex items-center gap-3 justify-center text-slate-300 font-medium md:text-lg">
-              <CalendarIcon className="text-[#E7162A] w-6 h-6" />
+              <motion.div animate={rotateAnim}>
+                <Clock className="text-[#E7162A] w-6 h-6" />
+              </motion.div>
               <span>SESSION DE LANCEMENT : <strong className="text-white">21 JUIN – 19 AOUT 2026 (02 MOIS)</strong></span>
             </div>
           </motion.div>
 
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}
             className="pt-8 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
           >
             <Button size="lg" asChild className="w-full sm:w-auto bg-[#E7162A] hover:bg-[#E7162A]/90 text-white font-bold h-14 px-8 text-lg rounded-xl shadow-[0_0_20px_rgba(231,22,42,0.4)]">
               <Link href="/register">Rejoindre la Session</Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="w-full sm:w-auto h-14 px-8 text-lg font-bold rounded-xl border-slate-700 hover:bg-slate-800 text-white">
-              <a href="#mission">Découvrir le programme</a>
-            </Button>
           </motion.div>
         </div>
       </header>
+
+      {/* POURQUOI NOUS ? */}
+      <section id="pourquoi-nous" className="py-24 px-4 bg-slate-900/50 border-t border-slate-800/50 relative">
+        <div className="max-w-7xl mx-auto space-y-16">
+          <div className="text-center space-y-4">
+            <Badge variant="secondary" className="bg-[#21286E]/40 text-blue-300 hover:bg-[#21286E]/50">L'Excellence PLA</Badge>
+            <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight uppercase">
+              POURQUOI NOUS CHOISIR ?
+            </h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+              L'anglais n'est pas une matière scolaire à mémoriser, c'est un muscle à entraîner. Voici pourquoi notre académie est différente de toutes les autres.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: BrainCircuit, color: "text-purple-400", title: "Zéro Traduction Mentale", desc: "Notre méthode force votre cerveau à penser directement en anglais, éliminant les hésitations et les blocages." },
+              { icon: Globe2, color: "text-blue-400", title: "Immersion Sans Voyager", desc: "Vivez une véritable immersion linguistique en plein cœur d'Abidjan, avec des mises en situation réelles." },
+              { icon: Target, color: "text-green-400", title: "Objectif ROI Rapide", desc: "Chaque séance est conçue pour un retour sur investissement immédiat dans votre carrière professionnelle." },
+              { icon: Star, color: "text-yellow-400", title: "Exigence & Certification", desc: "Nous ne faisons pas dans l'à-peu-près. Obtenez un niveau certifié et validé (Standard Européen CECRL)." }
+            ].map((item, idx) => (
+              <motion.div key={idx} whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
+                <Card className="bg-slate-900 border-slate-800 h-full">
+                  <CardHeader>
+                    <motion.div animate={pulseAnim} className="mb-4">
+                      <div className={`w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center ${item.color}`}>
+                        <item.icon className="w-6 h-6" />
+                      </div>
+                    </motion.div>
+                    <CardTitle className="text-lg text-white">{item.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* 1. MISSION */}
       <section id="mission" className="py-24 px-4 bg-slate-900">
@@ -126,29 +170,35 @@ export default function ClientLanding({ session }: { session: any }) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-slate-950 border-slate-800">
+            <Card className="bg-slate-950 border-slate-800 group hover:border-[#E7162A]/50 transition-colors">
               <CardHeader>
-                <MapPin className="w-10 h-10 text-[#E7162A] mb-2" />
+                <motion.div animate={bounceAnim} className="mb-2">
+                  <MapPin className="w-10 h-10 text-[#E7162A]" />
+                </motion.div>
                 <CardTitle className="text-xl text-white">Infrastructure</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-slate-400 leading-relaxed">Salles de formation climatisées permettant de mener confortablement les activités.</p>
+                <p className="text-slate-400 leading-relaxed">Salles de formation climatisées permettant de mener confortablement les activités interactives et les débats.</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-950 border-slate-800">
+            <Card className="bg-slate-950 border-slate-800 group hover:border-[#21286E] transition-colors">
               <CardHeader>
-                <GraduationCap className="w-10 h-10 text-[#21286E] mb-2" />
+                <motion.div animate={pulseAnim} className="mb-2">
+                  <Users className="w-10 h-10 text-[#5c68ea]" />
+                </motion.div>
                 <CardTitle className="text-xl text-white">Encadrement</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-slate-400 leading-relaxed">Formateurs experts mobilisés pour un suivi personnalisé et rigoureux.</p>
+                <p className="text-slate-400 leading-relaxed">Formateurs experts mobilisés pour un suivi personnalisé, une correction active et un mentorat continu.</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-950 border-slate-800">
+            <Card className="bg-slate-950 border-slate-800 group hover:border-orange-500/50 transition-colors">
               <CardHeader>
-                <Zap className="w-10 h-10 text-orange-500 mb-2" />
+                <motion.div animate={rotateAnim} className="mb-2">
+                  <Zap className="w-10 h-10 text-orange-500" />
+                </motion.div>
                 <CardTitle className="text-xl text-white">Méthode ISO+</CardTitle>
               </CardHeader>
               <CardContent>
@@ -159,9 +209,9 @@ export default function ClientLanding({ session }: { session: any }) {
         </div>
       </section>
 
-      {/* 2. GRILLE TARIFAIRE */}
-      <section id="tarifs" className="py-24 px-4 relative overflow-hidden">
-        <div className="max-w-6xl mx-auto space-y-16 relative z-10">
+      {/* 2. GRILLE TARIFAIRE DÉTAILLÉE */}
+      <section id="tarifs" className="py-24 px-4 relative overflow-hidden bg-slate-950">
+        <div className="max-w-7xl mx-auto space-y-16 relative z-10">
           <div className="text-center space-y-4">
             <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight flex flex-col items-center gap-2">
               <span className="text-[#E7162A] text-xl">2.</span>
@@ -170,60 +220,109 @@ export default function ClientLanding({ session }: { session: any }) {
             <Badge variant="secondary" className="bg-slate-800 text-slate-300 text-sm px-4 py-1">SESSION DE 02 MOIS</Badge>
           </div>
 
-          <Card className="bg-[#E7162A]/10 border-[#E7162A]/30 overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#E7162A]/20 blur-3xl" />
-            <CardHeader>
-              <CardTitle className="text-[#E7162A] text-xl md:text-2xl flex items-center gap-2">
-                <span>🎁</span> OFFRE DE LANCEMENT : INSCRIPTION OFFERTE (0 FCFA)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-slate-300 md:text-lg">
-                Le programme est ouvert aux inscriptions 8 semaines avant le début des cours, vous permettant de solder votre participation en toute sérénité avant le démarrage.
-              </p>
-            </CardContent>
-          </Card>
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <Card className="bg-[#E7162A]/10 border-[#E7162A]/30 overflow-hidden relative max-w-4xl mx-auto">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#E7162A]/20 blur-3xl" />
+              <CardHeader>
+                <CardTitle className="text-[#E7162A] text-xl md:text-2xl flex items-center gap-2">
+                  <motion.span animate={bounceAnim}>🎁</motion.span> OFFRE DE LANCEMENT : INSCRIPTION OFFERTE (0 FCFA)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-slate-300 md:text-lg">
+                  Le programme est ouvert aux inscriptions 8 semaines avant le début des cours, vous permettant de solder votre participation en toute sérénité avant le démarrage.
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {[
-              { name: "Loisir", freq: "1 séance / semaine", price: "50 000 FCFA" },
-              { name: "Essentiel", freq: "2 séances / semaine", price: "70 000 FCFA" },
-              { name: "Équilibre", freq: "3 séances / semaine", price: "90 000 FCFA" },
-              { name: "Performance", freq: "4 séances / semaine", price: "110 000 FCFA" },
-              { name: "Intensif", freq: "5 séances / semaine", price: "130 000 FCFA" },
-              { name: "Immersion", freq: "6 séances / semaine", price: "150 000 FCFA", highlight: true },
+              { 
+                name: "Loisir", freq: "1 séance / semaine", price: "50 000 FCFA", 
+                target: "Débutants absolus ou curieux.", 
+                use: "Découvrir la langue sans pression et maintenir un contact basique avec l'anglais."
+              },
+              { 
+                name: "Essentiel", freq: "2 séances / semaine", price: "70 000 FCFA", 
+                target: "Étudiants ou professionnels très occupés.", 
+                use: "Bâtir des fondations solides et comprendre la structure de base sans surcharger son emploi du temps."
+              },
+              { 
+                name: "Équilibre", freq: "3 séances / semaine", price: "90 000 FCFA", 
+                target: "Personnes cherchant le compromis idéal.", 
+                use: "Progresser régulièrement, enrichir son vocabulaire et commencer à converser avec confiance."
+              },
+              { 
+                name: "Performance", freq: "4 séances / semaine", price: "110 000 FCFA", 
+                target: "Professionnels préparant des réunions/examens.", 
+                use: "Développer une fluidité rapide, vaincre la peur de parler en public et maîtriser le jargon métier."
+              },
+              { 
+                name: "Intensif", freq: "5 séances / semaine", price: "130 000 FCFA", 
+                target: "Futurs expatriés ou managers d'équipes internationales.", 
+                use: "Atteindre un niveau opérationnel très rapidement pour interagir au quotidien (Business English)."
+              },
+              { 
+                name: "Immersion", freq: "6 séances / semaine", price: "150 000 FCFA", highlight: true,
+                target: "Ceux qui visent l'excellence et le bilinguisme total.", 
+                use: "Penser et rêver en anglais. Créer des réflexes natifs automatiques pour une maîtrise absolue."
+              },
             ].map((plan, idx) => (
-              <Card key={idx} className={`bg-slate-900 border-slate-800 relative transition-transform hover:-translate-y-1 ${plan.highlight ? 'ring-2 ring-[#E7162A] shadow-[0_0_30px_rgba(231,22,42,0.15)]' : ''}`}>
-                {plan.highlight && <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#E7162A] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Recommandé</div>}
-                <CardHeader>
-                  <CardTitle className="text-2xl text-white">{plan.name}</CardTitle>
-                  <CardDescription className="text-slate-400">{plan.freq}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-black text-white mb-6">{plan.price}</div>
-                  <Button asChild className={`w-full font-bold ${plan.highlight ? 'bg-[#E7162A] hover:bg-[#E7162A]/90 text-white' : 'bg-slate-800 hover:bg-slate-700 text-white'}`}>
-                    <Link href="/register">Sélectionner</Link>
-                  </Button>
-                </CardContent>
-              </Card>
+              <motion.div key={idx} whileHover={{ y: -8 }} transition={{ duration: 0.3 }} className="h-full">
+                <Card className={`h-full flex flex-col bg-slate-900 border-slate-800 relative ${plan.highlight ? 'ring-2 ring-[#E7162A] shadow-[0_0_30px_rgba(231,22,42,0.15)]' : ''}`}>
+                  {plan.highlight && <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#E7162A] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Le Summum</div>}
+                  <CardHeader>
+                    <div className="flex justify-between items-start mb-2">
+                      <CardTitle className="text-2xl text-white">{plan.name}</CardTitle>
+                      <Badge variant="outline" className="text-slate-400 border-slate-700">{plan.freq}</Badge>
+                    </div>
+                    <div className="text-3xl font-black text-white">{plan.price}</div>
+                  </CardHeader>
+                  <CardContent className="flex-1 space-y-4">
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+                        <Users className="w-3 h-3"/> À qui est-ce destiné ?
+                      </h4>
+                      <p className="text-slate-300 text-sm">{plan.target}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+                        <Target className="w-3 h-3"/> À quoi ça sert ?
+                      </h4>
+                      <p className="text-slate-300 text-sm">{plan.use}</p>
+                    </div>
+                  </CardContent>
+                  <div className="p-6 pt-0 mt-auto">
+                    <Button asChild className={`w-full font-bold ${plan.highlight ? 'bg-[#E7162A] hover:bg-[#E7162A]/90 text-white' : 'bg-slate-800 hover:bg-slate-700 text-white'}`}>
+                      <Link href="/register">Sélectionner</Link>
+                    </Button>
+                  </div>
+                </Card>
+              </motion.div>
             ))}
           </div>
 
+          {/* Choix du parcours & Paiement */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-8">
             <Card className="bg-slate-900 border-slate-800">
               <CardHeader>
-                <CardTitle className="text-lg text-[#E7162A] flex items-center gap-2"><Target className="w-5 h-5"/> Choix du Parcours</CardTitle>
+                <CardTitle className="text-lg text-[#E7162A] flex items-center gap-2">
+                  <motion.div animate={pulseAnim}><Target className="w-5 h-5"/></motion.div> Choix du Parcours
+                </CardTitle>
               </CardHeader>
               <CardContent className="text-slate-400 leading-relaxed text-sm">
-                Vous devez opter soit pour la Formation Régulière (bases et structure), soit pour le Club d’Anglais (pratique et fluidité). Ces parcours sont distincts et ne sont pas cumulables simultanément. Apres votre programme de formation régulière (2 mois) vous rejoignez le programme du Club d’Anglais.
+                Vous devez opter soit pour la <strong>Formation Régulière</strong> (bases et structure), soit pour le <strong>Club d’Anglais</strong> (pratique et fluidité). Ces parcours sont distincts et ne sont pas cumulables simultanément. Après votre programme de formation régulière (2 mois), vous rejoignez le programme du Club d’Anglais.
               </CardContent>
             </Card>
             <Card className="bg-slate-900 border-slate-800">
               <CardHeader>
-                <CardTitle className="text-lg text-[#E7162A] flex items-center gap-2"><Shield className="w-5 h-5"/> Paiement</CardTitle>
+                <CardTitle className="text-lg text-[#E7162A] flex items-center gap-2">
+                  <motion.div animate={bounceAnim}><Shield className="w-5 h-5"/></motion.div> Paiement Exigé
+                </CardTitle>
               </CardHeader>
               <CardContent className="text-slate-400 leading-relaxed text-sm">
-                Le solde total doit être réglé avant le début de la formation pour garantir votre place.
+                Le solde total doit être réglé en intégralité avant le début de la formation pour garantir votre place et confirmer votre engagement vers l'excellence.
               </CardContent>
             </Card>
           </div>
@@ -245,26 +344,34 @@ export default function ClientLanding({ session }: { session: any }) {
             </div>
             
             <div className="space-y-4">
-              <Card className="bg-[#21286E]/20 border-[#21286E]/50">
-                <CardHeader className="py-4">
-                  <CardTitle className="text-slate-300 text-base font-semibold">Vague 1</CardTitle>
-                  <CardDescription className="text-2xl font-black text-white mt-1">16h00 – 18h00</CardDescription>
-                </CardHeader>
-              </Card>
-              <Card className="bg-[#21286E]/20 border-[#21286E]/50">
-                <CardHeader className="py-4">
-                  <CardTitle className="text-slate-300 text-base font-semibold">Vague 2</CardTitle>
-                  <CardDescription className="text-2xl font-black text-white mt-1">18h00 – 20h00</CardDescription>
-                </CardHeader>
-              </Card>
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300 }}>
+                <Card className="bg-[#21286E]/20 border-[#21286E]/50 overflow-hidden relative group">
+                  <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#E7162A] transform translate-x-full group-hover:translate-x-0 transition-transform"/>
+                  <CardHeader className="py-5">
+                    <CardTitle className="text-slate-300 text-base font-semibold uppercase tracking-widest">Vague 1</CardTitle>
+                    <CardDescription className="text-3xl font-black text-white mt-1">16h00 – 18h00</CardDescription>
+                  </CardHeader>
+                </Card>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300 }}>
+                <Card className="bg-[#21286E]/20 border-[#21286E]/50 overflow-hidden relative group">
+                  <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#E7162A] transform translate-x-full group-hover:translate-x-0 transition-transform"/>
+                  <CardHeader className="py-5">
+                    <CardTitle className="text-slate-300 text-base font-semibold uppercase tracking-widest">Vague 2</CardTitle>
+                    <CardDescription className="text-3xl font-black text-white mt-1">18h00 – 20h00</CardDescription>
+                  </CardHeader>
+                </Card>
+              </motion.div>
             </div>
           </div>
 
           <div className="lg:col-span-7 space-y-8" id="faq">
             <div className="space-y-4">
               <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#E7162A] text-xl">3.</span> RÉPONSES À VOS PRÉOCCUPATIONS (FAQ)
+                <span className="text-[#E7162A] text-xl">3.</span> FAQ
               </h2>
+              <p className="text-slate-400">Réponses rapides à vos préoccupations fréquentes.</p>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -274,7 +381,7 @@ export default function ClientLanding({ session }: { session: any }) {
                 { title: "Reconnaissance", desc: "Nous délivrons une Attestation de Formation en fin de session, certifiant votre assiduité et votre niveau selon le cadre européen (A1 à C2)." },
                 { title: "Confort au Centre", desc: "Profitez d'un espace sécurisé avec WiFi haut débit, parking, et un espace \"breakout\" pour vos rafraîchissements." }
               ].map((faq, i) => (
-                <div key={i} className="space-y-2">
+                <motion.div key={i} whileHover={{ x: 5 }} className="space-y-2 p-4 rounded-lg hover:bg-slate-800/50 transition-colors border border-transparent hover:border-slate-800">
                   <h4 className="font-bold text-white flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-[#E7162A]" />
                     {faq.title}
@@ -282,7 +389,7 @@ export default function ClientLanding({ session }: { session: any }) {
                   <p className="text-slate-400 text-sm leading-relaxed pl-6">
                     {faq.desc}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -291,7 +398,7 @@ export default function ClientLanding({ session }: { session: any }) {
       </section>
 
       {/* 5. FOOTER / INSCRIPTION */}
-      <footer className="py-24 px-4 border-t border-slate-800 relative overflow-hidden">
+      <footer className="py-24 px-4 border-t border-slate-800 relative overflow-hidden bg-[#060A14]">
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-[#21286E]/10 blur-[150px] pointer-events-none" />
         
         <div className="max-w-4xl mx-auto relative z-10">
@@ -300,56 +407,57 @@ export default function ClientLanding({ session }: { session: any }) {
               <span className="text-[#E7162A] text-xl">5.</span>
               INSCRIPTION & RÉSERVATION
             </h2>
+            <p className="text-slate-400">Prenez votre avenir en main dès aujourd'hui.</p>
           </div>
 
           <Card className="bg-slate-900/80 border-slate-800 backdrop-blur-xl">
             <CardContent className="pt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="bg-slate-800 w-10 h-10 rounded-full flex items-center justify-center shrink-0">
-                    <Target className="w-5 h-5 text-[#E7162A]" />
-                  </div>
+                <div className="flex gap-4 group">
+                  <motion.div animate={pulseAnim} className="bg-slate-800 w-12 h-12 rounded-full flex items-center justify-center shrink-0 group-hover:bg-[#E7162A]/20 transition-colors">
+                    <Target className="w-6 h-6 text-[#E7162A]" />
+                  </motion.div>
                   <div>
-                    <h4 className="text-white font-bold mb-1">Test de niveau gratuit</h4>
+                    <h4 className="text-white font-bold mb-1 text-lg">Test de niveau gratuit</h4>
                     <p className="text-slate-400 text-sm">Indispensable pour votre orientation.</p>
                   </div>
                 </div>
                 
-                <div className="flex gap-4">
-                  <div className="bg-slate-800 w-10 h-10 rounded-full flex items-center justify-center shrink-0">
-                    <Clock className="w-5 h-5 text-[#E7162A]" />
-                  </div>
+                <div className="flex gap-4 group">
+                  <motion.div animate={rotateAnim} className="bg-slate-800 w-12 h-12 rounded-full flex items-center justify-center shrink-0 group-hover:bg-[#E7162A]/20 transition-colors">
+                    <Clock className="w-6 h-6 text-[#E7162A]" />
+                  </motion.div>
                   <div>
-                    <h4 className="text-white font-bold mb-1">RDV Consultant (Visio/Vocal)</h4>
-                    <p className="text-slate-400 text-sm">Mardi (10h-14h) et Jeudi (9h-14h).</p>
+                    <h4 className="text-white font-bold mb-1 text-lg">RDV Consultant</h4>
+                    <p className="text-slate-400 text-sm">Mardi (10h-14h) et Jeudi (9h-14h) en Visio ou Vocal.</p>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="bg-slate-800 w-10 h-10 rounded-full flex items-center justify-center shrink-0">
-                    <MapPin className="w-5 h-5 text-[#E7162A]" />
-                  </div>
+                <div className="flex gap-4 group">
+                  <motion.div animate={bounceAnim} className="bg-slate-800 w-12 h-12 rounded-full flex items-center justify-center shrink-0 group-hover:bg-[#E7162A]/20 transition-colors">
+                    <MapPin className="w-6 h-6 text-[#E7162A]" />
+                  </motion.div>
                   <div>
-                    <h4 className="text-white font-bold mb-1">Localisation</h4>
+                    <h4 className="text-white font-bold mb-1 text-lg">Localisation</h4>
                     <p className="text-slate-400 text-sm">Angré 8e Tranche, Zone Bon Prix (à 120m en face du carrefour Pain du Quotidien).</p>
                   </div>
                 </div>
                 
-                <div className="flex gap-4">
-                  <div className="bg-slate-800 w-10 h-10 rounded-full flex items-center justify-center shrink-0">
-                    <Phone className="w-5 h-5 text-[#E7162A]" />
-                  </div>
+                <div className="flex gap-4 group">
+                  <motion.div animate={pulseAnim} className="bg-slate-800 w-12 h-12 rounded-full flex items-center justify-center shrink-0 group-hover:bg-[#E7162A]/20 transition-colors">
+                    <Phone className="w-6 h-6 text-[#E7162A]" />
+                  </motion.div>
                   <div>
-                    <h4 className="text-white font-bold mb-1">WhatsApp / Tel</h4>
-                    <a href="tel:+2250161337864" className="text-slate-400 hover:text-white transition-colors text-sm">+225 01 61 33 78 64</a>
+                    <h4 className="text-white font-bold mb-1 text-lg">WhatsApp / Tel</h4>
+                    <a href="tel:+2250161337864" className="text-slate-400 hover:text-white transition-colors text-sm font-medium">+225 01 61 33 78 64</a>
                   </div>
                 </div>
               </div>
             </CardContent>
-            <div className="border-t border-slate-800 p-8 text-center bg-slate-900/50">
-              <Button size="lg" asChild className="w-full sm:w-auto bg-[#E7162A] hover:bg-[#E7162A]/90 text-white font-bold h-14 px-12 text-lg rounded-xl">
+            <div className="border-t border-slate-800 p-8 text-center bg-slate-900/50 rounded-b-xl">
+              <Button size="lg" asChild className="w-full sm:w-auto bg-[#E7162A] hover:bg-[#E7162A]/90 text-white font-bold h-14 px-12 text-lg rounded-xl shadow-[0_0_20px_rgba(231,22,42,0.4)]">
                 <Link href="/register">Procéder à l'inscription</Link>
               </Button>
             </div>
@@ -372,27 +480,4 @@ export default function ClientLanding({ session }: { session: any }) {
       </footer>
     </div>
   );
-}
-
-// Temporary icon to avoid importing Calendar from lucide if not present or to avoid naming conflicts
-function CalendarIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M8 2v4" />
-      <path d="M16 2v4" />
-      <rect width="18" height="18" x="3" y="4" rx="2" />
-      <path d="M3 10h18" />
-    </svg>
-  )
 }
