@@ -107,3 +107,6 @@ Offrir un écosystème autonome où les étudiants peuvent s'inscrire, payer, su
 - *Date :* [22/04/2026]
 - *Action :* Intégration de shadcn/ui, création du système de RDV public, refonte du formulaire RDV étudiant, et correction des bugs d'encodage/build.
 - *Status :* Système de RDV et UI modernisés. Build stabilisé.
+- *Date :* [25/04/2026]
+- *Action :* Refonte visuelle "Premium Dark", intégration du blog (25 articles), ajout des particules flottantes, implémentation du mode Sombre/Clair, et intégration de la vision "Language Mastery Academy".
+- *Status :* Site moderne, immersif et prêt pour la production.
