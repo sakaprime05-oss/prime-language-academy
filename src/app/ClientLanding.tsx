@@ -1,564 +1,324 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import Image from "next/image";
-import { CheckCircle2, Clock, MapPin, Phone, Shield, Target, GraduationCap, Zap, Star, Users, BrainCircuit, Globe2 } from "lucide-react";
-import { ParticlesBackground } from "@/components/particles";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { useState, useEffect, useRef } from "react";
+import { OwlMascot } from "@/components/owl-mascot";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+/* ── tiny helpers ── */
+const PLANS = [
+  { id:"loisir",      freq:"1×/sem",  price:"50 000",  label:"Loisir" },
+  { id:"essentiel",   freq:"2×/sem",  price:"70 000",  label:"Essentiel" },
+  { id:"equilibre",   freq:"3×/sem",  price:"90 000",  label:"Équilibre" },
+  { id:"performance", freq:"4×/sem",  price:"110 000", label:"Performance" },
+  { id:"intensif",    freq:"5×/sem",  price:"130 000", label:"Intensif" },
+  { id:"immersion",   freq:"6×/sem",  price:"150 000", label:"Immersion", top:true },
+];
+
+const MARQUEE_WORDS = ["Speaking","Confidence","Fluency","Excellence","Bilinguisme","Impact","Immersion","Mastery","Progress","Growth"];
+
+const WHY = [
+  { n:"01", title:"Méthode ISO+", desc:"Input → Structure → Output → Automatisation. Votre cerveau pense directement en anglais." },
+  { n:"02", title:"Formateurs experts", desc:"Suivi personnalisé, corrections actives, mentorat continu pour chaque apprenant." },
+  { n:"03", title:"Flexibilité totale", desc:"1 à 6 séances par semaine. Rattrapage possible le même jour sur une autre vague." },
+  { n:"04", title:"Certification CECRL", desc:"Attestation officielle A1→C2 remise en fin de session, reconnue à l'international." },
+];
 
 export default function ClientLanding({ session }: { session: any }) {
-  // Animation variants for "Lottie-style" continuous icon animations
-  const bounceAnim = {
-    y: [0, -8, 0],
-    transition: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-  };
-  
-  const pulseAnim = {
-    scale: [1, 1.1, 1],
-    transition: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-  };
+  const [scrolled, setScrolled] = useState(false);
+  const [activePlan, setActivePlan] = useState("immersion");
 
-  const rotateAnim = {
-    rotate: [0, 10, -10, 0],
-    transition: { duration: 3, repeat: Infinity, ease: "easeInOut" }
-  };
+  useEffect(() => {
+    const h = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", h);
+    return () => window.removeEventListener("scroll", h);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans selection:bg-[#E7162A]/30 relative overflow-hidden">
-      <ParticlesBackground />
-      
-      {/* NAVIGATION */}
-      <nav className="fixed top-0 w-full z-50 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-xl border-b border-white/10 px-4 py-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 transition-transform group-hover:scale-105">
-              <Image 
-                src="/icon-512x512.png" 
-                alt="PLA Logo" 
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-            <span className="font-extrabold tracking-tight text-xl text-slate-900 dark:text-white hidden sm:block">
-              Prime Academy
-            </span>
-          </Link>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-700 dark:text-slate-300">
-            <a href="#mission" className="hover:text-slate-900 dark:text-white transition-colors">Mission</a>
-            <a href="#pourquoi-nous" className="hover:text-slate-900 dark:text-white transition-colors">Pourquoi Nous</a>
-            <a href="#tarifs" className="hover:text-slate-900 dark:text-white transition-colors">Tarifs</a>
-            <a href="#faq" className="hover:text-slate-900 dark:text-white transition-colors">FAQ</a>
-            <Link href="/blog" className="hover:text-slate-900 dark:text-white transition-colors flex items-center gap-1">
-              Blog <span className="text-xs bg-[#E7162A]/20 text-[#E7162A] px-1.5 py-0.5 rounded ml-1 font-bold">NEW</span>
+    <div style={{ background:"#080808", color:"#F5F0E8", fontFamily:"'Inter', sans-serif", overflowX:"hidden" }}>
+
+      {/* ══════════ NAV ══════════ */}
+      <nav style={{
+        position:"fixed", top:0, width:"100%", zIndex:100,
+        background: scrolled ? "rgba(8,8,8,0.92)" : "transparent",
+        backdropFilter: scrolled ? "blur(20px)" : "none",
+        borderBottom: scrolled ? "1px solid rgba(212,175,55,0.12)" : "1px solid transparent",
+        transition:"all 0.4s ease",
+        padding:"0 2rem",
+        display:"flex", alignItems:"center", justifyContent:"space-between",
+        height:"72px",
+      }}>
+        <Link href="/" style={{ display:"flex", alignItems:"center", gap:"12px", textDecoration:"none" }}>
+          <div style={{
+            width:36, height:36, borderRadius:"50%",
+            background:"linear-gradient(135deg,#D4AF37,#A08828)",
+            display:"flex", alignItems:"center", justifyContent:"center",
+            fontSize:16, fontWeight:900, color:"#080808",
+          }}>P</div>
+          <span style={{ fontFamily:"'Playfair Display', serif", fontWeight:700, fontSize:18, color:"#F5F0E8", letterSpacing:"0.02em" }}>
+            Prime<span style={{ color:"#D4AF37" }}>.</span>
+          </span>
+        </Link>
+
+        <div style={{ display:"flex", gap:"2.5rem", fontSize:13, fontWeight:500, letterSpacing:"0.08em", textTransform:"uppercase", color:"rgba(245,240,232,0.55)" }}>
+          {[["Mission","#mission"],["Méthode","#methode"],["Tarifs","#tarifs"],["Blog","/blog"]].map(([l,h]) => (
+            <Link key={l} href={h} style={{ color:"inherit", textDecoration:"none", transition:"color 0.2s" }}
+              onMouseEnter={e=>(e.currentTarget.style.color="#D4AF37")}
+              onMouseLeave={e=>(e.currentTarget.style.color="rgba(245,240,232,0.55)")}>{l}</Link>
+          ))}
+        </div>
+
+        <div style={{ display:"flex", gap:"12px", alignItems:"center" }}>
+          {session ? (
+            <Link href="/dashboard" className="btn-primary" style={{ textDecoration:"none", padding:"10px 24px", fontSize:12 }}>
+              Mon Espace
             </Link>
-          </div>
-          <div className="flex items-center gap-4">
-            {session ? (
-              <Button asChild className="bg-[#E7162A] hover:bg-[#E7162A]/90 text-slate-900 dark:text-white font-bold">
-                <Link href="/dashboard">Mon Espace</Link>
-              </Button>
-            ) : (
-              <>
-                <Link href="/login" className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-white hidden sm:block">
-                  Connexion
-                </Link>
-                <Button asChild className="bg-[#E7162A] hover:bg-[#E7162A]/90 text-slate-900 dark:text-white font-bold shadow-[0_0_15px_rgba(231,22,42,0.3)] hover:shadow-[0_0_25px_rgba(231,22,42,0.5)] transition-shadow">
-                  <Link href="/register">S'inscrire</Link>
-                </Button>
-              </>
-            )}
-            <ThemeToggle />
-          </div>
+          ) : (
+            <>
+              <Link href="/login" style={{ fontSize:13, color:"rgba(245,240,232,0.5)", textDecoration:"none", letterSpacing:"0.05em" }}>Connexion</Link>
+              <Link href="/register" className="btn-primary" style={{ textDecoration:"none", padding:"10px 24px", fontSize:12 }}>
+                S'inscrire
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
-      {/* HERO SECTION */}
-      <header className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-4 flex flex-col justify-center items-center text-center overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#21286E]/20 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#E7162A]/10 rounded-full blur-[100px] pointer-events-none" />
-        
-        <div className="max-w-5xl mx-auto relative z-10 space-y-6 md:space-y-8 flex flex-col items-center">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
-            <Badge variant="outline" className="border-[#E7162A]/50 bg-[#E7162A]/10 text-[#E7162A] px-3 md:px-4 py-1.5 text-[10px] md:text-xs font-bold tracking-widest uppercase mb-2 md:mb-4 shadow-[0_0_15px_rgba(231,22,42,0.2)] text-center w-full block sm:inline-block max-w-[90vw] leading-relaxed">
-              PROGRAMME OFFICIEL DE FORMATION : PRIME LANGUAGE ACADEMY (PLA)
-            </Badge>
-          </motion.div>
-          
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-slate-900 dark:text-white tracking-tighter leading-[1.1] md:leading-[1.1]"
-          >
-            Parlez anglais. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E7162A] to-orange-500">
-              Vivez des opportunités.
-            </span>
-          </motion.h1>
+      {/* ══════════ HERO ══════════ */}
+      <section style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", padding:"120px 2rem 80px", overflow:"hidden" }}>
+        {/* Glow blobs */}
+        <div style={{ position:"absolute", top:"20%", left:"15%", width:500, height:500, borderRadius:"50%", background:"rgba(212,175,55,0.06)", filter:"blur(100px)", pointerEvents:"none" }}/>
+        <div style={{ position:"absolute", bottom:"10%", right:"10%", width:400, height:400, borderRadius:"50%", background:"rgba(212,175,55,0.04)", filter:"blur(120px)", pointerEvents:"none" }}/>
+        {/* Grid lines */}
+        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(212,175,55,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,55,0.03) 1px, transparent 1px)", backgroundSize:"80px 80px", pointerEvents:"none" }}/>
 
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-white dark:bg-slate-900/50 border border-slate-800 backdrop-blur-sm rounded-2xl p-4 md:p-6 inline-block mt-4"
-          >
-            <div className="flex flex-col sm:flex-row items-center gap-2 md:gap-3 justify-center text-slate-700 dark:text-slate-300 font-medium text-sm md:text-lg text-center">
-              <motion.div animate={rotateAnim}>
-                <Clock className="text-[#E7162A] w-5 h-5 md:w-6 md:h-6" />
-              </motion.div>
-              <span>SESSION DE LANCEMENT : <strong className="text-slate-900 dark:text-white block sm:inline mt-1 sm:mt-0">21 JUIN – 19 AOUT 2026 (02 MOIS)</strong></span>
-            </div>
-          </motion.div>
+        <div style={{ maxWidth:1200, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"80px", alignItems:"center", position:"relative", zIndex:1 }}>
 
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}
-            className="pt-8 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
-          >
-            <Button size="lg" asChild className="w-full sm:w-auto bg-[#E7162A] hover:bg-[#E7162A]/90 text-slate-900 dark:text-white font-bold h-14 px-8 text-lg rounded-xl shadow-[0_0_20px_rgba(231,22,42,0.4)]">
-              <Link href="/register">Rejoindre la Session</Link>
-            </Button>
-          </motion.div>
-        </div>
-      </header>
-
-      {/* NOTRE VISION : Language Mastery Academy */}
-      <section id="vision" className="py-24 px-4 bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#21286E]/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="max-w-4xl mx-auto space-y-12 relative z-10">
-          <div className="text-center space-y-4">
-            <Badge variant="secondary" className="bg-[#E7162A]/10 text-[#E7162A] hover:bg-[#E7162A]/20 px-4 py-1">Notre Identité</Badge>
-            <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-              LANGUAGE MASTERY ACADEMY
-            </h2>
-          </div>
-
-          <div className="prose prose-invert prose-lg max-w-none text-slate-700 dark:text-slate-300 leading-relaxed">
-            <p className="text-xl md:text-2xl text-slate-900 dark:text-white font-medium mb-12 text-center leading-relaxed">
-              L’ambition d’offrir une vraie maîtrise — <span className="text-[#E7162A]">pas seulement des notions.</span>
-            </p>
-            
-            <p className="mb-6">
-              C’est la volonté d’accompagner les professionnels, les étudiants, les entrepreneurs et les acteurs du changement, à devenir à l’aise, confiants et efficaces dans leur communication multilingue.
-            </p>
-            
-            <p className="mb-10">
-              Dans l’espace francophone africain, la maîtrise de langues étrangères reste un frein majeur pour beaucoup, alors même qu’elle est devenue une compétence clé dans le monde professionnel, académique et entrepreneurial. Language Mastery Academy est née d’un constat simple, mais profond : dans un environnement majoritairement francophone, apprendre une langue étrangère — notamment l’anglais — reste un défi majeur pour beaucoup, malgré les nombreuses tentatives et offres de formation existantes.
-            </p>
-            
-            <h3 className="text-2xl text-slate-900 dark:text-white font-bold mt-12 mb-6 flex items-center gap-3">
-              <span className="bg-[#E7162A] text-slate-900 dark:text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">?</span>
-              Pourquoi ?
-            </h3>
-            <p className="mb-4">Parce que ces offres ne prennent pas toujours en compte les réalités spécifiques des apprenants francophones :</p>
-            <ul className="list-none space-y-3 pl-0 my-6 bg-white dark:bg-slate-900/50 p-6 rounded-xl border border-slate-800">
-              <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 rounded-full bg-[#E7162A] shrink-0" /> les blocages psychologiques liés à l’oral,</li>
-              <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 rounded-full bg-[#E7162A] shrink-0" /> la peur de faire des fautes,</li>
-              <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 rounded-full bg-[#E7162A] shrink-0" /> l’absence d’un cadre progressif,</li>
-              <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 rounded-full bg-[#E7162A] shrink-0" /> ou encore le manque d’une approche réellement pratique et adaptée.</li>
-            </ul>
-
-            <p className="mt-10 mb-10">
-              <strong className="text-slate-900 dark:text-white">Nous connaissons notre public.</strong> Nous savons que derrière chaque apprenant, il y a un professionnel, un entrepreneur, un étudiant ou un travailleur ambitieux, confronté à la mondialisation, à la compétitivité, et à la nécessité de communiquer efficacement.
-            </p>
-            
-            <h3 className="text-2xl text-slate-900 dark:text-white font-bold mt-12 mb-6">Une solution ciblée</h3>
-            <p className="mb-6">Language Mastery Academy a donc été pensée comme une solution ciblée :</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-8">
-              <div className="flex items-start gap-3 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-800">
-                <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" /> 
-                <span className="text-sm md:text-base font-medium">Une pédagogie claire et structurée</span>
-              </div>
-              <div className="flex items-start gap-3 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-800">
-                <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" /> 
-                <span className="text-sm md:text-base font-medium">Un accompagnement humain et motivant</span>
-              </div>
-              <div className="flex items-start gap-3 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-800">
-                <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" /> 
-                <span className="text-sm md:text-base font-medium">Des formats flexibles</span>
-              </div>
-              <div className="flex items-start gap-3 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-800">
-                <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" /> 
-                <span className="text-sm md:text-base font-medium">Priorité donnée à la maîtrise active de la langue</span>
-              </div>
+          {/* Left */}
+          <div>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:8, border:"1px solid rgba(212,175,55,0.3)", borderRadius:100, padding:"6px 18px", marginBottom:32, background:"rgba(212,175,55,0.06)" }}>
+              <span style={{ width:6, height:6, borderRadius:"50%", background:"#D4AF37", display:"inline-block", animation:"ping 2s infinite" }}/>
+              <span style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#D4AF37", fontWeight:600 }}>Session Juin – Août 2026</span>
             </div>
 
-            <div className="bg-gradient-to-br from-slate-900 to-[#21286E]/20 border border-[#21286E]/30 p-8 md:p-12 rounded-[2rem] mt-16 text-center relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#E7162A] to-transparent opacity-50" />
-              <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-6">Notre mission ?</h3>
-              <p className="text-lg md:text-xl text-slate-700 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto">
-                Aider chaque apprenant à prendre confiance, progresser avec méthode, et s’exprimer avec impact dans une langue étrangère.
-                <br /><br />
-                <strong className="text-slate-900 dark:text-white block text-2xl mb-4">Nous ne formons pas juste à parler anglais.</strong>
-                <span className="text-[#E7162A] font-bold">Nous aidons à débloquer le potentiel</span> de celles et ceux qui veulent faire la différence.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+            <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(3rem,6vw,5.5rem)", lineHeight:1.05, fontWeight:900, marginBottom:28, letterSpacing:"-0.02em" }}>
+              Parlez anglais.<br/>
+              <em style={{ color:"#D4AF37", fontStyle:"italic" }}>Vivez des</em><br/>
+              opportunités.
+            </h1>
 
-      {/* POURQUOI NOUS ? */}
-      <section id="pourquoi-nous" className="py-24 px-4 bg-white dark:bg-slate-900/50 border-t border-slate-800/50 relative">
-        <div className="max-w-7xl mx-auto space-y-16">
-          <div className="text-center space-y-4">
-            <Badge variant="secondary" className="bg-[#21286E]/40 text-blue-300 hover:bg-[#21286E]/50">L'Excellence PLA</Badge>
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
-              POURQUOI NOUS CHOISIR ?
-            </h2>
-            <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto">
-              L'anglais n'est pas une matière scolaire à mémoriser, c'est un muscle à entraîner. Voici pourquoi notre académie est différente de toutes les autres.
+            <p style={{ fontSize:17, lineHeight:1.75, color:"rgba(245,240,232,0.6)", maxWidth:480, marginBottom:44 }}>
+              Language Mastery Academy accompagne professionnels, étudiants et entrepreneurs francophones vers une maîtrise confiante et efficace de l'anglais.
             </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: BrainCircuit, color: "text-purple-400", title: "Zéro Traduction Mentale", desc: "Notre méthode force votre cerveau à penser directement en anglais, éliminant les hésitations et les blocages." },
-              { icon: Globe2, color: "text-blue-400", title: "Immersion Sans Voyager", desc: "Vivez une véritable immersion linguistique en plein cœur d'Abidjan, avec des mises en situation réelles." },
-              { icon: Target, color: "text-green-400", title: "Objectif ROI Rapide", desc: "Chaque séance est conçue pour un retour sur investissement immédiat dans votre carrière professionnelle." },
-              { icon: Star, color: "text-yellow-400", title: "Exigence & Certification", desc: "Nous ne faisons pas dans l'à-peu-près. Obtenez un niveau certifié et validé (Standard Européen CECRL)." }
-            ].map((item, idx) => (
-              <motion.div key={idx} whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-                <Card className="bg-white dark:bg-slate-900 border-slate-800 h-full">
-                  <CardHeader>
-                    <motion.div animate={pulseAnim} className="mb-4">
-                      <div className={`w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center ${item.color}`}>
-                        <item.icon className="w-6 h-6" />
-                      </div>
-                    </motion.div>
-                    <CardTitle className="text-lg text-slate-900 dark:text-white">{item.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{item.desc}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 1. MISSION */}
-      <section id="mission" className="py-24 px-4 bg-white dark:bg-slate-900">
-        <div className="max-w-7xl mx-auto space-y-16">
-          <div className="max-w-3xl text-center mx-auto space-y-4">
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight flex flex-col items-center gap-2">
-              <span className="text-[#E7162A] text-xl">1.</span>
-              NOTRE MISSION : L’IMMERSION PREMIUM À ABIDJAN
-            </h2>
-            <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
-              Dans un environnement majoritairement francophone, PLA transforme l'anglais en une compétence réelle et vivante. Pour cette session, nous doublons nos capacités pour vous offrir un cadre d'apprentissage d'élite.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-slate-50 dark:bg-slate-950 border-slate-800 group hover:border-[#E7162A]/50 transition-colors">
-              <CardHeader>
-                <motion.div animate={bounceAnim} className="mb-2">
-                  <MapPin className="w-10 h-10 text-[#E7162A]" />
-                </motion.div>
-                <CardTitle className="text-xl text-slate-900 dark:text-white">Infrastructure</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 leading-relaxed">Salles de formation climatisées permettant de mener confortablement les activités interactives et les débats.</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-slate-50 dark:bg-slate-950 border-slate-800 group hover:border-[#21286E] transition-colors">
-              <CardHeader>
-                <motion.div animate={pulseAnim} className="mb-2">
-                  <Users className="w-10 h-10 text-[#5c68ea]" />
-                </motion.div>
-                <CardTitle className="text-xl text-slate-900 dark:text-white">Encadrement</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 leading-relaxed">Formateurs experts mobilisés pour un suivi personnalisé, une correction active et un mentorat continu.</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-slate-50 dark:bg-slate-950 border-slate-800 group hover:border-orange-500/50 transition-colors">
-              <CardHeader>
-                <motion.div animate={rotateAnim} className="mb-2">
-                  <Zap className="w-10 h-10 text-orange-500" />
-                </motion.div>
-                <CardTitle className="text-xl text-slate-900 dark:text-white">Méthode ISO+</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 leading-relaxed">Un processus dynamique (Input, Structure, Output, Automatisation) pour transformer vos connaissances en réflexes naturels.</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. GRILLE TARIFAIRE DÉTAILLÉE */}
-      <section id="tarifs" className="py-24 px-4 relative overflow-hidden bg-slate-50 dark:bg-slate-950">
-        <div className="max-w-7xl mx-auto space-y-16 relative z-10">
-          <div className="text-center space-y-4">
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight flex flex-col items-center gap-2">
-              <span className="text-[#E7162A] text-xl">2.</span>
-              GRILLE TARIFAIRE "À LA CARTE"
-            </h2>
-            <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm px-4 py-1">SESSION DE 02 MOIS</Badge>
-          </div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <Card className="bg-[#E7162A]/10 border-[#E7162A]/30 overflow-hidden relative max-w-4xl mx-auto">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#E7162A]/20 blur-3xl" />
-              <CardHeader>
-                <CardTitle className="text-[#E7162A] text-xl md:text-2xl flex items-center gap-2">
-                  <motion.span animate={bounceAnim}>🎁</motion.span> OFFRE DE LANCEMENT : INSCRIPTION OFFERTE (0 FCFA)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-slate-700 dark:text-slate-300 md:text-lg">
-                  Le programme est ouvert aux inscriptions 8 semaines avant le début des cours, vous permettant de solder votre participation en toute sérénité avant le démarrage.
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {[
-              { 
-                name: "Loisir", freq: "1 séance / semaine", price: "50 000 FCFA", 
-                target: "Débutants absolus ou curieux.", 
-                use: "Découvrir la langue sans pression et maintenir un contact basique avec l'anglais."
-              },
-              { 
-                name: "Essentiel", freq: "2 séances / semaine", price: "70 000 FCFA", 
-                target: "Étudiants ou professionnels très occupés.", 
-                use: "Bâtir des fondations solides et comprendre la structure de base sans surcharger son emploi du temps."
-              },
-              { 
-                name: "Équilibre", freq: "3 séances / semaine", price: "90 000 FCFA", 
-                target: "Personnes cherchant le compromis idéal.", 
-                use: "Progresser régulièrement, enrichir son vocabulaire et commencer à converser avec confiance."
-              },
-              { 
-                name: "Performance", freq: "4 séances / semaine", price: "110 000 FCFA", 
-                target: "Professionnels préparant des réunions/examens.", 
-                use: "Développer une fluidité rapide, vaincre la peur de parler en public et maîtriser le jargon métier."
-              },
-              { 
-                name: "Intensif", freq: "5 séances / semaine", price: "130 000 FCFA", 
-                target: "Futurs expatriés ou managers d'équipes internationales.", 
-                use: "Atteindre un niveau opérationnel très rapidement pour interagir au quotidien (Business English)."
-              },
-              { 
-                name: "Immersion", freq: "6 séances / semaine", price: "150 000 FCFA", highlight: true,
-                target: "Ceux qui visent l'excellence et le bilinguisme total.", 
-                use: "Penser et rêver en anglais. Créer des réflexes natifs automatiques pour une maîtrise absolue."
-              },
-            ].map((plan, idx) => (
-              <motion.div key={idx} whileHover={{ y: -8 }} transition={{ duration: 0.3 }} className="h-full">
-                <Card className={`h-full flex flex-col bg-white dark:bg-slate-900 border-slate-800 relative ${plan.highlight ? 'ring-2 ring-[#E7162A] shadow-[0_0_30px_rgba(231,22,42,0.15)]' : ''}`}>
-                  {plan.highlight && <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#E7162A] text-slate-900 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Le Summum</div>}
-                  <CardHeader>
-                    <div className="flex justify-between items-start mb-4">
-                      <CardTitle className="text-xl lg:text-2xl text-slate-900 dark:text-white">{plan.name}</CardTitle>
-                      <Badge variant="outline" className="text-slate-500 dark:text-slate-600 dark:text-slate-400 border-slate-700 text-xs text-center">{plan.freq}</Badge>
-                    </div>
-                    <div className="text-2xl lg:text-3xl font-black text-slate-900 dark:text-white">{plan.price}</div>
-                  </CardHeader>
-                  <CardContent className="flex-1 space-y-4">
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
-                        <Users className="w-3 h-3"/> À qui est-ce destiné ?
-                      </h4>
-                      <p className="text-slate-700 dark:text-slate-300 text-sm">{plan.target}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
-                        <Target className="w-3 h-3"/> À quoi ça sert ?
-                      </h4>
-                      <p className="text-slate-700 dark:text-slate-300 text-sm">{plan.use}</p>
-                    </div>
-                  </CardContent>
-                  <div className="p-6 pt-0 mt-auto">
-                    <Button asChild className={`w-full font-bold ${plan.highlight ? 'bg-[#E7162A] hover:bg-[#E7162A]/90 text-slate-900 dark:text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white'}`}>
-                      <Link href="/register">Sélectionner</Link>
-                    </Button>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Choix du parcours & Paiement */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-8">
-            <Card className="bg-white dark:bg-slate-900 border-slate-800">
-              <CardHeader>
-                <CardTitle className="text-lg text-[#E7162A] flex items-center gap-2">
-                  <motion.div animate={pulseAnim}><Target className="w-5 h-5"/></motion.div> Choix du Parcours
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-slate-500 dark:text-slate-600 dark:text-slate-400 leading-relaxed text-sm">
-                Vous devez opter soit pour la <strong>Formation Régulière</strong> (bases et structure), soit pour le <strong>Club d’Anglais</strong> (pratique et fluidité). Ces parcours sont distincts et ne sont pas cumulables simultanément. Après votre programme de formation régulière (2 mois), vous rejoignez le programme du Club d’Anglais.
-              </CardContent>
-            </Card>
-            <Card className="bg-white dark:bg-slate-900 border-slate-800">
-              <CardHeader>
-                <CardTitle className="text-lg text-[#E7162A] flex items-center gap-2">
-                  <motion.div animate={bounceAnim}><Shield className="w-5 h-5"/></motion.div> Paiement Exigé
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-slate-500 dark:text-slate-600 dark:text-slate-400 leading-relaxed text-sm">
-                Le solde total doit être réglé en intégralité avant le début de la formation pour garantir votre place et confirmer votre engagement vers l'excellence.
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* 3 & 4. FAQ + ORGANISATION */}
-      <section className="py-24 px-4 bg-white dark:bg-slate-900 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16">
-          
-          <div className="lg:col-span-5 space-y-8" id="organisation">
-            <div className="space-y-4">
-              <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#E7162A] text-xl">4.</span> ORGANISATION DES SÉANCES
-              </h2>
-              <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 text-lg">
-                Les cours se déroulent du <strong className="text-slate-900 dark:text-white">Lundi au Dimanche</strong> avec deux vagues au choix :
-              </p>
+            <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
+              <Link href="/register" className="btn-primary" style={{ textDecoration:"none", display:"inline-block" }}>
+                Rejoindre la session →
+              </Link>
+              <Link href="/placement-test" style={{
+                display:"inline-flex", alignItems:"center", gap:8,
+                padding:"14px 28px", borderRadius:100,
+                border:"1px solid rgba(212,175,55,0.25)", color:"#D4AF37",
+                textDecoration:"none", fontSize:13, letterSpacing:"0.08em", textTransform:"uppercase", fontWeight:600,
+                transition:"all 0.25s",
+              }}
+                onMouseEnter={e=>{e.currentTarget.style.background="rgba(212,175,55,0.08)"; e.currentTarget.style.borderColor="rgba(212,175,55,0.5)";}}
+                onMouseLeave={e=>{e.currentTarget.style.background="transparent"; e.currentTarget.style.borderColor="rgba(212,175,55,0.25)";}}>
+                Test de niveau gratuit
+              </Link>
             </div>
-            
-            <div className="space-y-4">
-              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300 }}>
-                <Card className="bg-[#21286E]/20 border-[#21286E]/50 overflow-hidden relative group">
-                  <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#E7162A] transform translate-x-full group-hover:translate-x-0 transition-transform"/>
-                  <CardHeader className="py-5">
-                    <CardTitle className="text-slate-700 dark:text-slate-300 text-base font-semibold uppercase tracking-widest">Vague 1</CardTitle>
-                    <CardDescription className="text-3xl font-black text-slate-900 dark:text-white mt-1">16h00 – 18h00</CardDescription>
-                  </CardHeader>
-                </Card>
-              </motion.div>
-              
-              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300 }}>
-                <Card className="bg-[#21286E]/20 border-[#21286E]/50 overflow-hidden relative group">
-                  <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#E7162A] transform translate-x-full group-hover:translate-x-0 transition-transform"/>
-                  <CardHeader className="py-5">
-                    <CardTitle className="text-slate-700 dark:text-slate-300 text-base font-semibold uppercase tracking-widest">Vague 2</CardTitle>
-                    <CardDescription className="text-3xl font-black text-slate-900 dark:text-white mt-1">18h00 – 20h00</CardDescription>
-                  </CardHeader>
-                </Card>
-              </motion.div>
-            </div>
-          </div>
 
-          <div className="lg:col-span-7 space-y-8" id="faq">
-            <div className="space-y-4">
-              <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#E7162A] text-xl">3.</span> FAQ
-              </h2>
-              <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400">Réponses rapides à vos préoccupations fréquentes.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {[
-                { title: "Flexibilité et Absences", desc: "En cas d'imprévu, vous avez la possibilité de rattraper votre séance sur l'autre vague horaire de la même journée ou sur un autre créneau de la semaine." },
-                { title: "Supports Pédagogiques", desc: "Aucun livre à acheter. Tous les supports de cours sont offerts en format numérique, accessibles sur votre smartphone ou tablette pour réviser partout." },
-                { title: "Reconnaissance", desc: "Nous délivrons une Attestation de Formation en fin de session, certifiant votre assiduité et votre niveau selon le cadre européen (A1 à C2)." },
-                { title: "Confort au Centre", desc: "Profitez d'un espace sécurisé avec WiFi haut débit, parking, et un espace \"breakout\" pour vos rafraîchissements." }
-              ].map((faq, i) => (
-                <motion.div key={i} whileHover={{ x: 5 }} className="space-y-2 p-4 rounded-lg hover:bg-slate-100 dark:bg-slate-800/50 transition-colors border border-transparent hover:border-slate-800">
-                  <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#E7162A]" />
-                    {faq.title}
-                  </h4>
-                  <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 text-sm leading-relaxed pl-6">
-                    {faq.desc}
-                  </p>
-                </motion.div>
+            {/* Stats */}
+            <div style={{ display:"flex", gap:40, marginTop:56, paddingTop:40, borderTop:"1px solid rgba(212,175,55,0.12)" }}>
+              {[["6","Formules adaptées"],["2","Vagues horaires"],["21 juin","Début session"]].map(([v,l])=>(
+                <div key={l}>
+                  <div style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:900, color:"#D4AF37", lineHeight:1 }}>{v}</div>
+                  <div style={{ fontSize:11, color:"rgba(245,240,232,0.4)", marginTop:6, textTransform:"uppercase", letterSpacing:"0.1em" }}>{l}</div>
+                </div>
               ))}
             </div>
           </div>
 
+          {/* Right — Mascot */}
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:24 }}>
+            <OwlMascot size={240} />
+            <div style={{ textAlign:"center" }}>
+              <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:700, color:"#D4AF37", marginBottom:6 }}>ATLAS</div>
+              <div style={{ fontSize:12, color:"rgba(245,240,232,0.4)", letterSpacing:"0.15em", textTransform:"uppercase" }}>Votre guide linguistique</div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 5. FOOTER / INSCRIPTION */}
-      <footer className="py-24 px-4 border-t border-slate-800 relative overflow-hidden bg-[#060A14]">
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-[#21286E]/10 blur-[150px] pointer-events-none" />
-        
-        <div className="max-w-4xl mx-auto relative z-10">
-          <div className="text-center mb-12 space-y-4">
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight flex flex-col items-center gap-2">
-              <span className="text-[#E7162A] text-xl">5.</span>
-              INSCRIPTION & RÉSERVATION
+      {/* ══════════ MARQUEE ══════════ */}
+      <div style={{ borderTop:"1px solid rgba(212,175,55,0.1)", borderBottom:"1px solid rgba(212,175,55,0.1)", padding:"18px 0", overflow:"hidden", background:"rgba(212,175,55,0.03)" }}>
+        <div className="marquee-track" style={{ display:"flex", gap:"60px", width:"max-content" }}>
+          {[...MARQUEE_WORDS, ...MARQUEE_WORDS].map((w,i) => (
+            <span key={i} style={{ fontSize:13, fontWeight:600, letterSpacing:"0.25em", textTransform:"uppercase", color: i%3===0 ? "#D4AF37" : "rgba(245,240,232,0.25)", whiteSpace:"nowrap" }}>
+              {w} <span style={{ color:"rgba(212,175,55,0.3)", marginLeft:30 }}>✦</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ══════════ POURQUOI NOUS ══════════ */}
+      <section id="methode" style={{ padding:"120px 2rem", maxWidth:1200, margin:"0 auto" }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:72 }}>
+          <div>
+            <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#D4AF37", marginBottom:16 }}>Notre différence</div>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.2rem,4vw,3.5rem)", fontWeight:900, lineHeight:1.1, margin:0 }}>
+              Pourquoi choisir<br/><em style={{ color:"#D4AF37" }}>Prime Academy ?</em>
             </h2>
-            <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400">Prenez votre avenir en main dès aujourd'hui.</p>
           </div>
+          <p style={{ maxWidth:320, fontSize:15, color:"rgba(245,240,232,0.5)", lineHeight:1.7, textAlign:"right" }}>
+            L'anglais n'est pas une matière à mémoriser. C'est un muscle à entraîner — avec la bonne méthode.
+          </p>
+        </div>
 
-          <Card className="bg-white dark:bg-slate-900/80 border-slate-800 backdrop-blur-xl">
-            <CardContent className="pt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <div className="flex gap-4 group">
-                  <motion.div animate={pulseAnim} className="bg-slate-100 dark:bg-slate-800 w-12 h-12 rounded-full flex items-center justify-center shrink-0 group-hover:bg-[#E7162A]/20 transition-colors">
-                    <Target className="w-6 h-6 text-[#E7162A]" />
-                  </motion.div>
-                  <div>
-                    <h4 className="text-slate-900 dark:text-white font-bold mb-1 text-lg">Test de niveau gratuit</h4>
-                    <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 text-sm">Indispensable pour votre orientation.</p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-4 group">
-                  <motion.div animate={rotateAnim} className="bg-slate-100 dark:bg-slate-800 w-12 h-12 rounded-full flex items-center justify-center shrink-0 group-hover:bg-[#E7162A]/20 transition-colors">
-                    <Clock className="w-6 h-6 text-[#E7162A]" />
-                  </motion.div>
-                  <div>
-                    <h4 className="text-slate-900 dark:text-white font-bold mb-1 text-lg">RDV Consultant</h4>
-                    <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 text-sm">Mardi (10h-14h) et Jeudi (9h-14h) en Visio ou Vocal.</p>
-                  </div>
-                </div>
-              </div>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(250px, 1fr))", gap:24 }}>
+          {WHY.map(({ n, title, desc }) => (
+            <div key={n} style={{
+              border:"1px solid rgba(212,175,55,0.12)", borderRadius:20, padding:"36px 28px",
+              background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)",
+              transition:"all 0.3s",
+            }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.borderColor="rgba(212,175,55,0.4)"; (e.currentTarget as HTMLElement).style.transform="translateY(-6px)";}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.borderColor="rgba(212,175,55,0.12)"; (e.currentTarget as HTMLElement).style.transform="translateY(0)";}}>
+              <div style={{ fontFamily:"'Playfair Display',serif", fontSize:56, fontWeight:900, color:"rgba(212,175,55,0.12)", lineHeight:1, marginBottom:20 }}>{n}</div>
+              <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:20, fontWeight:700, marginBottom:12, color:"#F5F0E8" }}>{title}</h3>
+              <p style={{ fontSize:14, color:"rgba(245,240,232,0.5)", lineHeight:1.7, margin:0 }}>{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-              <div className="space-y-6">
-                <div className="flex gap-4 group">
-                  <motion.div animate={bounceAnim} className="bg-slate-100 dark:bg-slate-800 w-12 h-12 rounded-full flex items-center justify-center shrink-0 group-hover:bg-[#E7162A]/20 transition-colors">
-                    <MapPin className="w-6 h-6 text-[#E7162A]" />
-                  </motion.div>
-                  <div>
-                    <h4 className="text-slate-900 dark:text-white font-bold mb-1 text-lg">Localisation</h4>
-                    <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 text-sm">Angré 8e Tranche, Zone Bon Prix (à 120m en face du carrefour Pain du Quotidien).</p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-4 group">
-                  <motion.div animate={pulseAnim} className="bg-slate-100 dark:bg-slate-800 w-12 h-12 rounded-full flex items-center justify-center shrink-0 group-hover:bg-[#E7162A]/20 transition-colors">
-                    <Phone className="w-6 h-6 text-[#E7162A]" />
-                  </motion.div>
-                  <div>
-                    <h4 className="text-slate-900 dark:text-white font-bold mb-1 text-lg">WhatsApp / Tel</h4>
-                    <a href="tel:+2250161337864" className="text-slate-500 dark:text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors text-sm font-medium">+225 01 61 33 78 64</a>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            <div className="border-t border-slate-800 p-8 text-center bg-white dark:bg-slate-900/50 rounded-b-xl">
-              <Button size="lg" asChild className="w-full sm:w-auto bg-[#E7162A] hover:bg-[#E7162A]/90 text-slate-900 dark:text-white font-bold h-14 px-12 text-lg rounded-xl shadow-[0_0_20px_rgba(231,22,42,0.4)]">
-                <Link href="/register">Procéder à l'inscription</Link>
-              </Button>
-            </div>
-          </Card>
+      {/* Divider */}
+      <div className="divider-gold" style={{ maxWidth:1200, margin:"0 auto" }}/>
 
-          <div className="mt-20 text-center space-y-6">
-            <div className="relative w-16 h-16 mx-auto opacity-50">
-              <Image src="/icon-512x512.png" alt="Logo PLA" fill className="object-contain" />
-            </div>
-            <div>
-              <div className="font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-2">
-                PRIME LANGUAGE ACADEMY
+      {/* ══════════ MISSION / VISION ══════════ */}
+      <section id="mission" style={{ padding:"120px 2rem" }}>
+        <div style={{ maxWidth:1200, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"80px", alignItems:"center" }}>
+          <div style={{ position:"relative" }}>
+            <div style={{ position:"absolute", top:-40, left:-40, width:300, height:300, borderRadius:"50%", background:"rgba(212,175,55,0.05)", filter:"blur(80px)", pointerEvents:"none" }}/>
+            <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#D4AF37", marginBottom:16 }}>Notre mission</div>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2rem,4vw,3rem)", fontWeight:900, lineHeight:1.15, marginBottom:28 }}>
+              Language Mastery<br/><em style={{ color:"#D4AF37" }}>Academy</em>
+            </h2>
+            <p style={{ fontSize:16, lineHeight:1.85, color:"rgba(245,240,232,0.6)", marginBottom:20 }}>
+              Dans l'espace francophone africain, la maîtrise des langues étrangères reste un frein majeur. Language Mastery Academy est née d'un constat simple : les offres existantes ne prennent pas en compte les réalités spécifiques des apprenants francophones.
+            </p>
+            <p style={{ fontSize:16, lineHeight:1.85, color:"rgba(245,240,232,0.6)" }}>
+              Les blocages psychologiques à l'oral, la peur de faire des fautes, l'absence d'un cadre progressif et adapté. <strong style={{ color:"#F5F0E8" }}>Nous connaissons notre public.</strong>
+            </p>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+            {[
+              { icon:"🧠", t:"Pédagogie claire", d:"Structure progressive et adaptée aux francophones" },
+              { icon:"🤝", t:"Accompagnement humain", d:"Formateurs engagés, pas des algorithmes" },
+              { icon:"⚡", t:"Formats flexibles", d:"1 à 6 séances selon votre rythme de vie" },
+              { icon:"🌍", t:"Maîtrise active", d:"Priorité à l'expression orale et à la confiance" },
+            ].map(({icon,t,d}) => (
+              <div key={t} style={{ border:"1px solid rgba(212,175,55,0.1)", borderRadius:16, padding:"24px 20px", background:"rgba(20,20,30,0.5)" }}>
+                <div style={{ fontSize:28, marginBottom:12 }}>{icon}</div>
+                <div style={{ fontSize:14, fontWeight:700, color:"#F5F0E8", marginBottom:6 }}>{t}</div>
+                <div style={{ fontSize:12, color:"rgba(245,240,232,0.45)", lineHeight:1.6 }}>{d}</div>
               </div>
-              <div className="text-slate-500 dark:text-slate-600 text-sm font-medium">
-                Parlez anglais. Vivez des opportunités.
-              </div>
-            </div>
+            ))}
           </div>
         </div>
+      </section>
+
+      {/* ══════════ TARIFS ══════════ */}
+      <section id="tarifs" style={{ padding:"120px 2rem", background:"rgba(212,175,55,0.02)" }}>
+        <div style={{ maxWidth:1100, margin:"0 auto" }}>
+          <div style={{ textAlign:"center", marginBottom:72 }}>
+            <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#D4AF37", marginBottom:16 }}>Tarification</div>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.2rem,4vw,3.2rem)", fontWeight:900, margin:"0 0 16px" }}>
+              Grille <em style={{ color:"#D4AF37" }}>« À la carte »</em>
+            </h2>
+            <p style={{ color:"rgba(245,240,232,0.45)", fontSize:15 }}>Session de 2 mois · Inscription offerte (0 FCFA)</p>
+          </div>
+
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))", gap:16 }}>
+            {PLANS.map(p => (
+              <div key={p.id}
+                onClick={() => setActivePlan(p.id)}
+                style={{
+                  border: activePlan===p.id ? "1px solid #D4AF37" : "1px solid rgba(212,175,55,0.12)",
+                  borderRadius:20, padding:"28px 20px", cursor:"pointer",
+                  background: activePlan===p.id ? "rgba(212,175,55,0.08)" : "rgba(20,20,30,0.6)",
+                  backdropFilter:"blur(16px)",
+                  boxShadow: activePlan===p.id ? "0 0 30px rgba(212,175,55,0.15)" : "none",
+                  transition:"all 0.25s", position:"relative",
+                }}>
+                {p.top && <div style={{ position:"absolute", top:-10, left:"50%", transform:"translateX(-50%)", background:"#D4AF37", color:"#080808", fontSize:10, fontWeight:800, padding:"4px 12px", borderRadius:100, textTransform:"uppercase", letterSpacing:"0.12em", whiteSpace:"nowrap" }}>Le Summum</div>}
+                <div style={{ fontSize:13, fontWeight:700, color: activePlan===p.id ? "#D4AF37" : "#F5F0E8", marginBottom:6 }}>{p.label}</div>
+                <div style={{ fontSize:11, color:"rgba(245,240,232,0.4)", marginBottom:20, letterSpacing:"0.08em" }}>{p.freq}</div>
+                <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:900, color: activePlan===p.id ? "#D4AF37" : "#F5F0E8" }}>{p.price}</div>
+                <div style={{ fontSize:11, color:"rgba(245,240,232,0.35)", marginTop:2 }}>FCFA</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ textAlign:"center", marginTop:48 }}>
+            <Link href="/register" className="btn-primary" style={{ textDecoration:"none", display:"inline-block" }}>
+              Réserver ma place →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ HORAIRES ══════════ */}
+      <section style={{ padding:"80px 2rem" }}>
+        <div style={{ maxWidth:800, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:24 }}>
+          {[["Vague 1","16h00 – 18h00","Idéale pour les lycéens & étudiants"],["Vague 2","18h00 – 20h00","Idéale pour les professionnels"]].map(([label,time,desc]) => (
+            <div key={label} style={{ border:"1px solid rgba(212,175,55,0.15)", borderRadius:20, padding:"40px 32px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)", overflow:"hidden", position:"relative" }}>
+              <div style={{ position:"absolute", top:-20, right:-20, width:100, height:100, borderRadius:"50%", background:"rgba(212,175,55,0.05)", filter:"blur(30px)" }}/>
+              <div style={{ fontSize:11, color:"#D4AF37", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:12 }}>{label}</div>
+              <div style={{ fontFamily:"'Playfair Display',serif", fontSize:36, fontWeight:900, color:"#F5F0E8", marginBottom:12 }}>{time}</div>
+              <div style={{ fontSize:13, color:"rgba(245,240,232,0.45)" }}>{desc}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══════════ CTA FINAL ══════════ */}
+      <section style={{ padding:"120px 2rem", textAlign:"center", position:"relative", overflow:"hidden" }}>
+        <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:600, height:600, borderRadius:"50%", background:"rgba(212,175,55,0.05)", filter:"blur(120px)", pointerEvents:"none" }}/>
+        <div style={{ position:"relative", zIndex:1 }}>
+          <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#D4AF37", marginBottom:24 }}>Inscription ouverte</div>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.5rem,5vw,4.5rem)", fontWeight:900, lineHeight:1.1, marginBottom:20, maxWidth:700, margin:"0 auto 20px" }}>
+            Prêt à débloquer<br/><em style={{ color:"#D4AF37" }}>votre potentiel ?</em>
+          </h2>
+          <p style={{ color:"rgba(245,240,232,0.5)", fontSize:16, marginBottom:48, maxWidth:480, marginLeft:"auto", marginRight:"auto", lineHeight:1.7 }}>
+            Angré 8e Tranche · Lun–Dim · 16h – 20h<br/>
+            <a href="tel:+2250161337864" style={{ color:"#D4AF37", textDecoration:"none" }}>+225 01 61 33 78 64</a>
+          </p>
+          <div style={{ display:"flex", gap:16, justifyContent:"center", flexWrap:"wrap" }}>
+            <Link href="/register" className="btn-primary" style={{ textDecoration:"none" }}>
+              Commencer maintenant
+            </Link>
+            <Link href="/placement-test" style={{
+              display:"inline-flex", alignItems:"center",
+              padding:"14px 28px", borderRadius:100,
+              border:"1px solid rgba(212,175,55,0.3)", color:"#D4AF37",
+              textDecoration:"none", fontSize:13, letterSpacing:"0.08em", textTransform:"uppercase", fontWeight:600,
+            }}>Test de placement gratuit</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ FOOTER ══════════ */}
+      <footer style={{ borderTop:"1px solid rgba(212,175,55,0.1)", padding:"48px 2rem", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:24 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+          <div style={{ width:30, height:30, borderRadius:"50%", background:"linear-gradient(135deg,#D4AF37,#A08828)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:900, color:"#080808" }}>P</div>
+          <span style={{ fontFamily:"'Playfair Display',serif", fontSize:15, color:"rgba(245,240,232,0.5)" }}>Prime Language Academy</span>
+        </div>
+        <div style={{ display:"flex", gap:32, fontSize:12, color:"rgba(245,240,232,0.3)", letterSpacing:"0.1em", textTransform:"uppercase" }}>
+          <Link href="/blog" style={{ color:"inherit", textDecoration:"none" }}>Blog</Link>
+          <Link href="/placement-test" style={{ color:"inherit", textDecoration:"none" }}>Test</Link>
+          <Link href="/login" style={{ color:"inherit", textDecoration:"none" }}>Connexion</Link>
+        </div>
+        <div style={{ fontSize:11, color:"rgba(245,240,232,0.2)", letterSpacing:"0.1em" }}>© 2026 Prime Language Academy</div>
       </footer>
     </div>
   );
