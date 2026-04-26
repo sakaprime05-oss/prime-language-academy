@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { WhatsAppButton } from "@/components/whatsapp-button";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   title: "Prime Academy | Hub d'Excellence 2026",
   description: "Système de gestion pédagogique haute performance pour Prime Language Academy. Parlez anglais. Vivez des opportunités.",
   manifest: "/manifest.json",
-  themeColor: "#4f46e5",
+  themeColor: "#D4AF37",
   openGraph: {
     title: "Prime Language Academy",
     description: "Parlez anglais. Vivez des opportunités. Rejoignez le centre linguistique de référence en Côte d'Ivoire.",
@@ -78,6 +79,7 @@ export default function RootLayout({
         >
 
           {children}
+          <WhatsAppButton />
           <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>

@@ -291,7 +291,10 @@ export default function ClientLanding({ session }: { session: any }) {
           </h2>
           <p style={{ color:"rgba(245,240,232,0.5)", fontSize:16, marginBottom:48, maxWidth:480, marginLeft:"auto", marginRight:"auto", lineHeight:1.7 }}>
             Angré 8e Tranche · Lun–Dim · 16h – 20h<br/>
-            <a href="tel:+2250161337864" style={{ color:"#D4AF37", textDecoration:"none" }}>+225 01 61 33 78 64</a>
+            <a href="https://wa.me/2250161337864?text=Bonjour%20!%20Je%20souhaite%20avoir%20des%20informations%20sur%20Prime%20Language%20Academy%20%F0%9F%8E%93" target="_blank" rel="noopener noreferrer" style={{ color:"#25D366", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:6, marginTop:8 }}>
+              <svg width="18" height="18" viewBox="0 0 32 32" fill="none"><path d="M16 3C9.373 3 4 8.373 4 15c0 2.385.668 4.61 1.83 6.5L4 29l7.7-1.81A12.94 12.94 0 0016 28c6.627 0 12-5.373 12-13S22.627 3 16 3z" fill="#25D366"/><path d="M21.04 18.16c-.28-.14-1.664-.82-1.92-.912-.256-.096-.44-.14-.628.14-.188.28-.72.912-.88 1.1-.164.184-.324.208-.604.07-.28-.14-1.18-.436-2.248-1.388-.832-.74-1.392-1.656-1.556-1.936-.164-.28-.016-.432.124-.572.126-.124.28-.324.42-.488.14-.164.188-.28.28-.468.096-.188.048-.352-.024-.492-.068-.14-.628-1.512-.86-2.072-.228-.548-.456-.472-.628-.48l-.536-.008c-.188 0-.492.068-.748.352-.256.284-.98.956-.98 2.332 0 1.376 1.004 2.704 1.14 2.892.14.188 1.968 3.004 4.768 4.212.668.288 1.188.46 1.596.588.668.212 1.276.184 1.756.112.536-.08 1.664-.68 1.896-1.34.236-.656.236-1.22.168-1.34-.072-.12-.252-.188-.532-.328z" fill="white"/></svg>
+              +225 01 61 33 78 64 · WhatsApp
+            </a>
           </p>
           <div style={{ display:"flex", gap:16, justifyContent:"center", flexWrap:"wrap" }}>
             <Link href="/register" className="btn-primary" style={{ textDecoration:"none" }}>
