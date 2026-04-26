@@ -2,403 +2,380 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 
-// ── ÉTATS DE LA MASCOTTE ──────────────────────────────────────────
-type MascotState = "idle" | "walking-right" | "walking-left" | "jumping" | "sleeping";
+type State = "idle" | "walking" | "jumping" | "sleeping";
 
-const INACTIVITY_DELAY = 6000; // ms before sleeping
-const WALK_SPEED = 0.18;       // % of viewport per scroll px
-const JUMP_THRESHOLD = 300;    // px scroll delta to trigger jump
+const SLEEP_DELAY = 7000;
+const JUMP_SCROLL = 280;
 
-export function OwlMascot({ size = 130 }: { size?: number }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Eye tracking
-  const [pupil, setPupil] = useState({ x: 0, y: 0 });
+export function OwlMascot({ size = 120 }: { size?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [pupilX, setPupilX] = useState(0);
+  const [pupilY, setPupilY] = useState(0);
   const [blink, setBlink] = useState(false);
-
-  // Mascot behavior
-  const [state, setState] = useState<MascotState>("idle");
-  const [posX, setPosX] = useState(8); // % from left edge
+  const [state, setState] = useState<State>("idle");
+  const [posX, setPosX] = useState(6);
   const [flipped, setFlipped] = useState(false);
-  const [legPhase, setLegPhase] = useState(0); // walk cycle 0..1
+  const [legTick, setLegTick] = useState(0);
+  const [jumpY, setJumpY] = useState(0);
+  const [bobY, setBobY] = useState(0);
+  const [tailAngle, setTailAngle] = useState(0);
+  const [zOpacity, setZOpacity] = useState(0);
 
-  // Refs for scroll logic (avoid stale closures)
+  const stateRef = useRef<State>("idle");
+  const posXRef = useRef(6);
+  const targetXRef = useRef(6);
   const lastScrollY = useRef(0);
-  const inactivityTimer = useRef<ReturnType<typeof setTimeout>>();
-  const walkRaf = useRef<number>();
-  const stateRef = useRef<MascotState>("idle");
-  const posXRef = useRef(8);
-  const targetXRef = useRef(8);
+  const sleepTimer = useRef<ReturnType<typeof setTimeout>>();
+  const rafRef = useRef<number>();
 
-  const setStateSynced = (s: MascotState) => {
-    stateRef.current = s;
-    setState(s);
-  };
+  const setS = (s: State) => { stateRef.current = s; setState(s); };
 
-  // ── INACTIVITY → SLEEP ───────────────────────────────────────────
-  const resetInactivity = useCallback(() => {
-    clearTimeout(inactivityTimer.current);
-    if (stateRef.current === "sleeping") {
-      setStateSynced("idle");
-    }
-    inactivityTimer.current = setTimeout(() => {
-      setStateSynced("sleeping");
-    }, INACTIVITY_DELAY);
+  // ── INACTIVITY SLEEP ───────────────────────────────────────────────
+  const resetSleep = useCallback(() => {
+    clearTimeout(sleepTimer.current);
+    if (stateRef.current === "sleeping") setS("idle");
+    sleepTimer.current = setTimeout(() => setS("sleeping"), SLEEP_DELAY);
   }, []);
 
-  // ── MOUSE → EYE TRACKING ─────────────────────────────────────────
+  // ── MOUSE → EYE ────────────────────────────────────────────────────
   useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      resetInactivity();
-      if (!containerRef.current) return;
-      const r = containerRef.current.getBoundingClientRect();
+    const h = (e: MouseEvent) => {
+      resetSleep();
+      if (!ref.current) return;
+      const r = ref.current.getBoundingClientRect();
       const cx = r.left + r.width / 2;
       const cy = r.top + r.height / 2;
       const dx = e.clientX - cx;
       const dy = e.clientY - cy;
-      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      const factor = Math.min(dist, 350) / 350;
-      setPupil({ x: (dx / dist) * 7 * factor, y: (dy / dist) * 7 * factor });
+      const d = Math.sqrt(dx * dx + dy * dy) || 1;
+      const f = Math.min(d, 400) / 400;
+      setPupilX((dx / d) * 5 * f);
+      setPupilY((dy / d) * 5 * f);
     };
-    window.addEventListener("mousemove", onMove, { passive: true });
-    return () => window.removeEventListener("mousemove", onMove);
-  }, [resetInactivity]);
+    window.addEventListener("mousemove", h, { passive: true });
+    return () => window.removeEventListener("mousemove", h);
+  }, [resetSleep]);
 
-  // ── SCROLL → WALK / JUMP ─────────────────────────────────────────
+  // ── SCROLL → WALK / JUMP ───────────────────────────────────────────
   useEffect(() => {
+    let walkTimeout: ReturnType<typeof setTimeout>;
     let jumpTimeout: ReturnType<typeof setTimeout>;
 
-    const onScroll = () => {
-      resetInactivity();
-      const currentY = window.scrollY;
-      const delta = currentY - lastScrollY.current;
-      lastScrollY.current = currentY;
+    const h = () => {
+      resetSleep();
+      const cur = window.scrollY;
+      const delta = cur - lastScrollY.current;
+      lastScrollY.current = cur;
 
-      // Determine direction
-      const goingDown = delta > 0;
-      setFlipped(!goingDown); // flip sprite when going up
+      const goDown = delta > 0;
+      setFlipped(!goDown);
 
-      // Large jump = section jump animation
-      if (Math.abs(delta) > JUMP_THRESHOLD) {
-        setStateSynced("jumping");
+      if (Math.abs(delta) > JUMP_SCROLL && stateRef.current !== "jumping") {
+        setS("jumping");
         clearTimeout(jumpTimeout);
-        jumpTimeout = setTimeout(() => {
-          setStateSynced("idle");
-        }, 700);
+        jumpTimeout = setTimeout(() => setS("idle"), 750);
       } else if (stateRef.current !== "jumping") {
-        setStateSynced(goingDown ? "walking-right" : "walking-left");
-        clearTimeout(jumpTimeout);
-        jumpTimeout = setTimeout(() => {
-          setStateSynced("idle");
-        }, 600);
+        setS("walking");
+        clearTimeout(walkTimeout);
+        walkTimeout = setTimeout(() => setS("idle"), 700);
       }
 
-      // Move position (clamp 4%–88%)
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = maxScroll > 0 ? currentY / maxScroll : 0;
-      const newX = 4 + progress * 84;
-      targetXRef.current = newX;
+      const maxS = document.documentElement.scrollHeight - window.innerHeight;
+      const prog = maxS > 0 ? Math.max(0, Math.min(1, cur / maxS)) : 0;
+      targetXRef.current = 5 + prog * 82;
     };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    resetInactivity();
+    window.addEventListener("scroll", h, { passive: true });
+    resetSleep();
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", h);
+      clearTimeout(walkTimeout);
       clearTimeout(jumpTimeout);
     };
-  }, [resetInactivity]);
+  }, [resetSleep]);
 
-  // ── SMOOTH X POSITION (lerp) ─────────────────────────────────────
+  // ── ANIMATION LOOP ─────────────────────────────────────────────────
   useEffect(() => {
-    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-    const animate = () => {
+    let t = 0;
+    let jumpT = 0;
+    let sleeping = false;
+    let zT = 0;
+
+    const loop = () => {
+      t += 0.07;
+      const s = stateRef.current;
+      sleeping = s === "sleeping";
+
+      // Lerp X position
       const cur = posXRef.current;
       const target = targetXRef.current;
-      const next = lerp(cur, target, 0.06);
-      if (Math.abs(next - cur) > 0.01) {
+      const next = cur + (target - cur) * 0.055;
+      if (Math.abs(next - cur) > 0.005) {
         posXRef.current = next;
         setPosX(next);
       }
-      walkRaf.current = requestAnimationFrame(animate);
+
+      // Walk leg cycle
+      if (s === "walking") setLegTick(t);
+
+      // Gentle body bob when idle
+      setBobY(s === "idle" ? Math.sin(t * 0.6) * 2.5 : 0);
+
+      // Tail wag
+      setTailAngle(sleeping ? 0 : Math.sin(t * (s === "walking" ? 2 : 0.7)) * (s === "walking" ? 18 : 8));
+
+      // Jump arc
+      if (s === "jumping") {
+        jumpT += 0.15;
+        setJumpY(-Math.sin(jumpT * Math.PI) * 38);
+      } else {
+        jumpT = 0;
+        setJumpY(0);
+      }
+
+      // ZZZ float
+      if (sleeping) {
+        zT += 0.03;
+        setZOpacity(0.5 + Math.sin(zT * 2) * 0.5);
+      } else {
+        zT = 0;
+        setZOpacity(0);
+      }
+
+      rafRef.current = requestAnimationFrame(loop);
     };
-    walkRaf.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(walkRaf.current!);
+    rafRef.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafRef.current!);
   }, []);
 
-  // ── WALK LEG CYCLE ───────────────────────────────────────────────
-  useEffect(() => {
-    let frame: number;
-    let t = 0;
-    const loop = () => {
-      t += 0.08;
-      setLegPhase(t);
-      frame = requestAnimationFrame(loop);
-    };
-    frame = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  // ── RANDOM BLINK ─────────────────────────────────────────────────
+  // ── RANDOM BLINK ──────────────────────────────────────────────────
   useEffect(() => {
     let t: ReturnType<typeof setTimeout>;
     const cycle = () => {
       t = setTimeout(() => {
         setBlink(true);
-        setTimeout(() => { setBlink(false); cycle(); }, 120);
-      }, 2200 + Math.random() * 3500);
+        setTimeout(() => { setBlink(false); cycle(); }, 110);
+      }, 2000 + Math.random() * 4000);
     };
     cycle();
     return () => clearTimeout(t);
   }, []);
 
-  // ── COMPUTED VALUES ───────────────────────────────────────────────
-  const isWalking = state === "walking-right" || state === "walking-left";
-  const isSleeping = state === "sleeping";
-  const isJumping = state === "jumping";
+  // ── COMPUTED ──────────────────────────────────────────────────────
+  const walk = state === "walking";
+  const sleep = state === "sleeping";
+  const jump = state === "jumping";
+  const eyesClosed = sleep || blink;
 
-  // Leg swing angles (walk cycle)
-  const legSwingFront = isWalking ? Math.sin(legPhase * Math.PI * 2) * 20 : 0;
-  const legSwingBack  = isWalking ? Math.sin(legPhase * Math.PI * 2 + Math.PI) * 20 : 0;
+  // Leg angles (4 legs, alternating pairs)
+  const fl = walk ? Math.sin(legTick * Math.PI * 2) * 25 : 0;       // front-left
+  const fr = walk ? Math.sin(legTick * Math.PI * 2 + Math.PI) * 25 : 0; // front-right
+  const bl = walk ? Math.sin(legTick * Math.PI * 2 + Math.PI) * 25 : 0; // back-left
+  const br = walk ? Math.sin(legTick * Math.PI * 2) * 25 : 0;       // back-right
 
-  // Body bob (walking)
-  const bodyBob = isWalking ? Math.abs(Math.sin(legPhase * Math.PI * 2)) * 4 : 0;
+  // Speed lines when walking
+  const speedLines = walk && [16, 12, 8];
 
-  // Jump Y offset
-  const jumpY = isJumping ? -40 : 0;
-
-  // Sleep lean angle
-  const sleepAngle = isSleeping ? 35 : 0;
-
-  // Eye behavior during sleep
-  const eyesClosed = isSleeping;
-
-  // Pupil (normal or sleepy)
-  const px = eyesClosed ? 0 : pupil.x;
-  const py = eyesClosed ? 2 : pupil.y;
-
-  // Breathing when idle/sleeping
-  const breathScale = isSleeping ? 1 : 1;
-
-  const scale = size / 160;
+  const S = size / 140;
 
   return (
     <>
       <div
-        ref={containerRef}
+        ref={ref}
         style={{
           position: "fixed",
-          bottom: 12,
+          bottom: sleep ? 2 : 14,
           left: `${posX}%`,
           zIndex: 8888,
           transform: `
             translateX(-50%)
-            translateY(${jumpY}px)
-            rotate(${sleepAngle}deg)
+            translateY(${jumpY + bobY}px)
             scaleX(${flipped ? -1 : 1})
+            ${sleep ? "rotate(12deg)" : ""}
           `,
-          transition: isJumping
-            ? "bottom 0.3s cubic-bezier(0.34,1.56,0.64,1), transform 0.2s"
-            : "transform 0.3s ease, left 0.05s linear",
-          transformOrigin: "bottom center",
-          cursor: "default",
-          userSelect: "none",
+          transition: "bottom 0.4s ease, filter 0.5s ease",
+          filter: sleep ? "brightness(0.65) saturate(0.5)" : "none",
           pointerEvents: "none",
-          filter: isSleeping ? "brightness(0.7) saturate(0.6)" : "none",
-          transition2: "filter 0.6s ease",
-        } as any}
+          userSelect: "none",
+        }}
       >
-        <svg
-          width={160 * scale}
-          height={180 * scale}
-          viewBox="0 0 160 180"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{
-            transform: `translateY(${-bodyBob}px)`,
-            transition: "transform 0.06s linear",
-          }}
-        >
-          <defs>
-            <radialGradient id="mg-body" cx="50%" cy="40%" r="60%">
-              <stop offset="0%" stopColor="#EEEAE0" />
-              <stop offset="100%" stopColor="#C8BCAA" />
-            </radialGradient>
-            <radialGradient id="mg-face" cx="50%" cy="35%" r="55%">
-              <stop offset="0%" stopColor="#F5F0E6" />
-              <stop offset="100%" stopColor="#DDD0BC" />
-            </radialGradient>
-            <radialGradient id="mg-iris" cx="38%" cy="32%" r="62%">
-              <stop offset="0%" stopColor="#F8C830" />
-              <stop offset="45%" stopColor="#D4940A" />
-              <stop offset="100%" stopColor="#8B5E00" />
-            </radialGradient>
-          </defs>
-
-          {/* ── SHADOW ── */}
-          <ellipse cx="80" cy="175" rx={38 + bodyBob * 0.5} ry="5" fill="#000" opacity={isJumping ? 0.05 : 0.18} />
-
-          {/* ── BACK LEGS ── */}
-          <g transform={`rotate(${-legSwingBack} 54 142) translate(54 130)`}>
-            <rect x="-6" y="0" width="12" height="30" rx="6" fill="#B8AC9A" />
-            <rect x="-7" y="25" width="14" height="9" rx="4.5" fill="#2E2420" />
-          </g>
-          <g transform={`rotate(${legSwingBack} 106 142) translate(106 130)`}>
-            <rect x="-6" y="0" width="12" height="30" rx="6" fill="#B8AC9A" />
-            <rect x="-7" y="25" width="14" height="9" rx="4.5" fill="#2E2420" />
-          </g>
-
-          {/* ── BODY ── */}
-          <ellipse cx="80" cy="115" rx="38" ry="44" fill="url(#mg-body)" />
-          <ellipse cx="80" cy="122" rx="26" ry="32" fill="#F2EDE2" opacity="0.55" />
-
-          {/* ── FRONT LEGS ── */}
-          <g transform={`rotate(${legSwingFront} 58 115) translate(58 110)`}>
-            <rect x="-5.5" y="0" width="11" height="28" rx="5.5" fill="#C8BCAA" />
-            <rect x="-7" y="24" width="14" height="9" rx="4.5" fill="#2E2420" />
-          </g>
-          <g transform={`rotate(${-legSwingFront} 102 115) translate(102 110)`}>
-            <rect x="-5.5" y="0" width="11" height="28" rx="5.5" fill="#C8BCAA" />
-            <rect x="-7" y="24" width="14" height="9" rx="4.5" fill="#2E2420" />
-          </g>
-
-          {/* ── NECK ── */}
-          <path d="M62 88 Q60 72 65 64 Q80 56 95 64 Q100 72 98 88Z" fill="url(#mg-face)" />
-
-          {/* ── HEAD ── */}
-          <ellipse cx="80" cy="52" rx="38" ry="36" fill="url(#mg-face)" />
-
-          {/* ── EARS (floppy) ── */}
-          <path d="M44 58 Q24 50 20 66 Q22 80 42 74 Q50 70 50 62Z" fill="#D0C4B2">
-            <animateTransform
-              attributeName="transform"
-              type="rotate"
-              values={isWalking ? `0 44 62;5 44 62;-5 44 62;0 44 62` : "0 44 62"}
-              dur="0.5s"
-              repeatCount={isWalking ? "indefinite" : "1"}
-            />
-          </path>
-          <path d="M42 60 Q26 54 24 66 Q26 76 40 72" fill="#E8C0B4" opacity="0.7" />
-
-          <path d="M116 58 Q136 50 140 66 Q138 80 118 74 Q110 70 110 62Z" fill="#D0C4B2">
-            <animateTransform
-              attributeName="transform"
-              type="rotate"
-              values={isWalking ? `0 116 62;-5 116 62;5 116 62;0 116 62` : "0 116 62"}
-              dur="0.5s"
-              repeatCount={isWalking ? "indefinite" : "1"}
-            />
-          </path>
-          <path d="M118 60 Q134 54 136 66 Q134 76 120 72" fill="#E8C0B4" opacity="0.7" />
-
-          {/* ── HORNS ── */}
-          <path d="M56 28 Q46 10 40 2 Q50 8 54 22 Q57 30 57 34Z" fill="#D4AF37" />
-          <path d="M104 28 Q114 10 120 2 Q110 8 106 22 Q103 30 103 34Z" fill="#D4AF37" />
-
-          {/* ── FACE DISC ── */}
-          <ellipse cx="80" cy="58" rx="28" ry="24" fill="#F8F2E8" opacity="0.45" />
-
-          {/* ── LEFT EYE (BIG) ── */}
-          <ellipse cx="62" cy="50" rx="17" ry="16" fill="white" />
-          <ellipse cx="62" cy="50" rx="14" ry="13" fill="url(#mg-iris)" />
-          <ellipse cx="62" cy="50" rx="10" ry="9" fill="#A07000" opacity="0.35" />
-          {/* Pupil */}
-          {(eyesClosed || blink) ? (
-            <path d="M46 50 Q54 44 62 50 Q70 44 78 50" stroke="#5A3000" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-          ) : (
-            <rect x={62 + px - 3.5} y={50 + py - 7} width="7" height="14" rx="3" fill="#1A0A00" />
-          )}
-          {!eyesClosed && !blink && (
-            <>
-              <circle cx={58 + px * 0.4} cy={46 + py * 0.4} r="3" fill="white" opacity="0.95" />
-              <circle cx={64 + px * 0.25} cy={53 + py * 0.25} r="1.2" fill="white" opacity="0.5" />
-            </>
-          )}
-          <ellipse cx="62" cy="50" rx="17" ry="16" fill="none" stroke="#D4AF37" strokeWidth="1" strokeOpacity="0.35" />
-
-          {/* ── RIGHT EYE (BIG) ── */}
-          <ellipse cx="98" cy="50" rx="17" ry="16" fill="white" />
-          <ellipse cx="98" cy="50" rx="14" ry="13" fill="url(#mg-iris)" />
-          <ellipse cx="98" cy="50" rx="10" ry="9" fill="#A07000" opacity="0.35" />
-          {(eyesClosed || blink) ? (
-            <path d="M82 50 Q90 44 98 50 Q106 44 114 50" stroke="#5A3000" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-          ) : (
-            <rect x={98 + px - 3.5} y={50 + py - 7} width="7" height="14" rx="3" fill="#1A0A00" />
-          )}
-          {!eyesClosed && !blink && (
-            <>
-              <circle cx={94 + px * 0.4} cy={46 + py * 0.4} r="3" fill="white" opacity="0.95" />
-              <circle cx={100 + px * 0.25} cy={53 + py * 0.25} r="1.2" fill="white" opacity="0.5" />
-            </>
-          )}
-          <ellipse cx="98" cy="50" rx="17" ry="16" fill="none" stroke="#D4AF37" strokeWidth="1" strokeOpacity="0.35" />
-
-          {/* ── NOSE ── */}
-          <ellipse cx="80" cy="68" rx="9" ry="7" fill="#D4A8A0" />
-          <ellipse cx="77" cy="69" rx="2" ry="1.8" fill="#8B5050" />
-          <ellipse cx="83" cy="69" rx="2" ry="1.8" fill="#8B5050" />
-
-          {/* ── MOUTH ── */}
-          <path d={isSleeping
-            ? "M74 76 Q80 72 86 76"
-            : "M74 76 Q80 80 86 76"}
-            stroke="#A07070" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-
-          {/* ── BEARD ── */}
-          <path d="M74 80 Q78 95 80 98 Q82 95 86 80" fill="#C8BCA8" />
-
-          {/* ── GOLD COLLAR ── */}
-          <path d="M52 100 Q80 108 108 100" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.7" />
-          <polygon points="80,100 76,106 80,112 84,106" fill="#D4AF37" opacity="0.85" />
-
-          {/* ── SLEEP ZZZ ── */}
-          {isSleeping && (
-            <g>
-              <text x="112" y="30" fontSize="14" fill="#D4AF37" opacity="0.9" fontWeight="bold" fontFamily="serif">z</text>
-              <text x="122" y="18" fontSize="18" fill="#D4AF37" opacity="0.7" fontWeight="bold" fontFamily="serif">z</text>
-              <text x="134" y="6"  fontSize="22" fill="#D4AF37" opacity="0.5" fontWeight="bold" fontFamily="serif">Z</text>
-            </g>
-          )}
-
-          {/* ── JUMP EFFECT ── */}
-          {isJumping && (
-            <g>
-              <ellipse cx="80" cy="170" rx="45" ry="6" fill="#D4AF37" opacity="0.08" />
-              <path d="M55 155 L50 165 M65 158 L62 168 M95 158 L98 168 M105 155 L110 165" stroke="#D4AF37" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
-            </g>
-          )}
-        </svg>
-
-        {/* ── SPEED LINES (walking) ── */}
-        {isWalking && (
-          <div style={{
-            position: "absolute",
-            top: "35%",
-            [flipped ? "right" : "left"]: "100%",
-            display: "flex",
-            flexDirection: "column",
-            gap: 4,
-            opacity: 0.5,
-          }}>
-            {[28, 20, 14].map((w, i) => (
-              <div key={i} style={{ width: w, height: 2, background: "#D4AF37", borderRadius: 2, opacity: 0.6 - i * 0.15 }} />
+        {/* ── SPEED LINES ── */}
+        {speedLines && (
+          <div style={{ position: "absolute", right: "100%", top: "30%", display: "flex", flexDirection: "column", gap: 4, opacity: 0.55 }}>
+            {speedLines.map((w, i) => (
+              <div key={i} style={{ width: w, height: 2, background: "#D4AF37", borderRadius: 2 }} />
             ))}
           </div>
         )}
+
+        {/* ── ZZZ ── */}
+        {sleep && (
+          <div style={{ position: "absolute", bottom: "75%", left: "55%", pointerEvents: "none" }}>
+            {["z", "z", "Z"].map((c, i) => (
+              <span key={i} style={{
+                display: "block",
+                fontFamily: "serif",
+                fontWeight: 900,
+                fontSize: (12 + i * 5) * S,
+                color: "#D4AF37",
+                opacity: zOpacity * (0.5 + i * 0.25),
+                transform: `translateX(${i * 8 * S}px) translateY(${-i * 10 * S}px)`,
+                lineHeight: 1,
+              }}>{c}</span>
+            ))}
+          </div>
+        )}
+
+        {/* ── GOAT SVG ── */}
+        <svg
+          width={140 * S}
+          height={120 * S}
+          viewBox="0 0 140 120"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <radialGradient id="g-body" cx="45%" cy="40%" r="60%">
+              <stop offset="0%" stopColor="#D4904A" />
+              <stop offset="50%" stopColor="#C07832" />
+              <stop offset="100%" stopColor="#8B5020" />
+            </radialGradient>
+            <radialGradient id="g-belly" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#E8B070" />
+              <stop offset="100%" stopColor="#C8884A" />
+            </radialGradient>
+            <radialGradient id="g-face" cx="45%" cy="35%" r="60%">
+              <stop offset="0%" stopColor="#DCA060" />
+              <stop offset="100%" stopColor="#A86830" />
+            </radialGradient>
+            <radialGradient id="g-iris" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stopColor="#FFD040" />
+              <stop offset="50%" stopColor="#C89010" />
+              <stop offset="100%" stopColor="#7A5800" />
+            </radialGradient>
+            <filter id="g-shadow">
+              <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="#00000055" />
+            </filter>
+          </defs>
+
+          {/* ── GROUND SHADOW ── */}
+          <ellipse
+            cx="68" cy="116"
+            rx={jump ? 18 : 36} ry={jump ? 2 : 5}
+            fill="#000" opacity={jump ? 0.06 : 0.15}
+          />
+
+          {/* ── TAIL ── */}
+          <g transform={`rotate(${tailAngle} 18 52)`} style={{ transformOrigin: "18px 52px" }}>
+            <path d="M18 52 Q8 40 10 32 Q14 28 18 34 Q22 40 16 48Z" fill="#C07832" />
+            <path d="M10 32 Q6 24 8 18" stroke="#C07832" strokeWidth="3" strokeLinecap="round" />
+            <path d="M8 18 Q6 12 10 10" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round" />
+          </g>
+
+          {/* ── BACK LEGS (behind body) ── */}
+          {/* Back-right leg */}
+          <g transform={`rotate(${br} 30 82)`} style={{ transformOrigin: "30px 82px" }}>
+            <rect x="24" y="82" width="12" height="26" rx="5" fill="#A86830" />
+            <ellipse cx="30" cy="109" rx="9" ry="5" fill="#5A3010" />
+          </g>
+          {/* Back-left leg (slightly offset) */}
+          <g transform={`rotate(${bl} 38 82)`} style={{ transformOrigin: "38px 82px" }}>
+            <rect x="32" y="82" width="12" height="26" rx="5" fill="#B87838" />
+            <ellipse cx="38" cy="109" rx="9" ry="5" fill="#6A3818" />
+          </g>
+
+          {/* ── BODY ── */}
+          <ellipse cx="68" cy="68" rx="46" ry="30" fill="url(#g-body)" filter="url(#g-shadow)" />
+
+          {/* Belly shading */}
+          <ellipse cx="68" cy="78" rx="32" ry="16" fill="url(#g-belly)" opacity="0.6" />
+
+          {/* Body highlight */}
+          <ellipse cx="60" cy="52" rx="22" ry="10" fill="#E8A858" opacity="0.3" />
+
+          {/* ── FRONT LEGS (in front of body) ── */}
+          {/* Front-left leg */}
+          <g transform={`rotate(${fl} 90 82)`} style={{ transformOrigin: "90px 82px" }}>
+            <rect x="84" y="82" width="12" height="28" rx="5" fill="#B87838" />
+            <ellipse cx="90" cy="111" rx="9" ry="5" fill="#6A3818" />
+          </g>
+          {/* Front-right leg */}
+          <g transform={`rotate(${fr} 100 82)`} style={{ transformOrigin: "100px 82px" }}>
+            <rect x="94" y="82" width="12" height="28" rx="5" fill="#C88848" />
+            <ellipse cx="100" cy="111" rx="9" ry="5" fill="#7A4828" />
+          </g>
+
+          {/* ── NECK ── */}
+          <path d="M98 54 Q104 40 108 28 Q116 22 120 30 Q118 44 110 58Z" fill="url(#g-face)" />
+
+          {/* ── HEAD (proud, tilted up) ── */}
+          <ellipse cx="118" cy="24" rx="20" ry="18" fill="url(#g-face)" filter="url(#g-shadow)" />
+
+          {/* Face highlight */}
+          <ellipse cx="114" cy="18" rx="10" ry="7" fill="#E8B870" opacity="0.4" />
+
+          {/* ── HORNS ── */}
+          {/* Main horn */}
+          <path d="M112 10 Q110 0 108 -4 Q114 -2 116 6 Q118 12 114 14Z" fill="#E8DEC0" />
+          <path d="M110 1 Q108 -4 108 -6" stroke="#D4C8A0" strokeWidth="1.5" strokeLinecap="round" />
+          {/* Small second horn */}
+          <path d="M120 8 Q122 2 124 0 Q126 4 124 9 Q122 12 120 11Z" fill="#E8DEC0" />
+
+          {/* ── EAR ── */}
+          <path d="M100 16 Q94 8 92 14 Q92 22 100 22Z" fill="#C88040" />
+          <path d="M100 17 Q95 11 94 15 Q94 20 100 21Z" fill="#E8A870" opacity="0.5" />
+
+          {/* ── EYE (big & proud) ── */}
+          <ellipse cx="120" cy="22" rx="8" ry="8" fill="white" />
+          <ellipse cx="120" cy="22" rx="6.5" ry="6.5" fill="url(#g-iris)" />
+          <ellipse cx="120" cy="22" rx="4.5" ry="4.5" fill="#8B6000" opacity="0.4" />
+          {/* Pupil */}
+          {eyesClosed ? (
+            <path d="M113 22 Q117 18 120 22 Q123 18 127 22" stroke="#5A3A00" strokeWidth="2" fill="none" strokeLinecap="round" />
+          ) : (
+            <circle cx={120 + pupilX * 0.9} cy={22 + pupilY * 0.9} r="3" fill="#1A0800" />
+          )}
+          {!eyesClosed && (
+            <circle cx={117 + pupilX * 0.5} cy={19 + pupilY * 0.5} r="1.8" fill="white" opacity="0.95" />
+          )}
+          <ellipse cx="120" cy="22" rx="8" ry="8" fill="none" stroke="#D4AF37" strokeWidth="0.8" strokeOpacity="0.4" />
+
+          {/* Pupil catch-light extra */}
+          {!eyesClosed && (
+            <circle cx={122 + pupilX * 0.3} cy={25 + pupilY * 0.3} r="0.9" fill="white" opacity="0.5" />
+          )}
+
+          {/* ── NOSE ── */}
+          <ellipse cx="133" cy="26" rx="5" ry="4" fill="#C08060" />
+          <ellipse cx="132" cy="27" rx="1.5" ry="1.2" fill="#8B5040" />
+          <ellipse cx="135" cy="27" rx="1.5" ry="1.2" fill="#8B5040" />
+
+          {/* ── MOUTH / SMUG SMILE ── */}
+          <path d="M129 32 Q132 35 135 32" stroke="#9A6040" strokeWidth="1.3" strokeLinecap="round" fill="none" />
+
+          {/* ── BEARD ── */}
+          <path d="M128 34 Q126 42 125 46 Q128 48 131 44 Q132 40 130 34Z" fill="#C88848" />
+          <path d="M126 36 Q124 42 124 46" stroke="#B07838" strokeWidth="1.2" strokeLinecap="round" />
+
+          {/* ── SMUG EYEBROW (proud!) ── */}
+          <path d="M114 15 Q118 12 124 14" stroke="#8B5820" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+
+          {/* ── JUMP DUST ── */}
+          {jump && (
+            <>
+              <circle cx="40" cy="114" r="4" fill="#D4AF37" opacity="0.2" />
+              <circle cx="60" cy="116" r="3" fill="#D4AF37" opacity="0.15" />
+              <circle cx="28" cy="116" r="2" fill="#D4AF37" opacity="0.1" />
+            </>
+          )}
+        </svg>
       </div>
 
-      {/* ── GLOBAL ANIMATION STYLES ── */}
       <style>{`
-        @keyframes mascotJumpBounce {
-          0%   { transform: translateY(0px); }
-          40%  { transform: translateY(-45px); }
-          70%  { transform: translateY(-20px); }
-          100% { transform: translateY(0px); }
-        }
-        @keyframes sleepZFloat {
-          0%   { transform: translateY(0) scale(0.8); opacity: 0; }
-          20%  { opacity: 1; }
-          80%  { opacity: 0.8; }
-          100% { transform: translateY(-28px) scale(1.1); opacity: 0; }
+        @keyframes zFloat {
+          0%   { opacity: 0; transform: translateY(0) scale(0.7); }
+          30%  { opacity: 1; }
+          80%  { opacity: 0.6; }
+          100% { opacity: 0; transform: translateY(-20px) scale(1.1); }
         }
       `}</style>
     </>
