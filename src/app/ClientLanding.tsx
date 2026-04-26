@@ -13,6 +13,15 @@ const PLANS = [
   { id:"immersion",   freq:"6×/sem",  price:"150 000", label:"Immersion", top:true },
 ];
 
+const CLUB_PLANS = [
+  { id: "loisir",      freq: "1×/sem", price: "50 000", label: "Social" },
+  { id: "essentiel",   freq: "2×/sem", price: "70 000", label: "Connect" },
+  { id: "equilibre",   freq: "3×/sem", price: "90 000", label: "Network" },
+  { id: "performance", freq: "4×/sem", price: "110 000", label: "Executive" },
+  { id: "intensif",    freq: "5×/sem", price: "130 000", label: "Elite" },
+  { id: "immersion",   freq: "6×/sem", price: "150 000", label: "Founder", top: true },
+];
+
 const MARQUEE_WORDS = ["Speaking","Confidence","Fluency","Excellence","Bilinguisme","Impact","Immersion","Mastery","Progress","Growth","Networking","Community"];
 
 const WHY = [
@@ -25,6 +34,7 @@ const WHY = [
 export default function ClientLanding({ session }: { session: any }) {
   const [scrolled, setScrolled] = useState(false);
   const [activePlan, setActivePlan] = useState("immersion");
+  const [pricingMode, setPricingMode] = useState<"formation"|"club">("formation");
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 40);
@@ -229,16 +239,36 @@ export default function ClientLanding({ session }: { session: any }) {
       {/* ══════════ TARIFS ══════════ */}
       <section id="tarifs" style={{ padding:"120px 2rem", background:"rgba(212,175,55,0.02)" }}>
         <div style={{ maxWidth:1100, margin:"0 auto" }}>
-          <div style={{ textAlign:"center", marginBottom:72 }}>
+          <div style={{ textAlign:"center", marginBottom:56 }}>
             <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#D4AF37", marginBottom:16 }}>Tarification</div>
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.2rem,4vw,3.2rem)", fontWeight:900, margin:"0 0 16px" }}>
               Grille <em style={{ color:"#D4AF37" }}>« À la carte »</em>
             </h2>
-            <p style={{ color:"rgba(245,240,232,0.45)", fontSize:15 }}>Session de 2 mois · Inscription offerte (0 FCFA)</p>
+            <p style={{ color:"rgba(245,240,232,0.45)", fontSize:15, marginBottom:40 }}>Frais d'inscription offerts (0 FCFA) pour toutes les offres</p>
+
+            {/* Toggle Switch */}
+            <div style={{ display:"inline-flex", background:"rgba(20,20,30,0.8)", border:"1px solid rgba(212,175,55,0.2)", borderRadius:100, padding:6, position:"relative" }}>
+              <button onClick={() => setPricingMode("formation")}
+                style={{ position:"relative", zIndex:1, padding:"12px 28px", borderRadius:100, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: pricingMode==="formation" ? "#080808" : "rgba(245,240,232,0.5)", transition:"color 0.3s" }}>
+                Formation (2 Mois)
+              </button>
+              <button onClick={() => setPricingMode("club")}
+                style={{ position:"relative", zIndex:1, padding:"12px 28px", borderRadius:100, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: pricingMode==="club" ? "#080808" : "rgba(245,240,232,0.5)", transition:"color 0.3s" }}>
+                English Club (Mensuel)
+              </button>
+              {/* Highlight Background */}
+              <div style={{
+                position:"absolute", top:6, left:6, bottom:6, width:"calc(50% - 6px)",
+                background:"linear-gradient(135deg,#D4AF37,#F0D060)", borderRadius:100,
+                transition:"transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                transform: pricingMode==="club" ? "translateX(100%)" : "translateX(0)",
+                boxShadow:"0 0 20px rgba(212,175,55,0.2)"
+              }}/>
+            </div>
           </div>
 
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))", gap:16 }}>
-            {PLANS.map(p => (
+            {(pricingMode === "formation" ? PLANS : CLUB_PLANS).map(p => (
               <div key={p.id}
                 onClick={() => setActivePlan(p.id)}
                 style={{
@@ -253,14 +283,14 @@ export default function ClientLanding({ session }: { session: any }) {
                 <div style={{ fontSize:13, fontWeight:700, color: activePlan===p.id ? "#D4AF37" : "#F5F0E8", marginBottom:6 }}>{p.label}</div>
                 <div style={{ fontSize:11, color:"rgba(245,240,232,0.4)", marginBottom:20, letterSpacing:"0.08em" }}>{p.freq}</div>
                 <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:900, color: activePlan===p.id ? "#D4AF37" : "#F5F0E8" }}>{p.price}</div>
-                <div style={{ fontSize:11, color:"rgba(245,240,232,0.35)", marginTop:2 }}>FCFA</div>
+                <div style={{ fontSize:11, color:"rgba(245,240,232,0.35)", marginTop:2 }}>FCFA {pricingMode === "club" ? "/ mois" : "/ 2 mois"}</div>
               </div>
             ))}
           </div>
 
           <div style={{ textAlign:"center", marginTop:48 }}>
-            <Link href="/register" className="btn-primary" style={{ textDecoration:"none", display:"inline-block" }}>
-              Réserver ma place →
+            <Link href={pricingMode === "formation" ? "/register" : "/register-club"} className="btn-primary" style={{ textDecoration:"none", display:"inline-block" }}>
+              {pricingMode === "formation" ? "Réserver ma place →" : "Rejoindre le cercle →"}
             </Link>
           </div>
         </div>
