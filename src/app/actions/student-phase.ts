@@ -1,10 +1,21 @@
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
 
 export async function getStudentPhase() {
+    const session = await auth();
+    
+    if (session?.user?.id) {
+        const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+        if (user?.onboardingData) {
+            try {
+                const data = JSON.parse(user.onboardingData);
+                if (data.type === "CLUB") return "CLUB";
+            } catch (e) {}
+        }
+    }
+
     const settings = await prisma.systemSettings.findUnique({ where: { id: "default" } });
     
-    // On utilise la date officielle au format ISO pour que ce soit facilement parsable par JS
-    // Sinon on essaie de la déduire
     let sessionStartStr = settings?.currentSessionStart || "2026-06-18"; 
     
     if (sessionStartStr.toLowerCase().includes("juin")) {

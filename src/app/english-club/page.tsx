@@ -89,7 +89,7 @@ export default function EnglishClubPublicPage() {
           </p>
 
           <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginBottom: 72 }}>
-            <Link href="/register?type=club" style={{
+            <Link href="/register-club" style={{
               fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase",
               background: "linear-gradient(135deg,#D4AF37,#F0D060,#A08828)", color: "#080808",
               padding: "16px 36px", borderRadius: 100, textDecoration: "none",
@@ -238,7 +238,7 @@ export default function EnglishClubPublicPage() {
           </div>
 
           <div style={{ textAlign: "center", marginTop: 48 }}>
-            <Link href="/register?type=club" style={{
+            <Link href="/register-club" style={{
               fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase",
               background: "linear-gradient(135deg,#D4AF37,#F0D060,#A08828)", color: "#080808",
               padding: "16px 40px", borderRadius: 100, textDecoration: "none",
