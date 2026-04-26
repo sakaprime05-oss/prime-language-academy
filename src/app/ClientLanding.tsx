@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
-import { OwlMascot } from "@/components/owl-mascot";
+import { useState, useEffect } from "react";
 
 /* ── tiny helpers ── */
 const PLANS = [
@@ -138,9 +137,9 @@ export default function ClientLanding({ session }: { session: any }) {
             </div>
           </div>
 
-          {/* Right — Mascot */}
+          {/* Right — visual placeholder */}
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:24 }}>
-            <OwlMascot size={240} />
+            <div style={{ width:220, height:220, borderRadius:"50%", background:"rgba(212,175,55,0.06)", border:"1px solid rgba(212,175,55,0.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:80 }}>🐐</div>
             <div style={{ textAlign:"center" }}>
               <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:700, color:"#D4AF37", marginBottom:6 }}>ATLAS</div>
               <div style={{ fontSize:12, color:"rgba(245,240,232,0.4)", letterSpacing:"0.15em", textTransform:"uppercase" }}>Votre guide linguistique</div>
