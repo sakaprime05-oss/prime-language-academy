@@ -1,10 +1,7 @@
-import Link from "next/link";
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "English Club | Prime Language Academy — Abidjan",
-  description: "Cercle privé anglophone pour cadres, entrepreneurs et créatifs à Abidjan. Networking, conversations de haut niveau, événements lifestyle. Rejoignez l'élite anglophone d'Abidjan.",
-};
+import Link from "next/link";
+
 
 const ACTIVITIES = [
   {
