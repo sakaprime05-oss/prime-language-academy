@@ -14,7 +14,7 @@ const PLANS = [
   { id:"immersion",   freq:"6×/sem",  price:"150 000", label:"Immersion", top:true },
 ];
 
-const MARQUEE_WORDS = ["Speaking","Confidence","Fluency","Excellence","Bilinguisme","Impact","Immersion","Mastery","Progress","Growth"];
+const MARQUEE_WORDS = ["Speaking","Confidence","Fluency","Excellence","Bilinguisme","Impact","Immersion","Mastery","Progress","Growth","Networking","Community"];
 
 const WHY = [
   { n:"01", title:"Méthode ISO+", desc:"Input → Structure → Output → Automatisation. Votre cerveau pense directement en anglais." },
@@ -307,6 +307,74 @@ export default function ClientLanding({ session }: { session: any }) {
         </div>
       </section>
 
+      {/* ══════════ ENGLISH CLUB SECTION ══════════ */}
+      <section style={{ padding:"120px 2rem", background:"rgba(212,175,55,0.02)", position:"relative", overflow:"hidden" }}>
+        <div style={{ position:"absolute", inset:0, backgroundImage:"radial-gradient(ellipse 60% 50% at 50% 100%, rgba(212,175,55,0.07) 0%, transparent 70%)", pointerEvents:"none" }}/>
+        <div style={{ maxWidth:1100, margin:"0 auto", position:"relative", zIndex:1 }}>
+          {/* Header */}
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", flexWrap:"wrap", gap:24, marginBottom:64 }}>
+            <div>
+              <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#D4AF37", marginBottom:16 }}>Exclusivité</div>
+              <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.2rem,4vw,3.5rem)", fontWeight:900, margin:0, lineHeight:1.1 }}>
+                The English Club<br/><em style={{ color:"#D4AF37" }}>by Prime</em>
+              </h2>
+            </div>
+            <Link href="/english-club" style={{ fontSize:12, color:"#D4AF37", textDecoration:"none", border:"1px solid rgba(212,175,55,0.3)", borderRadius:100, padding:"10px 22px", letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:600, flexShrink:0, transition:"all 0.2s" }}>Découvrir le Club →</Link>
+          </div>
+
+          {/* Two-column split */}
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, marginBottom:24 }}>
+            {/* Left — concept */}
+            <div style={{ border:"1px solid #D4AF37", borderRadius:24, padding:"48px 40px", background:"rgba(212,175,55,0.04)", backdropFilter:"blur(16px)", boxShadow:"0 0 40px rgba(212,175,55,0.08)", gridRow:"1 / 3" }}>
+              <div style={{ fontSize:11, color:"#D4AF37", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:20 }}>Cercle Privé · B2 → C2</div>
+              <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:900, color:"#D4AF37", marginBottom:20, lineHeight:1.2 }}>Un club social anglophone pour l'élite d'Abidjan</h3>
+              <p style={{ color:"rgba(245,240,232,0.6)", lineHeight:1.85, fontSize:15, marginBottom:32 }}>
+                Pour ceux qui maîtrisent déjà l'anglais et veulent <strong style={{ color:"#F5F0E8" }}>le vivre au quotidien</strong>. Un cercle chic et connecté — cadres, entrepreneurs, créatifs, profils international — où la langue est un passeport social.
+              </p>
+              <div style={{ display:"flex", flexDirection:"column", gap:14, marginBottom:40 }}>
+                {["🥂 English Social Nights","🎯 Conversation Circles (6–10 pers)","🎤 Guest Talks & Masterclasses","🎬 Projections VO & Ateliers CV"].map(f => (
+                  <div key={f} style={{ fontSize:13, color:"rgba(245,240,232,0.75)", display:"flex", alignItems:"center", gap:10 }}>
+                    <span style={{ color:"#D4AF37" }}>✦</span> {f}
+                  </div>
+                ))}
+              </div>
+              <Link href="/english-club" style={{ fontSize:12, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", background:"linear-gradient(135deg,#D4AF37,#F0D060,#A08828)", color:"#080808", padding:"14px 28px", borderRadius:100, textDecoration:"none", display:"inline-block", boxShadow:"0 0 25px rgba(212,175,55,0.2)" }}>Rejoindre le cercle →</Link>
+            </div>
+
+            {/* Right top — public vs formation */}
+            <div style={{ border:"1px solid rgba(212,175,55,0.12)", borderRadius:20, padding:"32px 28px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)" }}>
+              <div style={{ fontSize:11, color:"rgba(245,240,232,0.4)", letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:16 }}>Comment ça marche ?</div>
+              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                {[
+                  { step:"01", label:"Vous avez déjà le niveau B2+", sub:"Accès direct au Club" },
+                  { step:"02", label:"Vous débutez ?", sub:"Formation 2 mois → puis Club" },
+                  { step:"03", label:"Membership mensuel à la carte", sub:"1 à 6 sessions / semaine" },
+                  { step:"04", label:"Espace membre privé inclus", sub:"Accès à la plateforme & forums" },
+                ].map(({step,label,sub}) => (
+                  <div key={step} style={{ display:"flex", alignItems:"flex-start", gap:16, padding:"14px 0", borderBottom:"1px solid rgba(212,175,55,0.07)" }}>
+                    <span style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:900, color:"rgba(212,175,55,0.25)", lineHeight:1, flexShrink:0, width:28 }}>{step}</span>
+                    <div>
+                      <div style={{ fontSize:13, fontWeight:600, color:"#F5F0E8", marginBottom:3 }}>{label}</div>
+                      <div style={{ fontSize:11, color:"rgba(245,240,232,0.4)" }}>{sub}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right bottom — ambiance */}
+            <div style={{ border:"1px solid rgba(212,175,55,0.12)", borderRadius:20, padding:"28px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)" }}>
+              <div style={{ fontSize:11, color:"rgba(245,240,232,0.4)", letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:14 }}>L'ambiance</div>
+              <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+                {["Chaleureux","Exigeant","Bienveillant","Chic","100% Anglais","Networking","Ouvert","Global Mindset","Connecté"].map(t => (
+                  <span key={t} style={{ fontSize:11, border:"1px solid rgba(212,175,55,0.2)", borderRadius:100, padding:"5px 14px", color:"rgba(245,240,232,0.55)" }}>{t}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ══════════ FOOTER ══════════ */}
       <footer style={{ borderTop:"1px solid rgba(212,175,55,0.1)", padding:"48px 2rem", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:24 }}>
         <div style={{ display:"flex", alignItems:"center", gap:12 }}>
@@ -315,6 +383,7 @@ export default function ClientLanding({ session }: { session: any }) {
         </div>
         <div style={{ display:"flex", gap:32, fontSize:12, color:"rgba(245,240,232,0.3)", letterSpacing:"0.1em", textTransform:"uppercase" }}>
           <Link href="/blog" style={{ color:"inherit", textDecoration:"none" }}>Blog</Link>
+          <Link href="/english-club" style={{ color:"#D4AF37", textDecoration:"none" }}>English Club</Link>
           <Link href="/placement-test" style={{ color:"inherit", textDecoration:"none" }}>Test</Link>
           <Link href="/login" style={{ color:"inherit", textDecoration:"none" }}>Connexion</Link>
         </div>
