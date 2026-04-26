@@ -32,6 +32,39 @@ export async function markLessonComplete(lessonId: string) {
         }
     });
 
+    // Check total completed lessons for this user
+    const completedCount = await prisma.progress.count({
+        where: { userId, completed: true }
+    });
+
+    // Award "Premier Pas" badge for the first lesson
+    if (completedCount === 1) {
+        const badge = await prisma.badge.upsert({
+            where: { name: "Premier Pas" },
+            update: {},
+            create: {
+                name: "Premier Pas",
+                description: "A terminé sa première leçon avec succès.",
+                icon: "🌟",
+                color: "#3b82f6" // blue
+            }
+        });
+
+        await prisma.studentBadge.upsert({
+            where: {
+                userId_badgeId: {
+                    userId,
+                    badgeId: badge.id
+                }
+            },
+            update: {},
+            create: {
+                userId,
+                badgeId: badge.id
+            }
+        });
+    }
+
     revalidatePath("/dashboard/student");
 }
 

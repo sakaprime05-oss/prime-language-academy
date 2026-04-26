@@ -26,34 +26,38 @@ export async function registerUser(formData: FormData) {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Find or create the level based on planId
-        let level = await prisma.level.findFirst({
-            where: { name: { contains: planId } }
-        });
-
-        // Map plan IDs to prices if level doesn't exist or to ensure sync
-        const planPrices: Record<string, number> = {
-            "essentiel": 75000,
-            "intensif": 110000,
-            "immersion": 140000
-        };
-
-        if (!level && planPrices[planId]) {
-            level = await prisma.level.create({
-                data: {
-                    name: planId.charAt(0).toUpperCase() + planId.slice(1),
-                    price: planPrices[planId],
-                    description: `Plan ${planId} pour English Mastery Program`
-                }
-            });
-        }
-
         let onboardingParams: any = {};
         try {
             onboardingParams = JSON.parse(onboardingData);
         } catch (e) { }
 
-        const totalAmount = level?.price || planPrices[planId] || 0;
+        // Find or create the pedagogical level based on onboardingData
+        const pedagogicalLevelName = onboardingParams.level || "Débutant";
+        let level = await prisma.level.findFirst({
+            where: { name: { contains: pedagogicalLevelName, mode: 'insensitive' } }
+        });
+
+        if (!level) {
+            level = await prisma.level.create({
+                data: {
+                    name: pedagogicalLevelName,
+                    price: 0,
+                    description: `Niveau ${pedagogicalLevelName}`
+                }
+            });
+        }
+
+        // Map plan IDs to prices
+        const planPrices: Record<string, number> = {
+            "loisir": 50000,
+            "essentiel": 70000,
+            "equilibre": 90000,
+            "performance": 110000,
+            "intensif": 130000,
+            "immersion": 150000
+        };
+
+        const totalAmount = planPrices[planId] || 70000;
         const amountToPay = onboardingParams.paymentOption === "fractionne" ? (totalAmount * 0.2) : totalAmount;
 
         // Create student with assigned level, status PENDING
