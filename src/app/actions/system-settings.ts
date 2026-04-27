@@ -5,22 +5,34 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 
 export async function getSystemSettings() {
-    let settings = await prisma.systemSettings.findUnique({
-        where: { id: "default" }
-    });
-
-    if (!settings) {
-        settings = await prisma.systemSettings.create({
-            data: {
-                id: "default",
-                currentSessionName: "SESSION DE LANCEMENT : 18 JUIN – 19 AOUT 2026",
-                currentSessionStart: "18 Juin 2026",
-                currentSessionDuration: "02 MOIS"
-            }
+    try {
+        let settings = await prisma.systemSettings.findUnique({
+            where: { id: "default" }
         });
-    }
 
-    return settings;
+        if (!settings) {
+            settings = await prisma.systemSettings.create({
+                data: {
+                    id: "default",
+                    currentSessionName: "SESSION DE LANCEMENT : 18 JUIN – 19 AOUT 2026",
+                    currentSessionStart: "18 Juin 2026",
+                    currentSessionDuration: "02 MOIS"
+                }
+            });
+        }
+        return settings;
+    } catch (error) {
+        console.error("Database connection failed in getSystemSettings:", error);
+        // Fallback pour éviter que le site ne crashe
+        return {
+            id: "default",
+            currentSessionName: "SESSION DE LANCEMENT : 18 JUIN – 19 AOUT 2026",
+            currentSessionStart: "18 Juin 2026",
+            currentSessionDuration: "02 MOIS",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
+    }
 }
 
 export async function updateSystemSettings(formData: FormData) {
