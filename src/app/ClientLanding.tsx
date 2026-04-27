@@ -62,7 +62,7 @@ export default function ClientLanding({ session }: { session: any }) {
           <LogoMark className="h-20 w-20 sm:h-24 sm:w-24" />
         </Link>
 
-        <div style={{ display:"flex", gap:"2.5rem", fontSize:13, fontWeight:500, letterSpacing:"0.08em", textTransform:"uppercase", color:"rgba(245,240,232,0.55)" }}>
+        <div className="hidden lg:flex gap-10 text-[13px] font-medium tracking-widest uppercase text-[#F5F0E8]/55">
           {[["Mission","#mission"],["Méthode","#methode"],["Tarifs","#tarifs"],["Blog","/blog"]].map(([l,h]) => (
             <Link key={l} href={h} style={{ color:"inherit", textDecoration:"none", transition:"color 0.2s" }}
               onMouseEnter={e=>(e.currentTarget.style.color="#E7162A")}
@@ -158,14 +158,14 @@ export default function ClientLanding({ session }: { session: any }) {
 
       {/* ══════════ POURQUOI NOUS ══════════ */}
       <section id="methode" style={{ padding:"120px 2rem", maxWidth:1200, margin:"0 auto" }}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:72 }}>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16">
           <div>
             <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", marginBottom:16 }}>Notre différence</div>
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.2rem,4vw,3.5rem)", fontWeight:900, lineHeight:1.1, margin:0 }}>
               Pourquoi choisir<br/><em style={{ color:"#E7162A" }}>Prime Academy ?</em>
             </h2>
           </div>
-          <p style={{ maxWidth:320, fontSize:15, color:"rgba(245,240,232,0.5)", lineHeight:1.7, textAlign:"right" }}>
+          <p className="max-w-[320px] text-[15px] text-[#F5F0E8]/50 leading-relaxed md:text-right">
             L'anglais n'est pas une matière à mémoriser. C'est un muscle à entraîner — avec la bonne méthode.
           </p>
         </div>
@@ -192,7 +192,7 @@ export default function ClientLanding({ session }: { session: any }) {
 
       {/* ══════════ MISSION / VISION ══════════ */}
       <section id="mission" style={{ padding:"120px 2rem" }}>
-        <div style={{ maxWidth:1200, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"80px", alignItems:"center" }}>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
           <div style={{ position:"relative" }}>
             <div style={{ position:"absolute", top:-40, left:-40, width:300, height:300, borderRadius:"50%", background:"rgba(231,22,42,0.05)", filter:"blur(80px)", pointerEvents:"none" }}/>
             <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", marginBottom:16 }}>Notre mission</div>
@@ -206,7 +206,7 @@ export default function ClientLanding({ session }: { session: any }) {
               Les blocages psychologiques à l'oral, la peur de faire des fautes, l'absence d'un cadre progressif et adapté. <strong style={{ color:"#F5F0E8" }}>Nous connaissons notre public.</strong>
             </p>
           </div>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
               { icon:"🧠", t:"Pédagogie claire", d:"Structure progressive et adaptée aux francophones" },
               { icon:"🤝", t:"Accompagnement humain", d:"Formateurs engagés, pas des algorithmes" },
@@ -285,7 +285,7 @@ export default function ClientLanding({ session }: { session: any }) {
 
       {/* ══════════ HORAIRES ══════════ */}
       <section style={{ padding:"80px 2rem" }}>
-        <div style={{ maxWidth:800, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:24 }}>
+        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           {[["Vague 1","16h00 – 18h00","Idéale pour les lycéens & étudiants"],["Vague 2","18h00 – 20h00","Idéale pour les professionnels"]].map(([label,time,desc]) => (
             <div key={label} style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px 32px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)", overflow:"hidden", position:"relative" }}>
               <div style={{ position:"absolute", top:-20, right:-20, width:100, height:100, borderRadius:"50%", background:"rgba(231,22,42,0.05)", filter:"blur(30px)" }}/>
@@ -342,9 +342,9 @@ export default function ClientLanding({ session }: { session: any }) {
           </div>
 
           {/* Two-column split */}
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, marginBottom:24 }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Left — concept */}
-            <div style={{ border:"1px solid #E7162A", borderRadius:24, padding:"48px 40px", background:"rgba(231,22,42,0.04)", backdropFilter:"blur(16px)", boxShadow:"0 0 40px rgba(231,22,42,0.08)", gridRow:"1 / 3" }}>
+            <div className="lg:row-span-2" style={{ border:"1px solid #E7162A", borderRadius:24, padding:"48px 40px", background:"rgba(231,22,42,0.04)", backdropFilter:"blur(16px)", boxShadow:"0 0 40px rgba(231,22,42,0.08)" }}>
               <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:20 }}>Cercle Privé · B2 → C2</div>
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:900, color:"#E7162A", marginBottom:20, lineHeight:1.2 }}>Un club social anglophone pour l'élite d'Abidjan</h3>
               <p style={{ color:"rgba(245,240,232,0.6)", lineHeight:1.85, fontSize:15, marginBottom:32 }}>
@@ -395,7 +395,7 @@ export default function ClientLanding({ session }: { session: any }) {
       </section>
 
       {/* ══════════ FOOTER ══════════ */}
-      <footer style={{ borderTop:"1px solid rgba(231,22,42,0.1)", padding:"48px 2rem", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:24 }}>
+      <footer className="border-t border-[#E7162A]/10 px-6 sm:px-8 py-12 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
         <div style={{ display:"flex", alignItems:"center", gap:12 }}>
           <LogoMark className="h-16 w-16 sm:h-20 sm:w-20" />
           <span style={{ fontFamily:"'Playfair Display',serif", fontSize:15, color:"rgba(245,240,232,0.5)" }}>Prime Language Academy</span>
