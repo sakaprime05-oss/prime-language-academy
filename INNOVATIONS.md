@@ -31,11 +31,21 @@ Ce document récapitule les avancées majeures réalisées sur la plateforme **P
 - **Identité du Navigateur** : Mise à jour de la Favicon et des icônes d'application (PWA) pour une reconnaissance immédiate de la marque dans les onglets.
 - **Standardisation des Composants** : Utilisation du composant `LogoMark` unifié pour faciliter les futures évolutions.
 
+## 7. 📊 Tableaux de Bord Analytiques (Admin)
+- **Visualisation de Données** : Intégration de graphiques dynamiques (`recharts`) pour suivre les revenus, la croissance du nombre d'étudiants et la répartition par niveau.
+- **Pilotage Stratégique** : Analyse en temps réel des performances de l'académie directement depuis l'espace administrateur.
+
+## 8. 🔔 Système de Notifications par Email
+- **Engagement Forum** : Envoi automatique d'un email de notification à l'auteur d'un post dès qu'un nouveau commentaire est ajouté.
+- **Réactivité Accrue** : Permet aux étudiants de rester connectés aux discussions sans avoir à rafraîchir la page constamment.
+
 ## 🛠️ Stack Technique Mise à Jour
 - **Next-Themes** : Gestion du mode clair/sombre.
 - **Framer Motion** : Animations et particules.
 - **Lucide React** : Icônes premium.
 - **Tailwind CSS v4** : Utilisation des nouvelles variables et utilitaires.
+- **Recharts** : Bibliothèque de visualisation de données pour les statistiques.
+- **Nodemailer** : Pipeline d'emails transactionnels (Welcome, Invoices, Notifications).
 - **GitHub Actions / Vercel** : Pipeline de déploiement automatisé activé.
 
 ---
