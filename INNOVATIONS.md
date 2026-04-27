@@ -1,6 +1,6 @@
 # 🚀 Dernières Innovations & Mises à Jour (Avril 2026)
 
-Ce document récapitule les avancées majeures réalisées sur la plateforme **Prime Language Academy / Language Mastery Academy**.
+Ce document récapitule les avancées majeures réalisées sur la plateforme **Prime Language Academy**.
 
 ## 1. 💅 Refonte Visuelle "Premium Dark"
 - **Esthétique Moderne** : Passage à un design "Dark Mode Premium" utilisant les couleurs de la marque (#21286E et #E7162A) sur un fond Slate-950 élégant.
@@ -19,7 +19,7 @@ Ce document récapitule les avancées majeures réalisées sur la plateforme **P
 - **Adaptativité** : Toutes les interfaces de la landing page et du blog sont désormais 100% compatibles avec les deux modes.
 
 ## 4. 🏛️ Identité & Vision
-- **Language Mastery Academy** : Intégration d'une nouvelle section "Notre Identité" détaillant la vision de l'académie, les blocages des francophones et la mission de déblocage du potentiel.
+- **Prime Language Academy** : Intégration d'une nouvelle section "Notre Identité" détaillant la vision de l'académie, les blocages des francophones et la mission de déblocage du potentiel.
 
 ## 5. 📱 Optimisations Mobiles (Responsive)
 - Réajustement des dimensions des titres (H1), paddings et badges pour une expérience parfaite sur smartphone.

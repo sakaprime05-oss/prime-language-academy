@@ -134,7 +134,7 @@ export default function RegisterClubForm() {
                     return (
                         <div key={label} className="flex flex-col items-center gap-2">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all ${
-                                isActive ? 'bg-secondary text-[#080808] shadow-[0_0_15px_rgba(212,175,55,0.4)] scale-110' :
+                                isActive ? 'bg-secondary text-[#080808] shadow-[0_0_15px_rgba(231,22,42,0.4)] scale-110' :
                                 isPassed ? 'bg-secondary/20 text-secondary' :
                                 'bg-[var(--foreground)]/5 text-[var(--foreground)]/30'
                             }`}>
@@ -189,7 +189,7 @@ export default function RegisterClubForm() {
                                 <button type="button" key={lvl} onClick={() => setFormData({ ...formData, level: lvl })}
                                     className={`p-4 rounded-xl border text-left text-sm font-bold transition-all ${
                                         formData.level === lvl 
-                                        ? 'bg-secondary/10 border-secondary text-secondary shadow-[0_0_15px_rgba(212,175,55,0.15)]' 
+                                        ? 'bg-secondary/10 border-secondary text-secondary shadow-[0_0_15px_rgba(231,22,42,0.15)]' 
                                         : 'border-[var(--foreground)]/10 text-[var(--foreground)]/60 hover:border-[var(--foreground)]/30'
                                     }`}>
                                     {lvl}
@@ -208,7 +208,7 @@ export default function RegisterClubForm() {
                             <button type="button" key={plan.id} onClick={() => setFormData({ ...formData, planId: plan.id })}
                                 className={`p-4 rounded-xl border text-center transition-all ${
                                     formData.planId === plan.id 
-                                    ? 'bg-secondary/10 border-secondary shadow-[0_0_20px_rgba(212,175,55,0.15)]' 
+                                    ? 'bg-secondary/10 border-secondary shadow-[0_0_20px_rgba(231,22,42,0.15)]' 
                                     : 'border-[var(--foreground)]/10 hover:border-secondary/30'
                                 }`}>
                                 <div className={`text-xs font-black mb-1 ${formData.planId === plan.id ? 'text-secondary' : 'text-[var(--foreground)]/70'}`}>{plan.name}</div>

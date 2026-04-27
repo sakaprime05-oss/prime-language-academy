@@ -4,7 +4,7 @@ export function LogoMark({ className = "w-10 h-10" }: { className?: string }) {
     return (
         <div className={`relative flex items-center justify-center overflow-hidden shrink-0 ${className}`}>
             <Image 
-                src="/icon-512x512.png" 
+                src="/logo.png" 
                 alt="Prime Language Academy Logo" 
                 fill
                 sizes="(max-width: 768px) 100vw, 512px"

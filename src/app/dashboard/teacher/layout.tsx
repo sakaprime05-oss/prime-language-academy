@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { logoutAction } from "@/app/actions/logout";
+import { LogoMark } from "@/components/logo";
 
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
     const session = await auth();
@@ -17,9 +18,7 @@ export default async function TeacherLayout({ children }: { children: React.Reac
             <aside className="hidden md:flex w-64 flex-col bg-[#101820] border-r border-white/5 sticky top-0 h-screen z-50">
                 <div className="p-6 pb-3 border-b border-white/5">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-teal-500/20 text-teal-400 rounded-xl flex items-center justify-center text-lg font-black">
-                            T
-                        </div>
+                        <LogoMark className="w-10 h-10" />
                         <div>
                             <h1 className="text-lg font-black text-white tracking-tight">Prime Teacher</h1>
                             <p className="text-[10px] uppercase tracking-widest font-black text-teal-300">Espace Enseignant</p>
@@ -64,7 +63,7 @@ export default async function TeacherLayout({ children }: { children: React.Reac
             <div className="md:hidden flex flex-col w-full min-h-screen">
                 <header className="sticky top-0 z-40 bg-[#101820]/95 backdrop-blur-xl border-b border-white/5 px-5 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center text-sm font-black">T</div>
+                        <LogoMark className="w-8 h-8" />
                         <h1 className="text-lg font-black text-white">Teacher</h1>
                     </div>
                     <form action={logoutAction}>

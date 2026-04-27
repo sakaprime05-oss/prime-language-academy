@@ -66,7 +66,7 @@ export function OwlMascot({ size = 100 }: { size?: number }) {
         transform: `translateY(${bob}px)`,
         pointerEvents: "none",
         userSelect: "none",
-        filter: "drop-shadow(0 8px 20px rgba(212,175,55,0.3))",
+        filter: "drop-shadow(0 8px 20px rgba(231,22,42,0.3))",
       }}
     >
       <svg
@@ -149,7 +149,7 @@ export function OwlMascot({ size = 100 }: { size?: number }) {
           <circle cx={28.5 + px * 0.5} cy={42.5 + py * 0.5} r="2.2" fill="white" opacity="0.95"/>
           <circle cx={34 + px * 0.3} cy={49 + py * 0.3} r="1" fill="white" opacity="0.5"/>
         </>}
-        <ellipse cx="32" cy="46" rx="13" ry="13" fill="none" stroke="#D4AF37" strokeWidth="0.8" strokeOpacity="0.4"/>
+        <ellipse cx="32" cy="46" rx="13" ry="13" fill="none" stroke="#E7162A" strokeWidth="0.8" strokeOpacity="0.4"/>
 
         {/* ── RIGHT EYE ── */}
         <ellipse cx="68" cy="46" rx="13" ry="13" fill="white" filter="url(#hg)"/>
@@ -163,10 +163,10 @@ export function OwlMascot({ size = 100 }: { size?: number }) {
           <circle cx={64.5 + px * 0.5} cy={42.5 + py * 0.5} r="2.2" fill="white" opacity="0.95"/>
           <circle cx={70 + px * 0.3} cy={49 + py * 0.3} r="1" fill="white" opacity="0.5"/>
         </>}
-        <ellipse cx="68" cy="46" rx="13" ry="13" fill="none" stroke="#D4AF37" strokeWidth="0.8" strokeOpacity="0.4"/>
+        <ellipse cx="68" cy="46" rx="13" ry="13" fill="none" stroke="#E7162A" strokeWidth="0.8" strokeOpacity="0.4"/>
 
         {/* Gold ring around neck base */}
-        <path d="M14 80 Q50 90 86 80" stroke="#D4AF37" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.5"/>
+        <path d="M14 80 Q50 90 86 80" stroke="#E7162A" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.5"/>
       </svg>
     </div>
   );

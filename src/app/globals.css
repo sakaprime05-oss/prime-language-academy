@@ -74,11 +74,11 @@
   --background:    #080808;
   --foreground:    #F5F0E8;
   --surface:       rgba(20, 20, 30, 0.85);
-  --surface-hover: rgba(212, 175, 55, 0.08);
-  --primary:       #D4AF37;
-  --primary-glow:  rgba(212, 175, 55, 0.35);
+  --surface-hover: rgba(231,22,42, 0.08);
+  --primary:       #E7162A;
+  --primary-glow:  rgba(231,22,42, 0.35);
   --secondary:     #F5F0E8;
-  --glass-border:  rgba(212, 175, 55, 0.15);
+  --glass-border:  rgba(231,22,42, 0.15);
   --glass-shadow:  0 8px 40px 0 rgba(0,0,0,0.6);
   --card:          #111118;
   --card-foreground: #F5F0E8;
@@ -86,17 +86,17 @@
   --popover-foreground: #F5F0E8;
   --muted:         #1A1A28;
   --muted-foreground: rgba(245,240,232,0.45);
-  --border:        rgba(212, 175, 55, 0.12);
+  --border:        rgba(231,22,42, 0.12);
   --input:         rgba(245,240,232,0.08);
-  --ring:          #D4AF37;
+  --ring:          #E7162A;
   --sidebar:       #0D0D14;
   --sidebar-foreground: #F5F0E8;
-  --sidebar-primary: #D4AF37;
+  --sidebar-primary: #E7162A;
   --sidebar-primary-foreground: #080808;
-  --sidebar-accent: rgba(212,175,55,0.1);
+  --sidebar-accent: rgba(231,22,42,0.1);
   --sidebar-accent-foreground: #F5F0E8;
-  --sidebar-border: rgba(212,175,55,0.1);
-  --sidebar-ring: #D4AF37;
+  --sidebar-border: rgba(231,22,42,0.1);
+  --sidebar-ring: #E7162A;
 }
 
 @theme inline {
@@ -162,20 +162,20 @@
     @apply p-6 transition-all duration-300;
   }
   .glass-card:hover {
-    border-color: rgba(212, 175, 55, 0.3);
+    border-color: rgba(231,22,42, 0.3);
     transform: translateY(-2px);
-    box-shadow: 0 16px 50px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,175,55,0.2);
+    box-shadow: 0 16px 50px rgba(0,0,0,0.7), 0 0 0 1px rgba(231,22,42,0.2);
   }
 
   /* ── GOLD BUTTON ── */
   .btn-primary {
     @apply relative overflow-hidden rounded-full py-4 px-8 font-semibold transition-all duration-300 active:scale-95 text-sm tracking-widest uppercase;
-    background: linear-gradient(135deg, #D4AF37, #F0D060, #A08828);
+    background: linear-gradient(135deg, #E7162A, #FF4D5E, #B30012);
     color: #080808;
-    box-shadow: 0 0 30px rgba(212,175,55,0.25), inset 0 1px 0 rgba(255,255,255,0.3);
+    box-shadow: 0 0 30px rgba(231,22,42,0.25), inset 0 1px 0 rgba(255,255,255,0.3);
   }
   .btn-primary:hover {
-    box-shadow: 0 0 50px rgba(212,175,55,0.45), inset 0 1px 0 rgba(255,255,255,0.4);
+    box-shadow: 0 0 50px rgba(231,22,42,0.45), inset 0 1px 0 rgba(255,255,255,0.4);
     filter: brightness(1.08);
   }
   .btn-primary::after {
@@ -188,7 +188,7 @@
   /* ── GOLD TEXT ── */
   .text-gold { color: var(--gold); }
   .gradient-gold {
-    background: linear-gradient(135deg, #D4AF37, #F0D060, #C8960C);
+    background: linear-gradient(135deg, #E7162A, #FF4D5E, #CC0014);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -197,7 +197,7 @@
   /* ── DIVIDER ── */
   .divider-gold {
     height: 1px;
-    background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+    background: linear-gradient(90deg, transparent, #E7162A, transparent);
     opacity: 0.3;
   }
 

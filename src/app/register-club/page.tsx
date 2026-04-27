@@ -17,7 +17,7 @@ export default async function RegisterClubPage() {
 
             <div className="w-full max-w-sm glass-card relative z-10 border-secondary/20 shadow-2xl">
                 <div className="text-center space-y-4 mb-8">
-                    <div className="w-16 h-16 bg-gradient-to-br from-secondary to-[#A08828] rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-secondary/20 rotate-3">
+                    <div className="w-16 h-16 bg-gradient-to-br from-secondary to-[#B30012] rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-secondary/20 rotate-3">
                         <span className="text-2xl font-black text-[#080808] -rotate-3">P</span>
                     </div>
                     <div>

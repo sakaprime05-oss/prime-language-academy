@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   title: "Prime Academy | Hub d'Excellence 2026",
   description: "Système de gestion pédagogique haute performance pour Prime Language Academy. Parlez anglais. Vivez des opportunités.",
   manifest: "/manifest.json",
-  themeColor: "#D4AF37",
+  themeColor: "#E7162A",
   openGraph: {
     title: "Prime Language Academy",
     description: "Parlez anglais. Vivez des opportunités. Rejoignez le centre linguistique de référence en Côte d'Ivoire.",
