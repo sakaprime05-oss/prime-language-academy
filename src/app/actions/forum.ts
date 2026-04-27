@@ -38,13 +38,28 @@ export async function createComment(postId: string, formData: FormData) {
     if (!content) return { error: "Veuillez entrer un commentaire." };
 
     try {
-        await prisma.comment.create({
+        const comment = await prisma.comment.create({
             data: {
                 content,
                 postId,
                 authorId: session.user.id
+            },
+            include: {
+                post: { include: { author: true } }
             }
         });
+
+        // Notify post author if commenter is not the author
+        if (comment.post.authorId !== session.user.id && comment.post.author.email) {
+            const { sendForumCommentEmail } = await import("@/lib/email");
+            await sendForumCommentEmail(
+                comment.post.author.email,
+                comment.post.author.name || "Étudiant",
+                session.user.name || "Un autre étudiant",
+                comment.post.title,
+                postId
+            ).catch(err => console.error("Could not send forum notification", err));
+        }
 
         revalidatePath(`/dashboard/student/forum/${postId}`);
         return { success: true };

@@ -196,3 +196,28 @@ export async function sendAdminPaymentProofEmail(studentName: string, provider: 
     `;
     return sendEmail({ to: adminEmail, subject, html });
 }
+
+export async function sendForumCommentEmail(postAuthorEmail: string, postAuthorName: string, commenterName: string, postTitle: string, postId: string) {
+    const subject = `Nouveau commentaire sur votre post : "${postTitle}" 💬`;
+    const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; background-color: #f9f9fb; padding: 40px; border-radius: 12px;">
+            <h2 style="color: #E7162A;">Bonjour ${postAuthorName},</h2>
+            <p style="font-size: 16px; color: #4b5563;">
+                <strong>${commenterName}</strong> vient de commenter votre publication sur le forum.
+            </p>
+            <div style="background-color: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; margin-top: 20px;">
+                <p><strong>Post :</strong> ${postTitle}</p>
+            </div>
+            <p style="margin-top: 20px;">
+                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/student/forum/${postId}" style="background-color: #E7162A; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; display: inline-block;">
+                    Répondre au commentaire
+                </a>
+            </p>
+            <p style="font-size: 12px; color: #999; margin-top: 30px;">
+                Ceci est une notification automatique de Prime Language Academy.
+            </p>
+        </div>
+    `;
+    return sendEmail({ to: postAuthorEmail, subject, html });
+}
+
