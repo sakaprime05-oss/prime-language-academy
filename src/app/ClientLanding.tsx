@@ -94,7 +94,7 @@ export default function ClientLanding({ session }: { session: any }) {
         {/* Grid lines */}
         <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(231,22,42,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(231,22,42,0.03) 1px, transparent 1px)", backgroundSize:"80px 80px", pointerEvents:"none" }}/>
 
-        <div style={{ maxWidth:1200, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"80px", alignItems:"center", position:"relative", zIndex:1 }}>
+        <div style={{ maxWidth:900, margin:"0 auto", display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center", position:"relative", zIndex:1 }}>
 
           {/* Left */}
           <div>
@@ -109,11 +109,11 @@ export default function ClientLanding({ session }: { session: any }) {
               opportunités.
             </h1>
 
-            <p style={{ fontSize:17, lineHeight:1.75, color:"rgba(245,240,232,0.6)", maxWidth:480, marginBottom:44 }}>
+            <p style={{ fontSize:17, lineHeight:1.75, color:"rgba(245,240,232,0.6)", maxWidth:600, marginBottom:44, marginLeft:"auto", marginRight:"auto" }}>
               Prime Language Academy accompagne professionnels, étudiants et entrepreneurs francophones vers une maîtrise confiante et efficace de l'anglais.
             </p>
 
-            <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
+            <div style={{ display:"flex", gap:16, flexWrap:"wrap", justifyContent:"center" }}>
               <Link href="/register" className="btn-primary" style={{ textDecoration:"none", display:"inline-block" }}>
                 Rejoindre la session →
               </Link>
@@ -131,7 +131,7 @@ export default function ClientLanding({ session }: { session: any }) {
             </div>
 
             {/* Stats */}
-            <div style={{ display:"flex", gap:40, marginTop:56, paddingTop:40, borderTop:"1px solid rgba(231,22,42,0.12)" }}>
+            <div style={{ display:"flex", gap:40, marginTop:56, paddingTop:40, borderTop:"1px solid rgba(231,22,42,0.12)", justifyContent:"center", width:"100%" }}>
               {[["6","Formules adaptées"],["2","Vagues horaires"],["21 juin","Début session"]].map(([v,l])=>(
                 <div key={l}>
                   <div style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:900, color:"#E7162A", lineHeight:1 }}>{v}</div>
@@ -141,16 +141,7 @@ export default function ClientLanding({ session }: { session: any }) {
             </div>
           </div>
 
-          {/* Right — visual placeholder */}
-          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:24 }}>
-            <div style={{ width:220, height:220, borderRadius:"50%", background:"rgba(231,22,42,0.06)", border:"1px solid rgba(231,22,42,0.15)", display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
-              <img src="/goat_head.png" alt="Atlas Goat Head" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-            </div>
-            <div style={{ textAlign:"center" }}>
-              <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:700, color:"#E7162A", marginBottom:6 }}>ATLAS</div>
-              <div style={{ fontSize:12, color:"rgba(245,240,232,0.4)", letterSpacing:"0.15em", textTransform:"uppercase" }}>Votre guide linguistique</div>
-            </div>
-          </div>
+
         </div>
       </section>
 
