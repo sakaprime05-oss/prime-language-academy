@@ -18,7 +18,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <aside className="hidden md:flex w-64 flex-col bg-[#12121e] border-r border-white/5 sticky top-0 h-screen z-50">
                 <div className="p-6 pb-3 border-b border-white/5">
                     <div className="flex items-center gap-3">
-                        <LogoMark className="w-10 h-10" />
+                        <LogoMark className="w-16 h-16 sm:w-20 sm:h-20" />
                         <div>
                             <h1 className="text-lg font-black text-white tracking-tight">Prime Admin</h1>
                             <p className="text-[9px] uppercase tracking-widest font-bold text-red-400/60">Back-Office</p>
@@ -45,7 +45,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <div className="md:hidden flex flex-col w-full min-h-screen">
                 <header className="sticky top-0 z-40 bg-[#12121e]/95 backdrop-blur-xl border-b border-white/5 px-5 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <LogoMark className="w-8 h-8" />
+                        <LogoMark className="w-12 h-12" />
                         <h1 className="text-lg font-black text-white">Admin</h1>
                     </div>
                     <form action={logoutAction}>

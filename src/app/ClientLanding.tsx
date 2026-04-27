@@ -59,7 +59,7 @@ export default function ClientLanding({ session }: { session: any }) {
       }}>
         <Link href="/" style={{ display:"flex", alignItems:"center", gap:"12px", textDecoration:"none" }}>
           {/* Remplacez '/logo.png' par le nom exact de votre fichier logo s'il est différent (ex: '/logo.svg') */}
-          <LogoMark className="h-10 w-10" />
+          <LogoMark className="h-20 w-20 sm:h-24 sm:w-24" />
         </Link>
 
         <div style={{ display:"flex", gap:"2.5rem", fontSize:13, fontWeight:500, letterSpacing:"0.08em", textTransform:"uppercase", color:"rgba(245,240,232,0.55)" }}>
@@ -397,7 +397,7 @@ export default function ClientLanding({ session }: { session: any }) {
       {/* ══════════ FOOTER ══════════ */}
       <footer style={{ borderTop:"1px solid rgba(231,22,42,0.1)", padding:"48px 2rem", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:24 }}>
         <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-          <LogoMark className="h-8 w-8" />
+          <LogoMark className="h-16 w-16 sm:h-20 sm:w-20" />
           <span style={{ fontFamily:"'Playfair Display',serif", fontSize:15, color:"rgba(245,240,232,0.5)" }}>Prime Language Academy</span>
         </div>
         <div style={{ display:"flex", gap:32, fontSize:12, color:"rgba(245,240,232,0.3)", letterSpacing:"0.1em", textTransform:"uppercase" }}>
