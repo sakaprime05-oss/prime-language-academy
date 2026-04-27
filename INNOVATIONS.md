@@ -25,11 +25,18 @@ Ce document récapitule les avancées majeures réalisées sur la plateforme **P
 - Réajustement des dimensions des titres (H1), paddings et badges pour une expérience parfaite sur smartphone.
 - Navigation mobile fluide et lisible.
 
+## 6. 🎨 Intégration de l'Identité de Marque (Logo Officiel)
+- **Logo sur Mesure** : Intégration du logo officiel (3 capsules rouges dynamiques) sur l'ensemble de la plateforme.
+- **Cohérence Globale** : Remplacement des icônes temporaires (P, A, T) par la marque officielle dans les barres de navigation et les headers des espaces Étudiant, Enseignant et Administrateur.
+- **Identité du Navigateur** : Mise à jour de la Favicon et des icônes d'application (PWA) pour une reconnaissance immédiate de la marque dans les onglets.
+- **Standardisation des Composants** : Utilisation du composant `LogoMark` unifié pour faciliter les futures évolutions.
+
 ## 🛠️ Stack Technique Mise à Jour
 - **Next-Themes** : Gestion du mode clair/sombre.
 - **Framer Motion** : Animations et particules.
 - **Lucide React** : Icônes premium.
 - **Tailwind CSS v4** : Utilisation des nouvelles variables et utilitaires.
+- **GitHub Actions / Vercel** : Pipeline de déploiement automatisé activé.
 
 ---
-*Dossier alimenté le 25/04/2026 par Antigravity.*
+*Dossier alimenté le 27/04/2026 par Antigravity.*
