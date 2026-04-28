@@ -39,7 +39,7 @@ export async function POST(req: Request) {
                         email: true,
                         createdAt: true,
                         role: true,
-                        isActive: true
+                        status: true
                     }
                 });
                 return NextResponse.json({ users });
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
                     prisma.user.findMany({
                         take: 20,
                         orderBy: { createdAt: "desc" },
-                        select: { name: true, email: true, role: true, createdAt: true, isActive: true }
+                        select: { name: true, email: true, role: true, createdAt: true, status: true }
                     }),
                     prisma.transaction.findMany({
                         where: { status: "PENDING" },
@@ -86,9 +86,9 @@ export async function POST(req: Request) {
                 const { email, active } = params;
                 const user = await prisma.user.update({
                     where: { email },
-                    data: { isActive: active },
+                    data: { status: active ? "ACTIVE" : "SUSPENDED" },
                 });
-                return NextResponse.json({ success: true, user: { name: user.name, isActive: user.isActive } });
+                return NextResponse.json({ success: true, user: { name: user.name, status: user.status } });
             }
 
             default:
