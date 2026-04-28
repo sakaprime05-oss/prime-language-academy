@@ -32,24 +32,46 @@ export async function POST(req: Request) {
 
             case "get_recent_registrations": {
                 const users = await prisma.user.findMany({
-                    take: 5,
+                    take: 10,
                     orderBy: { createdAt: "desc" },
                     select: {
                         name: true,
                         email: true,
                         createdAt: true,
                         role: true,
-                        status: true
+                        status: true,
+                        registrationType: true
                     }
                 });
                 return NextResponse.json({ users });
             }
 
+            case "get_lapsed_registrations": {
+                // Étudiants inscrits il y a plus de 24h mais sans transaction COMPLETED
+                const yesterday = new Date();
+                yesterday.setHours(yesterday.getHours() - 24);
+
+                const users = await prisma.user.findMany({
+                    where: {
+                        role: "STUDENT",
+                        createdAt: { lt: yesterday },
+                        paymentPlans: {
+                            none: {
+                                transactions: {
+                                    some: { status: "COMPLETED" }
+                                }
+                            }
+                        }
+                    },
+                    select: { name: true, email: true, createdAt: true, registrationType: true }
+                });
+                return NextResponse.json({ users });
+            }
+
             case "analyze_data": {
-                // Cette action donne une vue d'ensemble complète à l'IA pour analyse
-                const [users, pendingPayments, recentArticles, stats] = await Promise.all([
+                const [users, pendingPayments, recentArticles, distribution] = await Promise.all([
                     prisma.user.findMany({
-                        take: 20,
+                        take: 10,
                         orderBy: { createdAt: "desc" },
                         select: { name: true, email: true, role: true, createdAt: true, status: true }
                     }),
@@ -73,20 +95,24 @@ export async function POST(req: Request) {
                         recent_users: users,
                         pending_payments: pendingPayments.map(p => ({
                             student: p.paymentPlan?.student?.name || "Inconnu",
+                            email: p.paymentPlan?.student?.email,
                             amount: p.amount,
-                            date: p.date
+                            date: p.date,
+                            ref: p.referenceId
                         })),
-                        content_performance: recentArticles,
-                        distribution: stats
+                        content: recentArticles,
+                        distribution
                     }
                 });
             }
 
             case "toggle_user_status": {
-                const { email, active } = params;
+                const { email, action } = params; // action: "BLOCK" or "ACTIVATE"
+                const newStatus = action === "BLOCK" ? "BLOCKED" : "ACTIVE";
+                
                 const user = await prisma.user.update({
                     where: { email },
-                    data: { status: active ? "ACTIVE" : "SUSPENDED" },
+                    data: { status: newStatus },
                 });
                 return NextResponse.json({ success: true, user: { name: user.name, status: user.status } });
             }
