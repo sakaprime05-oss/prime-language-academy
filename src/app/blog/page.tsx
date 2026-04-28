@@ -126,7 +126,6 @@ export default async function BlogPage() {
                       {format(new Date(article.createdAt), "dd MMMM yyyy", { locale: fr })}
                     </span>
                   </div>
-                </div>
                 <Link href={`/blog/${article.slug}`}>
                   <CardTitle className="text-xl md:text-2xl font-black text-slate-900 dark:text-white group-hover:text-[#E7162A] transition-colors leading-tight line-clamp-2">
                     {article.title}
