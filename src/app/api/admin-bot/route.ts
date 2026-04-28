@@ -16,7 +16,7 @@ export async function POST(req: Request) {
                 const [totalStudents, totalClub, pendingPayments, totalArticles] = await Promise.all([
                     prisma.user.count({ where: { role: "STUDENT" } }),
                     prisma.user.count({ where: { registrationType: "CLUB" } }),
-                    prisma.payment.count({ where: { status: "PENDING" } }),
+                    prisma.transaction.count({ where: { status: "PENDING" } }),
                     prisma.article.count(),
                 ]);
 
@@ -53,14 +53,14 @@ export async function POST(req: Request) {
                         orderBy: { createdAt: "desc" },
                         select: { name: true, email: true, role: true, createdAt: true, isActive: true }
                     }),
-                    prisma.payment.findMany({
+                    prisma.transaction.findMany({
                         where: { status: "PENDING" },
-                        include: { user: { select: { name: true, email: true } } }
+                        include: { paymentPlan: { include: { student: { select: { name: true, email: true } } } } }
                     }),
                     prisma.article.findMany({
                         take: 5,
                         orderBy: { createdAt: "desc" },
-                        select: { title: true, views: true }
+                        select: { title: true, slug: true }
                     }),
                     prisma.user.groupBy({
                         by: ['role'],
@@ -72,9 +72,9 @@ export async function POST(req: Request) {
                     summary: {
                         recent_users: users,
                         pending_payments: pendingPayments.map(p => ({
-                            student: p.user.name,
+                            student: p.paymentPlan?.student?.name || "Inconnu",
                             amount: p.amount,
-                            date: p.createdAt
+                            date: p.date
                         })),
                         content_performance: recentArticles,
                         distribution: stats
