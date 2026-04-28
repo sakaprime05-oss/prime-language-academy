@@ -19,6 +19,7 @@ model User {
 
   // Onboarding data (JSON string)
   onboardingData String?
+  registrationType String @default("FORMATION") // FORMATION or CLUB
 
   // For Students
   levelId       String?
@@ -141,6 +142,7 @@ model Transaction {
   // MANUAL PAYMENT FIELDS
   senderPhone   String?     // Numéro de téléphone de l'expéditeur
   proof         String?     // N° de transaction secret ou référence SMS
+  invoiceUrl    String?     // Chemin vers la facture PDF générée
 }
 
 // FORUM / COMMUNITY MODELS
@@ -191,6 +193,8 @@ model SystemSettings {
   currentSessionName     String   @default("Avril - Juin 2026")
   currentSessionStart    String   @default("11 Avril 2026")
   currentSessionDuration String   @default("2 Mois")
+  enableOnlineRegistration Boolean @default(true)
+  enableCorporateRegistration Boolean @default(true)
   updatedAt              DateTime @updatedAt
 }
 

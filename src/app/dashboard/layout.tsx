@@ -1,5 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { getDictionary, getLocale } from "@/lib/i18n";
+import { LangToggle } from "@/components/lang-toggle";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     const session = await auth();
@@ -15,6 +17,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
     if (role === "ADMIN" || role === "TEACHER") {
         return <>{children}</>;
     }
+
+    const dict = await getDictionary();
+    const currentLang = await getLocale();
 
     // ===== LAYOUT ÉTUDIANT — Expérience immersive =====
     return (
@@ -33,17 +38,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 </div>
 
                 <div className="flex-1 overflow-y-auto px-4 mt-4">
-                    <StudentSidebarNav />
+                    <StudentSidebarNav dict={dict.nav} />
                 </div>
 
                 <div className="p-6 m-4 mt-auto rounded-3xl bg-[var(--surface-hover)] border border-[var(--foreground)]/5 flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-500 flex items-center justify-center font-black shadow-inner">
                         {session.user.name?.[0] || session.user.email?.[0].toUpperCase()}
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                         <p className="font-bold text-sm text-[var(--foreground)] truncate">{session.user.name || "Étudiant"}</p>
                         <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Étudiant</p>
                     </div>
+                    <LangToggle currentLang={currentLang} />
                 </div>
             </aside>
 
@@ -54,9 +60,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
                         <LogoMark className="w-16 h-16 sm:w-20 sm:h-20" />
                         Prime
                     </h1>
-                    <a href="/dashboard/student/profile" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-primary/20 flex items-center justify-center text-xs sm:text-sm font-bold text-primary shadow-sm hover:scale-105 transition-transform">
-                        {session.user.name?.[0] || session.user.email?.[0].toUpperCase()}
-                    </a>
+                    <div className="flex items-center gap-3">
+                        <LangToggle currentLang={currentLang} />
+                        <a href="/dashboard/student/profile" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-primary/20 flex items-center justify-center text-xs sm:text-sm font-bold text-primary shadow-sm hover:scale-105 transition-transform">
+                            {session.user.name?.[0] || session.user.email?.[0].toUpperCase()}
+                        </a>
+                    </div>
                 </header>
 
                 {/* Main Content (Mobile) */}
@@ -65,7 +74,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 </main>
 
                 {/* Bottom Navigation (Mobile — Student) */}
-                <StudentMobileNav />
+                <StudentMobileNav dict={dict.nav} />
             </div>
 
             {/* Main Content (Desktop) */}
@@ -88,10 +97,10 @@ import Link from "next/link";
 import { LogoMark } from "@/components/logo";
 import { StudentSidebarNavClient, StudentMobileNavClient } from "@/components/student-nav";
 
-function StudentSidebarNav() {
-    return <StudentSidebarNavClient />;
+function StudentSidebarNav({ dict }: { dict: any }) {
+    return <StudentSidebarNavClient dict={dict} />;
 }
 
-function StudentMobileNav() {
-    return <StudentMobileNavClient />;
+function StudentMobileNav({ dict }: { dict: any }) {
+    return <StudentMobileNavClient dict={dict} />;
 }

@@ -14,6 +14,21 @@ import { ThemeToggle } from "@/components/theme-toggle";
 export const metadata = {
   title: "Blog & Articles | Prime Language Academy",
   description: "Découvrez nos articles, conseils et réflexions sur l'apprentissage de l'anglais et l'importance du bilinguisme.",
+  keywords: "cours d'anglais Abidjan, English Club Côte d'Ivoire, apprendre l'anglais Abidjan, centre linguistique, formation anglais pro",
+  openGraph: {
+    title: "Blog | Prime Language Academy",
+    description: "Conseils et astuces pour maîtriser l'anglais en Côte d'Ivoire.",
+    url: "https://primelanguageacademy.com/blog",
+    siteName: "Prime Language Academy",
+    images: [{ url: "https://primelanguageacademy.com/icon-512x512.png" }],
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog | Prime Language Academy",
+    description: "Le meilleur blog pour apprendre l'anglais à Abidjan.",
+  }
 };
 
 export default async function BlogPage() {
@@ -75,15 +90,33 @@ export default async function BlogPage() {
 
       {/* ARTICLES LIST */}
       <section className="py-16 px-4 min-h-[40vh] relative z-10">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 gap-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles.map((article) => (
-            <Card key={article.id} className="bg-white dark:bg-slate-900 border-slate-800 hover:border-[#E7162A]/50 transition-all group overflow-hidden shadow-lg shadow-black/20 hover:shadow-[0_0_30px_rgba(231,22,42,0.15)]">
-              <CardHeader className="p-6 md:p-8 pb-2">
-                <div className="flex flex-wrap items-center gap-4 mb-4">
-                  <Badge className="bg-[#21286E]/40 text-blue-300 hover:bg-[#21286E]/50 border-none px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                    {article.category}
-                  </Badge>
-                  <div className="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+            <Card key={article.id} className="bg-white dark:bg-slate-900 border-slate-800 hover:border-[#E7162A]/50 transition-all group overflow-hidden shadow-lg shadow-black/20 hover:shadow-[0_0_30px_rgba(231,22,42,0.15)] flex flex-col">
+              {article.coverImage && (
+                <div className="relative w-full h-56 overflow-hidden">
+                  <Image 
+                    src={article.coverImage} 
+                    alt={article.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <Badge className="bg-[#21286E]/90 text-white border-none px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-md shadow-lg">
+                      {article.category}
+                    </Badge>
+                  </div>
+                </div>
+              )}
+              <CardHeader className={`p-6 md:p-8 pb-2 ${article.coverImage ? 'pt-6' : ''}`}>
+                {!article.coverImage && (
+                  <div className="flex flex-wrap items-center gap-4 mb-4">
+                    <Badge className="bg-[#21286E]/40 text-blue-300 hover:bg-[#21286E]/50 border-none px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                      {article.category}
+                    </Badge>
+                  </div>
+                )}
+                <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4">
                     <span className="flex items-center gap-1.5">
                       <User className="w-3 h-3" />
                       {article.author.name || "Équipe PLA"}
@@ -95,14 +128,14 @@ export default async function BlogPage() {
                   </div>
                 </div>
                 <Link href={`/blog/${article.slug}`}>
-                  <CardTitle className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white group-hover:text-[#E7162A] transition-colors leading-tight">
+                  <CardTitle className="text-xl md:text-2xl font-black text-slate-900 dark:text-white group-hover:text-[#E7162A] transition-colors leading-tight line-clamp-2">
                     {article.title}
                   </CardTitle>
                 </Link>
               </CardHeader>
-              <CardContent className="px-6 md:px-8 py-4">
-                <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 text-base leading-relaxed line-clamp-3">
-                  {article.content.replace(/<[^>]*>/g, '').substring(0, 300)}...
+              <CardContent className="px-6 md:px-8 py-4 flex-1">
+                <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 text-sm leading-relaxed line-clamp-3">
+                  {article.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
                 </p>
               </CardContent>
               <CardFooter className="px-6 md:px-8 py-6 pt-2">

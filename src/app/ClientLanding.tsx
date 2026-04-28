@@ -6,21 +6,21 @@ import { LogoMark } from "@/components/logo";
 
 /* ── tiny helpers ── */
 const PLANS = [
-  { id:"loisir",      freq:"1×/sem",  price:"50 000",  label:"Loisir" },
-  { id:"essentiel",   freq:"2×/sem",  price:"70 000",  label:"Essentiel" },
-  { id:"equilibre",   freq:"3×/sem",  price:"90 000",  label:"Équilibre" },
-  { id:"performance", freq:"4×/sem",  price:"110 000", label:"Performance" },
-  { id:"intensif",    freq:"5×/sem",  price:"130 000", label:"Intensif" },
-  { id:"immersion",   freq:"6×/sem",  price:"150 000", label:"Immersion", top:true },
+  { id:"loisir",      freq:"1×/sem",  price:"52 000",  label:"Loisir" },
+  { id:"essentiel",   freq:"2×/sem",  price:"72 000",  label:"Essentiel" },
+  { id:"equilibre",   freq:"3×/sem",  price:"92 000",  label:"Équilibre" },
+  { id:"performance", freq:"4×/sem",  price:"112 000", label:"Performance" },
+  { id:"intensif",    freq:"5×/sem",  price:"132 000", label:"Intensif" },
+  { id:"immersion",   freq:"6×/sem",  price:"152 000", label:"Immersion", top:true },
 ];
 
 const CLUB_PLANS = [
-  { id: "loisir",      freq: "1×/sem", price: "50 000", label: "Social" },
-  { id: "essentiel",   freq: "2×/sem", price: "70 000", label: "Connect" },
-  { id: "equilibre",   freq: "3×/sem", price: "90 000", label: "Network" },
-  { id: "performance", freq: "4×/sem", price: "110 000", label: "Executive" },
-  { id: "intensif",    freq: "5×/sem", price: "130 000", label: "Elite" },
-  { id: "immersion",   freq: "6×/sem", price: "150 000", label: "Founder", top: true },
+  { id: "loisir",      freq: "1×/sem", price: "52 000", label: "Social" },
+  { id: "essentiel",   freq: "2×/sem", price: "72 000", label: "Connect" },
+  { id: "equilibre",   freq: "3×/sem", price: "92 000", label: "Network" },
+  { id: "performance", freq: "4×/sem", price: "112 000", label: "Executive" },
+  { id: "intensif",    freq: "5×/sem", price: "132 000", label: "Elite" },
+  { id: "immersion",   freq: "6×/sem", price: "152 000", label: "Founder", top: true },
 ];
 
 const MARQUEE_WORDS = ["Speaking","Confidence","Fluency","Excellence","Bilinguisme","Impact","Immersion","Mastery","Progress","Growth","Networking","Community"];
@@ -32,7 +32,7 @@ const WHY = [
   { n:"04", title:"Certification CECRL", desc:"Attestation officielle A1→C2 remise en fin de session, reconnue à l'international." },
 ];
 
-export default function ClientLanding({ session }: { session: any }) {
+export default function ClientLanding({ session, systemSettings }: { session: any, systemSettings?: any, latestArticles?: any[] }) {
   const [scrolled, setScrolled] = useState(false);
   const [activePlan, setActivePlan] = useState("immersion");
   const [pricingMode, setPricingMode] = useState<"formation"|"club">("formation");
@@ -63,7 +63,7 @@ export default function ClientLanding({ session }: { session: any }) {
         </Link>
 
         <div className="hidden lg:flex gap-10 text-[13px] font-medium tracking-widest uppercase text-[#F5F0E8]/55">
-          {[["Mission","#mission"],["Méthode","#methode"],["Tarifs","#tarifs"],["Blog","/blog"]].map(([l,h]) => (
+          {[["Mission","#mission"],["Méthode","#methode"],["Tarifs","#tarifs"],["Le Club","/english-club"],["Blog","/blog"]].map(([l,h]) => (
             <Link key={l} href={h} style={{ color:"inherit", textDecoration:"none", transition:"color 0.2s" }}
               onMouseEnter={e=>(e.currentTarget.style.color="#E7162A")}
               onMouseLeave={e=>(e.currentTarget.style.color="rgba(245,240,232,0.55)")}>{l}</Link>
@@ -190,6 +190,51 @@ export default function ClientLanding({ session }: { session: any }) {
       {/* Divider */}
       <div className="divider-gold" style={{ maxWidth:1200, margin:"0 auto" }}/>
 
+      {/* ══════════ FORMATS DE COURS ══════════ */}
+      <section style={{ padding:"120px 2rem", background:"rgba(231,22,42,0.02)" }}>
+        <div style={{ maxWidth:1200, margin:"0 auto" }}>
+          <div style={{ textAlign:"center", marginBottom:60 }}>
+            <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", marginBottom:16 }}>Flexibilité totale</div>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.2rem,4vw,3.2rem)", fontWeight:900, margin:"0 0 16px" }}>
+              Des formats adaptés à <em style={{ color:"#E7162A" }}>vos besoins</em>
+            </h2>
+          </div>
+
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(300px, 1fr))", gap:24 }}>
+            {/* Format Présentiel */}
+            <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)" }}>
+              <div style={{ width:50, height:50, borderRadius:12, background:"rgba(231,22,42,0.1)", color:"#E7162A", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, marginBottom:24 }}>🏢</div>
+              <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:900, color:"#F5F0E8", marginBottom:12 }}>Présentiel</h3>
+              <p style={{ color:"rgba(245,240,232,0.5)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Immersion totale dans nos locaux à Angré 8e Tranche. L'environnement idéal pour rester concentré, interagir en face-à-face et profiter de la dynamique de groupe.</p>
+              <div style={{ fontSize:12, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#E7162A" }}>Disponible</div>
+            </div>
+
+            {/* Format En Ligne (Conditionnel) */}
+            {(systemSettings?.enableOnlineRegistration ?? true) && (
+              <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)" }}>
+                <div style={{ width:50, height:50, borderRadius:12, background:"rgba(231,22,42,0.1)", color:"#E7162A", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, marginBottom:24 }}>💻</div>
+                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:900, color:"#F5F0E8", marginBottom:12 }}>En Ligne (100% Live)</h3>
+                <p style={{ color:"rgba(245,240,232,0.5)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Suivez vos cours depuis chez vous ou le bureau via Zoom/Meet. Une interactivité préservée, des corrections en direct, et un gain de temps précieux dans les transports.</p>
+                <div style={{ fontSize:12, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#1dcaff" }}>Inscriptions ouvertes</div>
+              </div>
+            )}
+
+            {/* Format Entreprise (Conditionnel) */}
+            {(systemSettings?.enableCorporateRegistration ?? true) && (
+              <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)" }}>
+                <div style={{ width:50, height:50, borderRadius:12, background:"rgba(231,22,42,0.1)", color:"#E7162A", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, marginBottom:24 }}>💼</div>
+                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:900, color:"#F5F0E8", marginBottom:12 }}>B2B & Entreprises</h3>
+                <p style={{ color:"rgba(245,240,232,0.5)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Programmes sur-mesure pour vos collaborateurs. Coaching exécutif, formations sectorielles et renforcement des capacités en anglais professionnel intra-muros.</p>
+                <div style={{ fontSize:12, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#f59e0b" }}>Sur devis</div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Divider */}
+      <div className="divider-gold" style={{ maxWidth:1200, margin:"0 auto" }}/>
+
       {/* ══════════ MISSION / VISION ══════════ */}
       <section id="mission" style={{ padding:"120px 2rem" }}>
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
@@ -275,10 +320,15 @@ export default function ClientLanding({ session }: { session: any }) {
             ))}
           </div>
 
-          <div style={{ textAlign:"center", marginTop:48 }}>
+          <div style={{ textAlign:"center", marginTop:48, display:"flex", flexDirection:"column", alignItems:"center", gap:16 }}>
             <Link href={pricingMode === "formation" ? "/register" : "/register-club"} className="btn-primary" style={{ textDecoration:"none", display:"inline-block" }}>
               {pricingMode === "formation" ? "Réserver ma place →" : "Rejoindre le cercle →"}
             </Link>
+            {pricingMode === "club" && (
+              <Link href="/english-club" style={{ color:"rgba(245,240,232,0.5)", fontSize:13, letterSpacing:"0.08em", textTransform:"uppercase", fontWeight:600, textDecoration:"underline", textUnderlineOffset:4 }}>
+                Découvrir en détail le Club
+              </Link>
+            )}
           </div>
         </div>
       </section>

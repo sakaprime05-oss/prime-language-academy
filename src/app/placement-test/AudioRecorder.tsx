@@ -12,8 +12,11 @@ export default function AudioRecorder({ questionId, onRecordingComplete }: Audio
   const [hasRecording, setHasRecording] = useState(false);
   const [duration, setDuration] = useState(0);
   const [permissionDenied, setPermissionDenied] = useState(false);
+  const [transcript, setTranscript] = useState("");
+  const [isTranscribing, setIsTranscribing] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const speechRecRef = useRef<any>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number>(0);
@@ -24,6 +27,9 @@ export default function AudioRecorder({ questionId, onRecordingComplete }: Audio
       if (timerRef.current) clearInterval(timerRef.current);
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
         mediaRecorderRef.current.stop();
+      }
+      if (speechRecRef.current) {
+        speechRecRef.current.stop();
       }
     };
   }, []);
@@ -68,6 +74,36 @@ export default function AudioRecorder({ questionId, onRecordingComplete }: Audio
       setIsRecording(true);
       setPermissionDenied(false);
 
+      // Start Speech Recognition
+      setTranscript("");
+      try {
+        const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (SpeechRec) {
+          const recognition = new SpeechRec();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.lang = 'en-US'; // We want them to speak English
+
+          recognition.onresult = (event: any) => {
+            let currentTranscript = "";
+            for (let i = 0; i < event.results.length; i++) {
+              currentTranscript += event.results[i][0].transcript;
+            }
+            setTranscript(currentTranscript);
+          };
+
+          recognition.onend = () => {
+            setIsTranscribing(false);
+          };
+
+          recognition.start();
+          speechRecRef.current = recognition;
+          setIsTranscribing(true);
+        }
+      } catch (err) {
+        console.warn("Speech recognition not supported or failed to start", err);
+      }
+
       // Timer for visual feedback
       timerRef.current = setInterval(() => {
         setDuration(Math.round((Date.now() - startTimeRef.current) / 1000));
@@ -81,11 +117,15 @@ export default function AudioRecorder({ questionId, onRecordingComplete }: Audio
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
       mediaRecorderRef.current.stop();
     }
+    if (speechRecRef.current) {
+      speechRecRef.current.stop();
+    }
   }, []);
 
   const reRecord = useCallback(() => {
     setHasRecording(false);
     setDuration(0);
+    setTranscript("");
   }, []);
 
   const formatTime = (seconds: number): string => {
@@ -168,6 +208,19 @@ export default function AudioRecorder({ questionId, onRecordingComplete }: Audio
           </div>
         )}
       </div>
+
+      {/* Live Transcript / Transcription Result */}
+      {(isTranscribing || transcript) && (
+        <div className="mt-2 p-4 bg-primary/5 border border-primary/20 rounded-xl">
+          <div className="text-[10px] uppercase font-black tracking-widest text-primary/60 mb-2 flex items-center gap-2">
+            <span>Retranscription (Speech-to-Text)</span>
+            {isTranscribing && <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
+          </div>
+          <p className="text-sm font-medium text-[var(--foreground)]/80 italic">
+            {transcript || "En attente de votre voix..."}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

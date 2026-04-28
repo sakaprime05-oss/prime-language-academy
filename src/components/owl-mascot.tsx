@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export function OwlMascot({ size = 100 }: { size?: number }) {
+export function OwlMascot({ size = 100, className = "" }: { size?: number, className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [pupil, setPupil] = useState({ x: 0, y: 0 });
   const [blink, setBlink] = useState(false);
@@ -58,6 +58,7 @@ export function OwlMascot({ size = 100 }: { size?: number }) {
   return (
     <div
       ref={ref}
+      className={className}
       style={{
         position: "fixed",
         bottom: 24,

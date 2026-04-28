@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   testSections,
@@ -28,6 +28,7 @@ export default function PlacementTest() {
   const [testComplete, setTestComplete] = useState(false);
   const [totalScore, setTotalScore] = useState(0);
   const [sectionScores, setSectionScores] = useState<Record<string, number>>({});
+  const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes
 
   const section = testSections[currentSection];
   const isLastSection = currentSection === testSections.length - 1;
@@ -74,6 +75,29 @@ export default function PlacementTest() {
     setSectionScores(scores);
     setTestComplete(true);
   }, [answers, audioData]);
+
+  useEffect(() => {
+    if (testComplete || currentSection === 0) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          calculateScores();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [testComplete, currentSection, calculateScores]);
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
 
   const handleNext = () => {
     if (isLastSection) {
@@ -227,7 +251,14 @@ export default function PlacementTest() {
       <div className="space-y-3">
         <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40">
           <span>Section {currentSection + 1} / {testSections.length}</span>
-          <span>{section.icon} {section.title}</span>
+          <div className="flex items-center gap-4">
+            {currentSection > 0 && (
+              <span className={`px-2 py-1 rounded-md font-bold text-xs ${timeLeft < 180 ? 'bg-red-500/10 text-red-500' : 'bg-primary/10 text-primary'}`}>
+                ⏱ {formatTime(timeLeft)}
+              </span>
+            )}
+            <span>{section.icon} {section.title}</span>
+          </div>
         </div>
         <div className="w-full h-1.5 bg-[var(--foreground)]/5 rounded-full overflow-hidden">
           <div

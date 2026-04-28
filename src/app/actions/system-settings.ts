@@ -16,7 +16,9 @@ export async function getSystemSettings() {
                     id: "default",
                     currentSessionName: "SESSION DE LANCEMENT : 18 JUIN – 19 AOUT 2026",
                     currentSessionStart: "18 Juin 2026",
-                    currentSessionDuration: "02 MOIS"
+                    currentSessionDuration: "02 MOIS",
+                    enableOnlineRegistration: true,
+                    enableCorporateRegistration: true
                 }
             });
         }
@@ -29,6 +31,8 @@ export async function getSystemSettings() {
             currentSessionName: "SESSION DE LANCEMENT : 18 JUIN – 19 AOUT 2026",
             currentSessionStart: "18 Juin 2026",
             currentSessionDuration: "02 MOIS",
+            enableOnlineRegistration: true,
+            enableCorporateRegistration: true,
             createdAt: new Date(),
             updatedAt: new Date(),
         };
@@ -44,6 +48,8 @@ export async function updateSystemSettings(formData: FormData) {
     const currentSessionName = formData.get("currentSessionName") as string;
     const currentSessionStart = formData.get("currentSessionStart") as string;
     const currentSessionDuration = formData.get("currentSessionDuration") as string;
+    const enableOnlineRegistration = formData.get("enableOnlineRegistration") === "true";
+    const enableCorporateRegistration = formData.get("enableCorporateRegistration") === "true";
 
     try {
         await prisma.systemSettings.upsert({
@@ -52,12 +58,16 @@ export async function updateSystemSettings(formData: FormData) {
                 currentSessionName,
                 currentSessionStart,
                 currentSessionDuration,
+                enableOnlineRegistration,
+                enableCorporateRegistration
             },
             create: {
                 id: "default",
                 currentSessionName,
                 currentSessionStart,
                 currentSessionDuration,
+                enableOnlineRegistration,
+                enableCorporateRegistration
             }
         });
 

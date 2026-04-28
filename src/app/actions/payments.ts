@@ -149,9 +149,6 @@ export async function getStudentPaymentStatus(userId: string) {
 }
 
 export async function submitManualPayment(formData: FormData) {
-    const session = await auth();
-    if (!session?.user) return { error: "Non autorisé" };
-
     const transactionId = formData.get("transactionId") as string;
     const provider = formData.get("provider") as string;
     const senderPhone = formData.get("senderPhone") as string;
@@ -162,6 +159,11 @@ export async function submitManualPayment(formData: FormData) {
     }
 
     try {
+        const existingTx = await prisma.transaction.findUnique({ where: { id: transactionId } });
+        if (!existingTx || existingTx.status !== "PENDING") {
+            return { error: "Transaction invalide ou déjà traitée." };
+        }
+
         const transaction = await prisma.transaction.update({
             where: { id: transactionId },
             data: {
@@ -189,6 +191,65 @@ export async function submitManualPayment(formData: FormData) {
     } catch (e) {
         console.error(e);
         return { error: "Erreur serveur" };
+    }
+}
+
+import { writeFile } from "fs/promises";
+import { join } from "path";
+
+export async function confirmWavePayment(formData: FormData) {
+    try {
+        const transactionId = formData.get("transactionId") as string;
+        const file = formData.get("proof") as File | null;
+
+        if (!transactionId || !file || file.size === 0) {
+            return { error: "Veuillez importer la capture d'écran de votre reçu." };
+        }
+
+        const existingTx = await prisma.transaction.findUnique({ 
+            where: { id: transactionId },
+            include: { paymentPlan: { include: { student: true } } }
+        });
+        
+        if (!existingTx || existingTx.status !== "PENDING") {
+            return { error: "Transaction invalide ou déjà traitée." };
+        }
+
+        // Sauvegarder le fichier
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        
+        const extension = file.name.split('.').pop() || 'png';
+        const filename = `proof-${existingTx.id}-${Date.now()}.${extension}`;
+        const uploadDir = join(process.cwd(), "public", "uploads", "proofs");
+        const filePath = join(uploadDir, filename);
+        
+        await writeFile(filePath, buffer);
+        const proofUrl = `/uploads/proofs/${filename}`;
+
+        const transaction = await prisma.transaction.update({
+            where: { id: transactionId },
+            data: {
+                provider: "WAVE",
+                status: "VERIFYING",
+                proof: proofUrl
+            }
+        });
+
+        // Notify admin
+        const { sendAdminPaymentProofEmail } = await import("@/lib/email");
+        await sendAdminPaymentProofEmail(
+            existingTx.paymentPlan.student.name || "Étudiant Inconnu",
+            "WAVE (Avec capture d'écran)",
+            "Voir tableau de bord",
+            existingTx.amount
+        ).catch(err => console.error("Could not send proof email", err));
+
+        revalidatePath("/checkout/" + transactionId);
+        return { success: true };
+    } catch (e) {
+        console.error("Erreur d'upload:", e);
+        return { error: "Une erreur est survenue lors de l'envoi de la capture d'écran." };
     }
 }
 
@@ -230,7 +291,15 @@ export async function approveTransaction(transactionId: string) {
 
         // Send invoice email if it's the first payment or full payment
         if (student.email) {
-            const { sendInvoiceEmail } = await import("@/lib/email");
+            const { sendInvoiceEmail, sendAccountActivatedEmail } = await import("@/lib/email");
+            
+            // 1. Envoyer l'email de félicitations et redirection
+            await sendAccountActivatedEmail(
+                student.email,
+                student.name || "Étudiant"
+            ).catch(console.error);
+
+            // 2. Envoyer la facture
             await sendInvoiceEmail(
                 student.email,
                 student.name || "Étudiant",

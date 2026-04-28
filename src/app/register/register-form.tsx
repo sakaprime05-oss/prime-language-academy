@@ -7,12 +7,12 @@ import { registerUser } from "@/app/actions/auth-actions";
 import { signIn } from "next-auth/react";
 
 const plans = [
-    { id: "loisir", name: "Loisir (1 séance/sem)", price: "50 000 FCFA", desc: "Initiation ou contact léger" },
-    { id: "essentiel", name: "Essentiel (2 séances/sem)", price: "70 000 FCFA", desc: "Construction des bases" },
-    { id: "equilibre", name: "Équilibre (3 séances/sem)", price: "90 000 FCFA", desc: "Pratique régulière" },
-    { id: "performance", name: "Performance (4 séances/sem)", price: "110 000 FCFA", desc: "Résultats tangibles" },
-    { id: "intensif", name: "Intensif (5 séances/sem)", price: "130 000 FCFA", desc: "Transformation radicale" },
-    { id: "immersion", name: "Immersion (6 séances/sem)", price: "150 000 FCFA", desc: "Maîtrise totale" }
+    { id: "loisir", name: "Loisir (1 séance/sem)", price: "52 000 FCFA", desc: "Initiation ou contact léger" },
+    { id: "essentiel", name: "Essentiel (2 séances/sem)", price: "72 000 FCFA", desc: "Construction des bases" },
+    { id: "equilibre", name: "Équilibre (3 séances/sem)", price: "92 000 FCFA", desc: "Pratique régulière" },
+    { id: "performance", name: "Performance (4 séances/sem)", price: "112 000 FCFA", desc: "Résultats tangibles" },
+    { id: "intensif", name: "Intensif (5 séances/sem)", price: "132 000 FCFA", desc: "Transformation radicale" },
+    { id: "immersion", name: "Immersion (6 séances/sem)", price: "152 000 FCFA", desc: "Maîtrise totale" }
 ];
 
 const availableDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
@@ -20,6 +20,12 @@ const availableDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samed
 const objectives = [
     "Travail / carrière", "Voyage", "Études",
     "Business / entrepreneuriat", "Développement personnel", "Autre"
+];
+
+const communes = [
+    "Abobo", "Adjamé", "Attécoubé", "Bingerville", "Cocody", 
+    "Koumassi", "Marcory", "Plateau", "Port-Bouët", "Treichville", 
+    "Yopougon", "Autre"
 ];
 
 const levels = ["Débutant", "Intermédiaire", "Avancé"];
@@ -31,7 +37,7 @@ const timeSlots = [
 
 const steps = ["Infos requises", "Objectifs", "Formule & Jours", "Engagement"];
 
-function RegisterFormContent() {
+function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -40,6 +46,7 @@ function RegisterFormContent() {
     const [error, setError] = useState("");
 
     const [formData, setFormData] = useState({
+        type: "FORMATION",
         name: "",
         dob: "",
         profession: "",
@@ -47,6 +54,7 @@ function RegisterFormContent() {
         phone: "",
         email: "",
         commune: "",
+        communeOther: "",
         password: "",
 
         objective: "",
@@ -54,6 +62,8 @@ function RegisterFormContent() {
         level: searchParams.get("level") || "",
 
         planId: searchParams.get("plan") || "essentiel",
+        courseMode: "PRESENTIEL", // PRESENTIEL, ONLINE
+        studentType: "INDIVIDUEL", // INDIVIDUEL, ENTREPRISE
         days: [] as string[],
         timeSlot: "",
 
@@ -118,12 +128,18 @@ function RegisterFormContent() {
             return;
         }
 
+        const finalData = {
+            ...formData,
+            objective: formData.objective === "Autre" ? formData.objectiveOther : formData.objective,
+            commune: formData.commune === "Autre" ? formData.communeOther : formData.commune
+        };
+
         const submitData = new FormData();
         submitData.append("name", formData.name);
         submitData.append("email", formData.email);
         submitData.append("password", formData.password);
         submitData.append("planId", formData.planId);
-        submitData.append("onboardingData", JSON.stringify(formData));
+        submitData.append("onboardingData", JSON.stringify(finalData));
 
         const result = await registerUser(submitData);
 
@@ -131,21 +147,10 @@ function RegisterFormContent() {
             setError(result.error);
             setLoading(false);
         } else {
-            const loginResult = await signIn("credentials", {
-                email: formData.email,
-                password: formData.password,
-                redirect: false,
-            });
-
-            if (loginResult?.error) {
-                router.push("/login?registered=true");
+            if (result.redirectUrl) {
+                router.push(result.redirectUrl);
             } else {
-                if (result.redirectUrl) {
-                    window.location.href = result.redirectUrl;
-                } else {
-                    router.push("/dashboard");
-                    router.refresh();
-                }
+                router.push("/dashboard");
             }
         }
     };
@@ -216,9 +221,20 @@ function RegisterFormContent() {
                             </div>
                         </div>
 
-                        <div className="space-y-1">
-                            <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Commune de résidence</label>
-                            <input type="text" name="commune" value={formData.commune} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none" placeholder="Ex: Cocody, Abidjan" />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Commune de résidence</label>
+                                <select name="commune" value={formData.commune} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none">
+                                    <option value="" disabled>Sélectionner une commune</option>
+                                    {communes.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                            </div>
+                            {formData.commune === "Autre" && (
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Précisez</label>
+                                    <input type="text" name="communeOther" value={formData.communeOther} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none" placeholder="Votre ville/quartier" />
+                                </div>
+                            )}
                         </div>
 
                         <div className="space-y-1 pt-2">
@@ -288,8 +304,43 @@ function RegisterFormContent() {
                 {/* STEP 3: Formule & Jours */}
                 {step === 3 && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-                        <div className="space-y-3">
-                            <h3 className="font-black text-[var(--foreground)] text-lg">4. Formule choisie</h3>
+                        {/* Type & Mode */}
+                        <div className="space-y-4">
+                            <div className="space-y-3">
+                                <h3 className="font-black text-[var(--foreground)] text-lg">Type d'étudiant</h3>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <label className={`flex items-center justify-center p-3 rounded-xl border text-sm font-bold cursor-pointer transition-all ${formData.studentType === 'INDIVIDUEL' ? 'bg-primary/10 border-primary text-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20 text-[var(--foreground)]/60'}`}>
+                                        <input type="radio" name="studentType" value="INDIVIDUEL" checked={formData.studentType === 'INDIVIDUEL'} onChange={handleChange} className="sr-only" />
+                                        Particulier
+                                    </label>
+                                    {(systemSettings?.enableCorporateRegistration ?? true) && (
+                                        <label className={`flex items-center justify-center p-3 rounded-xl border text-sm font-bold cursor-pointer transition-all ${formData.studentType === 'ENTREPRISE' ? 'bg-primary/10 border-primary text-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20 text-[var(--foreground)]/60'}`}>
+                                            <input type="radio" name="studentType" value="ENTREPRISE" checked={formData.studentType === 'ENTREPRISE'} onChange={handleChange} className="sr-only" />
+                                            Entreprise
+                                        </label>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="space-y-3 pt-4 border-t border-[var(--foreground)]/10">
+                                <h3 className="font-black text-[var(--foreground)] text-lg">Format des cours</h3>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <label className={`flex items-center justify-center p-3 rounded-xl border text-sm font-bold cursor-pointer transition-all ${formData.courseMode === 'PRESENTIEL' ? 'bg-primary/10 border-primary text-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20 text-[var(--foreground)]/60'}`}>
+                                        <input type="radio" name="courseMode" value="PRESENTIEL" checked={formData.courseMode === 'PRESENTIEL'} onChange={handleChange} className="sr-only" />
+                                        Présentiel
+                                    </label>
+                                    {(systemSettings?.enableOnlineRegistration ?? true) && (
+                                        <label className={`flex items-center justify-center p-3 rounded-xl border text-sm font-bold cursor-pointer transition-all ${formData.courseMode === 'ONLINE' ? 'bg-primary/10 border-primary text-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20 text-[var(--foreground)]/60'}`}>
+                                            <input type="radio" name="courseMode" value="ONLINE" checked={formData.courseMode === 'ONLINE'} onChange={handleChange} className="sr-only" />
+                                            En Ligne
+                                        </label>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-3 pt-4 border-t border-[var(--foreground)]/10">
+                            <h3 className="font-black text-[var(--foreground)] text-lg">Formule choisie</h3>
                             <div className="space-y-2">
                                 {plans.map(plan => (
                                     <label key={plan.id} className={`flex flex-col p-4 rounded-xl border cursor-pointer transition-all ${formData.planId === plan.id ? 'bg-primary/10 border-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20'}`}>
@@ -353,8 +404,8 @@ function RegisterFormContent() {
                                 <label className={`flex p-4 rounded-xl border cursor-pointer transition-all gap-3 ${formData.paymentOption === 'fractionne' ? 'bg-primary/5 border-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10'}`}>
                                     <input type="radio" name="paymentOption" value="fractionne" checked={formData.paymentOption === 'fractionne'} onChange={handleChange} className="accent-primary mt-0.5" />
                                     <div>
-                                        <span className="font-bold block text-sm">Paiement Fractionné</span>
-                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">Inscription requise : 20% | Réservation : 50%</span>
+                                        <span className="font-bold block text-sm">Paiement en 2 fois (Fractionné)</span>
+                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">Payez 50% maintenant pour valider l'inscription, et les 50% restants avant le début de la formation.</span>
                                     </div>
                                 </label>
                             </div>
@@ -366,8 +417,8 @@ function RegisterFormContent() {
                             <div className="bg-amber-500/5 text-amber-600 p-4 rounded-xl text-xs font-bold leading-relaxed border border-amber-500/20 max-h-40 overflow-y-auto">
                                 <ul className="list-disc pl-4 space-y-2">
                                     <li>L'inscription offerte est réservée aux premiers inscrits.</li>
-                                    <li>Le solde total doit être réglé avant le début de la formation (18 Juin 2026).</li>
-                                    <li>Aucun remboursement après le début des cours.</li>
+                                    <li>Le solde total doit obligatoirement être réglé avant le début de la formation.</li>
+                                    <li><strong>Condition de remboursement :</strong> En cas d'annulation notifiée avant le début de la formation, un remboursement est possible (une retenue pour frais de dossier peut s'appliquer). Aucun remboursement ne sera effectué une fois les cours commencés.</li>
                                     <li>Les supports pédagogiques sont offerts au format numérique.</li>
                                     <li>La présence régulière est indispensable pour obtenir l'attestation.</li>
                                 </ul>
@@ -403,10 +454,10 @@ function RegisterFormContent() {
     );
 }
 
-export default function RegisterForm() {
+export default function RegisterForm({ systemSettings }: { systemSettings?: any }) {
     return (
         <Suspense fallback={<div className="text-center py-10 opacity-50">Chargement...</div>}>
-            <RegisterFormContent />
+            <RegisterFormContent systemSettings={systemSettings} />
         </Suspense>
     );
 }

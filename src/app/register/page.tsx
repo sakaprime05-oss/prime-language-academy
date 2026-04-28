@@ -2,9 +2,11 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import RegisterForm from "./register-form";
 import Link from "next/link";
+import { getSystemSettings } from "@/app/actions/system-settings";
 
 export default async function RegisterPage() {
     const session = await auth();
+    const systemSettings = await getSystemSettings();
 
     if (session) {
         redirect("/dashboard");
@@ -27,7 +29,7 @@ export default async function RegisterPage() {
                     </div>
                 </div>
 
-                <RegisterForm />
+                <RegisterForm systemSettings={systemSettings} />
 
                 <div className="pt-8 flex flex-col items-center gap-4">
                     <p className="text-xs font-bold text-[var(--foreground)]/50">

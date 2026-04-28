@@ -1,5 +1,8 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import { PaymentLock } from "@/components/payment-lock";
+import { headers } from "next/headers";
 
 /**
  * Layout de protection des routes Student.
@@ -14,6 +17,21 @@ export default async function StudentLayout({ children }: { children: React.Reac
         if (session?.user?.role === "ADMIN") redirect("/dashboard/admin");
         if (session?.user?.role === "TEACHER") redirect("/dashboard/teacher");
         redirect("/login");
+    }
+
+    // Récupérer le statut réel en base
+    const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { status: true }
+    });
+
+    const headerList = await headers();
+    const pathname = headerList.get("x-url") || "";
+    const isPaymentPage = pathname.includes("/payments/manual");
+
+    // Si PENDING et pas sur la page de paiement → bloquer l'accès
+    if (user?.status === "PENDING" && !isPaymentPage) {
+        return <PaymentLock />;
     }
 
     return <>{children}</>;

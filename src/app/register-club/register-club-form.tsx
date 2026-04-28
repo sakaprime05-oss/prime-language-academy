@@ -6,16 +6,22 @@ import { registerUser } from "@/app/actions/auth-actions";
 import { signIn } from "next-auth/react";
 
 const memberships = [
-    { id: "loisir", name: "Social (1x/sem)", price: "50 000 FCFA" },
-    { id: "essentiel", name: "Connect (2x/sem)", price: "70 000 FCFA" },
-    { id: "equilibre", name: "Network (3x/sem)", price: "90 000 FCFA" },
-    { id: "performance", name: "Executive (4x/sem)", price: "110 000 FCFA" },
-    { id: "intensif", name: "Elite (5x/sem)", price: "130 000 FCFA" },
-    { id: "immersion", name: "Founder (6x/sem)", price: "150 000 FCFA" }
+    { id: "loisir", name: "Social (1x/sem)", price: "52 000 FCFA" },
+    { id: "essentiel", name: "Connect (2x/sem)", price: "72 000 FCFA" },
+    { id: "equilibre", name: "Network (3x/sem)", price: "92 000 FCFA" },
+    { id: "performance", name: "Executive (4x/sem)", price: "112 000 FCFA" },
+    { id: "intensif", name: "Elite (5x/sem)", price: "132 000 FCFA" },
+    { id: "immersion", name: "Founder (6x/sem)", price: "152 000 FCFA" }
 ];
 
 const levels = ["Intermédiaire (B1/B2)", "Avancé (C1/C2)"];
 const steps = ["Identité", "Profil", "Membership", "Validation"];
+
+const communes = [
+    "Abobo", "Adjamé", "Attécoubé", "Bingerville", "Cocody", 
+    "Koumassi", "Marcory", "Plateau", "Port-Bouët", "Treichville", 
+    "Yopougon", "Autre"
+];
 
 export default function RegisterClubForm() {
     const router = useRouter();
@@ -31,6 +37,8 @@ export default function RegisterClubForm() {
         profession: "",
         company: "",
         level: "",
+        commune: "",
+        communeOther: "",
         planId: "essentiel",
         agreement: false,
         signature: ""
@@ -87,6 +95,7 @@ export default function RegisterClubForm() {
             profession: formData.profession,
             company: formData.company,
             level: formData.level,
+            commune: formData.commune === "Autre" ? formData.communeOther : formData.commune,
             signature: formData.signature,
             phone: formData.phone
         };
@@ -106,18 +115,10 @@ export default function RegisterClubForm() {
                 return;
             }
 
-            const signInResult = await signIn("credentials", {
-                email: formData.email,
-                password: formData.password,
-                redirect: false,
-            });
-
-            if (signInResult?.error) {
-                setError("Compte créé mais connexion automatique échouée.");
-                setLoading(false);
+            if (res.redirectUrl) {
+                router.push(res.redirectUrl);
             } else {
                 router.push("/dashboard/student/club");
-                router.refresh();
             }
         } catch (err) {
             setError("Une erreur inattendue s'est produite.");
@@ -169,6 +170,19 @@ export default function RegisterClubForm() {
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Mot de passe</label>
                         <input type="password" name="password" value={formData.password} onChange={handleChange} className="input-field" placeholder="••••••••" required />
                     </div>
+                    <div>
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Commune de résidence</label>
+                        <select name="commune" value={formData.commune} onChange={handleChange} className="input-field cursor-pointer">
+                            <option value="" disabled>Sélectionner une commune</option>
+                            {communes.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                    </div>
+                    {formData.commune === "Autre" && (
+                        <div>
+                            <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Précisez la commune</label>
+                            <input type="text" name="communeOther" value={formData.communeOther} onChange={handleChange} className="input-field" placeholder="Votre ville/quartier" />
+                        </div>
+                    )}
                 </div>
             )}
 

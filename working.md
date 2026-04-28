@@ -46,13 +46,15 @@ Offrir un écosystème autonome où les étudiants peuvent s'inscrire, payer, su
 - **Quizz :** Modèles de questions/réponses et tracking de scores (`QuizAttempt`).
 - **Gestion Professeur :** Emplois du temps (`TeacherSchedule`), notation (`StudentGrade`), appels (`Attendance`).
 - **Finance :** Plans de paiement (`PaymentPlan`) et transactions ciblant les providers Mobile Money.
-- **Système de RDV Public :** Page `/rendez-vous` pour les visiteurs, avec API d'envoi d'emails de notification (`/api/public-appointment`).
-- **Modernisation UI :** Migration progressive vers shadcn/ui pour les formulaires et composants interactifs.
+- **Système de placement (Placement Test) :** Implémenté avec chronomètre de 15 minutes, soumission automatique à expiration, et retranscription vocale (Speech-to-Text) en temps réel pour l'expression orale.
+- **Onboarding Différencié :** Parcours distincts pour le "English Club" et la "Formation" (Emails personnalisés, Dashboards spécifiques, Checkout adapté).
+- **Contrôles Administrateurs :** Toggles permettant d'activer/désactiver les inscriptions "En Ligne", "Entreprises" et "English Club" globalement.
+- **Modernisation UI :** Migration vers shadcn/ui et optimisation responsive (masquage de la mascotte sur mobile).
 
 ## 7. Modules incomplets ou manquants
 - **Messagerie Interne (`Message`) :** Le modèle DB existe, mais aucune action serveur (`message.ts` ou autre) ne semble présente dans l'arborescence actuelle concernant l'envoi direct entre utilisateurs.
 - **Badges / Gamification :** Les modèles `Badge` et `StudentBadge` existent, mais l'automatisation de la distribution n'est pas claire.
-- **Système de placement (Placement Test) :** Le dossier `/placement-test` existe, mais il faut s'assurer du raccordement avec le niveau initial (Level) attribué à l'apprenant dans Prisma.
+- **Système de placement (Placement Test) :** Finalisé et raccordé au flux d'inscription avec recommandation de niveau dynamique.
 
 ## 8. Flux utilisateur
 1. Landing Page -> Test de niveau -> Choix du forfait (Loisir à Immersion).
@@ -114,4 +116,6 @@ Offrir un écosystème autonome où les étudiants peuvent s'inscrire, payer, su
 - *Action :* Intégration de l'identité de marque officielle, mise à jour des tableaux de bord (Admin/Prof/Élève), installation de Recharts pour les statistiques analytiques et implémentation des notifications par email pour le forum.
 - *Status :* Système complet avec pilotage par données et engagement utilisateur renforcé.
 
-
+- *Date :* [28/04/2026]
+- *Action :* Optimisation du Test de Placement (Chrono + Speech-to-Text), Distinction complète des parcours "English Club" vs "Formation" (Emails, Checkouts, Dashboards), Harmonisation des tarifs (52k-152k), et ajout de Toggles Admin pour la disponibilité des inscriptions.
+- *Status :* Parcours utilisateur fluide, différencié et pilotable dynamiquement par l'administration.

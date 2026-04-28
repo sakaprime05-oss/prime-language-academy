@@ -31,6 +31,8 @@ export async function registerUser(formData: FormData) {
             onboardingParams = JSON.parse(onboardingData);
         } catch (e) { }
 
+        const registrationType = onboardingParams.type === "CLUB" ? "CLUB" : "FORMATION";
+
         // Find or create the pedagogical level based on onboardingData
         const pedagogicalLevelName = onboardingParams.level || "Débutant";
         let level = await prisma.level.findFirst({
@@ -49,16 +51,16 @@ export async function registerUser(formData: FormData) {
 
         // Map plan IDs to prices
         const planPrices: Record<string, number> = {
-            "loisir": 50000,
-            "essentiel": 70000,
-            "equilibre": 90000,
-            "performance": 110000,
-            "intensif": 130000,
-            "immersion": 150000
+            "loisir": 52000,
+            "essentiel": 72000,
+            "equilibre": 92000,
+            "performance": 112000,
+            "intensif": 132000,
+            "immersion": 152000
         };
 
-        const totalAmount = planPrices[planId] || 70000;
-        const amountToPay = onboardingParams.paymentOption === "fractionne" ? (totalAmount * 0.2) : totalAmount;
+        const totalAmount = planPrices[planId] || 72000;
+        const amountToPay = onboardingParams.paymentOption === "fractionne" ? (totalAmount * 0.5) : totalAmount;
 
         // Create student with assigned level, status PENDING
         const user = await prisma.user.create({
@@ -70,6 +72,7 @@ export async function registerUser(formData: FormData) {
                 status: "PENDING",
                 levelId: level?.id,
                 onboardingData,
+                registrationType,
                 paymentPlans: {
                     create: {
                         totalAmount,
@@ -103,7 +106,7 @@ export async function registerUser(formData: FormData) {
 
         const refCommand = `PRIME-${paymentPlan.id}-${Date.now()}`;
         
-        await prisma.transaction.create({
+        const transaction = await prisma.transaction.create({
             data: {
                 planId: paymentPlan.id,
                 amount: amountToPay,
@@ -113,10 +116,10 @@ export async function registerUser(formData: FormData) {
             }
         });
 
-        const redirectUrl = "/dashboard/student/payments/manual";
+        const redirectUrl = `/checkout/${transaction.id}`;
 
-        // Notify user
-        await sendWelcomeEmail(user.email, user.name || "Étudiant")
+        // Notify user with custom template based on type
+        await sendWelcomeEmail(user.email, user.name || "Étudiant", registrationType)
             .catch(err => console.error("Could not send welcome email", err));
 
         // Notify admin

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E7162A"/>
+      <stop offset="100%" style="stop-color:#c41222"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="38.400000000000006" fill="url(#bg)"/>
+  <text x="96" y="136.32" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="115.19999999999999" 
+        font-weight="bold" 
+        fill="white" 
+        text-anchor="middle">P</text>
+  <text x="96" y="170.88" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="17.279999999999998" 
+        font-weight="600" 
+        fill="rgba(255,255,255,0.8)" 
+        text-anchor="middle"
+        letter-spacing="2">PRIME ACADEMY</text>
+</svg>

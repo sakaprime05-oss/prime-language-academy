@@ -4,22 +4,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logoutAction } from "@/app/actions/logout";
 
-const studentLinks = [
-    { href: "/dashboard/student", label: "Accueil", icon: HomeIcon, exact: true },
-    { href: "/dashboard/student/courses", label: "Mes Cours", icon: BookIcon },
-    { href: "/dashboard/student/forum", label: "Forum", icon: ChatIcon },
-    { href: "/dashboard/student/club", label: "English Club", icon: ClubIcon },
-    { href: "/dashboard/student/appointments", label: "Rendez-vous", icon: ClockIcon },
-    { href: "/dashboard/student/messages", label: "Messagerie", icon: MessageIcon },
-    { href: "/dashboard/student/profile", label: "Mon Profil", icon: UserIcon },
-];
-
-export function StudentSidebarNavClient() {
+export function StudentSidebarNavClient({ dict }: { dict?: any }) {
     const pathname = usePathname();
+
+    const getLabel = (key: string, fallback: string) => dict?.[key] || fallback;
+
+    const studentLinks = [
+        { href: "/dashboard/student", label: getLabel("dashboard", "Accueil"), icon: HomeIcon, exact: true },
+        { href: "/dashboard/student/courses", label: getLabel("courses", "Mes Cours"), icon: BookIcon },
+        { href: "/dashboard/student/forum", label: getLabel("forum", "Forum"), icon: ChatIcon },
+        { href: "/dashboard/student/club", label: getLabel("club", "English Club"), icon: ClubIcon },
+        { href: "/dashboard/student/appointments", label: getLabel("appointments", "Rendez-vous"), icon: ClockIcon },
+        { href: "/dashboard/student/messages", label: getLabel("messages", "Messagerie"), icon: MessageIcon },
+        { href: "/dashboard/student/profile", label: getLabel("profile", "Mon Profil"), icon: UserIcon },
+    ];
 
     return (
         <nav className="flex flex-col gap-2">
-            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/30 px-4 mb-2">Navigation</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/30 px-4 mb-2">
+                {getLabel("navigation", "Navigation")}
+            </p>
             {studentLinks.map((link) => {
                 const isActive = link.exact
                     ? pathname === link.href
@@ -49,15 +53,27 @@ export function StudentSidebarNavClient() {
                     className="flex items-center gap-4 px-4 py-4 rounded-2xl font-bold text-red-500/60 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200 w-full"
                 >
                     <LogoutIcon className="w-5 h-5 flex-shrink-0" />
-                    Déconnexion
+                    {dict?.logout || "Déconnexion"}
                 </button>
             </form>
         </nav>
     );
 }
 
-export function StudentMobileNavClient() {
+export function StudentMobileNavClient({ dict }: { dict?: any }) {
     const pathname = usePathname();
+
+    const getLabel = (key: string, fallback: string) => dict?.[key] || fallback;
+
+    const studentLinks = [
+        { href: "/dashboard/student", label: getLabel("dashboard", "Accueil"), icon: HomeIcon, exact: true },
+        { href: "/dashboard/student/courses", label: getLabel("courses", "Mes Cours"), icon: BookIcon },
+        { href: "/dashboard/student/forum", label: getLabel("forum", "Forum"), icon: ChatIcon },
+        { href: "/dashboard/student/club", label: getLabel("club", "English Club"), icon: ClubIcon },
+        { href: "/dashboard/student/appointments", label: getLabel("appointments", "Rendez-vous"), icon: ClockIcon },
+        { href: "/dashboard/student/messages", label: getLabel("messages", "Messagerie"), icon: MessageIcon },
+        { href: "/dashboard/student/profile", label: getLabel("profile", "Mon Profil"), icon: UserIcon },
+    ];
 
     return (
         <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--surface)]/90 backdrop-blur-3xl border-t border-white/10 dark:border-white/5 flex items-center justify-around px-2 py-3 shadow-2xl shadow-black/20">
