@@ -144,6 +144,17 @@ export async function getAvailableContacts() {
         
         return students;
     }
+    // If admin, return all teachers and students
+    else if (user.role === "ADMIN") {
+        const users = await prisma.user.findMany({
+            where: {
+                role: { in: ["TEACHER", "STUDENT"] }
+            },
+            select: { id: true, name: true, role: true },
+            orderBy: { name: 'asc' }
+        });
+        return users;
+    }
     
     return [];
 }

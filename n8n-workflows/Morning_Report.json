@@ -1,0 +1,78 @@
+{
+  "name": "Prime Academy - Morning Report 8h",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "e6f47738-f1c5-412f-93d3-7d88566a7b37",
+      "name": "Déclencheur 8h00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://primelanguageacademy.com/api/admin-bot",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "pla_bot_secret_2026_admin"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"action\": \"get_morning_report\"\n}",
+        "options": {}
+      },
+      "id": "70d24fcd-613d-4c3d-b4b6-3a7891cf1567",
+      "name": "API Morning Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "6645894689",
+        "text": "=🌅 *Morning Report - Prime Academy*\n\nBonjour Directeur ! Voici le point du {{ new Date().toLocaleDateString('fr-FR') }} :\n\n📊 *Nouveaux inscrits (24h)* : {{ $json.report.new_students }}\n💰 *Paiements à valider* : {{ $json.report.pending_validations }}\n📅 *Rendez-vous aujourd'hui* : {{ $json.report.appointments_count }}\n\n{{ $json.report.appointments_count > 0 ? '📋 *Détails RDV :*\\n' + $json.report.appointments_details.map(a => '• ' + new Date(a.time).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) + ' — ' + a.student + (a.reason ? ' (' + a.reason + ')' : '')).join('\\n') : '' }}\n\nBonne journée ! 💪",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "90db2075-8025-455b-b9f8-b0a6e0fbfeab",
+      "name": "Envoyer Morning Report",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [680, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "HkSBgFG3AltWbaTn",
+          "name": "compte Telegram"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Déclencheur 8h00": {
+      "main": [[{ "node": "API Morning Report", "type": "main", "index": 0 }]]
+    },
+    "API Morning Report": {
+      "main": [[{ "node": "Envoyer Morning Report", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "f7d4e5a9-c3b2-4d1e-8a0f-1a2b3c4d5e6f"
+}

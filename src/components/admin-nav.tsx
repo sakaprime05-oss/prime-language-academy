@@ -14,6 +14,7 @@ const adminLinks = [
     { href: "/dashboard/admin/payments", label: "Paiements", icon: WalletIcon },
     { href: "/dashboard/admin/appointments", label: "Rendez-vous", icon: ClockIcon },
     { href: "/dashboard/admin/articles", label: "Gestion Blog", icon: BlogIcon },
+    { href: "/dashboard/admin/messages", label: "Messagerie", icon: MessageIcon },
     { href: "/dashboard/admin/settings", label: "Paramètres", icon: SettingsIcon },
 ];
 
@@ -92,4 +93,8 @@ function CalendarIcon(props: any) {
 
 function BlogIcon(props: any) {
     return <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v12a2 2 0 01-2 2z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h5M7 12h10M7 16h10" /></svg>;
+}
+
+function MessageIcon(props: any) {
+    return <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>;
 }
