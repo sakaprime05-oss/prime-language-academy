@@ -177,7 +177,7 @@ export async function submitManualPayment(formData: FormData) {
             }
         });
         
-        // Notify admin
+        // Notify admin via Email
         const { sendAdminPaymentProofEmail } = await import("@/lib/email");
         await sendAdminPaymentProofEmail(
             transaction.paymentPlan.student.name || "Étudiant Inconnu",
@@ -185,6 +185,16 @@ export async function submitManualPayment(formData: FormData) {
             senderPhone,
             transaction.amount
         ).catch(err => console.error("Could not send proof email", err));
+
+        // Notify admin via Telegram (Real-time)
+        const { notifyTelegram } = await import("@/lib/notify");
+        await notifyTelegram("payment_proof", {
+            name: transaction.paymentPlan.student.name || "Étudiant Inconnu",
+            email: transaction.paymentPlan.student.email,
+            amount: transaction.amount,
+            provider,
+            phone: senderPhone
+        });
 
         revalidatePath("/dashboard/student");
         return { success: true };
@@ -236,7 +246,7 @@ export async function confirmWavePayment(formData: FormData) {
             }
         });
 
-        // Notify admin
+        // Notify admin via Email
         const { sendAdminPaymentProofEmail } = await import("@/lib/email");
         await sendAdminPaymentProofEmail(
             existingTx.paymentPlan.student.name || "Étudiant Inconnu",
@@ -244,6 +254,16 @@ export async function confirmWavePayment(formData: FormData) {
             "Voir tableau de bord",
             existingTx.amount
         ).catch(err => console.error("Could not send proof email", err));
+
+        // Notify admin via Telegram (Real-time)
+        const { notifyTelegram } = await import("@/lib/notify");
+        await notifyTelegram("payment_proof", {
+            name: existingTx.paymentPlan.student.name || "Étudiant Inconnu",
+            email: existingTx.paymentPlan.student.email,
+            amount: existingTx.amount,
+            provider: "WAVE",
+            phone: "Capture envoyée"
+        });
 
         revalidatePath("/checkout/" + transactionId);
         return { success: true };

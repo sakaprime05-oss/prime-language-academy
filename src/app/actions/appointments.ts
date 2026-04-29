@@ -35,6 +35,15 @@ export async function createAppointment(data: { date: Date, startTime: Date, end
         );
     }
     
+    // Notify admin via Telegram (Real-time)
+    const { notifyTelegram } = await import("@/lib/notify");
+    await notifyTelegram("new_appointment", {
+        studentName: appointment.student?.name || appointment.student?.email,
+        date: new Date(data.startTime).toLocaleDateString('fr-FR'),
+        time: new Date(data.startTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+        reason: data.reason || "Non précisé"
+    });
+    
     return appointment;
 }
 

@@ -122,10 +122,18 @@ export async function registerUser(formData: FormData) {
         await sendWelcomeEmail(user.email, user.name || "Étudiant", registrationType)
             .catch(err => console.error("Could not send welcome email", err));
 
-        // Notify admin
+        // Notify admin via Email
         const { sendAdminNewRegistrationEmail } = await import("@/lib/email");
         await sendAdminNewRegistrationEmail(user.name || "Nouveau", user.email, level?.name || planId)
             .catch(err => console.error("Could not send admin reg email", err));
+
+        // Notify admin via Telegram (Real-time)
+        const { notifyTelegram } = await import("@/lib/notify");
+        await notifyTelegram("new_registration", {
+            name: user.name,
+            email: user.email,
+            type: registrationType
+        });
 
         return { success: true, redirectUrl };
     } catch (error) {
