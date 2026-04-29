@@ -4,9 +4,9 @@ import { Suspense } from "react";
 import PlacementTest from "./PlacementTest";
 
 export const metadata = {
-  title: "Test de Placement | Prime Language Academy",
+  title: "Test de Niveau | Prime Language Academy",
   description:
-    "Évaluez votre niveau d'anglais avec notre test de placement gratuit. Compréhension, grammaire, expression orale et écrite.",
+    "Évaluez votre niveau d'anglais avec notre test de niveau gratuit. Compréhension, grammaire, expression orale et écrite.",
 };
 
 export default function PlacementTestPage() {
@@ -40,7 +40,7 @@ export default function PlacementTestPage() {
             Test Gratuit
           </div>
           <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
-            Test de Placement
+            Test de Niveau
           </h1>
           <p className="text-xs text-[var(--foreground)]/50 font-medium max-w-sm mx-auto">
             Ce test évalue votre niveau en anglais à travers la compréhension, la grammaire,

@@ -100,6 +100,21 @@ export default function PlacementTest() {
   };
 
   const handleNext = () => {
+    // Validate that all questions in the current section are answered
+    for (const q of section.questions) {
+      if (q.type === "audio-record") {
+        if (!audioData[q.id] || audioData[q.id].duration === 0) {
+          alert(`Veuillez enregistrer une réponse pour la question : "${q.questionFr || q.question}"`);
+          return;
+        }
+      } else {
+        if (!answers[q.id] || !answers[q.id].trim()) {
+          alert(`Veuillez répondre à la question : "${q.questionFr || q.question}"`);
+          return;
+        }
+      }
+    }
+
     if (isLastSection) {
       calculateScores();
     } else {
