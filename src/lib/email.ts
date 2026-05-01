@@ -1,10 +1,18 @@
 import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 type SendEmailInput = {
     to: string;
     subject: string;
     html: string;
     attachments?: unknown[];
+};
+
+type EmailAttachment = {
+    filename?: string;
+    content?: string | Buffer;
+    path?: string;
+    contentType?: string;
 };
 
 const brand = {
@@ -21,9 +29,9 @@ function appUrl() {
 }
 
 function senderAddress() {
-    const email = process.env.EMAIL_FROM || process.env.EMAIL_USER;
+    const email = process.env.EMAIL_FROM || process.env.EMAIL_USER || "noreply@primelangageacademy.com";
     const name = process.env.EMAIL_FROM_NAME || brand.name;
-    return email ? `"${name}" <${email}>` : undefined;
+    return `"${name}" <${email}>`;
 }
 
 function adminEmail() {
@@ -103,8 +111,33 @@ function detailRows(rows: Array<[string, string]>) {
 }
 
 export async function sendEmail({ to, subject, html, attachments }: SendEmailInput) {
+    const resendKey = process.env.RESEND_API_KEY;
     const user = process.env.EMAIL_USER;
     const pass = process.env.EMAIL_APP_PASSWORD;
+
+    if (resendKey) {
+        try {
+            const resend = new Resend(resendKey);
+            const { data, error } = await resend.emails.send({
+                from: senderAddress(),
+                to,
+                subject,
+                html,
+                attachments: attachments as EmailAttachment[] | undefined,
+            });
+
+            if (error) {
+                console.error("Resend email failed:", error);
+                return false;
+            }
+
+            console.log(`Email sent with Resend to ${to} (${data?.id})`);
+            return true;
+        } catch (error) {
+            console.error("Resend email send failed:", error);
+            return false;
+        }
+    }
 
     if (!user || !pass) {
         console.log("[email:simulation]", { to, subject, attachments: attachments?.length || 0 });
