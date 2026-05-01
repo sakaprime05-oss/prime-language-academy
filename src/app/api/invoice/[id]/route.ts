@@ -1,8 +1,10 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session = await auth();
     // Allow admins to download any invoice, restrict students to their own
     if (!session || !session.user) {
@@ -10,7 +12,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     }
 
     const transaction = await prisma.transaction.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
             paymentPlan: {
                 include: { student: { include: { level: true } } }

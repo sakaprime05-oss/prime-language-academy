@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 export async function getArticles(onlyPublished = false) {
   try {
@@ -18,10 +19,10 @@ export async function getArticles(onlyPublished = false) {
   }
 }
 
-export async function getArticleBySlug(slug: string) {
+export async function getArticleBySlug(slug: string, includeDrafts = false) {
   try {
-    return await prisma.article.findUnique({
-      where: { slug },
+    return await prisma.article.findFirst({
+      where: includeDrafts ? { slug } : { slug, published: true },
       include: { author: { select: { name: true, email: true } } },
     });
   } catch (error) {
@@ -49,7 +50,7 @@ export async function saveArticle(formData: FormData) {
 
   const id = formData.get("id") as string;
   const title = formData.get("title") as string;
-  const content = formData.get("content") as string;
+  const content = sanitizeHtml(formData.get("content") as string);
   const category = (formData.get("category") as string) || "GENERAL";
   const published = formData.get("published") === "true";
   let slug = formData.get("slug") as string;

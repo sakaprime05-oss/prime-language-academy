@@ -6,6 +6,8 @@ interface AudioPlayerProps {
   text: string;
 }
 
+const waveformHeights = [16, 24, 14, 20];
+
 export default function AudioPlayer({ text }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSupported, setIsSupported] = useState(true);
@@ -100,7 +102,7 @@ export default function AudioPlayer({ text }: AudioPlayerProps) {
                 key={i}
                 className="w-1 bg-primary rounded-full animate-pulse"
                 style={{
-                  height: `${12 + Math.random() * 12}px`,
+                  height: `${waveformHeights[i]}px`,
                   animationDelay: `${i * 0.15}s`,
                 }}
               />

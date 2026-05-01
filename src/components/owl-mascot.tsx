@@ -31,8 +31,8 @@ export function OwlMascot({ size = 100, className = "" }: { size?: number, class
     const cycle = () => {
       t = setTimeout(() => {
         setBlink(true);
-        setTimeout(() => { setBlink(false); cycle(); }, 110);
-      }, 1800 + Math.random() * 3500);
+        setTimeout(() => { setBlink(false); cycle(); }, 120);
+      }, 2000 + Math.random() * 4000);
     };
     cycle();
     return () => clearTimeout(t);
@@ -43,8 +43,8 @@ export function OwlMascot({ size = 100, className = "" }: { size?: number, class
     let frame: number;
     let tick = 0;
     const loop = () => {
-      tick += 0.02;
-      setBob(Math.sin(tick) * 5);
+      tick += 0.03;
+      setBob(Math.sin(tick) * 4);
       frame = requestAnimationFrame(loop);
     };
     frame = requestAnimationFrame(loop);
@@ -67,108 +67,82 @@ export function OwlMascot({ size = 100, className = "" }: { size?: number, class
         transform: `translateY(${bob}px)`,
         pointerEvents: "none",
         userSelect: "none",
-        filter: "drop-shadow(0 8px 20px rgba(231,22,42,0.3))",
+        filter: "drop-shadow(0 12px 30px rgba(0,0,0,0.5))",
       }}
     >
       <svg
         width={100 * S}
-        height={108 * S}
-        viewBox="0 0 100 108"
+        height={110 * S}
+        viewBox="0 0 100 110"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <radialGradient id="hf" cx="45%" cy="35%" r="65%">
-            <stop offset="0%" stopColor="#E0A060" />
-            <stop offset="60%" stopColor="#C07838" />
-            <stop offset="100%" stopColor="#8B5020" />
-          </radialGradient>
-          <radialGradient id="hi" cx="35%" cy="30%" r="65%">
-            <stop offset="0%" stopColor="#FFD040" />
-            <stop offset="50%" stopColor="#C89010" />
-            <stop offset="100%" stopColor="#7A5200" />
-          </radialGradient>
-          <radialGradient id="hn" cx="50%" cy="40%" r="60%">
-            <stop offset="0%" stopColor="#D49070" />
-            <stop offset="100%" stopColor="#A06040" />
-          </radialGradient>
-          <filter id="hs">
-            <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#00000040" />
-          </filter>
-          <filter id="hg">
-            <feGaussianBlur stdDeviation="2.5" result="b"/>
-            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#2A2A2A" />
+            <stop offset="100%" stopColor="#080808" />
+          </linearGradient>
+          <linearGradient id="faceGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#E7162A" stopOpacity="0.1" />
+            <stop offset="100%" stopColor="#E7162A" stopOpacity="0.02" />
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
         </defs>
 
-        {/* Horns */}
-        <path d="M32 26 Q26 10 22 2 Q30 6 34 18 Q36 24 34 28Z" fill="#EEE4C0"/>
-        <path d="M24 4 Q22 0 22 -2" stroke="#D4C8A0" strokeWidth="1.5" strokeLinecap="round"/>
-        <path d="M68 26 Q74 10 78 2 Q70 6 66 18 Q64 24 66 28Z" fill="#EEE4C0"/>
-        <path d="M76 4 Q78 0 78 -2" stroke="#D4C8A0" strokeWidth="1.5" strokeLinecap="round"/>
+        {/* ── EAR TUFTS ── */}
+        <path d="M25 25 L10 5 L35 20 Z" fill="#1A1A1A" stroke="#E7162A" strokeWidth="1" strokeLinejoin="round" />
+        <path d="M75 25 L90 5 L65 20 Z" fill="#1A1A1A" stroke="#E7162A" strokeWidth="1" strokeLinejoin="round" />
 
-        {/* Ears */}
-        <path d="M18 42 Q6 34 4 44 Q4 56 18 52 Q24 48 22 42Z" fill="#C07838"/>
-        <path d="M18 43 Q8 37 6 44 Q6 53 18 50" fill="#E8A870" opacity="0.5"/>
-        <path d="M82 42 Q94 34 96 44 Q96 56 82 52 Q76 48 78 42Z" fill="#C07838"/>
-        <path d="M82 43 Q92 37 94 44 Q94 53 82 50" fill="#E8A870" opacity="0.5"/>
+        {/* ── MAIN BODY ── */}
+        <path d="M50 20 C20 20 10 40 10 70 C10 100 25 105 50 105 C75 105 90 100 90 70 C90 40 80 20 50 20Z" fill="url(#bodyGrad)" stroke="#E7162A" strokeWidth="1.5" />
 
-        {/* Head */}
-        <ellipse cx="50" cy="54" rx="42" ry="40" fill="url(#hf)" filter="url(#hs)"/>
+        {/* ── FACE HEART SHAPE ── */}
+        <path d="M50 35 C35 35 25 45 25 60 C25 75 40 85 50 88 C60 85 75 75 75 60 C75 45 65 35 50 35Z" fill="url(#faceGrad)" />
 
-        {/* Face highlight */}
-        <ellipse cx="42" cy="40" rx="20" ry="12" fill="#E8B870" opacity="0.28"/>
+        {/* ── EYES ── */}
+        {/* Left Eye */}
+        <circle cx="38" cy="58" r="14" fill="#1A1A1A" stroke="#E7162A" strokeWidth="0.5" />
+        <circle cx="38" cy="58" r="10" fill="white" opacity="0.05" />
+        {blink ? (
+            <path d="M28 58 Q38 52 48 58" stroke="#E7162A" strokeWidth="2.5" strokeLinecap="round" />
+        ) : (
+            <>
+                <circle cx={38 + px} cy={58 + py} r="6" fill="#E7162A" filter="url(#glow)" />
+                <circle cx={38 + px} cy={58 + py} r="3" fill="black" />
+                <circle cx={36 + px} cy={56 + py} r="1.5" fill="white" opacity="0.8" />
+            </>
+        )}
 
-        {/* Muzzle */}
-        <ellipse cx="50" cy="72" rx="18" ry="14" fill="url(#hn)" opacity="0.85"/>
-        <ellipse cx="50" cy="74" rx="12" ry="9" fill="#D4A080" opacity="0.5"/>
+        {/* Right Eye */}
+        <circle cx="62" cy="58" r="14" fill="#1A1A1A" stroke="#E7162A" strokeWidth="0.5" />
+        <circle cx="62" cy="58" r="10" fill="white" opacity="0.05" />
+        {blink ? (
+            <path d="M52 58 Q62 52 72 58" stroke="#E7162A" strokeWidth="2.5" strokeLinecap="round" />
+        ) : (
+            <>
+                <circle cx={62 + px} cy={58 + py} r="6" fill="#E7162A" filter="url(#glow)" />
+                <circle cx={62 + px} cy={58 + py} r="3" fill="black" />
+                <circle cx={60 + px} cy={56 + py} r="1.5" fill="white" opacity="0.8" />
+            </>
+        )}
 
-        {/* Nostrils */}
-        <ellipse cx="45" cy="74" rx="3" ry="2.5" fill="#7A3820"/>
-        <ellipse cx="55" cy="74" rx="3" ry="2.5" fill="#7A3820"/>
+        {/* ── BEAK ── */}
+        <path d="M46 72 L50 82 L54 72 Z" fill="#E7162A" />
+        <path d="M46 72 Q50 70 54 72" stroke="#B30012" strokeWidth="0.5" fill="none" />
 
-        {/* Smug mouth */}
-        <path d="M43 84 Q50 89 57 84" stroke="#9A6040" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+        {/* ── WINGS (Subtle) ── */}
+        <path d="M10 65 Q5 75 10 85" stroke="#E7162A" strokeWidth="1" strokeOpacity="0.3" fill="none" />
+        <path d="M90 65 Q95 75 90 85" stroke="#E7162A" strokeWidth="1" strokeOpacity="0.3" fill="none" />
 
-        {/* Beard */}
-        <path d="M42 88 Q46 100 50 104 Q54 100 58 88" fill="#C07838" opacity="0.9"/>
-        <path d="M44 90 Q48 100 50 103 Q52 100 56 90" fill="#D4904A" opacity="0.5"/>
-
-        {/* Smug eyebrow (left — visible side) */}
-        <path d="M24 36 Q32 31 40 33" stroke="#7A4818" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
-        <path d="M60 33 Q68 31 76 36" stroke="#7A4818" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
-
-        {/* ── LEFT EYE ── */}
-        <ellipse cx="32" cy="46" rx="13" ry="13" fill="white" filter="url(#hg)"/>
-        <ellipse cx="32" cy="46" rx="11" ry="11" fill="url(#hi)"/>
-        <ellipse cx="32" cy="46" rx="7.5" ry="7.5" fill="#8B6000" opacity="0.35"/>
-        {blink
-          ? <path d="M20 46 Q26 40 32 46 Q38 40 44 46" stroke="#5A3000" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-          : <circle cx={32 + px} cy={46 + py} r="4.5" fill="#120600"/>
-        }
-        {!blink && <>
-          <circle cx={28.5 + px * 0.5} cy={42.5 + py * 0.5} r="2.2" fill="white" opacity="0.95"/>
-          <circle cx={34 + px * 0.3} cy={49 + py * 0.3} r="1" fill="white" opacity="0.5"/>
-        </>}
-        <ellipse cx="32" cy="46" rx="13" ry="13" fill="none" stroke="#E7162A" strokeWidth="0.8" strokeOpacity="0.4"/>
-
-        {/* ── RIGHT EYE ── */}
-        <ellipse cx="68" cy="46" rx="13" ry="13" fill="white" filter="url(#hg)"/>
-        <ellipse cx="68" cy="46" rx="11" ry="11" fill="url(#hi)"/>
-        <ellipse cx="68" cy="46" rx="7.5" ry="7.5" fill="#8B6000" opacity="0.35"/>
-        {blink
-          ? <path d="M56 46 Q62 40 68 46 Q74 40 80 46" stroke="#5A3000" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-          : <circle cx={68 + px} cy={46 + py} r="4.5" fill="#120600"/>
-        }
-        {!blink && <>
-          <circle cx={64.5 + px * 0.5} cy={42.5 + py * 0.5} r="2.2" fill="white" opacity="0.95"/>
-          <circle cx={70 + px * 0.3} cy={49 + py * 0.3} r="1" fill="white" opacity="0.5"/>
-        </>}
-        <ellipse cx="68" cy="46" rx="13" ry="13" fill="none" stroke="#E7162A" strokeWidth="0.8" strokeOpacity="0.4"/>
-
-        {/* Gold ring around neck base */}
-        <path d="M14 80 Q50 90 86 80" stroke="#E7162A" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.5"/>
+        {/* ── FEET ── */}
+        <path d="M35 105 Q35 110 40 110" stroke="#E7162A" strokeWidth="2" strokeLinecap="round" />
+        <path d="M65 105 Q65 110 60 110" stroke="#E7162A" strokeWidth="2" strokeLinecap="round" />
+        
       </svg>
     </div>
   );
 }
+

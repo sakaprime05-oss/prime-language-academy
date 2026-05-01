@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { LogoMark } from "@/components/logo";
+import { OwlMascot } from "@/components/owl-mascot";
 
 /* ── tiny helpers ── */
 const PLANS = [
@@ -458,6 +459,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
         </div>
         <div style={{ fontSize:11, color:"rgba(245,240,232,0.2)", letterSpacing:"0.1em" }}>© 2026 Prime Language Academy</div>
       </footer>
+      <OwlMascot size={120} className="hidden sm:block" />
     </div>
   );
 }

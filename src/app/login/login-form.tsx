@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginForm() {
     const [email, setEmail] = useState("");
@@ -10,6 +10,8 @@ export default function LoginForm() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const isPaymentSuccess = searchParams.get("status") === "payment_success";
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -44,9 +46,15 @@ export default function LoginForm() {
                 </div>
             )}
 
+            {isPaymentSuccess && (
+                <div className="p-4 text-xs font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-center animate-in fade-in slide-in-from-top-1">
+                    🎉 Paiement réussi ! Votre compte est maintenant activé. Vous pouvez vous connecter.
+                </div>
+            )}
+
             <div className="space-y-5">
                 <div className="space-y-2">
-                    <label className="text-[10px] font-black px-1 text-[var(--foreground)]/70 uppercase tracking-[0.2em]">
+                    <label className="label-sm">
                         Adresse Email
                     </label>
                     <input
@@ -54,13 +62,13 @@ export default function LoginForm() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-2xl px-5 py-4 text-[var(--foreground)] focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent focus:outline-none transition-all placeholder:text-[var(--foreground)]/50"
+                        className="input-field"
                         placeholder="nom@exemple.com"
                     />
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-[10px] font-black px-1 text-[var(--foreground)]/70 uppercase tracking-[0.2em] flex justify-between items-center w-full">
+                    <label className="label-sm flex justify-between items-center w-full">
                         <span>Mot de passe</span>
                         <a href="/forgot-password" className="text-[var(--primary)] hover:underline normal-case tracking-normal">Oublié ?</a>
                     </label>
@@ -69,7 +77,7 @@ export default function LoginForm() {
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-2xl px-5 py-4 text-[var(--foreground)] focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent focus:outline-none transition-all placeholder:text-[var(--foreground)]/50"
+                        className="input-field"
                         placeholder="••••••••"
                     />
                 </div>
@@ -77,7 +85,7 @@ export default function LoginForm() {
 
             <button
                 type="submit"
-                className="btn-primary"
+                className="btn-primary w-full"
                 disabled={loading}
             >
                 {loading ? (

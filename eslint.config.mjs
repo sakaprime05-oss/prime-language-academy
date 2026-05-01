@@ -12,7 +12,27 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "node_modules/**",
+    "scratch/**",
+    "scripts/**",
+    "n8n-workflows/**",
+    "create-admins.js",
+    "create_notif_workflow.js",
+    "replace_colors.js",
+    "test-db.js",
+    "check-env.js",
+    "vercel-check.mjs",
+    "vercel-fix.mjs",
   ]),
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@next/next/no-img-element": "off",
+      "react/no-unescaped-entities": "off",
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

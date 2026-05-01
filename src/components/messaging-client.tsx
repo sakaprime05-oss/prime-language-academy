@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { sendMessage, getConversations, getMessages, getAvailableContacts } from "@/app/actions/messages";
-import { useRouter } from "next/navigation";
 
 export function MessagingClient({ currentUserId }: { currentUserId: string }) {
     const [conversations, setConversations] = useState<any[]>([]);
@@ -12,11 +11,28 @@ export function MessagingClient({ currentUserId }: { currentUserId: string }) {
     const [newMessage, setNewMessage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [isSending, setIsSending] = useState(false);
-    const router = useRouter();
+
+    const loadInitialData = useCallback(async () => {
+        setIsLoading(true);
+        const [convs, availableContacts] = await Promise.all([
+            getConversations(),
+            getAvailableContacts()
+        ]);
+        setConversations(convs);
+        setContacts(availableContacts);
+        setIsLoading(false);
+    }, []);
+
+    const loadMessages = useCallback(async (partnerId: string, background = false) => {
+        if (!background) setIsLoading(true);
+        const msgs = await getMessages(partnerId);
+        setMessages(msgs);
+        if (!background) setIsLoading(false);
+    }, []);
 
     useEffect(() => {
         loadInitialData();
-    }, []);
+    }, [loadInitialData]);
 
     useEffect(() => {
         if (activeContact) {
@@ -27,25 +43,7 @@ export function MessagingClient({ currentUserId }: { currentUserId: string }) {
             }, 5000);
             return () => clearInterval(interval);
         }
-    }, [activeContact]);
-
-    async function loadInitialData() {
-        setIsLoading(true);
-        const [convs, availableContacts] = await Promise.all([
-            getConversations(),
-            getAvailableContacts()
-        ]);
-        setConversations(convs);
-        setContacts(availableContacts);
-        setIsLoading(false);
-    }
-
-    async function loadMessages(partnerId: string, background = false) {
-        if (!background) setIsLoading(true);
-        const msgs = await getMessages(partnerId);
-        setMessages(msgs);
-        if (!background) setIsLoading(false);
-    }
+    }, [activeContact, loadMessages]);
 
     async function handleSend(e: React.FormEvent) {
         e.preventDefault();

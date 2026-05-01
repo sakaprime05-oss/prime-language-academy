@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, Eye, FileText } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, FileText, BookOpen } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 

@@ -48,21 +48,21 @@ export async function deleteLevel(id: string) {
 // Module Actions
 export async function createModule(data: { title: string; order: number; levelId: string }) {
     await checkAdmin();
-    const module = await prisma.module.create({
+    const courseModule = await prisma.module.create({
         data,
     });
     revalidatePath("/dashboard/admin/courses");
-    return module;
+    return courseModule;
 }
 
 export async function updateModule(id: string, data: { title?: string; order?: number }) {
     await checkAdmin();
-    const module = await prisma.module.update({
+    const courseModule = await prisma.module.update({
         where: { id },
         data,
     });
     revalidatePath("/dashboard/admin/courses");
-    return module;
+    return courseModule;
 }
 
 export async function deleteModule(id: string) {

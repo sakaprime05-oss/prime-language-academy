@@ -21,19 +21,23 @@ export default async function StudentDashboardPage() {
     const dict = fullDict.dashboard;
 
     const isClub = user?.registrationType === "CLUB";
+    const memberSince = user?.createdAt
+        ? new Date(user.createdAt).toLocaleDateString('fr-FR')
+        : "";
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-16">
-            <header className="flex items-center justify-between">
-                <div className="space-y-1">
-                    <h2 className="text-2xl md:text-3xl font-black text-[var(--foreground)] tracking-tight">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
+            <header className="flex items-center justify-between gap-4">
+                <div className="space-y-0.5 min-w-0">
+                    <p className="text-xl md:text-2xl font-black text-[var(--foreground)] tracking-tight leading-snug truncate"
+                        style={{fontFamily: 'Inter, sans-serif'}}>
                         {isClub ? `Welcome back, ${session.user.name?.split(' ')[0]} 🥂` : `${dict.welcome}, ${session.user.name?.split(' ')[0]} 👋`}
-                    </h2>
-                    <p className="text-[var(--foreground)]/50 font-medium text-sm">
+                    </p>
+                    <p className="text-sm text-[var(--foreground)]/50 font-medium leading-tight">
                         {isClub ? dict.ready_club : dict.ready_course}
                     </p>
                 </div>
-                <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-black shadow-lg shadow-primary/20 text-xl border-2 border-white/20">
+                <div className="w-11 h-11 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-black shadow-lg shadow-primary/20 text-lg border-2 border-white/20 flex-shrink-0">
                     {session.user.name?.[0]}
                 </div>
             </header>
@@ -62,7 +66,7 @@ export default async function StudentDashboardPage() {
                                 </p>
                                 <h3 className="text-2xl font-black text-[var(--foreground)]">{progressData.levelName}</h3>
                                 <p className="text-xs text-[var(--foreground)]/50 mt-2 font-bold uppercase tracking-widest">
-                                    {isClub ? `${dict.member_since} : ${new Date(user?.createdAt || Date.now()).toLocaleDateString('fr-FR')}` : `${dict.start_date} : ${systemSettings.currentSessionStart}`}
+                                    {isClub ? `${dict.member_since} : ${memberSince}` : `${dict.start_date} : ${systemSettings.currentSessionStart}`}
                                 </p>
                             </div>
 
@@ -143,7 +147,7 @@ export default async function StudentDashboardPage() {
                     <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-sm">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/60">{isClub ? dict.community : dict.nav?.forum || "Forum"}</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/60">{isClub ? dict.community : fullDict.nav?.forum || "Forum"}</span>
                 </Link>
 
                 <Link href="/dashboard/student/appointments" className="glass-card flex flex-col items-center justify-center gap-3 p-6 hover:border-primary/50 transition-all group">

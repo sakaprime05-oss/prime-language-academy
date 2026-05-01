@@ -79,7 +79,7 @@ export default async function StudentCoursesPage() {
                                 <LessonItem
                                     key={lesson.id}
                                     lesson={lesson}
-                                    isCompleted={progressData.completedLessonIds?.includes(lesson.id) ?? false}
+                                    isCompleted={(progressData.completedLessonIds as string[]).includes(lesson.id)}
                                 />
                             ))}
                         </div>

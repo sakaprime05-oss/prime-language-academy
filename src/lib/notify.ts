@@ -1,6 +1,11 @@
 export async function notifyTelegram(type: string, data: any) {
     try {
-        const webhookUrl = "https://n8n.sakamomo.tech/webhook/pla-notifications";
+        const webhookUrl = process.env.N8N_PLA_NOTIFICATIONS_WEBHOOK;
+        if (!webhookUrl) {
+            console.warn("Notification webhook missing; Telegram notification skipped.");
+            return;
+        }
+
         await fetch(webhookUrl, {
             method: "POST",
             headers: {

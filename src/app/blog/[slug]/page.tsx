@@ -10,6 +10,7 @@ import { fr } from "date-fns/locale";
 import Image from "next/image";
 import { ParticlesBackground } from "@/components/particles";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const { slug } = await params;
@@ -47,6 +48,8 @@ export default async function SingleArticlePage({ params }: { params: { slug: st
   if (!article) {
     notFound();
   }
+
+  const safeContent = sanitizeHtml(article.content);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans selection:bg-[#E7162A]/30 overflow-x-hidden relative">
@@ -125,7 +128,7 @@ export default async function SingleArticlePage({ params }: { params: { slug: st
             {/* The dangerouslySetInnerHTML is crucial to parse the HTML tags correctly */}
             <div 
               className="prose prose-invert prose-lg max-w-none text-slate-700 dark:text-slate-300 prose-headings:text-slate-900 dark:text-white prose-headings:font-black prose-a:text-[#E7162A] prose-strong:text-slate-900 dark:text-white leading-relaxed prose-p:mb-6"
-              dangerouslySetInnerHTML={{ __html: article.content }}
+              dangerouslySetInnerHTML={{ __html: safeContent }}
             />
           </div>
 

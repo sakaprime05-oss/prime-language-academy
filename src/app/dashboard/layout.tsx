@@ -28,13 +28,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
             {/* Desktop Sidebar — Étudiants */}
             <aside className="hidden md:flex w-72 flex-col bg-[var(--surface)]/80 backdrop-blur-3xl border-r border-white/20 dark:border-white/5 sticky top-0 h-screen z-50 shadow-2xl shadow-indigo-500/5">
                 <div className="p-8 pb-4">
-                    <div className="mb-6">
+                    <div className="mb-4">
                         <Link href="/dashboard">
-                            <LogoMark className="w-24 h-24 lg:w-32 lg:h-32 -ml-2" />
+                            <LogoMark className="w-20 h-20 lg:w-24 lg:h-24 -ml-2" />
                         </Link>
                     </div>
-                    <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">Prime</h1>
-                    <p className="text-[10px] uppercase tracking-widest font-black text-primary/60">Language Academy</p>
+                    {/* Titre sidebar — Inter, pas Playfair (trop grand en sidebar) */}
+                    <p className="text-lg font-black text-[var(--foreground)] tracking-tight" style={{fontFamily:'Inter,sans-serif'}}>Prime</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary/60 mt-0.5">Language Academy</p>
                 </div>
 
                 <div className="flex-1 overflow-y-auto px-4 mt-4">
@@ -56,10 +57,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
             {/* Mobile Header (Student only) */}
             <div className="md:hidden flex flex-col w-full min-h-screen pb-24">
                 <header className="sticky top-0 z-40 bg-[var(--surface)]/80 backdrop-blur-3xl border-b border-white/20 dark:border-white/5 px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between shadow-sm">
-                    <h1 className="text-xl sm:text-2xl font-black text-[var(--foreground)] flex items-center gap-3">
-                        <LogoMark className="w-16 h-16 sm:w-20 sm:h-20" />
-                        Prime
-                    </h1>
+                    <div className="flex items-center gap-3">
+                        <LogoMark className="w-10 h-10" />
+                        <h1 className="text-xl font-black text-[var(--foreground)]">Prime</h1>
+                    </div>
                     <div className="flex items-center gap-3">
                         <LangToggle currentLang={currentLang} />
                         <a href="/dashboard/student/profile" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-primary/20 flex items-center justify-center text-xs sm:text-sm font-bold text-primary shadow-sm hover:scale-105 transition-transform">

@@ -100,9 +100,9 @@ export function AppointmentForm() {
     };
 
     return (
-        <form onSubmit={onSubmit} className="flex flex-col gap-6">
-            <div className="flex flex-col gap-3">
-                <label className="text-sm font-semibold text-foreground/80">
+        <form onSubmit={onSubmit} className="flex flex-col gap-5">
+            <div className="flex flex-col gap-1.5">
+                <label className="label-sm">
                     Date souhaitée
                 </label>
                 <Popover>
@@ -110,7 +110,7 @@ export function AppointmentForm() {
                         <Button
                             variant={"outline"}
                             className={cn(
-                                "w-full h-12 justify-start text-left font-medium rounded-xl border-[#21286E]/10 bg-white hover:bg-slate-50",
+                                "input-field justify-start text-left font-medium hover:bg-[var(--surface-hover)]",
                                 !date && "text-muted-foreground"
                             )}
                         >
@@ -134,12 +134,12 @@ export function AppointmentForm() {
                 </p>
             </div>
 
-            <div className="flex flex-col gap-3">
-                <label className="text-sm font-semibold text-foreground/80">
+            <div className="flex flex-col gap-1.5 mt-2">
+                <label className="label-sm">
                     Heure (Créneaux de 30 min)
                 </label>
-                <Select disabled={!date} value={time} onValueChange={setTime}>
-                    <SelectTrigger className="h-12 rounded-xl border-[#21286E]/10 bg-white hover:bg-slate-50">
+                <Select disabled={!date} value={time} onValueChange={(value) => setTime(value ?? "")}>
+                    <SelectTrigger className="input-field hover:bg-[var(--surface-hover)]">
                         <div className="flex items-center">
                             <Clock className="mr-2 h-4 w-4 text-[#E7162A]" />
                             <SelectValue placeholder={date ? "Choisir une heure" : "Sélectionnez d'abord une date"} />
@@ -164,8 +164,8 @@ export function AppointmentForm() {
                 )}
             </div>
 
-            <div className="flex flex-col gap-3">
-                <label htmlFor="reason" className="text-sm font-semibold text-foreground/80">
+            <div className="flex flex-col gap-1.5 mt-2">
+                <label htmlFor="reason" className="label-sm">
                     Motif du rendez-vous
                 </label>
                 <Textarea
@@ -174,17 +174,17 @@ export function AppointmentForm() {
                     onChange={(e) => setReason(e.target.value)}
                     rows={4}
                     placeholder="De quoi souhaitez-vous discuter ?"
-                    className="resize-none rounded-xl p-4 border-[#21286E]/10 bg-white hover:bg-slate-50 focus:border-[#E7162A]/50 transition-colors"
+                    className="input-field resize-none"
                 />
             </div>
 
-            <Button
+            <button
                 type="submit"
                 disabled={loading || !date || !time}
-                className="w-full h-14 mt-2 text-base font-bold bg-[#21286E] hover:bg-[#21286E]/90 text-white rounded-xl transition-all shadow-lg shadow-[#21286E]/20 disabled:opacity-50"
+                className="btn-primary w-full mt-4"
             >
                 {loading ? "Réservation en cours..." : "Confirmer la réservation"}
-            </Button>
+            </button>
         </form>
     );
 }

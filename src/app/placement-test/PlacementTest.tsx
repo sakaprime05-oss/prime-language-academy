@@ -14,9 +14,10 @@ import {
 import type { Question } from "./test-data";
 import AudioPlayer from "./AudioPlayer";
 import AudioRecorder from "./AudioRecorder";
+import { evaluateTranscriptAction } from "@/app/actions/ai-grader";
 
 type Answers = Record<number, string>;
-type AudioData = Record<number, { blob: Blob; duration: number }>;
+type AudioData = Record<number, { blob: Blob; duration: number; transcript: string }>;
 
 export default function PlacementTest() {
   const router = useRouter();
@@ -39,13 +40,16 @@ export default function PlacementTest() {
   }, []);
 
   const handleAudioRecording = useCallback(
-    (questionId: number, blob: Blob, durationSec: number) => {
-      setAudioData((prev) => ({ ...prev, [questionId]: { blob, duration: durationSec } }));
+    (questionId: number, blob: Blob, durationSec: number, transcript: string) => {
+      setAudioData((prev) => ({ ...prev, [questionId]: { blob, duration: durationSec, transcript } }));
     },
     []
   );
 
-  const calculateScores = useCallback(() => {
+  const [isCalculating, setIsCalculating] = useState(false);
+
+  const calculateScores = useCallback(async () => {
+    setIsCalculating(true);
     let total = 0;
     const scores: Record<string, number> = {};
 
@@ -61,9 +65,28 @@ export default function PlacementTest() {
           sectionScore += scoreShortAnswer(answers[q.id] || "", q);
         } else if (q.type === "audio-record") {
           const audio = audioData[q.id];
-          sectionScore += scoreAudioRecording(audio?.duration || 0, q.points);
+          const transcript = audio?.transcript || "";
+          
+          // Try AI Evaluation
+          const aiScore = await evaluateTranscriptAction(transcript, q.question, q.points);
+          
+          if (aiScore !== null) {
+            sectionScore += aiScore;
+          } else {
+            // Fallback to heuristic
+            sectionScore += scoreAudioRecording(audio?.duration || 0, q.points, transcript);
+          }
         } else if (q.type === "long-text") {
-          sectionScore += scoreWrittenExpression(answers[q.id] || "", q.points);
+          const text = answers[q.id] || "";
+          
+          // Try AI Evaluation for long text too
+          const aiScore = await evaluateTranscriptAction(text, q.question, q.points);
+          
+          if (aiScore !== null) {
+            sectionScore += aiScore;
+          } else {
+            sectionScore += scoreWrittenExpression(text, q.points);
+          }
         }
       }
 
@@ -74,6 +97,7 @@ export default function PlacementTest() {
     setTotalScore(total);
     setSectionScores(scores);
     setTestComplete(true);
+    setIsCalculating(false);
   }, [answers, audioData]);
 
   useEffect(() => {
@@ -258,6 +282,21 @@ export default function PlacementTest() {
   }
 
   // ============================================================
+  // CALCULATING SCREEN
+  // ============================================================
+  if (isCalculating) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-6 text-center animate-pulse">
+        <div className="w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+        <div className="space-y-2">
+          <h3 className="text-xl font-black text-[var(--foreground)]">Analyse de vos réponses...</h3>
+          <p className="text-sm text-[var(--foreground)]/50 font-medium">Notre intelligence artificielle évalue votre niveau d'anglais.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================================
   // TEST IN PROGRESS
   // ============================================================
   return (
@@ -356,8 +395,8 @@ interface QuestionCardProps {
   questionIndex: number;
   answer: string;
   onAnswer: (questionId: number, value: string) => void;
-  audioData?: { blob: Blob; duration: number };
-  onAudioRecording: (questionId: number, blob: Blob, durationSec: number) => void;
+  audioData?: { blob: Blob; duration: number; transcript: string };
+  onAudioRecording: (questionId: number, blob: Blob, durationSec: number, transcript: string) => void;
 }
 
 function QuestionCard({ question, questionIndex, answer, onAnswer, audioData, onAudioRecording }: QuestionCardProps) {

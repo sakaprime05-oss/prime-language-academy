@@ -1,10 +1,19 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { registerUser } from "@/app/actions/auth-actions";
 import { signIn } from "next-auth/react";
+
+const planSessions: Record<string, number> = {
+    "loisir": 1,
+    "essentiel": 2,
+    "equilibre": 3,
+    "performance": 4,
+    "intensif": 5,
+    "immersion": 6
+};
 
 const plans = [
     { id: "loisir", name: "Loisir (1 séance/sem)", price: "52 000 FCFA", desc: "Initiation ou contact léger" },
@@ -44,6 +53,8 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [emailStatus, setEmailStatus] = useState<"idle" | "checking" | "available" | "taken">("idle");
+    const emailDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const [formData, setFormData] = useState({
         type: "FORMATION",
@@ -82,16 +93,47 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
         if (type === "checkbox" && target instanceof HTMLInputElement) {
             setFormData(prev => ({ ...prev, [name]: target.checked }));
         } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
+            setFormData(prev => {
+                const newData = { ...prev, [name]: value };
+                if (name === "planId") {
+                    newData.days = []; // Reset days when plan changes to ensure correct count
+                }
+                return newData;
+            });
+        }
+
+        // Real-time email check with debounce
+        if (name === "email") {
+            setEmailStatus("idle");
+            if (emailDebounceRef.current) clearTimeout(emailDebounceRef.current);
+            const trimmed = value.trim();
+            if (trimmed.includes("@") && trimmed.length > 5) {
+                setEmailStatus("checking");
+                emailDebounceRef.current = setTimeout(async () => {
+                    try {
+                        const res = await fetch(`/api/check-email?email=${encodeURIComponent(trimmed)}`);
+                        const data = await res.json();
+                        setEmailStatus(data.exists ? "taken" : "available");
+                    } catch {
+                        setEmailStatus("idle");
+                    }
+                }, 600);
+            }
         }
     };
 
     const handleDayToggle = (day: string) => {
+        const maxSessions = planSessions[formData.planId] || 2;
         setFormData(prev => {
-            const days = prev.days.includes(day)
-                ? prev.days.filter(d => d !== day)
-                : [...prev.days, day];
-            return { ...prev, days };
+            if (prev.days.includes(day)) {
+                return { ...prev, days: prev.days.filter(d => d !== day) };
+            }
+            if (prev.days.length >= maxSessions) {
+                setError(`Votre formule ne permet de choisir que ${maxSessions} jour(s).`);
+                return prev;
+            }
+            setError("");
+            return { ...prev, days: [...prev.days, day] };
         });
     };
 
@@ -101,12 +143,17 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
             setError("Veuillez remplir les informations obligatoires (Nom, Email, Téléphone, Mot de passe).");
             return;
         }
+        if (step === 1 && emailStatus === "taken") {
+            setError("Cet email est déjà associé à un compte. Veuillez vous connecter ou utiliser un autre email.");
+            return;
+        }
         if (step === 2 && (!formData.objective || !formData.level)) {
             setError("Veuillez choisir un objectif et un niveau d'anglais.");
             return;
         }
-        if (step === 3 && (formData.days.length < 2 || !formData.timeSlot)) {
-            setError("Veuillez choisir au moins 2 jours de base et un créneau horaire.");
+        const requiredDays = planSessions[formData.planId] || 2;
+        if (step === 3 && (formData.days.length !== requiredDays || !formData.timeSlot)) {
+            setError(`Veuillez choisir exactement ${requiredDays} jour(s) de base et un créneau horaire.`);
             return;
         }
         setStep(prev => Math.min(prev + 1, 4));
@@ -148,7 +195,11 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
             setLoading(false);
         } else {
             if (result.redirectUrl) {
-                router.push(result.redirectUrl);
+                if (result.redirectUrl.startsWith("http")) {
+                    window.location.href = result.redirectUrl;
+                } else {
+                    router.push(result.redirectUrl);
+                }
             } else {
                 router.push("/dashboard");
             }
@@ -165,14 +216,14 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                     const isCurrent = step === stepNum;
                     return (
                         <div key={idx} className="flex items-center gap-1 sm:gap-2 flex-1 min-w-[60px]">
-                            <div className={`flex flex-col items-center gap-1 ${isActive ? 'text-primary' : 'text-[var(--foreground)]/30'}`}>
-                                <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-black text-xs sm:text-sm ${isActive ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-[var(--foreground)]/5 text-[var(--foreground)]/50 border border-[var(--foreground)]/10'}`}>
+                            <div className={`flex flex-col items-center gap-1 ${isActive ? 'text-primary' : 'text-[var(--foreground)]/40'}`}>
+                                <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-black text-xs sm:text-sm ${isActive ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-[var(--foreground)]/10 text-[var(--foreground)]/60 border border-[var(--foreground)]/20'}`}>
                                     {stepNum}
                                 </div>
-                                <span className={`text-[7px] sm:text-[9px] uppercase tracking-widest text-center truncate max-w-[60px] sm:max-w-full ${isCurrent ? 'font-black' : 'font-bold'}`}>{label}</span>
+                                <span className={`text-[7px] sm:text-[9px] uppercase tracking-widest text-center truncate max-w-[60px] sm:max-w-full ${isCurrent ? 'font-black opacity-100' : 'font-bold opacity-60'}`}>{label}</span>
                             </div>
                             {idx < steps.length - 1 && (
-                                <div className={`flex-1 h-px mt-[-15px] ${isActive ? 'bg-primary/50' : 'bg-[var(--foreground)]/10'}`}></div>
+                                <div className={`flex-1 h-px mt-[-15px] ${isActive ? 'bg-primary/50' : 'bg-[var(--foreground)]/20'}`}></div>
                             )}
                         </div>
                     );
@@ -194,52 +245,87 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Nom et Prénoms *</label>
-                                <input type="text" name="name" required value={formData.name} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none" />
+                                <input type="text" name="name" required value={formData.name} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)] font-medium" />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Date de naissance</label>
-                                <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none" />
+                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Date de naissance</label>
+                                <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Téléphone *</label>
-                                <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none" />
+                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Téléphone *</label>
+                                <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Email *</label>
-                                <input type="email" name="email" required value={formData.email} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none" />
+                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Email *</label>
+                                <div className="relative">
+                                    <input
+                                        type="email" name="email" required
+                                        value={formData.email} onChange={handleChange}
+                                        className={`w-full bg-[var(--foreground)]/5 border rounded-xl px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)] transition-colors ${
+                                            emailStatus === "taken" ? "border-red-500/70 bg-red-500/5" :
+                                            emailStatus === "available" ? "border-green-500/70 bg-green-500/5" :
+                                            "border-[var(--foreground)]/20"
+                                        }`}
+                                    />
+                                    {/* Email status indicator */}
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                        {emailStatus === "checking" && (
+                                            <span className="w-4 h-4 border-2 border-indigo-500/40 border-t-indigo-500 rounded-full animate-spin block" />
+                                        )}
+                                        {emailStatus === "available" && (
+                                            <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        )}
+                                        {emailStatus === "taken" && (
+                                            <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        )}
+                                    </div>
+                                </div>
+                                {emailStatus === "taken" && (
+                                    <p className="text-[11px] text-red-500 font-bold px-1 mt-1 flex items-center gap-1">
+                                        <span>⚠️</span> Email déjà utilisé.
+                                        <a href="/login" className="underline hover:text-red-400">Se connecter ?</a>
+                                    </p>
+                                )}
+                                {emailStatus === "available" && (
+                                    <p className="text-[11px] text-green-600 font-bold px-1 mt-1">✓ Email disponible</p>
+                                )}
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Profession</label>
-                                <input type="text" name="profession" value={formData.profession} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none" />
+                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Profession</label>
+                                <input type="text" name="profession" value={formData.profession} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Entreprise / Institution</label>
-                                <input type="text" name="company" value={formData.company} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none" />
+                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Entreprise / Institution</label>
+                                <input type="text" name="company" value={formData.company} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Commune de résidence</label>
-                                <select name="commune" value={formData.commune} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none">
+                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Commune de résidence</label>
+                                <select name="commune" value={formData.commune} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]">
                                     <option value="" disabled>Sélectionner une commune</option>
                                     {communes.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                             </div>
                             {formData.commune === "Autre" && (
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Précisez</label>
-                                    <input type="text" name="communeOther" value={formData.communeOther} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none" placeholder="Votre ville/quartier" />
+                                    <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Précisez</label>
+                                    <input type="text" name="communeOther" value={formData.communeOther} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" placeholder="Votre ville/quartier" />
                                 </div>
                             )}
                         </div>
 
                         <div className="space-y-1 pt-2">
-                            <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Mot de passe (Compte) *</label>
-                            <input type="password" name="password" required value={formData.password} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none" placeholder="••••••••" />
+                            <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Mot de passe (Compte) *</label>
+                            <input type="password" name="password" required value={formData.password} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" placeholder="••••••••" />
                         </div>
 
                         <button type="button" onClick={nextStep} className="btn-primary w-full mt-6">Suivant →</button>
@@ -269,26 +355,29 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             <h3 className="font-black text-[var(--foreground)] text-lg">3. Niveau en anglais</h3>
                             <div className="grid grid-cols-1 gap-2">
                                 {levels.map(lvl => (
-                                    <label key={lvl} className={`flex items-center gap-3 p-3 rounded-xl border text-sm cursor-pointer transition-all ${formData.level === lvl ? 'bg-primary/10 border-primary text-[var(--foreground)]' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20'}`}>
-                                        <input type="radio" name="level" value={lvl} checked={formData.level === lvl} onChange={handleChange} className="accent-primary" />
-                                        <span className="font-bold">{lvl}</span>
+                                    <label key={lvl} className={`flex items-center gap-3 p-3 rounded-xl border-2 text-sm cursor-pointer transition-all ${formData.level === lvl ? 'bg-primary/10 border-primary text-[var(--foreground)]' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20'}`}>
+                                        <input type="radio" name="level" value={lvl} checked={formData.level === lvl} onChange={handleChange} className="accent-primary w-4 h-4" />
+                                        <span className="font-black">{lvl}</span>
                                     </label>
                                 ))}
                             </div>
 
                             {/* Placement Test CTA */}
-                            <div className="mt-4 p-4 bg-secondary/5 border border-secondary/20 rounded-2xl">
-                                <p className="text-xs font-bold text-[var(--foreground)]/60 mb-3">
-                                    🤔 Vous ne connaissez pas votre niveau ? Passez notre test de placement gratuit !
+                            <div className="mt-4 p-5 bg-indigo-500/10 border-2 border-indigo-500/30 rounded-2xl shadow-lg shadow-indigo-500/5">
+                                <p className="text-sm font-black text-indigo-600 dark:text-indigo-400 mb-3 flex items-center gap-2">
+                                    <span className="text-xl">🤔</span> Vous ne connaissez pas votre niveau ?
+                                </p>
+                                <p className="text-xs font-bold text-[var(--foreground)]/70 mb-4 leading-relaxed">
+                                    Passez notre test de placement gratuit pour découvrir votre profil linguistique exact !
                                 </p>
                                 <Link
                                     href={`/placement-test${formData.planId ? `?plan=${formData.planId}` : ''}`}
-                                    className="flex items-center justify-center gap-2 w-full px-5 py-3 rounded-xl bg-secondary/10 text-secondary border border-secondary/30 font-bold text-sm hover:bg-secondary/20 transition-all"
+                                    className="flex items-center justify-center gap-2 w-full px-5 py-4 rounded-xl bg-indigo-600 text-white font-black text-sm hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md shadow-indigo-600/20"
                                 >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                                     </svg>
-                                    Passer le Test de Placement (Gratuit)
+                                    Lancer le Test de Placement
                                 </Link>
                             </div>
                         </div>
@@ -370,7 +459,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
                         <div className="space-y-3 pt-4 border-t border-[var(--foreground)]/10">
                             <h3 className="font-black text-[var(--foreground)] text-lg">6. Jours de base</h3>
-                            <p className="text-xs text-[var(--foreground)]/60 mb-2">Choisissez vos jours de base (2 jours minimum).</p>
+                            <p className="text-xs text-[var(--foreground)]/60 mb-2">Choisissez vos jours de base ({planSessions[formData.planId]} jour{planSessions[formData.planId] > 1 ? 's' : ''} requis).</p>
                             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                                 {availableDays.map(day => (
                                     <label key={day} className={`flex items-center gap-2 p-3 rounded-xl border text-sm cursor-pointer transition-all ${formData.days.includes(day) ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-500' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20'}`}>
@@ -414,11 +503,11 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         <div className="space-y-4 pt-4 border-t border-[var(--foreground)]/10">
                             <h3 className="font-black text-[var(--foreground)] text-lg">7. Règles et Engagement</h3>
 
-                            <div className="bg-amber-500/5 text-amber-600 p-4 rounded-xl text-xs font-bold leading-relaxed border border-amber-500/20 max-h-40 overflow-y-auto">
+                            <div className="bg-slate-900 text-white p-5 rounded-xl text-xs font-bold leading-relaxed border-l-4 border-primary shadow-lg shadow-black/10">
                                 <ul className="list-disc pl-4 space-y-2">
                                     <li>L'inscription offerte est réservée aux premiers inscrits.</li>
                                     <li>Le solde total doit obligatoirement être réglé avant le début de la formation.</li>
-                                    <li><strong>Condition de remboursement :</strong> En cas d'annulation notifiée avant le début de la formation, un remboursement est possible (une retenue pour frais de dossier peut s'appliquer). Aucun remboursement ne sera effectué une fois les cours commencés.</li>
+                                    <li><strong>Condition de remboursement :</strong> En cas d'annulation notifiée avant le début de la formation, un remboursement est possible. Aucun remboursement ne sera effectué une fois les cours commencés.</li>
                                     <li>Les supports pédagogiques sont offerts au format numérique.</li>
                                     <li>La présence régulière est indispensable pour obtenir l'attestation.</li>
                                 </ul>

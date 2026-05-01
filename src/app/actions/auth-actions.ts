@@ -2,7 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { sendWelcomeEmail } from "@/lib/email";
+import { sendWelcomeEmail, sendAdminNewRegistrationEmail } from "@/lib/email";
+import { notifyTelegram } from "@/lib/notify";
+
+const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 
 export async function registerUser(formData: FormData) {
     const name = formData.get("name") as string;
@@ -62,6 +65,8 @@ export async function registerUser(formData: FormData) {
         const totalAmount = planPrices[planId] || 72000;
         const amountToPay = onboardingParams.paymentOption === "fractionne" ? (totalAmount * 0.5) : totalAmount;
 
+        console.log(`[Registration] Creating user: ${email}, Plan: ${planId}, Amount: ${amountToPay}`);
+
         // Create student with assigned level, status PENDING
         const user = await prisma.user.create({
             data: {
@@ -75,7 +80,7 @@ export async function registerUser(formData: FormData) {
                 registrationType,
                 paymentPlans: {
                     create: {
-                        totalAmount,
+                        totalAmount: Number(totalAmount),
                         amountPaid: 0,
                         status: "PARTIAL"
                     }
@@ -85,59 +90,80 @@ export async function registerUser(formData: FormData) {
         });
 
         const paymentPlan = user.paymentPlans[0];
+        const refCommand = `REG-${paymentPlan.id}-${Date.now()}`;
 
-        // --- BYPASS PAYTECH FOR MANUAL PAYMENT ---
-        // (Comment everything out to keep it as backup)
-        // const refCommand = `PRIME-${paymentPlan.id}-${Date.now()}`;
-        //
-        // const customField = JSON.stringify({
-        //     transactionId: transaction.id,
-        //     planId: paymentPlan.id,
-        //     studentId: user.id,
-        //     email: user.email,
-        // });
-        //
-        // const apiKey = process.env.PAYTECH_API_KEY!;
-        // const apiSecret = process.env.PAYTECH_API_SECRET!;
-        // const env = process.env.PAYTECH_ENV || "test";
-        // const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-        //
-        // const paymentBody: Record<string, string> = { ... };
+        console.log(`[Registration] User created ID: ${user.id}. Creating transaction ref: ${refCommand}`);
 
-        const refCommand = `PRIME-${paymentPlan.id}-${Date.now()}`;
-        
+        // Create transaction record
         const transaction = await prisma.transaction.create({
             data: {
                 planId: paymentPlan.id,
-                amount: amountToPay,
-                method: "MANUAL",
+                amount: Number(amountToPay),
+                method: "PAYSTACK",
                 status: "PENDING",
                 referenceId: refCommand,
             }
         });
 
-        const redirectUrl = `/checkout/${transaction.id}`;
+        // Initialize Paystack payment
+        const secretKey = process.env.PAYSTACK_SECRET_KEY;
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
 
-        // Notify user with custom template based on type
-        await sendWelcomeEmail(user.email, user.name || "Étudiant", registrationType)
+        if (!secretKey) {
+            console.error("[Registration] CRITICAL: PAYSTACK_SECRET_KEY is missing");
+            return { error: "Erreur de configuration: Clé API Paystack manquante sur le serveur." };
+        }
+
+        console.log(`[Registration] Initializing Paystack at ${PAYSTACK_API_URL}`);
+
+        const paystackResponse = await fetch(PAYSTACK_API_URL, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${secretKey}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                email: email,
+                amount: Math.round(amountToPay), // NO * 100 for XOF/XAF on Paystack
+                reference: refCommand,
+                currency: "XOF",
+                callback_url: `${baseUrl}/login?status=payment_success`,
+                metadata: {
+                    transactionId: transaction.id,
+                    planId: paymentPlan.id,
+                    studentId: user.id,
+                }
+            }),
+        });
+
+        const paystackData = await paystackResponse.json();
+
+        if (!paystackData.status) {
+            console.error("[Registration] Paystack Init Failed:", paystackData);
+            return { error: `Erreur Paystack: ${paystackData.message || "Impossible d'initialiser le paiement"}` };
+        }
+
+        console.log("[Registration] Paystack Init Success, redirecting...");
+
+        // Notify user with welcome email (async, don't wait to avoid timeout)
+        sendWelcomeEmail(user.email, user.name || "Étudiant", registrationType)
             .catch(err => console.error("Could not send welcome email", err));
 
         // Notify admin via Email
-        const { sendAdminNewRegistrationEmail } = await import("@/lib/email");
-        await sendAdminNewRegistrationEmail(user.name || "Nouveau", user.email, level?.name || planId)
+        sendAdminNewRegistrationEmail(user.name || "Nouveau", user.email, level?.name || planId)
             .catch(err => console.error("Could not send admin reg email", err));
 
-        // Notify admin via Telegram (Real-time)
-        const { notifyTelegram } = await import("@/lib/notify");
-        await notifyTelegram("new_registration", {
+        // Notify admin via Telegram
+        notifyTelegram("new_registration", {
             name: user.name,
             email: user.email,
             type: registrationType
-        });
+        }).catch(err => console.error("Telegram notify failed", err));
 
-        return { success: true, redirectUrl };
-    } catch (error) {
-        console.error("Registration error:", error);
-        return { error: "Une erreur est survenue lors de l'inscription." };
+        return { success: true, redirectUrl: paystackData.data.authorization_url };
+
+    } catch (error: any) {
+        console.error("[Registration] CRITICAL ERROR:", error);
+        return { error: `Erreur technique lors de l'inscription: ${error.message || "Veuillez contacter le support."}` };
     }
 }

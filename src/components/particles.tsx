@@ -3,6 +3,20 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
+function seededRandom(seed: number) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
+const particles = Array.from({ length: 40 }).map((_, i) => ({
+  id: i,
+  size: seededRandom(i + 1) * 4 + 1,
+  x: seededRandom(i + 101) * 100,
+  y: seededRandom(i + 201) * 100,
+  duration: seededRandom(i + 301) * 20 + 10,
+  delay: seededRandom(i + 401) * -20,
+}));
+
 export function ParticlesBackground() {
   const [mounted, setMounted] = useState(false);
   
@@ -11,16 +25,6 @@ export function ParticlesBackground() {
   }, []);
 
   if (!mounted) return null;
-
-  // Generate 40 random particles
-  const particles = Array.from({ length: 40 }).map((_, i) => ({
-    id: i,
-    size: Math.random() * 4 + 1, // 1px to 5px
-    x: Math.random() * 100, // 0 to 100vw
-    y: Math.random() * 100, // 0 to 100vh
-    duration: Math.random() * 20 + 10, // 10s to 30s
-    delay: Math.random() * -20 // start at different points in the animation
-  }));
 
   return (
     <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">

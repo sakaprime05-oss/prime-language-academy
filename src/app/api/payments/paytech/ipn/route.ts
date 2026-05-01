@@ -23,8 +23,6 @@ export async function POST(req: Request) {
             params.forEach((value, key) => { payload[key] = value; });
         }
 
-        console.log("PayTech IPN received:", payload);
-
         const {
             type_event,
             custom_field,
@@ -40,6 +38,13 @@ export async function POST(req: Request) {
 
         const myApiKey = process.env.PAYTECH_API_KEY!;
         const myApiSecret = process.env.PAYTECH_API_SECRET!;
+
+        if (!myApiKey || !myApiSecret) {
+            console.error("PayTech IPN: missing server credentials");
+            return new Response("IPN KO - SERVER CONFIG", { status: 500 });
+        }
+
+        console.log("PayTech IPN received:", { type_event, ref_command });
 
         // ─── Security verification ─────────────────────────────────────────────
         let isAuthentic = false;
@@ -117,14 +122,18 @@ export async function POST(req: Request) {
             const newAmountPaid = plan.amountPaid + transaction.amount;
             const newPlanStatus = newAmountPaid >= plan.totalAmount ? "PAID" : "PARTIAL";
 
-            // Update transaction
-            await prisma.transaction.update({
-                where: { id: transaction.id },
+            // IPNs can be retried by the provider. Only the first successful event may credit the plan.
+            const completed = await prisma.transaction.updateMany({
+                where: { id: transaction.id, status: { not: "COMPLETED" } },
                 data: {
                     status: "COMPLETED",
                     provider: payment_method || "PAYTECH",
                 }
             });
+
+            if (completed.count === 0) {
+                return new Response("IPN OK - Already processed", { status: 200 });
+            }
 
             // Update payment plan
             await prisma.paymentPlan.update({

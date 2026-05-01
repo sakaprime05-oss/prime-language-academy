@@ -116,7 +116,11 @@ export default function RegisterClubForm() {
             }
 
             if (res.redirectUrl) {
-                router.push(res.redirectUrl);
+                if (res.redirectUrl.startsWith("http")) {
+                    window.location.href = res.redirectUrl;
+                } else {
+                    router.push(res.redirectUrl);
+                }
             } else {
                 router.push("/dashboard/student/club");
             }
@@ -137,7 +141,7 @@ export default function RegisterClubForm() {
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all ${
                                 isActive ? 'bg-secondary text-[#080808] shadow-[0_0_15px_rgba(231,22,42,0.4)] scale-110' :
                                 isPassed ? 'bg-secondary/20 text-secondary' :
-                                'bg-[var(--foreground)]/5 text-[var(--foreground)]/30'
+                                'bg-[var(--foreground)]/10 text-[var(--foreground)]/60 border border-[var(--foreground)]/20'
                             }`}>
                                 {isPassed ? '✓' : idx + 1}
                             </div>
@@ -155,24 +159,24 @@ export default function RegisterClubForm() {
             {step === 1 && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
                     <div>
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Nom Complet</label>
-                        <input type="text" name="name" value={formData.name} onChange={handleChange} className="input-field" placeholder="John Doe" required />
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Nom Complet</label>
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} className="input-field border-[var(--foreground)]/20" placeholder="John Doe" required />
                     </div>
                     <div>
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Email Pro / Personnel</label>
-                        <input type="email" name="email" value={formData.email} onChange={handleChange} className="input-field" placeholder="john@example.com" required />
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Email Pro / Personnel</label>
+                        <input type="email" name="email" value={formData.email} onChange={handleChange} className="input-field border-[var(--foreground)]/20" placeholder="john@example.com" required />
                     </div>
                     <div>
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Téléphone (WhatsApp)</label>
-                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="input-field" placeholder="+225 00 00 00 00 00" required />
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Téléphone (WhatsApp)</label>
+                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="input-field border-[var(--foreground)]/20" placeholder="+225 00 00 00 00 00" required />
                     </div>
                     <div>
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Mot de passe</label>
-                        <input type="password" name="password" value={formData.password} onChange={handleChange} className="input-field" placeholder="••••••••" required />
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Mot de passe</label>
+                        <input type="password" name="password" value={formData.password} onChange={handleChange} className="input-field border-[var(--foreground)]/20" placeholder="••••••••" required />
                     </div>
                     <div>
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Commune de résidence</label>
-                        <select name="commune" value={formData.commune} onChange={handleChange} className="input-field cursor-pointer">
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Commune de résidence</label>
+                        <select name="commune" value={formData.commune} onChange={handleChange} className="input-field cursor-pointer border-[var(--foreground)]/20 text-[var(--foreground)]">
                             <option value="" disabled>Sélectionner une commune</option>
                             {communes.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
@@ -197,14 +201,14 @@ export default function RegisterClubForm() {
                         <input type="text" name="company" value={formData.company} onChange={handleChange} className="input-field" placeholder="Nom de votre structure" />
                     </div>
                     <div>
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Niveau Actuel</label>
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Niveau Actuel</label>
                         <div className="grid grid-cols-1 gap-2">
                             {levels.map(lvl => (
                                 <button type="button" key={lvl} onClick={() => setFormData({ ...formData, level: lvl })}
-                                    className={`p-4 rounded-xl border text-left text-sm font-bold transition-all ${
+                                    className={`p-4 rounded-xl border-2 text-left text-sm font-black transition-all ${
                                         formData.level === lvl 
                                         ? 'bg-secondary/10 border-secondary text-secondary shadow-[0_0_15px_rgba(231,22,42,0.15)]' 
-                                        : 'border-[var(--foreground)]/10 text-[var(--foreground)]/60 hover:border-[var(--foreground)]/30'
+                                        : 'border-[var(--foreground)]/10 text-[var(--foreground)]/70 hover:border-[var(--foreground)]/30'
                                     }`}>
                                     {lvl}
                                 </button>

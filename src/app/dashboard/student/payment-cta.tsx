@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { initiatePayment } from "@/app/actions/payments";
 
 interface PaymentCTAProps {
     amount: number;
@@ -11,12 +11,25 @@ interface PaymentCTAProps {
 
 export default function PaymentCTA({ amount, studentId, planId }: PaymentCTAProps) {
     const [loading, setLoading] = useState(false);
-    const router = useRouter();
 
     const handlePayment = async () => {
         setLoading(true);
-        // Redirection vers le paiement manuel
-        router.push("/dashboard/student/payments/manual");
+        try {
+            const formData = new FormData();
+            formData.append("planId", planId);
+            formData.append("amount", amount.toString());
+            
+            const res = await initiatePayment(formData);
+            if (res.redirectUrl) {
+                window.location.href = res.redirectUrl;
+            } else {
+                alert("Erreur: " + (res.error || "Impossible d'initialiser le paiement"));
+                setLoading(false);
+            }
+        } catch (e) {
+            alert("Erreur de connexion");
+            setLoading(false);
+        }
     };
 
     return (
@@ -24,9 +37,9 @@ export default function PaymentCTA({ amount, studentId, planId }: PaymentCTAProp
             <button
                 onClick={handlePayment}
                 disabled={loading}
-                className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors mt-2 text-center shadow-lg shadow-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary w-full mt-2"
             >
-                {loading ? "Redirection..." : "Effectuer mon paiement (Wave/Orange/MTN)"}
+                {loading ? "Redirection sécurisée..." : "Payer par Mobile Money / Carte"}
             </button>
         </div>
     );

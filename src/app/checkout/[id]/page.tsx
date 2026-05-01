@@ -4,9 +4,10 @@ import { WAVE_LINKS } from "@/lib/wave-config";
 import { Smartphone, ExternalLink, CheckCircle } from "lucide-react";
 import SimpleConfirmForm from "./simple-confirm-form";
 
-export default async function CheckoutPage({ params }: { params: { id: string } }) {
+export default async function CheckoutPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const transaction = await prisma.transaction.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
             paymentPlan: {
                 include: { student: true }

@@ -1,10 +1,23 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
 const COLORS = ['#E7162A', '#21286E', '#4F46E5', '#10B981', '#F59E0B'];
 
 export function StatsCharts({ data }: { data: any }) {
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
+
+    const revenueData = data?.revenueData || [];
+    const studentData = data?.studentData || [];
+    const levelData = data?.levelData || [];
+
+    if (!mounted) {
+        return <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+            {[1,2,3].map(i => <div key={i} className="bg-[#12121e] rounded-2xl border border-white/5 h-[360px] animate-pulse" />)}
+        </div>;
+    }
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
             {/* Revenue Chart */}
@@ -15,7 +28,7 @@ export function StatsCharts({ data }: { data: any }) {
                 </h3>
                 <div className="h-[300px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data.revenueData}>
+                        <BarChart data={revenueData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                             <XAxis dataKey="name" stroke="rgba(255,255,255,0.3)" fontSize={12} tickLine={false} axisLine={false} />
                             <YAxis stroke="rgba(255,255,255,0.3)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value / 1000}k`} />
@@ -37,7 +50,7 @@ export function StatsCharts({ data }: { data: any }) {
                 </h3>
                 <div className="h-[300px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={data.studentData}>
+                        <LineChart data={studentData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                             <XAxis dataKey="name" stroke="rgba(255,255,255,0.3)" fontSize={12} tickLine={false} axisLine={false} />
                             <YAxis stroke="rgba(255,255,255,0.3)" fontSize={12} tickLine={false} axisLine={false} />
@@ -61,7 +74,7 @@ export function StatsCharts({ data }: { data: any }) {
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
-                                data={data.levelData}
+                                data={levelData}
                                 cx="50%"
                                 cy="50%"
                                 innerRadius={80}
@@ -69,7 +82,7 @@ export function StatsCharts({ data }: { data: any }) {
                                 paddingAngle={5}
                                 dataKey="value"
                             >
-                                {data.levelData.map((entry: any, index: number) => (
+                                {levelData.map((entry: any, index: number) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
@@ -79,7 +92,7 @@ export function StatsCharts({ data }: { data: any }) {
                         </PieChart>
                     </ResponsiveContainer>
                     <div className="hidden sm:flex flex-col gap-3 mr-12">
-                        {data.levelData.map((entry: any, index: number) => (
+                        {levelData.map((entry: any, index: number) => (
                             <div key={entry.name} className="flex items-center gap-3">
                                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
                                 <span className="text-xs font-bold text-white/60 uppercase tracking-widest">{entry.name}</span>

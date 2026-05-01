@@ -313,7 +313,7 @@ export default function RendezVousPage() {
                                             <label className="text-sm font-bold text-[#21286E]">
                                                 Heure <span className="text-[#E7162A]">*</span>
                                             </label>
-                                            <Select disabled={!date} value={time} onValueChange={setTime}>
+                                            <Select disabled={!date} value={time} onValueChange={(value) => setTime(value ?? "")}>
                                                 <SelectTrigger className="h-12 rounded-xl border-[#21286E]/10 bg-slate-50/50 hover:bg-slate-50 transition-all">
                                                     <div className="flex items-center">
                                                         <Clock className="mr-2 h-4 w-4 text-[#E7162A]" />

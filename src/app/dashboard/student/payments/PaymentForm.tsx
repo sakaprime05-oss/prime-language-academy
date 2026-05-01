@@ -21,18 +21,18 @@ export default function PaymentForm({ planId, maxAmount }: { planId: string, max
 
         if (res.error) {
             setError(res.error);
-        } else {
-            setSuccess(res.message || "Paiement initié !");
-            e.currentTarget.reset();
+            setLoading(false);
+        } else if (res.redirectUrl) {
+            setSuccess("Redirection vers Paystack...");
+            window.location.href = res.redirectUrl;
         }
-        setLoading(false);
     }
 
     return (
         <form onSubmit={handleSubmit} className="glass-card flex flex-col gap-6 p-8 border-primary/20 bg-primary/[0.02]">
             <div className="space-y-1">
                 <h3 className="text-xl font-black text-[var(--foreground)]">Payer maintenant</h3>
-                <p className="text-xs font-medium text-[var(--foreground)]/50">Effectuez un versement sécurisé via Mobile Money.</p>
+                <p className="text-xs font-medium text-[var(--foreground)]/50">Effectuez un paiement sécurisé via Paystack (Mobile Money ou Carte).</p>
             </div>
 
             {error && (
@@ -50,22 +50,6 @@ export default function PaymentForm({ planId, maxAmount }: { planId: string, max
             <div className="space-y-4">
                 <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 px-1">
-                        Opérateur Mobile Money
-                    </label>
-                    <select
-                        name="provider"
-                        required
-                        className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-2xl px-5 py-4 font-black text-lg focus:ring-2 focus:ring-primary focus:outline-none transition-all appearance-none cursor-pointer"
-                    >
-                        <option value="ORANGE_CIV">Orange Money</option>
-                        <option value="MTN_CIV">MTN MoMo</option>
-                        <option value="MOOV_CIV">Moov Money</option>
-                        <option value="WAVE_CIV">Wave</option>
-                    </select>
-                </div>
-
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 px-1">
                         Montant à verser (FCFA)
                     </label>
                     <input
@@ -78,23 +62,6 @@ export default function PaymentForm({ planId, maxAmount }: { planId: string, max
                         className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-2xl px-5 py-4 font-black text-lg focus:ring-2 focus:ring-primary focus:outline-none transition-all"
                     />
                 </div>
-
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 px-1">
-                        Numéro Mobile Money
-                    </label>
-                    <div className="relative">
-                        <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-[var(--foreground)]/30 text-lg">+225</span>
-                        <input
-                            name="phone"
-                            type="tel"
-                            placeholder="0102030405"
-                            required
-                            pattern="[0-9]{10}"
-                            className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-2xl pl-16 pr-5 py-4 font-black text-lg focus:ring-2 focus:ring-primary focus:outline-none transition-all tracking-widest"
-                        />
-                    </div>
-                </div>
             </div>
 
             <button
@@ -102,7 +69,7 @@ export default function PaymentForm({ planId, maxAmount }: { planId: string, max
                 disabled={loading || !!success}
                 className="btn-primary w-full py-5 text-lg shadow-xl shadow-primary/20"
             >
-                {loading ? "Traitement..." : `Payer via Mobile Money`}
+                {loading ? "Traitement..." : `Payer avec Paystack`}
             </button>
 
             <div className="flex justify-center items-center gap-6 opacity-40">

@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendWelcomeEmail, sendInvoiceEmail, sendAccountActivatedEmail, sendEmail } from "@/lib/email";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 export async function POST(req: Request) {
     try {
         const apiKey = req.headers.get("x-api-key");
-        if (apiKey !== process.env.ADMIN_BOT_KEY) {
+        if (!process.env.ADMIN_BOT_KEY || apiKey !== process.env.ADMIN_BOT_KEY) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
         const body = await req.json();
-        const { action, params } = body;
+        const { action, params = {} } = body;
 
         switch (action) {
             case "get_stats": {
@@ -109,6 +110,9 @@ export async function POST(req: Request) {
 
             case "toggle_user_status": {
                 const { email, action } = params; // action: "BLOCK" or "ACTIVATE"
+                if (!email || !["BLOCK", "ACTIVATE"].includes(action)) {
+                    return NextResponse.json({ error: "Parametres invalides" }, { status: 400 });
+                }
                 const newStatus = action === "BLOCK" ? "BLOCKED" : "ACTIVE";
                 
                 const user = await prisma.user.update({
@@ -121,6 +125,9 @@ export async function POST(req: Request) {
             case "validate_payment": {
                 const { email, amount } = params;
                 const numericAmount = parseFloat(amount.toString().replace(/\s/g, ''));
+                if (!email || !Number.isFinite(numericAmount) || numericAmount <= 0) {
+                    return NextResponse.json({ error: "Parametres invalides" }, { status: 400 });
+                }
 
                 const student = await prisma.user.findUnique({
                     where: { email },
@@ -264,7 +271,7 @@ export async function POST(req: Request) {
                 await sendEmail({
                     to,
                     subject,
-                    html: html || `<p>${text || subject}</p>`
+                    html: sanitizeHtml(html || `<p>${text || subject}</p>`)
                 });
                 return NextResponse.json({
                     success: true,
@@ -277,6 +284,6 @@ export async function POST(req: Request) {
         }
     } catch (error: any) {
         console.error("Admin Bot Error:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
     }
 }

@@ -52,10 +52,10 @@ export default function SimpleConfirmForm({ transactionId }: { transactionId: st
             <div className="space-y-4">
                 <div 
                     onClick={() => fileInputRef.current?.click()}
-                    className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
+                    className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
                         file 
-                        ? 'border-green-500 bg-green-500/5' 
-                        : 'border-[var(--foreground)]/20 hover:border-primary bg-[var(--foreground)]/5'
+                        ? 'border-green-500 bg-green-500/10' 
+                        : 'border-[var(--foreground)]/40 hover:border-primary bg-[var(--foreground)]/10 shadow-sm'
                     }`}
                 >
                     <input 
@@ -67,16 +67,16 @@ export default function SimpleConfirmForm({ transactionId }: { transactionId: st
                     />
                     
                     {file ? (
-                        <div className="flex flex-col items-center text-green-500">
-                            <CheckCircle2 className="w-8 h-8 mb-2" />
-                            <span className="text-sm font-bold truncate max-w-[200px]">{file.name}</span>
-                            <span className="text-xs opacity-70 mt-1 cursor-pointer underline">Changer l'image</span>
+                        <div className="flex flex-col items-center text-green-600 dark:text-green-400">
+                            <CheckCircle2 className="w-10 h-10 mb-3" />
+                            <span className="text-sm font-black truncate max-w-[200px]">{file.name}</span>
+                            <span className="text-xs opacity-80 mt-2 cursor-pointer underline font-bold">Changer l'image</span>
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center text-[var(--foreground)]/60">
-                            <UploadCloud className="w-8 h-8 mb-2 opacity-50" />
-                            <span className="text-sm font-bold">Importez votre capture d'écran</span>
-                            <span className="text-xs opacity-50 mt-1">PNG, JPG ou JPEG</span>
+                        <div className="flex flex-col items-center text-[var(--foreground)]/80">
+                            <UploadCloud className="w-10 h-10 mb-3 text-primary opacity-80" />
+                            <span className="text-sm font-black uppercase tracking-tight">Importez votre reçu Wave</span>
+                            <span className="text-[10px] opacity-60 mt-2 font-bold uppercase tracking-widest">Format Image (PNG, JPG, JPEG)</span>
                         </div>
                     )}
                 </div>

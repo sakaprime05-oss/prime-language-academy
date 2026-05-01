@@ -4,38 +4,58 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-const PAYTECH_API_URL = "https://paytech.sn/api/payment/request-payment";
+const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
+
+function parsePositiveAmount(value: FormDataEntryValue | null) {
+    const amount = Number(value);
+    return Number.isFinite(amount) && amount > 0 ? amount : null;
+}
 
 /**
- * Initiate a payment via PayTech and return a redirect URL
- * The student is then redirected to PayTech's checkout page
+ * Initiate a payment via Paystack and return a redirect URL
+ * The student is then redirected to Paystack's checkout page
  */
 export async function initiatePayment(formData: FormData) {
     const session = await auth();
     if (!session || !session.user) return { error: "Non autorisé" };
 
-    const amount = parseFloat(formData.get("amount") as string);
-    const planId = formData.get("planId") as string;
-    const studentName = (formData.get("studentName") as string) || "Étudiant";
-    const studentEmail = (formData.get("studentEmail") as string) || "";
-    const phone = (formData.get("phone") as string) || "";
-    const targetPayment = (formData.get("targetPayment") as string) || ""; // e.g. "Orange Money" or "Orange Money, Wave, Free Money"
+    if (session.user?.role !== "STUDENT") return { error: "Non autorise" };
 
-    if (!amount || !planId) {
+    const requestedAmount = parsePositiveAmount(formData.get("amount"));
+    const planId = formData.get("planId") as string;
+    const studentEmail = session.user.email || "student@primelanguageacademy.com";
+
+    if (!requestedAmount || !planId) {
         return { error: "Données de paiement incomplètes." };
     }
 
-    const apiKey = process.env.PAYTECH_API_KEY;
-    const apiSecret = process.env.PAYTECH_API_SECRET;
-    const env = process.env.PAYTECH_ENV || "test";
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const secretKey = process.env.PAYSTACK_SECRET_KEY;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
 
-    if (!apiKey || !apiSecret) {
-        console.error("PayTech API keys are missing");
+    if (!secretKey) {
+        console.error("Paystack API key is missing");
         return { error: "Configuration du système de paiement incomplète." };
     }
 
     try {
+        const plan = await prisma.paymentPlan.findFirst({
+            where: {
+                id: planId,
+                studentId: session.user.id,
+            },
+        });
+
+        if (!plan) {
+            return { error: "Plan de paiement introuvable." };
+        }
+
+        const remaining = Math.max(0, plan.totalAmount - plan.amountPaid);
+        if (remaining <= 0) {
+            return { error: "Ce plan est deja regle." };
+        }
+
+        const amount = Math.min(requestedAmount, remaining);
+
         // Generate a unique reference for this command
         const refCommand = `PRIME-${planId}-${Date.now()}`;
 
@@ -44,86 +64,61 @@ export async function initiatePayment(formData: FormData) {
             data: {
                 planId,
                 amount,
-                method: "PAYTECH",
+                method: "PAYSTACK",
                 status: "PENDING",
                 referenceId: refCommand,
             }
         });
 
-        // Custom field encodes our internal data (will be Base64-decoded in the IPN)
-        const customField = JSON.stringify({
-            transactionId: transaction.id,
-            planId,
-            studentId: session.user.id,
+        // Build the Paystack payment request body
+        // NOTE: XOF (Franc CFA) does NOT use subunits on Paystack — do NOT multiply by 100
+        const paymentBody = {
             email: studentEmail,
-        });
-
-        // Build the PayTech payment request body
-        const paymentBody: Record<string, string> = {
-            item_name: "Frais de scolarité - Prime Language Academy",
-            item_price: String(Math.round(amount)),
+            amount: Math.round(amount), // XOF: no × 100 needed (unlike NGN/GHS/KES)
+            reference: refCommand,
             currency: "XOF",
-            ref_command: refCommand,
-            command_name: `Paiement scolarité - ${studentName}`,
-            env: env,
-            ipn_url: `${baseUrl}/api/payments/paytech/ipn`,
-            success_url: `${baseUrl}/dashboard/student/payments?status=success`,
-            cancel_url: `${baseUrl}/dashboard/student/payments?status=cancel`,
-            custom_field: customField,
+            callback_url: `${baseUrl}/dashboard/student/payments?status=success`,
+            metadata: {
+                transactionId: transaction.id,
+                planId,
+                studentId: session.user.id,
+                custom_fields: [
+                    {
+                        display_name: "Plan ID",
+                        variable_name: "plan_id",
+                        value: planId
+                    }
+                ]
+            }
         };
 
-        // Only set target_payment if specified
-        if (targetPayment) {
-            paymentBody.target_payment = targetPayment;
-        }
-
-        const paytechResponse = await fetch(PAYTECH_API_URL, {
+        const response = await fetch(PAYSTACK_API_URL, {
             method: "POST",
             headers: {
-                "Accept": "application/json",
+                "Authorization": `Bearer ${secretKey}`,
                 "Content-Type": "application/json",
-                "API_KEY": apiKey,
-                "API_SECRET": apiSecret,
             },
             body: JSON.stringify(paymentBody),
         });
 
-        const data = await paytechResponse.json();
+        const data = await response.json();
 
-        if (data.success !== 1) {
-            console.error("PayTech error:", data);
+        if (!data.status) {
+            console.error("Paystack error:", data);
             await prisma.transaction.update({
                 where: { id: transaction.id },
-                data: { status: "FAILED", failureReason: data.message || "PayTech API Error" }
+                data: { status: "FAILED", failureReason: data.message || "Paystack API Error" }
             });
             return { error: "Le paiement n'a pas pu être initié. Veuillez réessayer." };
-        }
-
-        // Build redirect URL with autofill parameters if single payment method and phone provided
-        let redirectUrl: string = data.redirect_url;
-        if (targetPayment && !targetPayment.includes(",") && phone) {
-            const cleanPhone = phone.replace(/\s+/g, "");
-            // Phone for pn: +221XXXXXXXX format, for nn: without country code
-            const pn = cleanPhone.startsWith("+") ? cleanPhone : `+${cleanPhone}`;
-            const nn = pn.slice(4); // Remove +221
-            const isCardPayment = targetPayment === "Carte Bancaire";
-            const params = new URLSearchParams({
-                pn,
-                nn,
-                fn: studentName,
-                tp: targetPayment,
-                nac: isCardPayment ? "0" : "1",
-            });
-            redirectUrl += `?${params.toString()}`;
         }
 
         revalidatePath("/dashboard/student/payments");
         return {
             success: true,
             transactionId: transaction.id,
-            redirectUrl,
-            token: data.token,
-            message: "Redirection vers la page de paiement PayTech...",
+            redirectUrl: data.data.authorization_url,
+            reference: data.data.reference,
+            message: "Redirection vers la page de paiement Paystack...",
         };
 
     } catch (e: any) {
@@ -149,6 +144,9 @@ export async function getStudentPaymentStatus(userId: string) {
 }
 
 export async function submitManualPayment(formData: FormData) {
+    const session = await auth();
+    if (!session || session.user?.role !== "STUDENT") return { error: "Non autorise" };
+
     const transactionId = formData.get("transactionId") as string;
     const provider = formData.get("provider") as string;
     const senderPhone = formData.get("senderPhone") as string;
@@ -162,6 +160,17 @@ export async function submitManualPayment(formData: FormData) {
         const existingTx = await prisma.transaction.findUnique({ where: { id: transactionId } });
         if (!existingTx || existingTx.status !== "PENDING") {
             return { error: "Transaction invalide ou déjà traitée." };
+        }
+
+        const plan = await prisma.paymentPlan.findFirst({
+            where: {
+                id: existingTx.planId,
+                studentId: session.user.id,
+            },
+        });
+
+        if (!plan) {
+            return { error: "Transaction non autorisee." };
         }
 
         const transaction = await prisma.transaction.update({
@@ -204,16 +213,28 @@ export async function submitManualPayment(formData: FormData) {
     }
 }
 
-import { writeFile } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 
 export async function confirmWavePayment(formData: FormData) {
+    const session = await auth();
+    if (!session || session.user?.role !== "STUDENT") return { error: "Non autorise" };
+
     try {
         const transactionId = formData.get("transactionId") as string;
         const file = formData.get("proof") as File | null;
 
         if (!transactionId || !file || file.size === 0) {
             return { error: "Veuillez importer la capture d'écran de votre reçu." };
+        }
+
+        const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+        if (!allowedTypes.has(file.type)) {
+            return { error: "Format invalide. Importez une image JPG, PNG ou WebP." };
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            return { error: "Image trop lourde. Taille maximale : 5 Mo." };
         }
 
         const existingTx = await prisma.transaction.findUnique({ 
@@ -225,15 +246,20 @@ export async function confirmWavePayment(formData: FormData) {
             return { error: "Transaction invalide ou déjà traitée." };
         }
 
+        if (existingTx.paymentPlan.studentId !== session.user.id) {
+            return { error: "Transaction non autorisee." };
+        }
+
         // Sauvegarder le fichier
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
         
-        const extension = file.name.split('.').pop() || 'png';
+        const extension = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
         const filename = `proof-${existingTx.id}-${Date.now()}.${extension}`;
         const uploadDir = join(process.cwd(), "public", "uploads", "proofs");
         const filePath = join(uploadDir, filename);
         
+        await mkdir(uploadDir, { recursive: true });
         await writeFile(filePath, buffer);
         const proofUrl = `/uploads/proofs/${filename}`;
 
@@ -286,6 +312,10 @@ export async function approveTransaction(transactionId: string) {
         });
 
         if (!transaction) return { error: "Transaction introuvable" };
+        if (transaction.status === "COMPLETED") return { success: true };
+        if (transaction.status !== "VERIFYING" && transaction.status !== "PENDING") {
+            return { error: "Transaction deja traitee ou invalide" };
+        }
 
         const plan = transaction.paymentPlan;
         const student = plan.student;

@@ -76,7 +76,8 @@ export function StudentMobileNavClient({ dict }: { dict?: any }) {
     ];
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--surface)]/90 backdrop-blur-3xl border-t border-white/10 dark:border-white/5 flex items-center justify-around px-2 py-3 shadow-2xl shadow-black/20">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--surface)]/95 backdrop-blur-3xl border-t border-white/10 dark:border-white/5 flex items-stretch justify-around shadow-2xl shadow-black/20"
+            style={{paddingBottom: 'env(safe-area-inset-bottom, 0px)'}}>
             {studentLinks.map((link) => {
                 const isActive = link.exact
                     ? pathname === link.href
@@ -85,17 +86,20 @@ export function StudentMobileNavClient({ dict }: { dict?: any }) {
                     <Link
                         key={link.href}
                         href={link.href}
-                        className={`flex flex-col flex-1 items-center justify-center gap-1 px-1 py-2 mx-0.5 rounded-2xl transition-all duration-200 min-w-0 ${isActive
+                        className={`flex flex-col flex-1 items-center justify-center gap-1 px-1 py-2.5 mx-0.5 rounded-xl transition-all duration-200 min-w-0 ${
+                            isActive
                             ? "text-primary"
-                            : "text-[var(--foreground)]/40 hover:text-[var(--foreground)]/70 hover:bg-[var(--foreground)]/5"
-                            }`}
+                            : "text-[var(--foreground)]/45 hover:text-[var(--foreground)]/70 hover:bg-[var(--foreground)]/5"
+                        }`}
                     >
-                        <link.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${isActive ? 'scale-110' : ''} transition-transform`} />
-                        <span className={`text-[8px] sm:text-[10px] font-black tracking-wider truncate max-w-[90%] text-center ${isActive ? '' : 'opacity-60'}`}>
+                        <link.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'scale-110' : ''} transition-transform`} />
+                        <span className={`text-[9px] font-bold tracking-wide leading-tight truncate max-w-[90%] text-center mt-0.5 ${
+                            isActive ? 'text-primary' : 'opacity-60'
+                        }`}>
                             {link.label}
                         </span>
                         {isActive && (
-                            <div className="w-4 h-1 bg-primary rounded-full mt-0.5 animate-in zoom-in duration-300"></div>
+                            <div className="w-3 h-0.5 bg-primary rounded-full animate-in zoom-in duration-300"></div>
                         )}
                     </Link>
                 );

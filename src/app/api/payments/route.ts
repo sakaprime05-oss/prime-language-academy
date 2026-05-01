@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
 
 /**
  * PayTech payment token request endpoint
@@ -8,10 +9,16 @@ import { prisma } from "@/lib/prisma";
  */
 export async function POST(req: Request) {
     try {
+        const session = await auth();
+        if (!session || session.user?.role !== "STUDENT") {
+            return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+        }
+
         const body = await req.json();
         const { planId, amount, studentName, studentEmail, targetPayment, phone } = body;
+        const requestedAmount = Number(amount);
 
-        if (!planId || !amount) {
+        if (!planId || !Number.isFinite(requestedAmount) || requestedAmount <= 0) {
             return NextResponse.json({ error: "Données manquantes" }, { status: 400 });
         }
 
@@ -24,13 +31,32 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Configuration paiement manquante" }, { status: 500 });
         }
 
+        const plan = await prisma.paymentPlan.findFirst({
+            where: {
+                id: planId,
+                studentId: session.user.id,
+            },
+            include: { student: true },
+        });
+
+        if (!plan) {
+            return NextResponse.json({ error: "Plan de paiement introuvable" }, { status: 404 });
+        }
+
+        const remaining = Math.max(0, plan.totalAmount - plan.amountPaid);
+        if (remaining <= 0) {
+            return NextResponse.json({ error: "Ce plan est deja regle" }, { status: 400 });
+        }
+
+        const safeAmount = Math.min(requestedAmount, remaining);
+
         const refCommand = `PRIME-${planId}-${Date.now()}`;
 
         // Create pending transaction
         const transaction = await prisma.transaction.create({
             data: {
                 planId,
-                amount: parseFloat(amount),
+                amount: safeAmount,
                 method: "PAYTECH",
                 status: "PENDING",
                 referenceId: refCommand,
@@ -40,12 +66,12 @@ export async function POST(req: Request) {
         const customField = JSON.stringify({
             transactionId: transaction.id,
             planId,
-            email: studentEmail || "",
+            email: plan.student.email,
         });
 
         const paymentBody: Record<string, string> = {
             item_name: "Frais de scolarité - Prime Language Academy",
-            item_price: String(Math.round(parseFloat(amount))),
+            item_price: String(Math.round(safeAmount)),
             currency: "XOF",
             ref_command: refCommand,
             command_name: `Paiement scolarité - ${studentName || "Étudiant"}`,

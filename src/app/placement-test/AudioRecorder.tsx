@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 
 interface AudioRecorderProps {
   questionId: number;
-  onRecordingComplete: (questionId: number, blob: Blob, durationSec: number) => void;
+  onRecordingComplete: (questionId: number, blob: Blob, durationSec: number, transcript: string) => void;
 }
 
 export default function AudioRecorder({ questionId, onRecordingComplete }: AudioRecorderProps) {
@@ -61,7 +61,7 @@ export default function AudioRecorder({ questionId, onRecordingComplete }: Audio
         // Stop all tracks
         stream.getTracks().forEach((track) => track.stop());
 
-        onRecordingComplete(questionId, blob, durationSec);
+        onRecordingComplete(questionId, blob, durationSec, transcript);
 
         if (timerRef.current) {
           clearInterval(timerRef.current);
@@ -111,7 +111,7 @@ export default function AudioRecorder({ questionId, onRecordingComplete }: Audio
     } catch {
       setPermissionDenied(true);
     }
-  }, [questionId, onRecordingComplete]);
+  }, [questionId, onRecordingComplete, transcript]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {

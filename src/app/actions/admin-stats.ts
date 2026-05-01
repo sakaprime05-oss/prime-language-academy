@@ -22,8 +22,10 @@ export async function getAdminStats() {
         }
     });
 
+    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+
     const revenueByMonth = transactions.reduce((acc: any, curr) => {
-        const month = curr.date.toLocaleString('fr-FR', { month: 'short' });
+        const month = months[curr.date.getMonth()];
         acc[month] = (acc[month] || 0) + curr.amount;
         return acc;
     }, {});
@@ -42,7 +44,7 @@ export async function getAdminStats() {
     });
 
     const studentsByMonth = students.reduce((acc: any, curr) => {
-        const month = curr.createdAt.toLocaleString('fr-FR', { month: 'short' });
+        const month = months[curr.createdAt.getMonth()];
         acc[month] = (acc[month] || 0) + 1;
         return acc;
     }, {});

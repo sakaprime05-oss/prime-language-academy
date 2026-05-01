@@ -383,19 +383,43 @@ export function scoreMCQ(userAnswer: string, question: Question): number {
 }
 
 /**
- * Score audio recording based on duration (heuristic).
- * - No recording = 0
- * - < 5 seconds = 25% of points (they tried)
- * - 5-15 seconds = 50% of points (basic)
- * - 15-30 seconds = 75% of points (good)
- * - > 30 seconds = 100% of points (detailed)
+ * Score audio recording based on transcript quality and duration.
+ * Heuristic combines effort (duration) and content (transcript analysis).
  */
-export function scoreAudioRecording(durationSeconds: number, maxPoints: number): number {
-  if (durationSeconds <= 0) return 0;
-  if (durationSeconds < 5) return Math.round(maxPoints * 0.25);
-  if (durationSeconds < 15) return Math.round(maxPoints * 0.5);
-  if (durationSeconds < 30) return Math.round(maxPoints * 0.75);
-  return maxPoints;
+export function scoreAudioRecording(durationSeconds: number, maxPoints: number, transcript: string): number {
+  if (durationSeconds <= 0 || !transcript || transcript.trim().length === 0) return 0;
+
+  const words = transcript.trim().split(/\s+/);
+  const wordCount = words.length;
+
+  // 1. Effort Score (based on duration) - 40% of max points
+  let effortScore = 0;
+  if (durationSeconds >= 30) effortScore = maxPoints * 0.4;
+  else if (durationSeconds >= 15) effortScore = maxPoints * 0.3;
+  else if (durationSeconds >= 5) effortScore = maxPoints * 0.2;
+  else effortScore = maxPoints * 0.1;
+
+  // 2. Content Score (based on word count and vocabulary) - 60% of max points
+  let contentScore = 0;
+  
+  // Complexity indicators
+  const advancedKeywords = [
+    "because", "however", "therefore", "although", "consequently",
+    "especially", "actually", "basically", "usually", "frequently",
+    "experience", "opportunity", "management", "development", "challenge"
+  ];
+  
+  const hasComplexity = words.some(w => advancedKeywords.includes(w.toLowerCase()));
+  
+  if (wordCount >= 40) contentScore = maxPoints * 0.6;
+  else if (wordCount >= 20) contentScore = maxPoints * 0.4;
+  else if (wordCount >= 10) contentScore = maxPoints * 0.2;
+  else contentScore = maxPoints * 0.1;
+
+  if (hasComplexity) contentScore += (maxPoints * 0.1);
+
+  const finalScore = Math.min(Math.round(effortScore + contentScore), maxPoints);
+  return finalScore;
 }
 
 /**
