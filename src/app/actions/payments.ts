@@ -6,11 +6,6 @@ import { revalidatePath } from "next/cache";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 
-function parsePositiveAmount(value: FormDataEntryValue | null) {
-    const amount = Number(value);
-    return Number.isFinite(amount) && amount > 0 ? amount : null;
-}
-
 /**
  * Initiate a payment via Paystack and return a redirect URL
  * The student is then redirected to Paystack's checkout page
@@ -21,11 +16,10 @@ export async function initiatePayment(formData: FormData) {
 
     if (session.user?.role !== "STUDENT") return { error: "Non autorise" };
 
-    const requestedAmount = parsePositiveAmount(formData.get("amount"));
     const planId = formData.get("planId") as string;
     const studentEmail = session.user.email || "student@primelanguageacademy.com";
 
-    if (!requestedAmount || !planId) {
+    if (!planId) {
         return { error: "Données de paiement incomplètes." };
     }
 
@@ -54,7 +48,7 @@ export async function initiatePayment(formData: FormData) {
             return { error: "Ce plan est deja regle." };
         }
 
-        const amount = Math.min(requestedAmount, remaining);
+        const amount = remaining;
 
         // Generate a unique reference for this command
         const refCommand = `PRIME-${planId}-${Date.now()}`;

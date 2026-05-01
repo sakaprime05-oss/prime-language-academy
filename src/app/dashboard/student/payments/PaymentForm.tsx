@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { initiatePayment } from "@/app/actions/payments";
 
-export default function PaymentForm({ planId, maxAmount }: { planId: string, maxAmount: number }) {
+export default function PaymentForm({ planId, maxAmount }: { planId: string; maxAmount: number }) {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
@@ -32,7 +32,9 @@ export default function PaymentForm({ planId, maxAmount }: { planId: string, max
         <form onSubmit={handleSubmit} className="glass-card flex flex-col gap-6 p-8 border-primary/20 bg-primary/[0.02]">
             <div className="space-y-1">
                 <h3 className="text-xl font-black text-[var(--foreground)]">Payer maintenant</h3>
-                <p className="text-xs font-medium text-[var(--foreground)]/50">Effectuez un paiement sécurisé via Paystack (Mobile Money ou Carte).</p>
+                <p className="text-xs font-medium text-[var(--foreground)]/50">
+                    Effectuez un paiement securise via Paystack (Mobile Money ou Carte).
+                </p>
             </div>
 
             {error && (
@@ -50,17 +52,15 @@ export default function PaymentForm({ planId, maxAmount }: { planId: string, max
             <div className="space-y-4">
                 <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 px-1">
-                        Montant à verser (FCFA)
+                        Montant a payer (FCFA)
                     </label>
-                    <input
-                        name="amount"
-                        type="number"
-                        defaultValue={maxAmount}
-                        max={maxAmount}
-                        min={100}
-                        required
-                        className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-2xl px-5 py-4 font-black text-lg focus:ring-2 focus:ring-primary focus:outline-none transition-all"
-                    />
+                    <input name="amount" type="hidden" value={maxAmount} readOnly />
+                    <div className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-2xl px-5 py-4 font-black text-lg">
+                        {maxAmount.toLocaleString()} FCFA
+                    </div>
+                    <p className="text-[11px] font-medium text-[var(--foreground)]/45 px-1">
+                        Ce montant est calcule automatiquement depuis votre solde restant.
+                    </p>
                 </div>
             </div>
 
@@ -69,7 +69,7 @@ export default function PaymentForm({ planId, maxAmount }: { planId: string, max
                 disabled={loading || !!success}
                 className="btn-primary w-full py-5 text-lg shadow-xl shadow-primary/20"
             >
-                {loading ? "Traitement..." : `Payer avec Paystack`}
+                {loading ? "Traitement..." : "Payer avec Paystack"}
             </button>
 
             <div className="flex justify-center items-center gap-6 opacity-40">
