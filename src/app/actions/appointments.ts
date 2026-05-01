@@ -7,10 +7,10 @@ import { sendMail } from "@/lib/mail";
 
 const prisma = new PrismaClient();
 
-export async function createAppointment(data: { date: Date, startTime: Date, endTime: Date, reason?: string }) {
+export async function createAppointment(data: { date: Date; startTime: Date; endTime: Date; reason?: string }) {
     const session = await auth();
     if (!session || !session.user?.id) {
-        throw new Error("Non autorisé");
+        throw new Error("Non autorise");
     }
 
     const appointment = await prisma.appointment.create({
@@ -19,91 +19,84 @@ export async function createAppointment(data: { date: Date, startTime: Date, end
             date: data.date,
             startTime: data.startTime,
             endTime: data.endTime,
-            reason: data.reason
+            reason: data.reason,
         },
-        include: { student: true }
+        include: { student: true },
     });
 
     revalidatePath("/dashboard/student/appointments");
     revalidatePath("/dashboard/admin/appointments");
-    
+
     if (process.env.EMAIL_USER) {
         await sendMail(
             process.env.EMAIL_USER,
-            "Nouveau rendez-vous demandé",
-            `L'étudiant ${appointment.student?.name || appointment.student?.email} a demandé un rendez-vous.\nDate: ${new Date(data.startTime).toLocaleString('fr-FR')}\nMotif: ${data.reason || "Non précisé"}`
+            "Nouveau rendez-vous demande",
+            `Un etudiant a demande un rendez-vous.\n\nEtudiant : ${appointment.student?.name || appointment.student?.email}\nDate : ${new Date(data.startTime).toLocaleString("fr-FR")}\nMotif : ${data.reason || "Non precise"}`
         );
     }
-    
-    // Notify admin via Telegram (Real-time)
+
     const { notifyTelegram } = await import("@/lib/notify");
     await notifyTelegram("new_appointment", {
         studentName: appointment.student?.name || appointment.student?.email,
-        date: new Date(data.startTime).toLocaleDateString('fr-FR'),
-        time: new Date(data.startTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-        reason: data.reason || "Non précisé"
+        date: new Date(data.startTime).toLocaleDateString("fr-FR"),
+        time: new Date(data.startTime).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
+        reason: data.reason || "Non precise",
     });
-    
+
     return appointment;
 }
 
 export async function getStudentAppointments() {
     const session = await auth();
     if (!session || !session.user?.id) {
-        throw new Error("Non autorisé");
+        throw new Error("Non autorise");
     }
 
     return await prisma.appointment.findMany({
-        where: {
-            studentId: session.user.id
-        },
-        orderBy: {
-            date: "desc"
-        },
+        where: { studentId: session.user.id },
+        orderBy: { date: "desc" },
         include: {
             admin: {
                 select: {
                     name: true,
-                    email: true
-                }
-            }
-        }
+                    email: true,
+                },
+            },
+        },
     });
 }
 
 export async function getAdminAppointments() {
     const session = await auth();
     if (!session || session.user?.role !== "ADMIN") {
-        throw new Error("Non autorisé");
+        throw new Error("Non autorise");
     }
 
     return await prisma.appointment.findMany({
-        orderBy: {
-            date: "desc"
-        },
+        orderBy: { date: "desc" },
         include: {
             student: {
                 select: {
                     name: true,
-                    email: true
-                }
+                    email: true,
+                },
             },
             admin: {
                 select: {
-                    name: true
-                }
-            }
-        }
+                    name: true,
+                },
+            },
+        },
     });
 }
 
 export async function updateAppointmentStatus(id: string, status: string, adminId?: string) {
     const session = await auth();
     if (!session || session.user?.role !== "ADMIN") {
-        throw new Error("Non autorisé");
+        throw new Error("Non autorise");
     }
 
-    const dataToUpdate: any = { status };
+    const dataToUpdate: { status: string; adminId?: string } = { status };
     if (adminId) {
         dataToUpdate.adminId = adminId;
     }
@@ -111,7 +104,7 @@ export async function updateAppointmentStatus(id: string, status: string, adminI
     const appointment = await prisma.appointment.update({
         where: { id },
         data: dataToUpdate,
-        include: { student: true }
+        include: { student: true },
     });
 
     revalidatePath("/dashboard/student/appointments");
@@ -121,8 +114,8 @@ export async function updateAppointmentStatus(id: string, status: string, adminI
         const adminName = session.user.name || "Administrateur";
         await sendMail(
             appointment.student.email,
-            `Mise à jour de votre rendez-vous: ${status}`,
-            `Votre rendez-vous prévu le ${new Date(appointment.startTime).toLocaleString('fr-FR')} a été mis à jour.\nNouveau statut: ${status}\nPar: ${adminName}`
+            `Mise a jour de votre rendez-vous : ${status}`,
+            `Bonjour,\n\nVotre rendez-vous prevu le ${new Date(appointment.startTime).toLocaleString("fr-FR")} a ete mis a jour.\nNouveau statut : ${status}\nMis a jour par : ${adminName}\n\nPrime Language Academy`
         );
     }
 

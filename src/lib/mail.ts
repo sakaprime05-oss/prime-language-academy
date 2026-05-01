@@ -1,29 +1,18 @@
-import nodemailer from "nodemailer";
+import { sendEmail } from "@/lib/email";
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_APP_PASSWORD,
-    },
-});
+function textToHtml(text: string) {
+    return text
+        .split("\n")
+        .filter(Boolean)
+        .map((line) => `<p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;">${line}</p>`)
+        .join("");
+}
 
 export const sendMail = async (to: string | string[], subject: string, text: string, html?: string) => {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
-        console.warn("⚠️ Configuration email (EMAIL_USER et EMAIL_APP_PASSWORD) manquante, email non envoyé.");
-        return;
-    }
-
-    try {
-        await transporter.sendMail({
-            from: `"Prime Language Academy" <${process.env.EMAIL_USER}>`,
-            to,
-            subject,
-            text,
-            html,
-        });
-        console.log(`Email envoyé avec succès à ${to}`);
-    } catch (error) {
-        console.error("Erreur lors de l'envoi de l'email :", error);
-    }
+    const recipients = Array.isArray(to) ? to.join(",") : to;
+    return sendEmail({
+        to: recipients,
+        subject,
+        html: html || textToHtml(text),
+    });
 };
