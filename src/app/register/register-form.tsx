@@ -50,7 +50,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [emailStatus, setEmailStatus] = useState<"idle" | "checking" | "available" | "taken">("idle");
+    const [emailStatus, setEmailStatus] = useState<"idle" | "checking" | "available" | "pending" | "taken">("idle");
     const emailDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const [formData, setFormData] = useState({
@@ -110,7 +110,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                     try {
                         const res = await fetch(`/api/check-email?email=${encodeURIComponent(trimmed)}`);
                         const data = await res.json();
-                        setEmailStatus(data.exists ? "taken" : "available");
+                        setEmailStatus(data.canResumePayment ? "pending" : data.exists ? "taken" : "available");
                     } catch {
                         setEmailStatus("idle");
                     }
@@ -261,6 +261,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                         className={`w-full bg-[var(--foreground)]/5 border rounded-xl px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)] transition-colors ${
                                             emailStatus === "taken" ? "border-red-500/70 bg-red-500/5" :
                                             emailStatus === "available" ? "border-green-500/70 bg-green-500/5" :
+                                            emailStatus === "pending" ? "border-amber-500/70 bg-amber-500/5" :
                                             "border-[var(--foreground)]/20"
                                         }`}
                                     />
@@ -279,6 +280,11 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         )}
+                                        {emailStatus === "pending" && (
+                                            <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        )}
                                     </div>
                                 </div>
                                 {emailStatus === "taken" && (
@@ -289,6 +295,11 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 )}
                                 {emailStatus === "available" && (
                                     <p className="text-[11px] text-green-600 font-bold px-1 mt-1">✓ Email disponible</p>
+                                )}
+                                {emailStatus === "pending" && (
+                                    <p className="text-[11px] text-amber-600 font-bold px-1 mt-1">
+                                        Inscription deja creee. Continuez avec le meme mot de passe pour reprendre le paiement.
+                                    </p>
                                 )}
                             </div>
                         </div>

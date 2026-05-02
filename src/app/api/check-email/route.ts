@@ -12,10 +12,15 @@ export async function GET(request: Request) {
     try {
         const user = await prisma.user.findUnique({
             where: { email: email.toLowerCase().trim() },
-            select: { id: true },
+            select: { id: true, status: true },
         });
 
-        return NextResponse.json({ exists: !!user, valid: true });
+        return NextResponse.json({
+            exists: !!user,
+            valid: true,
+            status: user?.status || null,
+            canResumePayment: user?.status === "PENDING",
+        });
     } catch {
         return NextResponse.json({ exists: false, valid: true });
     }
