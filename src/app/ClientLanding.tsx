@@ -61,7 +61,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
         </Link>
 
         <div className="hidden lg:flex gap-10 text-[13px] font-medium tracking-widest uppercase text-[var(--foreground)]/55">
-          {[["Mission","#mission"],["Méthode","#methode"],["Programme","/programme"],["Tarifs","#tarifs"],["Le Club","/english-club"],["Blog","/blog"]].map(([l,h]) => (
+          {[["Mission","#mission"],["Méthode","#methode"],["Programme","/programme"],["Tarifs","#tarifs"],["Le Club","/english-club"],["Contact","/contact"],["Blog","/blog"]].map(([l,h]) => (
             <Link key={l} href={h} style={{ color:"inherit", textDecoration:"none", transition:"color 0.2s" }}
               onMouseEnter={e=>(e.currentTarget.style.color="#E7162A")}
               onMouseLeave={e=>(e.currentTarget.style.color="")}>{l}</Link>
@@ -478,6 +478,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
         </div>
         <div style={{ display:"flex", gap:32, fontSize:12, color:"var(--muted-foreground)", letterSpacing:"0.1em", textTransform:"uppercase" }}>
           <Link href="/programme" style={{ color:"inherit", textDecoration:"none" }}>Programme</Link>
+          <Link href="/contact" style={{ color:"inherit", textDecoration:"none" }}>Contact</Link>
           <Link href="/blog" style={{ color:"inherit", textDecoration:"none" }}>Blog</Link>
           <Link href="/english-club" style={{ color:"#E7162A", textDecoration:"none" }}>English Club</Link>
           <Link href="/placement-test" style={{ color:"inherit", textDecoration:"none" }}>Test</Link>

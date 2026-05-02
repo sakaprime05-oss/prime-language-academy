@@ -7,8 +7,20 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: `${siteConfig.shortName} | Hub d'Excellence 2026`,
   description: siteConfig.description,
+  keywords: [
+    "formation anglais Abidjan",
+    "cours anglais Cocody",
+    "anglais Angre",
+    "Prime Language Academy",
+    "English Club Abidjan",
+    "test niveau anglais Cote d'Ivoire",
+  ],
+  alternates: {
+    canonical: "/",
+  },
   manifest: "/manifest.json",
   openGraph: {
     title: siteConfig.name,
