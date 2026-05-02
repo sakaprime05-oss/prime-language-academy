@@ -83,6 +83,7 @@ async function createRegistrationCheckout(input: {
         transactionId: transaction.id,
         planId: input.paymentPlanId,
         studentId: input.userId,
+        callbackPath: `/api/payments/paystack/callback?reference=${encodeURIComponent(refCommand)}`,
     });
 
     if (checkout.error) {

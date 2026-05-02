@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Smartphone, Lock, ArrowRight } from "lucide-react";
+import { ArrowRight, Lock, Smartphone } from "lucide-react";
 
 export function PaymentLock() {
   return (
@@ -28,9 +28,9 @@ export function PaymentLock() {
           <p className="text-sm font-bold text-[#21286E] dark:text-white/80">
             Effectuez votre paiement via Mobile Money et transmettez votre preuve de dépôt.
           </p>
-          
-          <Link 
-            href="/dashboard/student/payments/manual" 
+
+          <Link
+            href="/dashboard/student/payments/manual"
             className="flex items-center justify-center gap-2 w-full py-4 bg-[#E7162A] hover:bg-[#c41222] text-white rounded-xl font-black text-sm transition-all shadow-lg shadow-[#E7162A]/25 active:scale-95 group"
           >
             Instructions de Paiement
