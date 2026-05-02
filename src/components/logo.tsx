@@ -2,12 +2,12 @@ import Image from "next/image";
 
 export function LogoMark({ className = "w-10 h-10" }: { className?: string }) {
     return (
-        <div className={`relative flex items-center justify-center overflow-hidden shrink-0 ${className}`}>
+        <div className={`relative flex shrink-0 items-center justify-center overflow-hidden ${className}`}>
             <Image 
-                src="/logo.png" 
+                src="/logo.png?v=2" 
                 alt="Prime Language Academy Logo" 
                 fill
-                sizes="(max-width: 768px) 100vw, 512px"
+                sizes="(max-width: 768px) 96px, 160px"
                 className="object-contain"
                 priority
             />
@@ -18,7 +18,7 @@ export function LogoMark({ className = "w-10 h-10" }: { className?: string }) {
 export function PrimeLogo({ className = "h-10" }: { className?: string }) {
     return (
         <div className={`flex items-center gap-3 ${className}`}>
-            <LogoMark className="h-full w-auto aspect-square" />
+            <LogoMark className="h-full w-14" />
             <div className="h-full w-[2px] bg-[var(--foreground)]/20 hidden sm:block"></div>
             <div className="flex flex-col justify-center">
                 <span className="font-extrabold text-xs leading-[1.1] tracking-widest text-[var(--foreground)]">PRIME</span>

@@ -1,10 +1,11 @@
-const CACHE_NAME = "prime-academy-v2";
+const CACHE_NAME = "prime-academy-v3";
 const OFFLINE_URL = "/offline.html";
 
 const PRECACHE_ASSETS = [
   "/",
   "/offline.html",
   "/manifest.json",
+  "/logo.png",
   "/icons/icon-192x192.png",
   "/icons/icon-512x512.png",
   "/icons/maskable-icon-512x512.png",

@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { LogoMark } from "@/components/logo";
 import { redirect } from "next/navigation";
 import LoginForm from "./login-form";
 
@@ -17,8 +18,8 @@ export default async function LoginPage() {
 
       <div className="w-full max-w-sm glass-card relative z-10 border-white/20 dark:border-white/10 shadow-2xl">
         <div className="text-center space-y-4 mb-10">
-          <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-[2rem] mx-auto flex items-center justify-center shadow-lg shadow-primary/20 rotate-3">
-            <span className="text-3xl font-black text-white -rotate-3">P</span>
+          <div className="mx-auto flex h-20 w-24 items-center justify-center rounded-[2rem] bg-white p-3 shadow-lg shadow-primary/15 ring-1 ring-black/5">
+            <LogoMark className="h-12 w-16" />
           </div>
           <div>
             <h1 className="text-3xl font-black text-[var(--foreground)] tracking-tight">Prime Academy</h1>
