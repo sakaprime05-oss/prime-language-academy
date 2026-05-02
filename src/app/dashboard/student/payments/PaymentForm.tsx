@@ -29,9 +29,9 @@ export default function PaymentForm({ planId, maxAmount }: { planId: string; max
     }
 
     return (
-        <form onSubmit={handleSubmit} className="glass-card flex flex-col gap-6 p-8 border-primary/20 bg-primary/[0.02]">
+        <form onSubmit={handleSubmit} className="glass-card !p-5 sm:!p-8 flex flex-col gap-5 sm:gap-6 border-primary/20 bg-primary/[0.02]">
             <div className="space-y-1">
-                <h3 className="text-xl font-black text-[var(--foreground)]">Payer maintenant</h3>
+                <h3 className="text-lg sm:text-xl font-black text-[var(--foreground)]">Payer maintenant</h3>
                 <p className="text-xs font-medium text-[var(--foreground)]/50">
                     Effectuez un paiement sécurisé via Paystack (Mobile Money ou Carte).
                 </p>
@@ -55,7 +55,7 @@ export default function PaymentForm({ planId, maxAmount }: { planId: string; max
                         Montant à payer (FCFA)
                     </label>
                     <input name="amount" type="hidden" value={maxAmount} readOnly />
-                    <div className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-2xl px-5 py-4 font-black text-lg">
+                    <div className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-2xl px-5 py-4 font-black text-base sm:text-lg">
                         {maxAmount.toLocaleString()} FCFA
                     </div>
                     <p className="text-[11px] font-medium text-[var(--foreground)]/45 px-1">
@@ -67,12 +67,12 @@ export default function PaymentForm({ planId, maxAmount }: { planId: string; max
             <button
                 type="submit"
                 disabled={loading || !!success}
-                className="btn-primary w-full py-5 text-lg shadow-xl shadow-primary/20"
+                className="btn-primary w-full min-h-12 py-4 sm:py-5 text-sm sm:text-lg shadow-xl shadow-primary/20"
             >
                 {loading ? "Traitement..." : "Payer avec Paystack"}
             </button>
 
-            <div className="flex justify-center items-center gap-6 opacity-40">
+            <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 opacity-40">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Orange_logo.svg" alt="Orange" className="h-5 grayscale hover:grayscale-0 transition-all" />
                 <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/MTN_Logo.svg" alt="MTN" className="h-5 grayscale hover:grayscale-0 transition-all" />
                 <img src="https://upload.wikimedia.org/wikipedia/fr/4/49/Wave_Mobile_Money.svg" alt="Wave" className="h-5 grayscale hover:grayscale-0 transition-all" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense, useEffect, useRef } from "react";
+import { useState, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { registerUser } from "@/app/actions/auth-actions";
@@ -206,22 +206,19 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     return (
         <div className="space-y-6">
             {/* Step Indicators */}
-            <div className="flex items-center justify-between mb-8 px-2 overflow-x-auto pb-4 gap-2 scrollbar-none">
+            <div className="grid grid-cols-4 gap-2 mb-6 sm:mb-8">
                 {steps.map((label, idx) => {
                     const stepNum = idx + 1;
                     const isActive = step >= stepNum;
                     const isCurrent = step === stepNum;
                     return (
-                        <div key={idx} className="flex items-center gap-1 sm:gap-2 flex-1 min-w-[60px]">
+                        <div key={idx} className="min-w-0">
                             <div className={`flex flex-col items-center gap-1 ${isActive ? 'text-primary' : 'text-[var(--foreground)]/40'}`}>
                                 <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-black text-xs sm:text-sm ${isActive ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-[var(--foreground)]/10 text-[var(--foreground)]/60 border border-[var(--foreground)]/20'}`}>
                                     {stepNum}
                                 </div>
-                                <span className={`text-[7px] sm:text-[9px] uppercase tracking-widest text-center truncate max-w-[60px] sm:max-w-full ${isCurrent ? 'font-black opacity-100' : 'font-bold opacity-60'}`}>{label}</span>
+                                <span className={`text-[7px] sm:text-[9px] uppercase tracking-[0.08em] sm:tracking-widest text-center leading-tight ${isCurrent ? 'font-black opacity-100' : 'font-bold opacity-60'}`}>{label}</span>
                             </div>
-                            {idx < steps.length - 1 && (
-                                <div className={`flex-1 h-px mt-[-15px] ${isActive ? 'bg-primary/50' : 'bg-[var(--foreground)]/20'}`}></div>
-                            )}
                         </div>
                     );
                 })}
@@ -239,7 +236,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                     <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
                         <h3 className="font-black text-[var(--foreground)] text-lg mb-2">1. Informations personnelles</h3>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Nom et Prénoms *</label>
                                 <input type="text" name="name" required value={formData.name} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)] font-medium" />
@@ -304,7 +301,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Profession</label>
                                 <input type="text" name="profession" value={formData.profession} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" />
@@ -315,7 +312,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Commune de résidence</label>
                                 <select name="commune" value={formData.commune} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]">
@@ -336,7 +333,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             <input type="password" name="password" required value={formData.password} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" placeholder="••••••••" />
                         </div>
 
-                        <button type="button" onClick={nextStep} className="btn-primary w-full mt-6">Suivant →</button>
+                        <button type="button" onClick={nextStep} className="btn-primary w-full mt-6 min-h-12">Suivant →</button>
                     </div>
                 )}
 
@@ -345,7 +342,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
                         <div className="space-y-3">
                             <h3 className="font-black text-[var(--foreground)] text-lg">2. Objectif principal</h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 {objectives.map(obj => (
                                     <label key={obj} className={`flex items-center gap-3 p-3 rounded-xl border text-sm cursor-pointer transition-all ${formData.objective === obj ? 'bg-primary/10 border-primary text-[var(--foreground)]' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20'}`}>
                                         <input type="radio" name="objective" value={obj} checked={formData.objective === obj} onChange={handleChange} className="accent-primary" />
@@ -372,7 +369,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
                             {/* Placement Test CTA */}
                             <div className="mt-4 p-5 bg-indigo-500/10 border-2 border-indigo-500/30 rounded-2xl shadow-lg shadow-indigo-500/5">
-                                <p className="text-sm font-black text-indigo-600 dark:text-indigo-400 mb-3 flex items-center gap-2">
+                                <p className="text-sm font-black text-indigo-600 dark:text-indigo-400 mb-3">
                                     <span className="text-xl">🤔</span> Vous ne connaissez pas votre niveau ?
                                 </p>
                                 <p className="text-xs font-bold text-[var(--foreground)]/70 mb-4 leading-relaxed">
@@ -391,9 +388,9 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         </div>
 
 
-                        <div className="flex gap-3 pt-2">
-                            <button type="button" onClick={prevStep} className="px-6 py-4 rounded-xl bg-[var(--foreground)]/5 font-bold hover:bg-[var(--foreground)]/10 text-[var(--foreground)] transition-all">Retour</button>
-                            <button type="button" onClick={nextStep} className="btn-primary flex-1">Suivant →</button>
+                        <div className="grid grid-cols-[0.8fr_1.2fr] gap-3 pt-2">
+                            <button type="button" onClick={prevStep} className="min-h-12 px-4 py-3 rounded-xl bg-[var(--foreground)]/5 font-bold hover:bg-[var(--foreground)]/10 text-[var(--foreground)] transition-all">Retour</button>
+                            <button type="button" onClick={nextStep} className="btn-primary min-h-12">Suivant →</button>
                         </div>
                     </div>
                 )}
@@ -455,7 +452,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         <div className="space-y-3 pt-4 border-t border-[var(--foreground)]/10">
                             <h3 className="font-black text-[var(--foreground)] text-lg">5. Créneau Horaire</h3>
                             <p className="text-xs text-[var(--foreground)]/60 mb-2">Choisissez votre vague horaire préférée.</p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 {timeSlots.map(slot => (
                                     <label key={slot.id} className={`flex items-center gap-3 p-3 rounded-xl border text-sm cursor-pointer transition-all ${formData.timeSlot === slot.id ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-500' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20'}`}>
                                         <input type="radio" name="timeSlot" value={slot.id} checked={formData.timeSlot === slot.id} onChange={handleChange} className="accent-indigo-500" />
@@ -478,9 +475,9 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
                         </div>
 
-                        <div className="flex gap-3 pt-2">
-                            <button type="button" onClick={prevStep} className="px-6 py-4 rounded-xl bg-[var(--foreground)]/5 font-bold hover:bg-[var(--foreground)]/10 text-[var(--foreground)] transition-all">Retour</button>
-                            <button type="button" onClick={nextStep} className="btn-primary flex-1">Suivant →</button>
+                        <div className="grid grid-cols-[0.8fr_1.2fr] gap-3 pt-2">
+                            <button type="button" onClick={prevStep} className="min-h-12 px-4 py-3 rounded-xl bg-[var(--foreground)]/5 font-bold hover:bg-[var(--foreground)]/10 text-[var(--foreground)] transition-all">Retour</button>
+                            <button type="button" onClick={nextStep} className="btn-primary min-h-12">Suivant →</button>
                         </div>
                     </div>
                 )}
@@ -526,7 +523,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 <span className="text-xs text-[var(--foreground)]/80 group-hover:text-[var(--foreground)] font-bold transition-colors">Je confirme mon inscription au programme English Mastery et m'engage à respecter les règles de participation.</span>
                             </label>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Signature (Nom complet) *</label>
                                     <input type="text" name="signature" required value={formData.signature} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none" placeholder="Ex: Jean Dupont" />
@@ -538,9 +535,9 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
                         </div>
 
-                        <div className="flex gap-3 pt-6 border-t border-[var(--foreground)]/10">
-                            <button type="button" onClick={prevStep} className="px-6 py-4 rounded-xl bg-[var(--foreground)]/5 font-bold hover:bg-[var(--foreground)]/10 text-[var(--foreground)] transition-all">Retour</button>
-                            <button type="submit" className="btn-primary flex-1" disabled={loading}>
+                        <div className="grid grid-cols-[0.8fr_1.2fr] gap-3 pt-6 border-t border-[var(--foreground)]/10">
+                            <button type="button" onClick={prevStep} className="min-h-12 px-4 py-3 rounded-xl bg-[var(--foreground)]/5 font-bold hover:bg-[var(--foreground)]/10 text-[var(--foreground)] transition-all">Retour</button>
+                            <button type="submit" className="btn-primary min-h-12" disabled={loading}>
                                 {loading ? "Création en cours..." : "Valider l'inscription"}
                             </button>
                         </div>

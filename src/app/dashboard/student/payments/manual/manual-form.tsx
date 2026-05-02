@@ -35,8 +35,8 @@ export default function ManualPaymentForm({ transactionId }: { transactionId: st
 
     if (success) {
         return (
-            <div className="text-center p-6 bg-green-500/10 text-green-600 rounded-2xl border border-green-500/20">
-                <div className="text-4xl mb-4">✅</div>
+            <div className="text-center p-5 sm:p-6 bg-green-500/10 text-green-600 rounded-2xl border border-green-500/20">
+                <div className="text-3xl mb-4">✅</div>
                 <h3 className="font-black text-lg mb-2">Reçu !</h3>
                 <p className="text-xs font-bold">Votre paiement est en cours de vérification. Votre compte sera activé sous peu.</p>
             </div>
@@ -47,7 +47,7 @@ export default function ManualPaymentForm({ transactionId }: { transactionId: st
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40 px-1">Opérateur utilisé *</label>
-                <select name="provider" required className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none font-bold">
+                <select name="provider" required className="min-h-12 w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none font-bold">
                     <option value="ORANGE">Orange Money</option>
                     <option value="WAVE">Wave</option>
                     <option value="MTN">MTN Mobile Money</option>
@@ -57,17 +57,17 @@ export default function ManualPaymentForm({ transactionId }: { transactionId: st
             
             <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40 px-1">Numéro d'envoi *</label>
-                <input type="text" name="senderPhone" required placeholder="Ex: 07 07 07 07 07" className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none font-bold placeholder:opacity-50" />
+                <input type="text" name="senderPhone" required placeholder="Ex: 07 07 07 07 07" className="min-h-12 w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none font-bold placeholder:opacity-50" />
             </div>
 
             <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40 px-1">Référence (Optionnel)</label>
-                <input type="text" name="proof" placeholder="ID de transaction / Notes" className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none font-bold placeholder:opacity-50" />
+                <input type="text" name="proof" placeholder="ID de transaction / Notes" className="min-h-12 w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none font-bold placeholder:opacity-50" />
             </div>
 
             {error && <div className="text-xs font-bold text-red-500 bg-red-500/10 p-3 rounded-xl">{error}</div>}
 
-            <button type="submit" disabled={loading} className="btn-primary w-full mt-4 disabled:opacity-50">
+            <button type="submit" disabled={loading} className="btn-primary w-full mt-4 min-h-12 disabled:opacity-50">
                 {loading ? "Soumission..." : "J'ai bien effectué le paiement"}
             </button>
         </form>

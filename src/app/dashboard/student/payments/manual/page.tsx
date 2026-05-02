@@ -46,40 +46,40 @@ export default async function ManualPaymentPage() {
              redirect("/dashboard/student");
         }
         return (
-             <div className="p-8 text-center bg-amber-500/10 text-amber-600 rounded-2xl max-w-lg mx-auto mt-20">
+             <div className="mx-4 mt-10 max-w-lg rounded-2xl bg-amber-500/10 p-5 text-center text-sm font-bold leading-6 text-amber-600 sm:mx-auto sm:mt-20 sm:p-8">
                  Aucun paiement en attente. Si vous avez déjà payé, veuillez patienter que l'administration valide votre compte.
              </div>
         );
     }
 
     return (
-        <div className="max-w-2xl mx-auto p-6 animate-in fade-in slide-in-from-bottom-4">
-            <div className="text-center mb-8">
-                <h1 className="text-2xl font-black text-[var(--foreground)]">Finalisez votre inscription</h1>
+        <div className="mx-auto max-w-3xl px-3 py-4 sm:p-6 animate-in fade-in slide-in-from-bottom-4">
+            <div className="text-center mb-6 sm:mb-8">
+                <h1 className="text-2xl sm:text-3xl font-black text-[var(--foreground)]">Finalisez votre inscription</h1>
                 <p className="text-sm font-bold text-[var(--foreground)]/50 mt-2">Effectuez votre paiement via Mobile Money pour activer votre accès.</p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                    <div className="bg-[#21286E] text-white p-8 rounded-[2rem] shadow-xl relative overflow-hidden group">
+            <div className="grid md:grid-cols-2 gap-4 sm:gap-8">
+                <div className="space-y-4 sm:space-y-6">
+                    <div className="bg-[#21286E] text-white p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] shadow-xl relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl -mr-16 -mt-16"></div>
-                        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 mb-6">Montant à régler</h2>
+                        <h2 className="text-[10px] font-black uppercase tracking-[0.16em] opacity-60 mb-4 sm:mb-6">Montant à régler</h2>
                         <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-black">{pendingTransaction.amount.toLocaleString()}</span>
+                            <span className="text-3xl sm:text-4xl font-black">{pendingTransaction.amount.toLocaleString()}</span>
                             <span className="text-sm font-bold opacity-60">FCFA</span>
                         </div>
-                        <p className="text-xs font-medium opacity-40 mt-4 uppercase tracking-widest">Frais de scolarité • Prime Academy</p>
+                        <p className="text-xs font-medium opacity-50 mt-4 uppercase tracking-[0.12em]">Frais de scolarité • Prime Academy</p>
                     </div>
 
-                    <div className="bg-[#1dcaff]/10 p-8 rounded-[2rem] border border-[#1dcaff]/20 space-y-6">
-                        <div className="flex items-center justify-between">
+                    <div className="bg-[#1dcaff]/10 p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] border border-[#1dcaff]/20 space-y-5 sm:space-y-6">
+                        <div className="flex items-start justify-between gap-3">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-[#1dcaff] rounded-xl flex items-center justify-center shadow-lg shadow-[#1dcaff]/20">
                                     <Smartphone className="text-white w-6 h-6" />
                                 </div>
                                 <h2 className="font-black text-[#1dcaff] text-lg">Paiement Wave</h2>
                             </div>
-                            <span className="px-2 py-1 bg-[#1dcaff]/20 text-[#1dcaff] text-[8px] font-black uppercase tracking-tighter rounded">Recommandé</span>
+                            <span className="shrink-0 px-2 py-1 bg-[#1dcaff]/20 text-[#1dcaff] text-[8px] font-black uppercase tracking-tighter rounded">Recommandé</span>
                         </div>
                         
                         <p className="text-xs font-bold text-[var(--foreground)]/60 leading-relaxed">
@@ -97,13 +97,13 @@ export default async function ManualPaymentPage() {
                         </a>
                     </div>
 
-                    <div className="p-6 rounded-2xl border border-[var(--foreground)]/5 bg-[var(--foreground)]/[0.02]">
+                    <div className="p-5 sm:p-6 rounded-2xl border border-[var(--foreground)]/5 bg-[var(--foreground)]/[0.02]">
                         <p className="text-[10px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mb-2">Autre moyen</p>
                         <p className="text-sm font-bold text-[var(--foreground)]/80 italic">Orange Money : +225 01 61 33 78 64</p>
                     </div>
                 </div>
 
-                <div className="glass-card p-8 border-white/20 flex flex-col h-full">
+                <div className="glass-card !p-5 sm:!p-8 border-white/20 flex flex-col h-full">
                     <div className="mb-6">
                         <h2 className="text-lg font-black text-[var(--foreground)]">Je confirme mon dépôt</h2>
                         <p className="text-xs font-medium text-[var(--foreground)]/50 mt-1">

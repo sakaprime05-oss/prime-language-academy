@@ -13,18 +13,17 @@ export default async function RegisterPage() {
     }
 
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-[var(--background)] relative overflow-hidden">
-            {/* Premium Background Blobs */}
-            <div className="bg-blob w-[500px] h-[500px] bg-primary -top-20 -left-20 animate-float opacity-10"></div>
-            <div className="bg-blob w-[400px] h-[400px] bg-secondary bottom-0 right-0 animate-float opacity-10" style={{ animationDelay: '-3s' }}></div>
+        <main className="min-h-screen flex flex-col items-center justify-start sm:justify-center px-3 py-4 sm:p-6 bg-[var(--background)] relative overflow-hidden">
+            <div className="hidden sm:block bg-blob w-[500px] h-[500px] bg-primary -top-20 -left-20 animate-float opacity-10"></div>
+            <div className="hidden sm:block bg-blob w-[400px] h-[400px] bg-secondary bottom-0 right-0 animate-float opacity-10" style={{ animationDelay: '-3s' }}></div>
 
-            <div className="w-full max-w-sm glass-card relative z-10 border-white/20 dark:border-white/10 shadow-2xl">
-                <div className="text-center space-y-4 mb-8">
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-primary/20 rotate-3">
+            <div className="w-full max-w-3xl glass-card relative z-10 border-white/20 dark:border-white/10 shadow-2xl !p-4 sm:!p-8">
+                <div className="text-center space-y-3 mb-6 sm:mb-8">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-primary/20 rotate-3">
                         <span className="text-2xl font-black text-white -rotate-3">P</span>
                     </div>
                     <div>
-                        <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">Rejoindre Prime</h1>
+                        <h1 className="text-2xl sm:text-3xl font-black text-[var(--foreground)] tracking-tight">Rejoindre Prime</h1>
                         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/40 mt-1">Établissement d'excellence</p>
                     </div>
                 </div>

@@ -50,7 +50,7 @@ const quickLinks = [
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+    <main className="min-h-screen overflow-x-hidden bg-[var(--background)] text-[var(--foreground)]">
       <section className="border-b border-[var(--border)] px-6 py-6 sm:px-8">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
           <Link href="/" className="text-sm font-black uppercase tracking-[0.18em] text-[var(--foreground)]">
@@ -66,13 +66,13 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="px-6 py-16 sm:px-8 lg:py-20">
-        <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-          <div>
+      <section className="px-5 py-14 sm:px-8 sm:py-16 lg:py-20">
+        <div className="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
+          <div className="min-w-0">
             <p className="mb-5 text-xs font-black uppercase tracking-[0.22em] text-[#E7162A]">
               Contact & orientation
             </p>
-            <h1 className="max-w-3xl text-4xl font-black leading-[1.05] tracking-normal sm:text-5xl lg:text-6xl">
+            <h1 className="max-w-3xl break-words text-3xl font-black leading-[1.08] tracking-normal sm:text-5xl lg:text-6xl">
               Parlez-nous de votre objectif en anglais.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-[var(--muted-foreground)] sm:text-lg">
@@ -81,17 +81,17 @@ export default function ContactPage() {
               votre objectif.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a
                 href={`${siteConfig.links.whatsapp}?text=${whatsappMessage}`}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#E7162A] px-6 py-3 text-sm font-black uppercase tracking-[0.1em] text-white shadow-sm transition hover:bg-[#c51224]"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#E7162A] px-5 py-3 text-sm font-black uppercase tracking-[0.08em] text-white shadow-sm transition hover:bg-[#c51224] sm:w-auto sm:px-6 sm:tracking-[0.1em]"
               >
                 <MessageCircle className="h-4 w-4" />
                 Écrire sur WhatsApp
               </a>
               <Link
                 href="/rendez-vous"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--border)] px-6 py-3 text-sm font-black uppercase tracking-[0.1em] text-[var(--foreground)] transition hover:border-[#E7162A] hover:text-[#E7162A]"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-[var(--border)] px-5 py-3 text-sm font-black uppercase tracking-[0.08em] text-[var(--foreground)] transition hover:border-[#E7162A] hover:text-[#E7162A] sm:w-auto sm:px-6 sm:tracking-[0.1em]"
               >
                 <CalendarDays className="h-4 w-4" />
                 Prendre rendez-vous
@@ -99,7 +99,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-sm sm:p-6">
+          <div className="min-w-0 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-sm sm:p-6">
             <div className="grid gap-3">
               {contactActions.map((action) => {
                 const Icon = action.icon;
@@ -108,7 +108,7 @@ export default function ContactPage() {
                   <a
                     key={action.label}
                     href={action.href}
-                    className={`group flex items-center gap-4 rounded-xl border p-4 transition ${
+                    className={`group flex min-w-0 max-w-full items-center gap-4 overflow-hidden rounded-xl border p-4 transition ${
                       action.tone === "primary"
                         ? "border-[#E7162A]/30 bg-[#E7162A]/10"
                         : "border-[var(--border)] bg-[var(--background)]"
@@ -121,7 +121,7 @@ export default function ContactPage() {
                       <span className="block text-xs font-black uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
                         {action.label}
                       </span>
-                      <span className="mt-1 block break-words text-sm font-bold text-[var(--foreground)] group-hover:text-[#E7162A]">
+                      <span className="mt-1 block break-all text-sm font-bold text-[var(--foreground)] group-hover:text-[#E7162A]">
                         {action.value}
                       </span>
                     </span>

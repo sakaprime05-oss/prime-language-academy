@@ -1,10 +1,19 @@
 "use client";
 
-const WA_NUMBER = "2250161337864"; // +225 01 61 33 78 64
-const WA_MESSAGE = encodeURIComponent("Bonjour ! Je souhaite avoir des informations sur Prime Language Academy 🎓");
+import { usePathname } from "next/navigation";
+
+const WA_NUMBER = "2250161337864";
+const WA_MESSAGE = encodeURIComponent("Bonjour ! Je souhaite avoir des informations sur Prime Language Academy.");
 const WA_URL = `https://wa.me/${WA_NUMBER}?text=${WA_MESSAGE}`;
 
+const HIDDEN_PREFIXES = ["/contact", "/login", "/register", "/register-club", "/forgot-password", "/reset-password", "/dashboard"];
+
 export function WhatsAppButton() {
+  const pathname = usePathname();
+  const shouldHide = HIDDEN_PREFIXES.some((prefix) => pathname?.startsWith(prefix));
+
+  if (shouldHide) return null;
+
   return (
     <>
       <a
@@ -12,34 +21,9 @@ export function WhatsAppButton() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Contacter Prime Language Academy sur WhatsApp"
-        style={{
-          position: "fixed",
-          bottom: 28,
-          right: 28,
-          zIndex: 9999,
-          width: 60,
-          height: 60,
-          borderRadius: "50%",
-          background: "linear-gradient(135deg, #25D366, #128C7E)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 4px 24px rgba(37,211,102,0.45), 0 0 0 0 rgba(37,211,102,0.4)",
-          animation: "waPulse 2.5s ease-in-out infinite",
-          textDecoration: "none",
-          transition: "transform 0.2s, box-shadow 0.2s",
-        }}
-        onMouseEnter={e => {
-          (e.currentTarget as HTMLElement).style.transform = "scale(1.12)";
-          (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 32px rgba(37,211,102,0.6)";
-        }}
-        onMouseLeave={e => {
-          (e.currentTarget as HTMLElement).style.transform = "scale(1)";
-          (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 24px rgba(37,211,102,0.45)";
-        }}
+        className="wa-float"
       >
-        {/* WhatsApp SVG icon */}
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M16 3C9.373 3 4 8.373 4 15c0 2.385.668 4.61 1.83 6.5L4 29l7.7-1.81A12.94 12.94 0 0016 28c6.627 0 12-5.373 12-13S22.627 3 16 3z"
             fill="white"
@@ -53,39 +37,74 @@ export function WhatsAppButton() {
             fill="white"
           />
         </svg>
-
-        {/* Tooltip */}
-        <span style={{
-          position: "absolute",
-          right: 70,
-          top: "50%",
-          transform: "translateY(-50%)",
-          background: "rgba(8,8,8,0.92)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(37,211,102,0.3)",
-          color: "#F5F0E8",
-          fontSize: 12,
-          fontWeight: 600,
-          padding: "8px 14px",
-          borderRadius: 10,
-          whiteSpace: "nowrap",
-          pointerEvents: "none",
-          opacity: 0,
-          transition: "opacity 0.2s",
-        }}
-          className="wa-tooltip"
-        >
-          💬 Nous écrire sur WhatsApp
-        </span>
+        <span className="wa-tooltip">Nous écrire sur WhatsApp</span>
       </a>
 
       <style>{`
-        @keyframes waPulse {
-          0%   { box-shadow: 0 4px 24px rgba(37,211,102,0.45), 0 0 0 0 rgba(37,211,102,0.4); }
-          70%  { box-shadow: 0 4px 24px rgba(37,211,102,0.45), 0 0 0 14px rgba(37,211,102,0); }
-          100% { box-shadow: 0 4px 24px rgba(37,211,102,0.45), 0 0 0 0 rgba(37,211,102,0); }
+        .wa-float {
+          position: fixed;
+          right: 18px;
+          bottom: 18px;
+          z-index: 60;
+          width: 56px;
+          height: 56px;
+          border-radius: 999px;
+          background: linear-gradient(135deg, #25D366, #128C7E);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 24px rgba(37,211,102,0.38), 0 0 0 0 rgba(37,211,102,0.3);
+          text-decoration: none;
+          animation: waPulse 2.5s ease-in-out infinite;
         }
-        a:hover .wa-tooltip { opacity: 1 !important; }
+
+        .wa-tooltip {
+          display: none;
+        }
+
+        @media (min-width: 640px) {
+          .wa-float {
+            right: 28px;
+            bottom: 28px;
+            width: 60px;
+            height: 60px;
+            transition: transform 0.2s, box-shadow 0.2s;
+          }
+
+          .wa-float:hover {
+            transform: scale(1.12);
+            box-shadow: 0 8px 32px rgba(37,211,102,0.6);
+          }
+
+          .wa-tooltip {
+            position: absolute;
+            right: 70px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: block;
+            white-space: nowrap;
+            border-radius: 10px;
+            border: 1px solid rgba(37,211,102,0.3);
+            background: rgba(8,8,8,0.92);
+            color: #F5F0E8;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 14px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+          }
+
+          .wa-float:hover .wa-tooltip {
+            opacity: 1;
+          }
+        }
+
+        @keyframes waPulse {
+          0%   { box-shadow: 0 4px 24px rgba(37,211,102,0.38), 0 0 0 0 rgba(37,211,102,0.3); }
+          70%  { box-shadow: 0 4px 24px rgba(37,211,102,0.38), 0 0 0 12px rgba(37,211,102,0); }
+          100% { box-shadow: 0 4px 24px rgba(37,211,102,0.38), 0 0 0 0 rgba(37,211,102,0); }
+        }
       `}</style>
     </>
   );

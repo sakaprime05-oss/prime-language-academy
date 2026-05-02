@@ -210,15 +210,17 @@
     border-radius: 1.5rem;
     @apply p-6 transition-all duration-300;
   }
-  .glass-card:hover {
-    border-color: rgba(231,22,42, 0.3);
-    transform: translateY(-2px);
-    box-shadow: 0 16px 50px rgba(0,0,0,0.7), 0 0 0 1px rgba(231,22,42,0.2);
+  @media (hover: hover) and (pointer: fine) {
+    .glass-card:hover {
+      border-color: rgba(231,22,42, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 16px 50px rgba(0,0,0,0.7), 0 0 0 1px rgba(231,22,42,0.2);
+    }
   }
 
   /* ── INPUT FIELD (classe utilitaire manquante) ── */
   .input-field {
-    @apply w-full rounded-xl px-4 py-3 text-sm outline-none transition-all duration-200;
+    @apply w-full min-h-12 rounded-xl px-4 py-3 text-sm outline-none transition-all duration-200;
     background: rgba(var(--foreground-rgb, 0,0,0), 0.04);
     border: 1.5px solid rgba(var(--foreground-rgb, 0,0,0), 0.15);
     color: var(--foreground);
