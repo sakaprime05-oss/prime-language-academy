@@ -5,6 +5,7 @@ import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 import { siteConfig } from "@/lib/site-config";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ServiceWorkerRegister } from "@/components/service-worker-register";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -80,6 +81,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <ServiceWorkerRegister />
           <WhatsAppButton />
           <PWAInstallPrompt />
           <Toaster richColors position="top-right" />

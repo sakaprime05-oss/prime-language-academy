@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { X, Download, Smartphone } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Download, Smartphone, X } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -9,47 +9,45 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function PWAInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showBanner, setShowBanner] = useState(false);
   const [showIOSGuide, setShowIOSGuide] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
-    // Check if already installed (standalone mode)
-    if (window.matchMedia("(display-mode: standalone)").matches) {
+    const standalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+
+    if (standalone) {
       setIsInstalled(true);
       return;
     }
 
-    // Detect iOS
     const isIOSDevice =
       /iPad|iPhone|iPod/.test(navigator.userAgent) ||
       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     setIsIOS(isIOSDevice);
 
-    // Check if user dismissed the banner before (respect for 7 days)
     const dismissedAt = localStorage.getItem("pwa-banner-dismissed");
     if (dismissedAt) {
-      const daysSinceDismissed =
-        (Date.now() - parseInt(dismissedAt)) / (1000 * 60 * 60 * 24);
+      const daysSinceDismissed = (Date.now() - Number(dismissedAt)) / (1000 * 60 * 60 * 24);
       if (daysSinceDismissed < 7) return;
     }
 
-    // For Android/Chrome — listen for install prompt
-    const handler = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    const handler = (event: Event) => {
+      event.preventDefault();
+      setDeferredPrompt(event as BeforeInstallPromptEvent);
       setShowBanner(true);
     };
+
     window.addEventListener("beforeinstallprompt", handler);
 
-    // For iOS — show a custom guide after a delay
     if (isIOSDevice) {
-      const timer = setTimeout(() => setShowBanner(true), 3000);
+      const timer = window.setTimeout(() => setShowBanner(true), 3000);
       return () => {
-        clearTimeout(timer);
+        window.clearTimeout(timer);
         window.removeEventListener("beforeinstallprompt", handler);
       };
     }
@@ -66,9 +64,10 @@ export function PWAInstallPrompt() {
         setIsInstalled(true);
       }
       setDeferredPrompt(null);
-    } else if (isIOS) {
-      setShowIOSGuide(true);
+      return;
     }
+
+    if (isIOS) setShowIOSGuide(true);
   };
 
   const handleDismiss = () => {
@@ -81,13 +80,8 @@ export function PWAInstallPrompt() {
 
   return (
     <>
-      {/* Install Banner */}
-      <div
-        className="fixed bottom-20 left-4 right-4 z-[9999] mx-auto max-w-md animate-slide-up"
-        role="alert"
-      >
+      <div className="fixed bottom-4 left-3 right-3 z-[80] mx-auto max-w-md animate-slide-up sm:bottom-6" role="alert">
         <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#21286E] to-[#1a1f55] p-4 shadow-2xl backdrop-blur-xl">
-          {/* Glow effect */}
           <div className="absolute -top-12 -right-12 h-24 w-24 rounded-full bg-[#E7162A]/20 blur-2xl" />
 
           <button
@@ -98,23 +92,21 @@ export function PWAInstallPrompt() {
             <X size={18} />
           </button>
 
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#E7162A] shadow-lg shadow-[#E7162A]/30">
-              <Smartphone size={28} className="text-white" />
+          <div className="flex items-center gap-4 pr-8">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#E7162A] shadow-lg shadow-[#E7162A]/30 sm:h-14 sm:w-14">
+              <Smartphone size={26} className="text-white" />
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-bold text-white">
-                📲 Installer l&apos;application
-              </h3>
-              <p className="mt-0.5 text-xs text-white/70">
-                Accédez à Prime Academy directement depuis votre écran d&apos;accueil
+              <h3 className="text-sm font-bold text-white">Installer l'application</h3>
+              <p className="mt-0.5 text-xs leading-5 text-white/70">
+                Ouvrez Prime Academy directement depuis l'écran d'accueil.
               </p>
             </div>
           </div>
 
           <button
             onClick={handleInstall}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#E7162A] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#E7162A]/25 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-[#E7162A]/30 active:scale-[0.98]"
+            className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#E7162A] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#E7162A]/25 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-[#E7162A]/30 active:scale-[0.98]"
           >
             <Download size={16} />
             {isIOS ? "Comment installer" : "Installer maintenant"}
@@ -122,7 +114,6 @@ export function PWAInstallPrompt() {
         </div>
       </div>
 
-      {/* iOS Installation Guide Modal */}
       {showIOSGuide && (
         <div
           className="fixed inset-0 z-[10000] flex items-end justify-center bg-black/60 backdrop-blur-sm"
@@ -130,7 +121,7 @@ export function PWAInstallPrompt() {
         >
           <div
             className="w-full max-w-md animate-slide-up rounded-t-3xl bg-white p-6 dark:bg-gray-900"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
           >
             <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700" />
 
@@ -138,34 +129,18 @@ export function PWAInstallPrompt() {
               Installer sur iPhone / iPad
             </h3>
 
-            <div className="space-y-4">
-              <Step
-                number={1}
-                icon="🧭"
-                text="Ouvrez ce site dans Safari"
-              />
-              <Step
-                number={2}
-                icon="📤"
-                text='Appuyez sur le bouton "Partager" (carré avec flèche ↑)'
-              />
-              <Step
-                number={3}
-                icon="➕"
-                text={`Faites défiler et appuyez sur "Sur l'écran d'accueil"`}
-              />
-              <Step
-                number={4}
-                icon="✅"
-                text='Appuyez "Ajouter" et c&apos;est fait !'
-              />
+            <div className="space-y-3">
+              <Step number={1} text="Ouvrez ce site dans Safari." />
+              <Step number={2} text='Appuyez sur le bouton "Partager".' />
+              <Step number={3} text='Choisissez "Sur l’écran d’accueil".' />
+              <Step number={4} text='Appuyez sur "Ajouter".' />
             </div>
 
             <button
               onClick={handleDismiss}
-              className="mt-6 w-full rounded-xl bg-[#E7162A] px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-[#c41222]"
+              className="mt-6 min-h-11 w-full rounded-xl bg-[#E7162A] px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-[#c41222]"
             >
-              J&apos;ai compris !
+              J'ai compris
             </button>
           </div>
         </div>
@@ -190,22 +165,13 @@ export function PWAInstallPrompt() {
   );
 }
 
-function Step({
-  number,
-  icon,
-  text,
-}: {
-  number: number;
-  icon: string;
-  text: string;
-}) {
+function Step({ number, text }: { number: number; text: string }) {
   return (
     <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-3 dark:bg-gray-800">
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#E7162A] text-xs font-bold text-white">
         {number}
       </div>
-      <span className="text-lg">{icon}</span>
-      <p className="text-sm text-gray-700 dark:text-gray-300">{text}</p>
+      <p className="text-sm leading-5 text-gray-700 dark:text-gray-300">{text}</p>
     </div>
   );
 }

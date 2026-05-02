@@ -1,16 +1,19 @@
 {
+  "id": "/dashboard",
   "name": "Prime Language Academy",
   "short_name": "Prime Academy",
-  "description": "Plateforme d'Excellence Prime Language Academy — Parlez anglais. Vivez des opportunités.",
+  "description": "Plateforme d'excellence Prime Language Academy. Parlez anglais. Vivez des opportunites.",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#E7162A",
   "categories": ["education", "language"],
   "lang": "fr",
   "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -67,34 +70,18 @@
       "purpose": "maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/icons/screenshot-wide.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Dashboard Prime Language Academy"
-    },
-    {
-      "src": "/icons/screenshot-narrow.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Dashboard Mobile Prime Academy"
-    }
-  ],
   "shortcuts": [
     {
       "name": "Mes Cours",
       "short_name": "Cours",
       "url": "/dashboard/student/courses",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Mon Profil",
       "short_name": "Profil",
       "url": "/dashboard/student/profile",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png" }]
     }
   ]
 }
