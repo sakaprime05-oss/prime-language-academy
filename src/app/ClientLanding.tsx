@@ -4,24 +4,20 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { LogoMark } from "@/components/logo";
 import { OwlMascot } from "@/components/owl-mascot";
+import { PLA_FAQ, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 /* ── tiny helpers ── */
 const PLANS = [
-  { id:"loisir",      freq:"1×/sem",  price:"52 000",  label:"Loisir" },
-  { id:"essentiel",   freq:"2×/sem",  price:"72 000",  label:"Essentiel" },
-  { id:"equilibre",   freq:"3×/sem",  price:"92 000",  label:"Équilibre" },
-  { id:"performance", freq:"4×/sem",  price:"112 000", label:"Performance" },
-  { id:"intensif",    freq:"5×/sem",  price:"132 000", label:"Intensif" },
-  { id:"immersion",   freq:"6×/sem",  price:"152 000", label:"Immersion", top:true },
+  ...PLA_PLANS.map((plan) => ({ ...plan, freq: plan.shortFreq, price: formatFcfa(plan.price).replace(" FCFA", "") })),
 ];
 
 const CLUB_PLANS = [
-  { id: "loisir",      freq: "1×/sem", price: "52 000", label: "Social" },
-  { id: "essentiel",   freq: "2×/sem", price: "72 000", label: "Connect" },
-  { id: "equilibre",   freq: "3×/sem", price: "92 000", label: "Network" },
-  { id: "performance", freq: "4×/sem", price: "112 000", label: "Executive" },
-  { id: "intensif",    freq: "5×/sem", price: "132 000", label: "Elite" },
-  { id: "immersion",   freq: "6×/sem", price: "152 000", label: "Founder", top: true },
+  ...PLA_PLANS.map((plan, index) => ({
+    ...plan,
+    freq: plan.shortFreq,
+    price: formatFcfa(plan.price).replace(" FCFA", ""),
+    label: ["Social", "Connect", "Network", "Executive", "Elite", "Founder"][index],
+  })),
 ];
 
 const MARQUEE_WORDS = ["Speaking","Confidence","Fluency","Excellence","Bilinguisme","Impact","Immersion","Mastery","Progress","Growth","Networking","Community"];
@@ -64,7 +60,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
         </Link>
 
         <div className="hidden lg:flex gap-10 text-[13px] font-medium tracking-widest uppercase text-[#F5F0E8]/55">
-          {[["Mission","#mission"],["Méthode","#methode"],["Tarifs","#tarifs"],["Le Club","/english-club"],["Blog","/blog"]].map(([l,h]) => (
+          {[["Mission","#mission"],["Méthode","#methode"],["Programme","/programme"],["Tarifs","#tarifs"],["Le Club","/english-club"],["Blog","/blog"]].map(([l,h]) => (
             <Link key={l} href={h} style={{ color:"inherit", textDecoration:"none", transition:"color 0.2s" }}
               onMouseEnter={e=>(e.currentTarget.style.color="#E7162A")}
               onMouseLeave={e=>(e.currentTarget.style.color="rgba(245,240,232,0.55)")}>{l}</Link>
@@ -101,7 +97,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
           <div>
             <div style={{ display:"inline-flex", alignItems:"center", gap:8, border:"1px solid rgba(231,22,42,0.3)", borderRadius:100, padding:"6px 18px", marginBottom:32, background:"rgba(231,22,42,0.06)" }}>
               <span style={{ width:6, height:6, borderRadius:"50%", background:"#E7162A", display:"inline-block", animation:"ping 2s infinite" }}/>
-              <span style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", fontWeight:600 }}>Session Juin – Août 2026</span>
+              <span style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", fontWeight:600 }}>{PLA_SESSION.dates}</span>
             </div>
 
             <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(3rem,6vw,5.5rem)", lineHeight:1.05, fontWeight:900, marginBottom:28, letterSpacing:"-0.02em" }}>
@@ -337,7 +333,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
       {/* ══════════ HORAIRES ══════════ */}
       <section style={{ padding:"80px 2rem" }}>
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-          {[["Vague 1","16h00 – 18h00","Idéale pour les lycéens & étudiants"],["Vague 2","18h00 – 20h00","Idéale pour les professionnels"]].map(([label,time,desc]) => (
+          {PLA_TIME_SLOTS.map(({ label, time, desc }) => (
             <div key={label} style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px 32px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)", overflow:"hidden", position:"relative" }}>
               <div style={{ position:"absolute", top:-20, right:-20, width:100, height:100, borderRadius:"50%", background:"rgba(231,22,42,0.05)", filter:"blur(30px)" }}/>
               <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:12 }}>{label}</div>
@@ -345,6 +341,33 @@ export default function ClientLanding({ session, systemSettings }: { session: an
               <div style={{ fontSize:13, color:"rgba(245,240,232,0.45)" }}>{desc}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ══════════ FAQ ══════════ */}
+      <section style={{ padding:"100px 2rem", background:"rgba(231,22,42,0.02)" }}>
+        <div style={{ maxWidth:1000, margin:"0 auto" }}>
+          <div style={{ textAlign:"center", marginBottom:48 }}>
+            <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", marginBottom:16 }}>Questions frequentes</div>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.2rem,4vw,3.2rem)", fontWeight:900, margin:"0 0 16px" }}>
+              Les points a clarifier<br/><em style={{ color:"#E7162A" }}>avant de reserver</em>
+            </h2>
+          </div>
+
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:16 }}>
+            {PLA_FAQ.map(({ question, answer }) => (
+              <div key={question} style={{ border:"1px solid rgba(231,22,42,0.12)", borderRadius:18, padding:"28px 24px", background:"rgba(20,20,30,0.6)" }}>
+                <h3 style={{ margin:"0 0 10px", color:"#F5F0E8", fontSize:16, fontWeight:800 }}>{question}</h3>
+                <p style={{ margin:0, color:"rgba(245,240,232,0.52)", lineHeight:1.7, fontSize:14 }}>{answer}</p>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ textAlign:"center", marginTop:36 }}>
+            <Link href="/programme" style={{ color:"#E7162A", textDecoration:"underline", textUnderlineOffset:4, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase" }}>
+              Voir le programme complet
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -452,9 +475,11 @@ export default function ClientLanding({ session, systemSettings }: { session: an
           <span style={{ fontFamily:"'Playfair Display',serif", fontSize:15, color:"rgba(245,240,232,0.5)" }}>Prime Language Academy</span>
         </div>
         <div style={{ display:"flex", gap:32, fontSize:12, color:"rgba(245,240,232,0.3)", letterSpacing:"0.1em", textTransform:"uppercase" }}>
+          <Link href="/programme" style={{ color:"inherit", textDecoration:"none" }}>Programme</Link>
           <Link href="/blog" style={{ color:"inherit", textDecoration:"none" }}>Blog</Link>
           <Link href="/english-club" style={{ color:"#E7162A", textDecoration:"none" }}>English Club</Link>
           <Link href="/placement-test" style={{ color:"inherit", textDecoration:"none" }}>Test</Link>
+          <Link href="/mentions-legales" style={{ color:"inherit", textDecoration:"none" }}>Legal</Link>
           <Link href="/login" style={{ color:"inherit", textDecoration:"none" }}>Connexion</Link>
         </div>
         <div style={{ fontSize:11, color:"rgba(245,240,232,0.2)", letterSpacing:"0.1em" }}>© 2026 Prime Language Academy</div>

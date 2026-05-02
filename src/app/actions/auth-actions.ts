@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { sendWelcomeEmail, sendAdminNewRegistrationEmail } from "@/lib/email";
 import { notifyTelegram } from "@/lib/notify";
+import { PLA_PLANS } from "@/lib/pla-program";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 
@@ -52,15 +53,7 @@ export async function registerUser(formData: FormData) {
             });
         }
 
-        // Map plan IDs to prices
-        const planPrices: Record<string, number> = {
-            "loisir": 52000,
-            "essentiel": 72000,
-            "equilibre": 92000,
-            "performance": 112000,
-            "intensif": 132000,
-            "immersion": 152000
-        };
+        const planPrices = Object.fromEntries(PLA_PLANS.map((plan) => [plan.id, plan.price])) as Record<string, number>;
 
         const totalAmount = planPrices[planId] || 72000;
         const amountToPay = onboardingParams.paymentOption === "fractionne" ? (totalAmount * 0.5) : totalAmount;

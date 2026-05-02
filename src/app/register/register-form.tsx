@@ -4,7 +4,7 @@ import { useState, Suspense, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { registerUser } from "@/app/actions/auth-actions";
-import { signIn } from "next-auth/react";
+import { PLA_PLANS, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 const planSessions: Record<string, number> = {
     "loisir": 1,
@@ -16,12 +16,12 @@ const planSessions: Record<string, number> = {
 };
 
 const plans = [
-    { id: "loisir", name: "Loisir (1 séance/sem)", price: "52 000 FCFA", desc: "Initiation ou contact léger" },
-    { id: "essentiel", name: "Essentiel (2 séances/sem)", price: "72 000 FCFA", desc: "Construction des bases" },
-    { id: "equilibre", name: "Équilibre (3 séances/sem)", price: "92 000 FCFA", desc: "Pratique régulière" },
-    { id: "performance", name: "Performance (4 séances/sem)", price: "112 000 FCFA", desc: "Résultats tangibles" },
-    { id: "intensif", name: "Intensif (5 séances/sem)", price: "132 000 FCFA", desc: "Transformation radicale" },
-    { id: "immersion", name: "Immersion (6 séances/sem)", price: "152 000 FCFA", desc: "Maîtrise totale" }
+    { id: "loisir", name: "Loisir (1 seance/sem)", price: formatFcfa(PLA_PLANS[0].price), desc: "Initiation ou contact leger" },
+    { id: "essentiel", name: "Essentiel (2 seances/sem)", price: formatFcfa(PLA_PLANS[1].price), desc: "Construction des bases" },
+    { id: "equilibre", name: "Equilibre (3 seances/sem)", price: formatFcfa(PLA_PLANS[2].price), desc: "Pratique reguliere" },
+    { id: "performance", name: "Performance (4 seances/sem)", price: formatFcfa(PLA_PLANS[3].price), desc: "Resultats tangibles" },
+    { id: "intensif", name: "Intensif (5 seances/sem)", price: formatFcfa(PLA_PLANS[4].price), desc: "Transformation radicale" },
+    { id: "immersion", name: "Immersion (6 seances/sem)", price: formatFcfa(PLA_PLANS[5].price), desc: "Maitrise totale" }
 ];
 
 const availableDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
@@ -39,10 +39,7 @@ const communes = [
 
 const levels = ["Débutant", "Intermédiaire", "Avancé"];
 
-const timeSlots = [
-    { id: "v1", name: "Vague 1 (16h - 18h)" },
-    { id: "v2", name: "Vague 2 (18h - 20h)" }
-];
+const timeSlots = PLA_TIME_SLOTS.map((slot) => ({ id: slot.id, name: `${slot.label} (${slot.time})` }));
 
 const steps = ["Infos requises", "Objectifs", "Formule & Jours", "Engagement"];
 
