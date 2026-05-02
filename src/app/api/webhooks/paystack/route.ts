@@ -54,6 +54,36 @@ export async function POST(req: Request) {
                 return NextResponse.json({ success: true }); // Return 200 to stop retries
             }
 
+            if (transaction.status === "COMPLETED") {
+                return NextResponse.json({ success: true });
+            }
+
+            const expectedAmount = Math.round(transaction.amount);
+            const receivedAmount = Number(data.amount);
+            const receivedCurrency = String(data.currency || "").toUpperCase();
+            const paymentStatus = String(data.status || "").toLowerCase();
+
+            // XOF does not use subunits on Paystack in this integration.
+            if (
+                paymentStatus !== "success" ||
+                !Number.isFinite(receivedAmount) ||
+                Math.round(receivedAmount) !== expectedAmount ||
+                receivedCurrency !== "XOF"
+            ) {
+                const failureReason = `Paystack mismatch: expected ${expectedAmount} XOF, received ${data.amount ?? "unknown"} ${data.currency ?? "unknown"} (${data.status ?? "unknown"})`;
+                console.error(failureReason, { refCommand, transactionId: transaction.id });
+
+                await prisma.transaction.updateMany({
+                    where: { id: transaction.id, status: { not: "COMPLETED" } },
+                    data: {
+                        status: "FAILED",
+                        failureReason,
+                    },
+                });
+
+                return NextResponse.json({ success: true });
+            }
+
             const completed = await prisma.transaction.updateMany({
                 where: { id: transaction.id, status: { not: "COMPLETED" } },
                 data: {
