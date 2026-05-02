@@ -115,6 +115,34 @@ export async function sendEmail({ to, subject, html, attachments }: SendEmailInp
     const user = process.env.EMAIL_USER;
     const pass = process.env.EMAIL_APP_PASSWORD;
 
+    async function sendWithGmail() {
+        if (!user || !pass) {
+            console.log("[email:simulation]", { to, subject, attachments: attachments?.length || 0 });
+            return true;
+        }
+
+        try {
+            const transporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: { user, pass },
+            });
+
+            const info = await transporter.sendMail({
+                from: senderAddress(),
+                to,
+                subject,
+                html,
+                attachments: attachments as any[] | undefined,
+            });
+
+            console.log(`Email sent with Gmail to ${to} (${info.messageId})`);
+            return true;
+        } catch (error) {
+            console.error("Gmail email send failed:", error);
+            return false;
+        }
+    }
+
     if (resendKey) {
         try {
             const resend = new Resend(resendKey);
@@ -128,42 +156,18 @@ export async function sendEmail({ to, subject, html, attachments }: SendEmailInp
 
             if (error) {
                 console.error("Resend email failed:", error);
-                return false;
+                return sendWithGmail();
             }
 
             console.log(`Email sent with Resend to ${to} (${data?.id})`);
             return true;
         } catch (error) {
             console.error("Resend email send failed:", error);
-            return false;
+            return sendWithGmail();
         }
     }
 
-    if (!user || !pass) {
-        console.log("[email:simulation]", { to, subject, attachments: attachments?.length || 0 });
-        return true;
-    }
-
-    try {
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: { user, pass },
-        });
-
-        const info = await transporter.sendMail({
-            from: senderAddress(),
-            to,
-            subject,
-            html,
-            attachments: attachments as any[] | undefined,
-        });
-
-        console.log(`Email sent to ${to} (${info.messageId})`);
-        return true;
-    } catch (error) {
-        console.error("Email send failed:", error);
-        return false;
-    }
+    return sendWithGmail();
 }
 
 export async function sendWelcomeEmail(to: string, name: string, type: string = "FORMATION") {
