@@ -45,7 +45,7 @@ export async function initiatePayment(formData: FormData) {
 
         const remaining = Math.max(0, plan.totalAmount - plan.amountPaid);
         if (remaining <= 0) {
-            return { error: "Ce plan est deja regle." };
+            return { error: "Ce plan est déjà réglé." };
         }
 
         const amount = remaining;
@@ -308,7 +308,7 @@ export async function approveTransaction(transactionId: string) {
         if (!transaction) return { error: "Transaction introuvable" };
         if (transaction.status === "COMPLETED") return { success: true };
         if (transaction.status !== "VERIFYING" && transaction.status !== "PENDING") {
-            return { error: "Transaction deja traitee ou invalide" };
+            return { error: "Transaction déjà traitée ou invalide" };
         }
 
         const plan = transaction.paymentPlan;

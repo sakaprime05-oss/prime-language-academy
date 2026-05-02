@@ -45,7 +45,7 @@ export async function POST(req: Request) {
 
         const remaining = Math.max(0, plan.totalAmount - plan.amountPaid);
         if (remaining <= 0) {
-            return NextResponse.json({ error: "Ce plan est deja regle" }, { status: 400 });
+            return NextResponse.json({ error: "Ce plan est déjà réglé" }, { status: 400 });
         }
 
         const safeAmount = Math.min(requestedAmount, remaining);

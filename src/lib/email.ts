@@ -72,7 +72,7 @@ function emailLayout(title: string, body: string, options: { preheader?: string;
                             </tr>
                             <tr>
                                 <td style="padding:18px 24px;background:#f9fafb;border-top:1px solid #e5e7eb;text-align:center;font-size:12px;line-height:1.6;color:#6b7280;">
-                                    ${options.footer || `${brand.address}<br>${brand.phone}<br>Message automatique envoye par ${brand.name}.`}
+                                    ${options.footer || `${brand.address}<br>${brand.phone}<br>Message automatique envoyé par ${brand.name}.`}
                                 </td>
                             </tr>
                         </table>
@@ -176,21 +176,21 @@ export async function sendWelcomeEmail(to: string, name: string, type: string = 
     const body = `
         ${paragraph(`Bonjour ${escapeHtml(name || "cher apprenant")},`)}
         ${paragraph(isClub
-            ? "Votre inscription au English Club a bien ete enregistree. Nous sommes heureux de vous compter parmi nos membres."
-            : "Votre inscription a bien ete enregistree. Votre parcours avec Prime Language Academy peut maintenant commencer.")}
-        ${paragraph("Vous pouvez vous connecter a votre espace avec l'email et le mot de passe utilises lors de l'inscription.")}
-        ${button("Acceder a mon espace", `${appUrl()}/login`)}
-        ${paragraph("Si vous avez une question, repondez directement a ce message ou contactez l'administration.")}
+            ? "Votre inscription au English Club a bien été enregistrée. Nous sommes heureux de vous compter parmi nos membres."
+            : "Votre inscription a bien été enregistrée. Votre parcours avec Prime Language Academy peut maintenant commencer.")}
+        ${paragraph("Vous pouvez vous connecter à votre espace avec l'email et le mot de passe utilisés lors de l'inscription.")}
+        ${button("Accéder à mon espace", `${appUrl()}/login`)}
+        ${paragraph("Si vous avez une question, répondez directement à ce message ou contactez l'administration.")}
     `;
     return sendEmail({ to, subject: title, html: emailLayout(title, body) });
 }
 
 export async function sendAccountActivatedEmail(to: string, name: string) {
-    const title = "Votre compte est active";
+    const title = "Votre compte est activé";
     const body = `
         ${paragraph(`Bonjour ${escapeHtml(name || "")},`)}
-        ${paragraph("Votre paiement a ete valide. Votre acces a la plateforme est maintenant actif.")}
-        ${paragraph("Vous pouvez acceder a vos cours, ressources, messages et espaces de suivi depuis votre tableau de bord.")}
+        ${paragraph("Votre paiement a été validé. Votre accès à la plateforme est maintenant actif.")}
+        ${paragraph("Vous pouvez accéder à vos cours, ressources, messages et espaces de suivi depuis votre tableau de bord.")}
         ${button("Ouvrir mon espace", `${appUrl()}/login`, brand.color)}
     `;
     return sendEmail({ to, subject: title, html: emailLayout(title, body) });
@@ -199,26 +199,26 @@ export async function sendAccountActivatedEmail(to: string, name: string) {
 export async function sendPaymentReminderEmail(to: string, name: string, amount: number, dueDate: string) {
     const title = "Rappel de paiement";
     const body = `
-        ${paragraph(`Bonjour ${escapeHtml(name || "cher etudiant")},`)}
-        ${paragraph("Nous vous rappelons qu'un solde reste a regler pour votre formation.")}
+        ${paragraph(`Bonjour ${escapeHtml(name || "cher étudiant")},`)}
+        ${paragraph("Nous vous rappelons qu'un solde reste à régler pour votre formation.")}
         ${detailRows([
-            ["Reste a payer", money(amount)],
-            ["Echeance", escapeHtml(dueDate)],
+            ["Reste à payer", money(amount)],
+            ["Échéance", escapeHtml(dueDate)],
         ])}
-        ${paragraph("Merci de regulariser votre situation pour eviter toute interruption d'acces aux cours.")}
-        ${button("Regler mon solde", `${appUrl()}/dashboard/student/payments`, brand.color)}
+        ${paragraph("Merci de régulariser votre situation pour éviter toute interruption d'accès aux cours.")}
+        ${button("Régler mon solde", `${appUrl()}/dashboard/student/payments`, brand.color)}
     `;
     return sendEmail({ to, subject: title, html: emailLayout(title, body) });
 }
 
 export async function sendInvoiceEmail(to: string, name: string, amount: number, transactionId: string) {
-    const title = "Recu de paiement";
+    const title = "Reçu de paiement";
     const body = `
-        ${paragraph(`Bonjour ${escapeHtml(name || "cher etudiant")},`)}
-        ${paragraph("Nous confirmons la reception de votre paiement. Merci pour votre confiance.")}
+        ${paragraph(`Bonjour ${escapeHtml(name || "cher étudiant")},`)}
+        ${paragraph("Nous confirmons la réception de votre paiement. Merci pour votre confiance.")}
         ${detailRows([
-            ["Reference", escapeHtml(transactionId)],
-            ["Montant regle", money(amount)],
+            ["Référence", escapeHtml(transactionId)],
+            ["Montant réglé", money(amount)],
             ["Date", new Date().toLocaleDateString("fr-FR")],
         ])}
         ${button("Voir mon espace", `${appUrl()}/dashboard/student`, brand.color)}
@@ -227,13 +227,13 @@ export async function sendInvoiceEmail(to: string, name: string, amount: number,
 }
 
 export async function sendAdminNotificationEmail(studentName: string, amount: number, transactionId: string) {
-    const title = "Paiement confirme";
+    const title = "Paiement confirmé";
     const body = `
-        ${paragraph(`Le paiement de ${escapeHtml(studentName || "un etudiant")} vient d'etre confirme.`)}
+        ${paragraph(`Le paiement de ${escapeHtml(studentName || "un étudiant")} vient d'être confirmé.`)}
         ${detailRows([
-            ["Etudiant", escapeHtml(studentName || "Non renseigne")],
+            ["Étudiant", escapeHtml(studentName || "Non renseigné")],
             ["Montant", money(amount)],
-            ["Reference", escapeHtml(transactionId)],
+            ["Référence", escapeHtml(transactionId)],
             ["Date", new Date().toLocaleDateString("fr-FR")],
         ])}
         ${button("Ouvrir le dashboard", `${appUrl()}/dashboard/admin`, brand.color)}
@@ -244,29 +244,29 @@ export async function sendAdminNotificationEmail(studentName: string, amount: nu
 export async function sendAdminNewRegistrationEmail(studentName: string, studentEmail: string, planName: string) {
     const title = "Nouvelle inscription";
     const body = `
-        ${paragraph("Une nouvelle inscription vient d'etre enregistree.")}
+        ${paragraph("Une nouvelle inscription vient d'être enregistrée.")}
         ${detailRows([
-            ["Nom", escapeHtml(studentName || "Non renseigne")],
-            ["Email", escapeHtml(studentEmail || "Non renseigne")],
-            ["Formule / niveau", escapeHtml(planName || "Non renseigne")],
+            ["Nom", escapeHtml(studentName || "Non renseigné")],
+            ["Email", escapeHtml(studentEmail || "Non renseigné")],
+            ["Formule / niveau", escapeHtml(planName || "Non renseigné")],
         ])}
         ${paragraph("Le paiement est en attente de confirmation.")}
-        ${button("Voir les etudiants", `${appUrl()}/dashboard/admin/students`, brand.color)}
+        ${button("Voir les étudiants", `${appUrl()}/dashboard/admin/students`, brand.color)}
     `;
     return sendEmail({ to: adminEmail(), subject: title, html: emailLayout(title, body) });
 }
 
 export async function sendAdminPaymentProofEmail(studentName: string, provider: string, phone: string, amount: number) {
-    const title = "Preuve de paiement a verifier";
+    const title = "Preuve de paiement à vérifier";
     const body = `
-        ${paragraph("Un etudiant a soumis une preuve de paiement. Merci de verifier le transfert avant validation.")}
+        ${paragraph("Un étudiant a soumis une preuve de paiement. Merci de vérifier le transfert avant validation.")}
         ${detailRows([
-            ["Etudiant", escapeHtml(studentName || "Non renseigne")],
-            ["Moyen de paiement", escapeHtml(provider || "Non renseigne")],
-            ["Numero / indication", escapeHtml(phone || "Non renseigne")],
-            ["Montant declare", money(amount)],
+            ["Étudiant", escapeHtml(studentName || "Non renseigné")],
+            ["Moyen de paiement", escapeHtml(provider || "Non renseigné")],
+            ["Numéro / indication", escapeHtml(phone || "Non renseigné")],
+            ["Montant déclaré", money(amount)],
         ])}
-        ${button("Verifier le paiement", `${appUrl()}/dashboard/admin/payments`, brand.color)}
+        ${button("Vérifier le paiement", `${appUrl()}/dashboard/admin/payments`, brand.color)}
     `;
     return sendEmail({ to: adminEmail(), subject: title, html: emailLayout(title, body) });
 }
@@ -275,7 +275,7 @@ export async function sendForumCommentEmail(postAuthorEmail: string, postAuthorN
     const title = "Nouveau commentaire sur votre publication";
     const body = `
         ${paragraph(`Bonjour ${escapeHtml(postAuthorName || "")},`)}
-        ${paragraph(`${escapeHtml(commenterName || "Un membre")} a commente votre publication.`)}
+        ${paragraph(`${escapeHtml(commenterName || "Un membre")} a commenté votre publication.`)}
         ${detailRows([["Publication", escapeHtml(postTitle || "Sans titre")]])}
         ${button("Lire le commentaire", `${appUrl()}/dashboard/student/forum/${postId}`, brand.color)}
     `;
@@ -284,11 +284,11 @@ export async function sendForumCommentEmail(postAuthorEmail: string, postAuthorN
 
 export async function sendPasswordResetEmail(to: string, name: string, token: string) {
     const resetLink = `${appUrl()}/reset-password?token=${token}`;
-    const title = "Reinitialisation de votre mot de passe";
+    const title = "Réinitialisation de votre mot de passe";
     const body = `
         ${paragraph(`Bonjour ${escapeHtml(name || "cher utilisateur")},`)}
-        ${paragraph("Nous avons recu une demande de reinitialisation du mot de passe de votre compte.")}
-        ${paragraph("Si vous n'etes pas a l'origine de cette demande, vous pouvez ignorer cet email.")}
+        ${paragraph("Nous avons reçu une demande de réinitialisation du mot de passe de votre compte.")}
+        ${paragraph("Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email.")}
         ${button("Choisir un nouveau mot de passe", resetLink, brand.accent)}
         ${paragraph(`Lien direct : <a href="${resetLink}" style="color:${brand.color};">${resetLink}</a>`)}
         ${paragraph("Ce lien est valable pendant 1 heure.")}

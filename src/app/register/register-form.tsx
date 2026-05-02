@@ -16,12 +16,12 @@ const planSessions: Record<string, number> = {
 };
 
 const plans = [
-    { id: "loisir", name: "Loisir (1 seance/sem)", price: formatFcfa(PLA_PLANS[0].price), desc: "Initiation ou contact leger" },
-    { id: "essentiel", name: "Essentiel (2 seances/sem)", price: formatFcfa(PLA_PLANS[1].price), desc: "Construction des bases" },
-    { id: "equilibre", name: "Equilibre (3 seances/sem)", price: formatFcfa(PLA_PLANS[2].price), desc: "Pratique reguliere" },
-    { id: "performance", name: "Performance (4 seances/sem)", price: formatFcfa(PLA_PLANS[3].price), desc: "Resultats tangibles" },
-    { id: "intensif", name: "Intensif (5 seances/sem)", price: formatFcfa(PLA_PLANS[4].price), desc: "Transformation radicale" },
-    { id: "immersion", name: "Immersion (6 seances/sem)", price: formatFcfa(PLA_PLANS[5].price), desc: "Maitrise totale" }
+    { id: "loisir", name: "Loisir (1 séance/sem)", price: formatFcfa(PLA_PLANS[0].price), desc: "Initiation ou contact léger" },
+    { id: "essentiel", name: "Essentiel (2 séances/sem)", price: formatFcfa(PLA_PLANS[1].price), desc: "Construction des bases" },
+    { id: "equilibre", name: "Équilibre (3 séances/sem)", price: formatFcfa(PLA_PLANS[2].price), desc: "Pratique régulière" },
+    { id: "performance", name: "Performance (4 séances/sem)", price: formatFcfa(PLA_PLANS[3].price), desc: "Résultats tangibles" },
+    { id: "intensif", name: "Intensif (5 séances/sem)", price: formatFcfa(PLA_PLANS[4].price), desc: "Transformation radicale" },
+    { id: "immersion", name: "Immersion (6 séances/sem)", price: formatFcfa(PLA_PLANS[5].price), desc: "Maîtrise totale" }
 ];
 
 const availableDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
@@ -298,7 +298,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 )}
                                 {emailStatus === "pending" && (
                                     <p className="text-[11px] text-amber-600 font-bold px-1 mt-1">
-                                        Inscription deja creee. Continuez avec le meme mot de passe pour reprendre le paiement.
+                                        Inscription déjà créée. Continuez avec le même mot de passe pour reprendre le paiement.
                                     </p>
                                 )}
                             </div>

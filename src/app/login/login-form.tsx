@@ -48,7 +48,7 @@ export default function LoginForm() {
 
             {isPaymentSuccess && (
                 <div className="p-4 text-xs font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-center animate-in fade-in slide-in-from-top-1">
-                    Paiement recu. L'activation peut prendre quelques instants pendant la confirmation automatique.
+                    Paiement reçu. L'activation peut prendre quelques instants pendant la confirmation automatique.
                 </div>
             )}
 

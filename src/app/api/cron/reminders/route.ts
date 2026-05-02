@@ -69,8 +69,8 @@ export async function GET(req: Request) {
             if (app.admin?.email) {
                 await sendMail(
                     app.admin.email,
-                    `Rappel professeur : cours avec ${app.student.name || "un etudiant"}`,
-                    `Votre cours avec ${app.student.name || "un etudiant"} commence a ${timeStr}.\nLien : ${meetLink}`
+                    `Rappel professeur : cours avec ${app.student.name || "un étudiant"}`,
+                    `Votre cours avec ${app.student.name || "un étudiant"} commence à ${timeStr}.\nLien : ${meetLink}`
                 );
             }
 

@@ -111,7 +111,7 @@ export async function POST(req: Request) {
             case "toggle_user_status": {
                 const { email, action } = params; // action: "BLOCK" or "ACTIVATE"
                 if (!email || !["BLOCK", "ACTIVATE"].includes(action)) {
-                    return NextResponse.json({ error: "Parametres invalides" }, { status: 400 });
+                    return NextResponse.json({ error: "Paramètres invalides" }, { status: 400 });
                 }
                 const newStatus = action === "BLOCK" ? "BLOCKED" : "ACTIVE";
                 
@@ -126,7 +126,7 @@ export async function POST(req: Request) {
                 const { email, amount } = params;
                 const numericAmount = parseFloat(amount.toString().replace(/\s/g, ''));
                 if (!email || !Number.isFinite(numericAmount) || numericAmount <= 0) {
-                    return NextResponse.json({ error: "Parametres invalides" }, { status: 400 });
+                    return NextResponse.json({ error: "Paramètres invalides" }, { status: 400 });
                 }
 
                 const student = await prisma.user.findUnique({

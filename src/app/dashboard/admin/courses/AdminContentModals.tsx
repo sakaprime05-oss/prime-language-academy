@@ -58,7 +58,7 @@ export const LevelModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         className="w-full bg-[var(--surface-hover)] border-none rounded-2xl px-4 py-3 text-[var(--foreground)] focus:ring-2 focus:ring-[var(--primary)] outline-none"
-                        placeholder="Ex: Debutant A1"
+                        placeholder="Ex: Débutant A1"
                     />
                 </div>
                 <div>

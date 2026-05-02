@@ -3,7 +3,7 @@ import { PLA_FAQ, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/l
 
 export const metadata = {
     title: "Programme officiel 2026 | Prime Language Academy",
-    description: "Session de lancement Prime Language Academy du 21 juin au 19 aout 2026: tarifs, horaires, methode ISO+, FAQ et inscription.",
+    description: "Session de lancement Prime Language Academy du 21 juin au 19 août 2026: tarifs, horaires, méthode ISO+, FAQ et inscription.",
 };
 
 export default function ProgrammePage() {
@@ -21,17 +21,17 @@ export default function ProgrammePage() {
                             <span className="text-[#E7162A]">{PLA_SESSION.dates}</span>
                         </h1>
                         <p className="text-lg leading-8 text-[#F5F0E8]/60">
-                            Une immersion premium a Abidjan pour transformer l'anglais en competence vivante:
-                            methode ISO+, formateurs experts, suivi personnalise et environnement de formation confortable.
+                            Une immersion premium à Abidjan pour transformer l'anglais en compétence vivante:
+                            méthode ISO+, formateurs experts, suivi personnalisé et environnement de formation confortable.
                         </p>
                     </div>
                 </header>
 
                 <section className="grid gap-4 md:grid-cols-3">
                     {[
-                        ["Infrastructure", "Salles climatisees, cadre securise, WiFi haut debit, parking et espace de pause."],
-                        ["Encadrement", "Formateurs experts mobilises pour une progression claire et un suivi humain."],
-                        ["Methode ISO+", "Input, Structure, Output, Automatisation: apprendre puis transformer en reflexes."],
+                        ["Infrastructure", "Salles climatisées, cadre sécurisé, WiFi haut débit, parking et espace de pause."],
+                        ["Encadrement", "Formateurs experts mobilisés pour une progression claire et un suivi humain."],
+                        ["Méthode ISO+", "Input, Structure, Output, Automatisation: apprendre puis transformer en réflexes."],
                     ].map(([title, text]) => (
                         <article key={title} className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-7">
                             <h2 className="mb-3 text-xl font-black">{title}</h2>
@@ -43,8 +43,8 @@ export default function ProgrammePage() {
                 <section className="space-y-6">
                     <div>
                         <p className="mb-2 text-xs font-black uppercase tracking-[0.22em] text-[#E7162A]">Tarifs 2 mois</p>
-                        <h2 className="text-3xl font-black">Grille a la carte</h2>
-                        <p className="mt-2 text-sm text-[#F5F0E8]/50">Inscription offerte: 0 FCFA. Le solde doit etre regle avant le demarrage pour garantir la place.</p>
+                        <h2 className="text-3xl font-black">Grille à la carte</h2>
+                        <p className="mt-2 text-sm text-[#F5F0E8]/50">Inscription offerte: 0 FCFA. Le solde doit être réglé avant le démarrage pour garantir la place.</p>
                     </div>
                     <div className="grid gap-4 md:grid-cols-3">
                         {PLA_PLANS.map((plan) => (
@@ -64,8 +64,8 @@ export default function ProgrammePage() {
 
                 <section className="grid gap-6 md:grid-cols-2">
                     <div className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-8">
-                        <h2 className="mb-5 text-2xl font-black">Organisation des seances</h2>
-                        <p className="mb-6 text-sm leading-7 text-[#F5F0E8]/55">Les cours se deroulent du lundi au dimanche, avec deux vagues horaires au choix.</p>
+                        <h2 className="mb-5 text-2xl font-black">Organisation des séances</h2>
+                        <p className="mb-6 text-sm leading-7 text-[#F5F0E8]/55">Les cours se déroulent du lundi au dimanche, avec deux vagues horaires au choix.</p>
                         <div className="space-y-4">
                             {PLA_TIME_SLOTS.map((slot) => (
                                 <div key={slot.id} className="rounded-xl border border-[#E7162A]/10 p-4">
@@ -78,7 +78,7 @@ export default function ProgrammePage() {
                     </div>
 
                     <div className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-8">
-                        <h2 className="mb-5 text-2xl font-black">Inscription et reservation</h2>
+                        <h2 className="mb-5 text-2xl font-black">Inscription et réservation</h2>
                         <div className="space-y-4 text-sm leading-7 text-[#F5F0E8]/60">
                             <p><strong className="text-[#F5F0E8]">Test de niveau gratuit:</strong> indispensable pour orienter chaque apprenant.</p>
                             <p><strong className="text-[#F5F0E8]">RDV consultant:</strong> mardi 10h-14h et jeudi 9h-14h, en visio ou vocal.</p>
@@ -90,7 +90,7 @@ export default function ProgrammePage() {
                                 Test gratuit
                             </Link>
                             <Link href="/register" className="rounded-full bg-[#E7162A] px-6 py-3 text-sm font-black uppercase tracking-widest text-black">
-                                Reserver ma place
+                                Réserver ma place
                             </Link>
                         </div>
                     </div>

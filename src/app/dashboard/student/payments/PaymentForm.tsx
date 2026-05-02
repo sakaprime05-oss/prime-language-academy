@@ -33,7 +33,7 @@ export default function PaymentForm({ planId, maxAmount }: { planId: string; max
             <div className="space-y-1">
                 <h3 className="text-xl font-black text-[var(--foreground)]">Payer maintenant</h3>
                 <p className="text-xs font-medium text-[var(--foreground)]/50">
-                    Effectuez un paiement securise via Paystack (Mobile Money ou Carte).
+                    Effectuez un paiement sécurisé via Paystack (Mobile Money ou Carte).
                 </p>
             </div>
 
@@ -52,14 +52,14 @@ export default function PaymentForm({ planId, maxAmount }: { planId: string; max
             <div className="space-y-4">
                 <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 px-1">
-                        Montant a payer (FCFA)
+                        Montant à payer (FCFA)
                     </label>
                     <input name="amount" type="hidden" value={maxAmount} readOnly />
                     <div className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-2xl px-5 py-4 font-black text-lg">
                         {maxAmount.toLocaleString()} FCFA
                     </div>
                     <p className="text-[11px] font-medium text-[var(--foreground)]/45 px-1">
-                        Ce montant est calcule automatiquement depuis votre solde restant.
+                        Ce montant est calculé automatiquement depuis votre solde restant.
                     </p>
                 </div>
             </div>

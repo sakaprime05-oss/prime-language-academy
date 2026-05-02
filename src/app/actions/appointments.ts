@@ -31,7 +31,7 @@ export async function createAppointment(data: { date: Date; startTime: Date; end
         await sendMail(
             process.env.EMAIL_USER,
             "Nouveau rendez-vous demande",
-            `Un etudiant a demande un rendez-vous.\n\nEtudiant : ${appointment.student?.name || appointment.student?.email}\nDate : ${new Date(data.startTime).toLocaleString("fr-FR")}\nMotif : ${data.reason || "Non precise"}`
+            `Un étudiant a demandé un rendez-vous.\n\nÉtudiant : ${appointment.student?.name || appointment.student?.email}\nDate : ${new Date(data.startTime).toLocaleString("fr-FR")}\nMotif : ${data.reason || "Non précisé"}`
         );
     }
 

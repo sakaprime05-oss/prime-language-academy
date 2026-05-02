@@ -24,7 +24,7 @@ async function initializePaystackCheckout(input: PaystackInitInput) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
 
     if (!secretKey) {
-        return { error: "Erreur de configuration: cle API Paystack manquante sur le serveur." };
+        return { error: "Erreur de configuration: clé API Paystack manquante sur le serveur." };
     }
 
     const paystackResponse = await fetch(PAYSTACK_API_URL, {
@@ -116,12 +116,12 @@ export async function registerUser(formData: FormData) {
 
         if (existingUser) {
             if (existingUser.status !== "PENDING") {
-                return { error: "Cet email est deja utilise." };
+                return { error: "Cet email est déjà utilisé." };
             }
 
             const isPasswordValid = await bcrypt.compare(password, existingUser.passwordHash);
             if (!isPasswordValid) {
-                return { error: "Cette inscription est en attente de paiement. Utilisez le meme mot de passe pour reprendre le paiement." };
+                return { error: "Cette inscription est en attente de paiement. Utilisez le même mot de passe pour reprendre le paiement." };
             }
 
             const paymentPlan = existingUser.paymentPlans[0];
@@ -131,7 +131,7 @@ export async function registerUser(formData: FormData) {
 
             const remaining = Math.max(0, paymentPlan.totalAmount - paymentPlan.amountPaid);
             if (remaining <= 0) {
-                return { error: "Votre paiement est deja complet. Patientez quelques instants puis connectez-vous." };
+                return { error: "Votre paiement est déjà complet. Patientez quelques instants puis connectez-vous." };
             }
 
             const checkout = await createRegistrationCheckout({
@@ -156,7 +156,7 @@ export async function registerUser(formData: FormData) {
 
         const registrationType = onboardingParams.type === "CLUB" ? "CLUB" : "FORMATION";
 
-        const pedagogicalLevelName = onboardingParams.level || "Debutant";
+        const pedagogicalLevelName = onboardingParams.level || "Débutant";
         let level = await prisma.level.findFirst({
             where: { name: { contains: pedagogicalLevelName, mode: "insensitive" } },
         });
@@ -219,7 +219,7 @@ export async function registerUser(formData: FormData) {
 
         console.log("[Registration] Paystack Init Success, redirecting...");
 
-        sendWelcomeEmail(user.email, user.name || "Etudiant", registrationType)
+        sendWelcomeEmail(user.email, user.name || "Étudiant", registrationType)
             .catch(err => console.error("Could not send welcome email", err));
 
         sendAdminNewRegistrationEmail(user.name || "Nouveau", user.email, level?.name || planId)
