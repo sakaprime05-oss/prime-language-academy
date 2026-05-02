@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { LogoMark } from "@/components/logo";
 import { OwlMascot } from "@/components/owl-mascot";
+import ThemeToggle from "@/components/ThemeToggle";
 import { PLA_FAQ, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 /* ── tiny helpers ── */
@@ -41,12 +42,12 @@ export default function ClientLanding({ session, systemSettings }: { session: an
   }, []);
 
   return (
-    <div style={{ background:"#080808", color:"#F5F0E8", fontFamily:"'Inter', sans-serif", overflowX:"hidden" }}>
+    <div className="bg-[var(--background)] text-[var(--foreground)]" style={{ fontFamily:"'Inter', sans-serif", overflowX:"hidden" }}>
 
       {/* ══════════ NAV ══════════ */}
       <nav style={{
         position:"fixed", top:0, width:"100%", zIndex:100,
-        background: scrolled ? "rgba(8,8,8,0.92)" : "transparent",
+        background: scrolled ? "var(--surface)" : "transparent",
         backdropFilter: scrolled ? "blur(20px)" : "none",
         borderBottom: scrolled ? "1px solid rgba(231,22,42,0.12)" : "1px solid transparent",
         transition:"all 0.4s ease",
@@ -59,11 +60,11 @@ export default function ClientLanding({ session, systemSettings }: { session: an
           <LogoMark className="h-20 w-20 sm:h-24 sm:w-24" />
         </Link>
 
-        <div className="hidden lg:flex gap-10 text-[13px] font-medium tracking-widest uppercase text-[#F5F0E8]/55">
+        <div className="hidden lg:flex gap-10 text-[13px] font-medium tracking-widest uppercase text-[var(--foreground)]/55">
           {[["Mission","#mission"],["Méthode","#methode"],["Programme","/programme"],["Tarifs","#tarifs"],["Le Club","/english-club"],["Blog","/blog"]].map(([l,h]) => (
             <Link key={l} href={h} style={{ color:"inherit", textDecoration:"none", transition:"color 0.2s" }}
               onMouseEnter={e=>(e.currentTarget.style.color="#E7162A")}
-              onMouseLeave={e=>(e.currentTarget.style.color="rgba(245,240,232,0.55)")}>{l}</Link>
+              onMouseLeave={e=>(e.currentTarget.style.color="")}>{l}</Link>
           ))}
         </div>
 
@@ -74,12 +75,13 @@ export default function ClientLanding({ session, systemSettings }: { session: an
             </Link>
           ) : (
             <>
-              <Link href="/login" style={{ fontSize:13, color:"rgba(245,240,232,0.5)", textDecoration:"none", letterSpacing:"0.05em" }}>Connexion</Link>
+              <Link href="/login" className="text-[var(--foreground)]/55 hover:text-[var(--primary)]" style={{ fontSize:13, textDecoration:"none", letterSpacing:"0.05em" }}>Connexion</Link>
               <Link href="/register" className="btn-primary" style={{ textDecoration:"none", padding:"10px 24px", fontSize:12 }}>
                 S'inscrire
               </Link>
             </>
           )}
+          <ThemeToggle />
         </div>
       </nav>
 
@@ -106,7 +108,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
               opportunités.
             </h1>
 
-            <p style={{ fontSize:17, lineHeight:1.75, color:"rgba(245,240,232,0.6)", maxWidth:600, marginBottom:44, marginLeft:"auto", marginRight:"auto" }}>
+            <p style={{ fontSize:17, lineHeight:1.75, color:"var(--muted-foreground)", maxWidth:600, marginBottom:44, marginLeft:"auto", marginRight:"auto" }}>
               Prime Language Academy accompagne professionnels, étudiants et entrepreneurs francophones vers une maîtrise confiante et efficace de l'anglais.
             </p>
 
@@ -132,7 +134,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
               {[["6","Formules adaptées"],["2","Vagues horaires"],["21 juin","Début session"]].map(([v,l])=>(
                 <div key={l}>
                   <div style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:900, color:"#E7162A", lineHeight:1 }}>{v}</div>
-                  <div style={{ fontSize:11, color:"rgba(245,240,232,0.4)", marginTop:6, textTransform:"uppercase", letterSpacing:"0.1em" }}>{l}</div>
+                  <div style={{ fontSize:11, color:"var(--muted-foreground)", marginTop:6, textTransform:"uppercase", letterSpacing:"0.1em" }}>{l}</div>
                 </div>
               ))}
             </div>
@@ -146,7 +148,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
       <div style={{ borderTop:"1px solid rgba(231,22,42,0.1)", borderBottom:"1px solid rgba(231,22,42,0.1)", padding:"18px 0", overflow:"hidden", background:"rgba(231,22,42,0.03)" }}>
         <div className="marquee-track" style={{ display:"flex", gap:"60px", width:"max-content" }}>
           {[...MARQUEE_WORDS, ...MARQUEE_WORDS].map((w,i) => (
-            <span key={i} style={{ fontSize:13, fontWeight:600, letterSpacing:"0.25em", textTransform:"uppercase", color: i%3===0 ? "#E7162A" : "rgba(245,240,232,0.25)", whiteSpace:"nowrap" }}>
+            <span key={i} style={{ fontSize:13, fontWeight:600, letterSpacing:"0.25em", textTransform:"uppercase", color: i%3===0 ? "#E7162A" : "var(--muted-foreground)", whiteSpace:"nowrap" }}>
               {w} <span style={{ color:"rgba(231,22,42,0.3)", marginLeft:30 }}>✦</span>
             </span>
           ))}
@@ -162,7 +164,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
               Pourquoi choisir<br/><em style={{ color:"#E7162A" }}>Prime Academy ?</em>
             </h2>
           </div>
-          <p className="max-w-[320px] text-[15px] text-[#F5F0E8]/50 leading-relaxed md:text-right">
+          <p className="max-w-[320px] text-[15px] text-[var(--muted-foreground)] leading-relaxed md:text-right">
             L'anglais n'est pas une matière à mémoriser. C'est un muscle à entraîner — avec la bonne méthode.
           </p>
         </div>
@@ -171,14 +173,14 @@ export default function ClientLanding({ session, systemSettings }: { session: an
           {WHY.map(({ n, title, desc }) => (
             <div key={n} style={{
               border:"1px solid rgba(231,22,42,0.12)", borderRadius:20, padding:"36px 28px",
-              background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)",
+              background:"var(--surface)", backdropFilter:"blur(16px)",
               transition:"all 0.3s",
             }}
               onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.borderColor="rgba(231,22,42,0.4)"; (e.currentTarget as HTMLElement).style.transform="translateY(-6px)";}}
               onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.borderColor="rgba(231,22,42,0.12)"; (e.currentTarget as HTMLElement).style.transform="translateY(0)";}}>
               <div style={{ fontFamily:"'Playfair Display',serif", fontSize:56, fontWeight:900, color:"rgba(231,22,42,0.12)", lineHeight:1, marginBottom:20 }}>{n}</div>
-              <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:20, fontWeight:700, marginBottom:12, color:"#F5F0E8" }}>{title}</h3>
-              <p style={{ fontSize:14, color:"rgba(245,240,232,0.5)", lineHeight:1.7, margin:0 }}>{desc}</p>
+              <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:20, fontWeight:700, marginBottom:12, color:"var(--foreground)" }}>{title}</h3>
+              <p style={{ fontSize:14, color:"var(--muted-foreground)", lineHeight:1.7, margin:0 }}>{desc}</p>
             </div>
           ))}
         </div>
@@ -199,29 +201,29 @@ export default function ClientLanding({ session, systemSettings }: { session: an
 
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(300px, 1fr))", gap:24 }}>
             {/* Format Présentiel */}
-            <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)" }}>
+            <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px", background:"var(--surface)", backdropFilter:"blur(16px)" }}>
               <div style={{ width:50, height:50, borderRadius:12, background:"rgba(231,22,42,0.1)", color:"#E7162A", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, marginBottom:24 }}>🏢</div>
-              <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:900, color:"#F5F0E8", marginBottom:12 }}>Présentiel</h3>
-              <p style={{ color:"rgba(245,240,232,0.5)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Immersion totale dans nos locaux à Angré 8e Tranche. L'environnement idéal pour rester concentré, interagir en face-à-face et profiter de la dynamique de groupe.</p>
+              <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>Présentiel</h3>
+              <p style={{ color:"var(--muted-foreground)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Immersion totale dans nos locaux à Angré 8e Tranche. L'environnement idéal pour rester concentré, interagir en face-à-face et profiter de la dynamique de groupe.</p>
               <div style={{ fontSize:12, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#E7162A" }}>Disponible</div>
             </div>
 
             {/* Format En Ligne (Conditionnel) */}
             {(systemSettings?.enableOnlineRegistration ?? true) && (
-              <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)" }}>
+              <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px", background:"var(--surface)", backdropFilter:"blur(16px)" }}>
                 <div style={{ width:50, height:50, borderRadius:12, background:"rgba(231,22,42,0.1)", color:"#E7162A", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, marginBottom:24 }}>💻</div>
-                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:900, color:"#F5F0E8", marginBottom:12 }}>En Ligne (100% Live)</h3>
-                <p style={{ color:"rgba(245,240,232,0.5)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Suivez vos cours depuis chez vous ou le bureau via Zoom/Meet. Une interactivité préservée, des corrections en direct, et un gain de temps précieux dans les transports.</p>
+                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>En Ligne (100% Live)</h3>
+                <p style={{ color:"var(--muted-foreground)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Suivez vos cours depuis chez vous ou le bureau via Zoom/Meet. Une interactivité préservée, des corrections en direct, et un gain de temps précieux dans les transports.</p>
                 <div style={{ fontSize:12, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#1dcaff" }}>Inscriptions ouvertes</div>
               </div>
             )}
 
             {/* Format Entreprise (Conditionnel) */}
             {(systemSettings?.enableCorporateRegistration ?? true) && (
-              <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)" }}>
+              <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px", background:"var(--surface)", backdropFilter:"blur(16px)" }}>
                 <div style={{ width:50, height:50, borderRadius:12, background:"rgba(231,22,42,0.1)", color:"#E7162A", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, marginBottom:24 }}>💼</div>
-                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:900, color:"#F5F0E8", marginBottom:12 }}>B2B & Entreprises</h3>
-                <p style={{ color:"rgba(245,240,232,0.5)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Programmes sur-mesure pour vos collaborateurs. Coaching exécutif, formations sectorielles et renforcement des capacités en anglais professionnel intra-muros.</p>
+                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>B2B & Entreprises</h3>
+                <p style={{ color:"var(--muted-foreground)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Programmes sur-mesure pour vos collaborateurs. Coaching exécutif, formations sectorielles et renforcement des capacités en anglais professionnel intra-muros.</p>
                 <div style={{ fontSize:12, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#f59e0b" }}>Sur devis</div>
               </div>
             )}
@@ -241,11 +243,11 @@ export default function ClientLanding({ session, systemSettings }: { session: an
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2rem,4vw,3rem)", fontWeight:900, lineHeight:1.15, marginBottom:28 }}>
               Prime Language<br/><em style={{ color:"#E7162A" }}>Academy</em>
             </h2>
-            <p style={{ fontSize:16, lineHeight:1.85, color:"rgba(245,240,232,0.6)", marginBottom:20 }}>
+            <p style={{ fontSize:16, lineHeight:1.85, color:"var(--muted-foreground)", marginBottom:20 }}>
               Dans l'espace francophone africain, la maîtrise des langues étrangères reste un frein majeur. Prime Language Academy est née d'un constat simple : les offres existantes ne prennent pas en compte les réalités spécifiques des apprenants francophones.
             </p>
-            <p style={{ fontSize:16, lineHeight:1.85, color:"rgba(245,240,232,0.6)" }}>
-              Les blocages psychologiques à l'oral, la peur de faire des fautes, l'absence d'un cadre progressif et adapté. <strong style={{ color:"#F5F0E8" }}>Nous connaissons notre public.</strong>
+            <p style={{ fontSize:16, lineHeight:1.85, color:"var(--muted-foreground)" }}>
+              Les blocages psychologiques à l'oral, la peur de faire des fautes, l'absence d'un cadre progressif et adapté. <strong style={{ color:"var(--foreground)" }}>Nous connaissons notre public.</strong>
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -255,10 +257,10 @@ export default function ClientLanding({ session, systemSettings }: { session: an
               { icon:"⚡", t:"Formats flexibles", d:"1 à 6 séances selon votre rythme de vie" },
               { icon:"🌍", t:"Maîtrise active", d:"Priorité à l'expression orale et à la confiance" },
             ].map(({icon,t,d}) => (
-              <div key={t} style={{ border:"1px solid rgba(231,22,42,0.1)", borderRadius:16, padding:"24px 20px", background:"rgba(20,20,30,0.5)" }}>
+              <div key={t} style={{ border:"1px solid rgba(231,22,42,0.1)", borderRadius:16, padding:"24px 20px", background:"var(--surface)" }}>
                 <div style={{ fontSize:28, marginBottom:12 }}>{icon}</div>
-                <div style={{ fontSize:14, fontWeight:700, color:"#F5F0E8", marginBottom:6 }}>{t}</div>
-                <div style={{ fontSize:12, color:"rgba(245,240,232,0.45)", lineHeight:1.6 }}>{d}</div>
+                <div style={{ fontSize:14, fontWeight:700, color:"var(--foreground)", marginBottom:6 }}>{t}</div>
+                <div style={{ fontSize:12, color:"var(--muted-foreground)", lineHeight:1.6 }}>{d}</div>
               </div>
             ))}
           </div>
@@ -273,16 +275,16 @@ export default function ClientLanding({ session, systemSettings }: { session: an
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.2rem,4vw,3.2rem)", fontWeight:900, margin:"0 0 16px" }}>
               Grille <em style={{ color:"#E7162A" }}>« À la carte »</em>
             </h2>
-            <p style={{ color:"rgba(245,240,232,0.45)", fontSize:15, marginBottom:40 }}>Frais d'inscription offerts (0 FCFA) pour toutes les offres</p>
+            <p style={{ color:"var(--muted-foreground)", fontSize:15, marginBottom:40 }}>Frais d'inscription offerts (0 FCFA) pour toutes les offres</p>
 
             {/* Toggle Switch */}
-            <div style={{ display:"inline-flex", background:"rgba(20,20,30,0.8)", border:"1px solid rgba(231,22,42,0.2)", borderRadius:100, padding:6, position:"relative" }}>
+            <div style={{ display:"inline-flex", background:"var(--surface)", border:"1px solid rgba(231,22,42,0.2)", borderRadius:100, padding:6, position:"relative" }}>
               <button onClick={() => setPricingMode("formation")}
-                style={{ position:"relative", zIndex:1, padding:"12px 28px", borderRadius:100, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: pricingMode==="formation" ? "#080808" : "rgba(245,240,232,0.5)", transition:"color 0.3s" }}>
+                style={{ position:"relative", zIndex:1, padding:"12px 28px", borderRadius:100, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: pricingMode==="formation" ? "#080808" : "var(--muted-foreground)", transition:"color 0.3s" }}>
                 Formation (2 Mois)
               </button>
               <button onClick={() => setPricingMode("club")}
-                style={{ position:"relative", zIndex:1, padding:"12px 28px", borderRadius:100, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: pricingMode==="club" ? "#080808" : "rgba(245,240,232,0.5)", transition:"color 0.3s" }}>
+                style={{ position:"relative", zIndex:1, padding:"12px 28px", borderRadius:100, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: pricingMode==="club" ? "#080808" : "var(--muted-foreground)", transition:"color 0.3s" }}>
                 English Club (Mensuel)
               </button>
               {/* Highlight Background */}
@@ -303,16 +305,16 @@ export default function ClientLanding({ session, systemSettings }: { session: an
                 style={{
                   border: activePlan===p.id ? "1px solid #E7162A" : "1px solid rgba(231,22,42,0.12)",
                   borderRadius:20, padding:"28px 20px", cursor:"pointer",
-                  background: activePlan===p.id ? "rgba(231,22,42,0.08)" : "rgba(20,20,30,0.6)",
+                  background: activePlan===p.id ? "rgba(231,22,42,0.08)" : "var(--surface)",
                   backdropFilter:"blur(16px)",
                   boxShadow: activePlan===p.id ? "0 0 30px rgba(231,22,42,0.15)" : "none",
                   transition:"all 0.25s", position:"relative",
                 }}>
                 {p.top && <div style={{ position:"absolute", top:-10, left:"50%", transform:"translateX(-50%)", background:"#E7162A", color:"#080808", fontSize:10, fontWeight:800, padding:"4px 12px", borderRadius:100, textTransform:"uppercase", letterSpacing:"0.12em", whiteSpace:"nowrap" }}>Le Summum</div>}
-                <div style={{ fontSize:13, fontWeight:700, color: activePlan===p.id ? "#E7162A" : "#F5F0E8", marginBottom:6 }}>{p.label}</div>
-                <div style={{ fontSize:11, color:"rgba(245,240,232,0.4)", marginBottom:20, letterSpacing:"0.08em" }}>{p.freq}</div>
-                <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:900, color: activePlan===p.id ? "#E7162A" : "#F5F0E8" }}>{p.price}</div>
-                <div style={{ fontSize:11, color:"rgba(245,240,232,0.35)", marginTop:2 }}>FCFA {pricingMode === "club" ? "/ mois" : "/ 2 mois"}</div>
+                <div style={{ fontSize:13, fontWeight:700, color: activePlan===p.id ? "#E7162A" : "var(--foreground)", marginBottom:6 }}>{p.label}</div>
+                <div style={{ fontSize:11, color:"var(--muted-foreground)", marginBottom:20, letterSpacing:"0.08em" }}>{p.freq}</div>
+                <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:900, color: activePlan===p.id ? "#E7162A" : "var(--foreground)" }}>{p.price}</div>
+                <div style={{ fontSize:11, color:"var(--muted-foreground)", marginTop:2 }}>FCFA {pricingMode === "club" ? "/ mois" : "/ 2 mois"}</div>
               </div>
             ))}
           </div>
@@ -322,7 +324,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
               {pricingMode === "formation" ? "Réserver ma place →" : "Rejoindre le cercle →"}
             </Link>
             {pricingMode === "club" && (
-              <Link href="/english-club" style={{ color:"rgba(245,240,232,0.5)", fontSize:13, letterSpacing:"0.08em", textTransform:"uppercase", fontWeight:600, textDecoration:"underline", textUnderlineOffset:4 }}>
+              <Link href="/english-club" style={{ color:"var(--muted-foreground)", fontSize:13, letterSpacing:"0.08em", textTransform:"uppercase", fontWeight:600, textDecoration:"underline", textUnderlineOffset:4 }}>
                 Découvrir en détail le Club
               </Link>
             )}
@@ -334,11 +336,11 @@ export default function ClientLanding({ session, systemSettings }: { session: an
       <section style={{ padding:"80px 2rem" }}>
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           {PLA_TIME_SLOTS.map(({ label, time, desc }) => (
-            <div key={label} style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px 32px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)", overflow:"hidden", position:"relative" }}>
+            <div key={label} style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px 32px", background:"var(--surface)", backdropFilter:"blur(16px)", overflow:"hidden", position:"relative" }}>
               <div style={{ position:"absolute", top:-20, right:-20, width:100, height:100, borderRadius:"50%", background:"rgba(231,22,42,0.05)", filter:"blur(30px)" }}/>
               <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:12 }}>{label}</div>
-              <div style={{ fontFamily:"'Playfair Display',serif", fontSize:36, fontWeight:900, color:"#F5F0E8", marginBottom:12 }}>{time}</div>
-              <div style={{ fontSize:13, color:"rgba(245,240,232,0.45)" }}>{desc}</div>
+              <div style={{ fontFamily:"'Playfair Display',serif", fontSize:36, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>{time}</div>
+              <div style={{ fontSize:13, color:"var(--muted-foreground)" }}>{desc}</div>
             </div>
           ))}
         </div>
@@ -356,9 +358,9 @@ export default function ClientLanding({ session, systemSettings }: { session: an
 
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:16 }}>
             {PLA_FAQ.map(({ question, answer }) => (
-              <div key={question} style={{ border:"1px solid rgba(231,22,42,0.12)", borderRadius:18, padding:"28px 24px", background:"rgba(20,20,30,0.6)" }}>
-                <h3 style={{ margin:"0 0 10px", color:"#F5F0E8", fontSize:16, fontWeight:800 }}>{question}</h3>
-                <p style={{ margin:0, color:"rgba(245,240,232,0.52)", lineHeight:1.7, fontSize:14 }}>{answer}</p>
+              <div key={question} style={{ border:"1px solid rgba(231,22,42,0.12)", borderRadius:18, padding:"28px 24px", background:"var(--surface)" }}>
+                <h3 style={{ margin:"0 0 10px", color:"var(--foreground)", fontSize:16, fontWeight:800 }}>{question}</h3>
+                <p style={{ margin:0, color:"var(--muted-foreground)", lineHeight:1.7, fontSize:14 }}>{answer}</p>
               </div>
             ))}
           </div>
@@ -379,7 +381,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.5rem,5vw,4.5rem)", fontWeight:900, lineHeight:1.1, marginBottom:20, maxWidth:700, margin:"0 auto 20px" }}>
             Prêt à débloquer<br/><em style={{ color:"#E7162A" }}>votre potentiel ?</em>
           </h2>
-          <p style={{ color:"rgba(245,240,232,0.5)", fontSize:16, marginBottom:48, maxWidth:480, marginLeft:"auto", marginRight:"auto", lineHeight:1.7 }}>
+          <p style={{ color:"var(--muted-foreground)", fontSize:16, marginBottom:48, maxWidth:480, marginLeft:"auto", marginRight:"auto", lineHeight:1.7 }}>
             Angré 8e Tranche · Lun–Dim · 16h – 20h<br/>
             <a href="https://wa.me/2250161337864?text=Bonjour%20!%20Je%20souhaite%20avoir%20des%20informations%20sur%20Prime%20Language%20Academy%20%F0%9F%8E%93" target="_blank" rel="noopener noreferrer" style={{ color:"#25D366", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:6, marginTop:8 }}>
               <svg width="18" height="18" viewBox="0 0 32 32" fill="none"><path d="M16 3C9.373 3 4 8.373 4 15c0 2.385.668 4.61 1.83 6.5L4 29l7.7-1.81A12.94 12.94 0 0016 28c6.627 0 12-5.373 12-13S22.627 3 16 3z" fill="#25D366"/><path d="M21.04 18.16c-.28-.14-1.664-.82-1.92-.912-.256-.096-.44-.14-.628.14-.188.28-.72.912-.88 1.1-.164.184-.324.208-.604.07-.28-.14-1.18-.436-2.248-1.388-.832-.74-1.392-1.656-1.556-1.936-.164-.28-.016-.432.124-.572.126-.124.28-.324.42-.488.14-.164.188-.28.28-.468.096-.188.048-.352-.024-.492-.068-.14-.628-1.512-.86-2.072-.228-.548-.456-.472-.628-.48l-.536-.008c-.188 0-.492.068-.748.352-.256.284-.98.956-.98 2.332 0 1.376 1.004 2.704 1.14 2.892.14.188 1.968 3.004 4.768 4.212.668.288 1.188.46 1.596.588.668.212 1.276.184 1.756.112.536-.08 1.664-.68 1.896-1.34.236-.656.236-1.22.168-1.34-.072-.12-.252-.188-.532-.328z" fill="white"/></svg>
@@ -421,12 +423,12 @@ export default function ClientLanding({ session, systemSettings }: { session: an
             <div className="lg:row-span-2" style={{ border:"1px solid #E7162A", borderRadius:24, padding:"48px 40px", background:"rgba(231,22,42,0.04)", backdropFilter:"blur(16px)", boxShadow:"0 0 40px rgba(231,22,42,0.08)" }}>
               <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:20 }}>Cercle Privé · B2 → C2</div>
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:900, color:"#E7162A", marginBottom:20, lineHeight:1.2 }}>Un club social anglophone pour l'élite d'Abidjan</h3>
-              <p style={{ color:"rgba(245,240,232,0.6)", lineHeight:1.85, fontSize:15, marginBottom:32 }}>
-                Pour ceux qui maîtrisent déjà l'anglais et veulent <strong style={{ color:"#F5F0E8" }}>le vivre au quotidien</strong>. Un cercle chic et connecté — cadres, entrepreneurs, créatifs, profils international — où la langue est un passeport social.
+              <p style={{ color:"var(--muted-foreground)", lineHeight:1.85, fontSize:15, marginBottom:32 }}>
+                Pour ceux qui maîtrisent déjà l'anglais et veulent <strong style={{ color:"var(--foreground)" }}>le vivre au quotidien</strong>. Un cercle chic et connecté — cadres, entrepreneurs, créatifs, profils international — où la langue est un passeport social.
               </p>
               <div style={{ display:"flex", flexDirection:"column", gap:14, marginBottom:40 }}>
                 {["🥂 English Social Nights","🎯 Conversation Circles (6–10 pers)","🎤 Guest Talks & Masterclasses","🎬 Projections VO & Ateliers CV"].map(f => (
-                  <div key={f} style={{ fontSize:13, color:"rgba(245,240,232,0.75)", display:"flex", alignItems:"center", gap:10 }}>
+                  <div key={f} style={{ fontSize:13, color:"var(--foreground)", display:"flex", alignItems:"center", gap:10 }}>
                     <span style={{ color:"#E7162A" }}>✦</span> {f}
                   </div>
                 ))}
@@ -435,8 +437,8 @@ export default function ClientLanding({ session, systemSettings }: { session: an
             </div>
 
             {/* Right top — public vs formation */}
-            <div style={{ border:"1px solid rgba(231,22,42,0.12)", borderRadius:20, padding:"32px 28px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)" }}>
-              <div style={{ fontSize:11, color:"rgba(245,240,232,0.4)", letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:16 }}>Comment ça marche ?</div>
+            <div style={{ border:"1px solid rgba(231,22,42,0.12)", borderRadius:20, padding:"32px 28px", background:"var(--surface)", backdropFilter:"blur(16px)" }}>
+              <div style={{ fontSize:11, color:"var(--muted-foreground)", letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:16 }}>Comment ça marche ?</div>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                 {[
                   { step:"01", label:"Vous avez déjà le niveau B2+", sub:"Accès direct au Club" },
@@ -447,8 +449,8 @@ export default function ClientLanding({ session, systemSettings }: { session: an
                   <div key={step} style={{ display:"flex", alignItems:"flex-start", gap:16, padding:"14px 0", borderBottom:"1px solid rgba(231,22,42,0.07)" }}>
                     <span style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:900, color:"rgba(231,22,42,0.25)", lineHeight:1, flexShrink:0, width:28 }}>{step}</span>
                     <div>
-                      <div style={{ fontSize:13, fontWeight:600, color:"#F5F0E8", marginBottom:3 }}>{label}</div>
-                      <div style={{ fontSize:11, color:"rgba(245,240,232,0.4)" }}>{sub}</div>
+                      <div style={{ fontSize:13, fontWeight:600, color:"var(--foreground)", marginBottom:3 }}>{label}</div>
+                      <div style={{ fontSize:11, color:"var(--muted-foreground)" }}>{sub}</div>
                     </div>
                   </div>
                 ))}
@@ -456,11 +458,11 @@ export default function ClientLanding({ session, systemSettings }: { session: an
             </div>
 
             {/* Right bottom — ambiance */}
-            <div style={{ border:"1px solid rgba(231,22,42,0.12)", borderRadius:20, padding:"28px", background:"rgba(20,20,30,0.6)", backdropFilter:"blur(16px)" }}>
-              <div style={{ fontSize:11, color:"rgba(245,240,232,0.4)", letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:14 }}>L'ambiance</div>
+            <div style={{ border:"1px solid rgba(231,22,42,0.12)", borderRadius:20, padding:"28px", background:"var(--surface)", backdropFilter:"blur(16px)" }}>
+              <div style={{ fontSize:11, color:"var(--muted-foreground)", letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:14 }}>L'ambiance</div>
               <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
                 {["Chaleureux","Exigeant","Bienveillant","Chic","100% Anglais","Networking","Ouvert","Global Mindset","Connecté"].map(t => (
-                  <span key={t} style={{ fontSize:11, border:"1px solid rgba(231,22,42,0.2)", borderRadius:100, padding:"5px 14px", color:"rgba(245,240,232,0.55)" }}>{t}</span>
+                  <span key={t} style={{ fontSize:11, border:"1px solid rgba(231,22,42,0.2)", borderRadius:100, padding:"5px 14px", color:"var(--muted-foreground)" }}>{t}</span>
                 ))}
               </div>
             </div>
@@ -472,9 +474,9 @@ export default function ClientLanding({ session, systemSettings }: { session: an
       <footer className="border-t border-[#E7162A]/10 px-6 sm:px-8 py-12 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
         <div style={{ display:"flex", alignItems:"center", gap:12 }}>
           <LogoMark className="h-16 w-16 sm:h-20 sm:w-20" />
-          <span style={{ fontFamily:"'Playfair Display',serif", fontSize:15, color:"rgba(245,240,232,0.5)" }}>Prime Language Academy</span>
+          <span style={{ fontFamily:"'Playfair Display',serif", fontSize:15, color:"var(--muted-foreground)" }}>Prime Language Academy</span>
         </div>
-        <div style={{ display:"flex", gap:32, fontSize:12, color:"rgba(245,240,232,0.3)", letterSpacing:"0.1em", textTransform:"uppercase" }}>
+        <div style={{ display:"flex", gap:32, fontSize:12, color:"var(--muted-foreground)", letterSpacing:"0.1em", textTransform:"uppercase" }}>
           <Link href="/programme" style={{ color:"inherit", textDecoration:"none" }}>Programme</Link>
           <Link href="/blog" style={{ color:"inherit", textDecoration:"none" }}>Blog</Link>
           <Link href="/english-club" style={{ color:"#E7162A", textDecoration:"none" }}>English Club</Link>
@@ -482,7 +484,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
           <Link href="/mentions-legales" style={{ color:"inherit", textDecoration:"none" }}>Mentions légales</Link>
           <Link href="/login" style={{ color:"inherit", textDecoration:"none" }}>Connexion</Link>
         </div>
-        <div style={{ fontSize:11, color:"rgba(245,240,232,0.2)", letterSpacing:"0.1em" }}>© 2026 Prime Language Academy</div>
+        <div style={{ fontSize:11, color:"var(--muted-foreground)", letterSpacing:"0.1em" }}>© 2026 Prime Language Academy</div>
       </footer>
       <OwlMascot size={120} className="hidden sm:block" />
     </div>

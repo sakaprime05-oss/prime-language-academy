@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function ProgrammePage() {
     return (
-        <main className="min-h-screen bg-[#080808] text-[#F5F0E8] px-6 py-24">
+        <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] px-6 py-24">
             <div className="mx-auto max-w-6xl space-y-16">
                 <header className="max-w-3xl space-y-6">
                     <Link href="/" className="text-sm font-bold uppercase tracking-[0.18em] text-[#E7162A] hover:underline">
@@ -20,7 +20,7 @@ export default function ProgrammePage() {
                             Programme officiel PLA<br />
                             <span className="text-[#E7162A]">{PLA_SESSION.dates}</span>
                         </h1>
-                        <p className="text-lg leading-8 text-[#F5F0E8]/60">
+                        <p className="text-lg leading-8 text-[var(--foreground)]/60">
                             Une immersion premium à Abidjan pour transformer l'anglais en compétence vivante:
                             méthode ISO+, formateurs experts, suivi personnalisé et environnement de formation confortable.
                         </p>
@@ -35,7 +35,7 @@ export default function ProgrammePage() {
                     ].map(([title, text]) => (
                         <article key={title} className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-7">
                             <h2 className="mb-3 text-xl font-black">{title}</h2>
-                            <p className="text-sm leading-7 text-[#F5F0E8]/55">{text}</p>
+                            <p className="text-sm leading-7 text-[var(--foreground)]/55">{text}</p>
                         </article>
                     ))}
                 </section>
@@ -44,7 +44,7 @@ export default function ProgrammePage() {
                     <div>
                         <p className="mb-2 text-xs font-black uppercase tracking-[0.22em] text-[#E7162A]">Tarifs 2 mois</p>
                         <h2 className="text-3xl font-black">Grille à la carte</h2>
-                        <p className="mt-2 text-sm text-[#F5F0E8]/50">Inscription offerte: 0 FCFA. Le solde doit être réglé avant le démarrage pour garantir la place.</p>
+                        <p className="mt-2 text-sm text-[var(--foreground)]/50">Inscription offerte: 0 FCFA. Le solde doit être réglé avant le démarrage pour garantir la place.</p>
                     </div>
                     <div className="grid gap-4 md:grid-cols-3">
                         {PLA_PLANS.map((plan) => (
@@ -52,7 +52,7 @@ export default function ProgrammePage() {
                                 <div className="flex items-start justify-between gap-3">
                                     <div>
                                         <h3 className="text-xl font-black">{plan.label}</h3>
-                                        <p className="mt-1 text-sm text-[#F5F0E8]/45">{plan.freq}</p>
+                                        <p className="mt-1 text-sm text-[var(--foreground)]/45">{plan.freq}</p>
                                     </div>
                                     {plan.top && <span className="rounded-full bg-[#E7162A] px-3 py-1 text-[10px] font-black uppercase text-black">Complet</span>}
                                 </div>
@@ -65,13 +65,13 @@ export default function ProgrammePage() {
                 <section className="grid gap-6 md:grid-cols-2">
                     <div className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-8">
                         <h2 className="mb-5 text-2xl font-black">Organisation des séances</h2>
-                        <p className="mb-6 text-sm leading-7 text-[#F5F0E8]/55">Les cours se déroulent du lundi au dimanche, avec deux vagues horaires au choix.</p>
+                        <p className="mb-6 text-sm leading-7 text-[var(--foreground)]/55">Les cours se déroulent du lundi au dimanche, avec deux vagues horaires au choix.</p>
                         <div className="space-y-4">
                             {PLA_TIME_SLOTS.map((slot) => (
                                 <div key={slot.id} className="rounded-xl border border-[#E7162A]/10 p-4">
                                     <p className="text-xs font-black uppercase tracking-[0.18em] text-[#E7162A]">{slot.label}</p>
                                     <p className="mt-1 text-2xl font-black">{slot.time}</p>
-                                    <p className="mt-1 text-sm text-[#F5F0E8]/45">{slot.desc}</p>
+                                    <p className="mt-1 text-sm text-[var(--foreground)]/45">{slot.desc}</p>
                                 </div>
                             ))}
                         </div>
@@ -79,11 +79,11 @@ export default function ProgrammePage() {
 
                     <div className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-8">
                         <h2 className="mb-5 text-2xl font-black">Inscription et réservation</h2>
-                        <div className="space-y-4 text-sm leading-7 text-[#F5F0E8]/60">
-                            <p><strong className="text-[#F5F0E8]">Test de niveau gratuit:</strong> indispensable pour orienter chaque apprenant.</p>
-                            <p><strong className="text-[#F5F0E8]">RDV consultant:</strong> mardi 10h-14h et jeudi 9h-14h, en visio ou vocal.</p>
-                            <p><strong className="text-[#F5F0E8]">Adresse:</strong> {PLA_SESSION.location}. {PLA_SESSION.locationHint}.</p>
-                            <p><strong className="text-[#F5F0E8]">WhatsApp:</strong> {PLA_SESSION.phone}</p>
+                        <div className="space-y-4 text-sm leading-7 text-[var(--foreground)]/60">
+                            <p><strong className="text-[var(--foreground)]">Test de niveau gratuit:</strong> indispensable pour orienter chaque apprenant.</p>
+                            <p><strong className="text-[var(--foreground)]">RDV consultant:</strong> mardi 10h-14h et jeudi 9h-14h, en visio ou vocal.</p>
+                            <p><strong className="text-[var(--foreground)]">Adresse:</strong> {PLA_SESSION.location}. {PLA_SESSION.locationHint}.</p>
+                            <p><strong className="text-[var(--foreground)]">WhatsApp:</strong> {PLA_SESSION.phone}</p>
                         </div>
                         <div className="mt-8 flex flex-wrap gap-3">
                             <Link href="/placement-test" className="rounded-full border border-[#E7162A]/40 px-6 py-3 text-sm font-black uppercase tracking-widest text-[#E7162A]">
@@ -102,7 +102,7 @@ export default function ProgrammePage() {
                         {PLA_FAQ.map((item) => (
                             <article key={item.question} className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-6">
                                 <h3 className="mb-2 font-black">{item.question}</h3>
-                                <p className="text-sm leading-7 text-[#F5F0E8]/55">{item.answer}</p>
+                                <p className="text-sm leading-7 text-[var(--foreground)]/55">{item.answer}</p>
                             </article>
                         ))}
                     </div>
