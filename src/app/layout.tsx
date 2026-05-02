@@ -13,10 +13,10 @@ export const metadata: Metadata = {
   keywords: [
     "formation anglais Abidjan",
     "cours anglais Cocody",
-    "anglais Angre",
+    "anglais Angré",
     "Prime Language Academy",
     "English Club Abidjan",
-    "test niveau anglais Cote d'Ivoire",
+    "test niveau anglais Côte d'Ivoire",
   ],
   alternates: {
     canonical: "/",

@@ -20,7 +20,7 @@ const brand = {
     shortName: "Prime Academy",
     color: "#21286E",
     accent: "#E7162A",
-    address: "Angre 8e Tranche, Abidjan",
+    address: "Angré 8e Tranche, Abidjan",
     phone: "+225 01 61 33 78 64",
 };
 

@@ -7,7 +7,7 @@ import { PLA_SESSION, PLA_TIME_SLOTS } from "@/lib/pla-program";
 export const metadata: Metadata = {
   title: "Contact | Prime Language Academy Abidjan",
   description:
-    "Contactez Prime Language Academy a Abidjan Cocody Angre pour une inscription, un test de niveau, un rendez-vous ou une question sur la formation d'anglais.",
+    "Contactez Prime Language Academy à Abidjan Cocody Angré pour une inscription, un test de niveau, un rendez-vous ou une question sur la formation d'anglais.",
   alternates: {
     canonical: "/contact",
   },
@@ -42,9 +42,9 @@ const contactActions = [
 ];
 
 const quickLinks = [
-  { label: "S'inscrire", href: "/register", detail: "Reserver une place pour la session de lancement" },
-  { label: "Test de niveau", href: "/placement-test", detail: "Evaluer son niveau avant de choisir un parcours" },
-  { label: "Rendez-vous", href: "/rendez-vous", detail: "Planifier un echange avec un conseiller" },
+  { label: "S'inscrire", href: "/register", detail: "Réserver une place pour la session de lancement" },
+  { label: "Test de niveau", href: "/placement-test", detail: "Évaluer son niveau avant de choisir un parcours" },
+  { label: "Rendez-vous", href: "/rendez-vous", detail: "Planifier un échange avec un conseiller" },
   { label: "Programme", href: "/programme", detail: "Voir les horaires, tarifs et formules disponibles" },
 ];
 
@@ -77,7 +77,7 @@ export default function ContactPage() {
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-[var(--muted-foreground)] sm:text-lg">
               Pour une inscription, un test de niveau, un rendez-vous ou une question sur les formules, WhatsApp reste le
-              canal le plus rapide. L'equipe vous oriente vers le bon parcours selon votre niveau, votre disponibilite et
+              canal le plus rapide. L'équipe vous oriente vers le bon parcours selon votre niveau, votre disponibilité et
               votre objectif.
             </p>
 
@@ -87,7 +87,7 @@ export default function ContactPage() {
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-[#E7162A] px-6 py-3 text-sm font-black uppercase tracking-[0.1em] text-white shadow-sm transition hover:bg-[#c51224]"
               >
                 <MessageCircle className="h-4 w-4" />
-                Ecrire sur WhatsApp
+                Écrire sur WhatsApp
               </a>
               <Link
                 href="/rendez-vous"
@@ -145,13 +145,13 @@ export default function ContactPage() {
             icon={Clock}
             title="Horaires des cours"
             value={PLA_TIME_SLOTS.map((slot) => `${slot.label}: ${slot.time}`).join(" | ")}
-            detail="Rattrapage possible selon disponibilite et organisation de la semaine."
+            detail="Rattrapage possible selon disponibilité et organisation de la semaine."
           />
           <InfoPanel
             icon={ShieldCheck}
             title="Session en cours"
             value={PLA_SESSION.dates}
-            detail="Inscription offerte pour la session de lancement, place confirmee apres validation du dossier."
+            detail="Inscription offerte pour la session de lancement, place confirmée après validation du dossier."
           />
         </div>
       </section>
@@ -160,11 +160,11 @@ export default function ContactPage() {
         <div className="mx-auto max-w-6xl">
           <div className="mb-7 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#E7162A]">Acces rapide</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#E7162A]">Accès rapide</p>
               <h2 className="mt-3 text-2xl font-black tracking-normal sm:text-3xl">Choisissez la prochaine action</h2>
             </div>
             <p className="max-w-xl text-sm leading-7 text-[var(--muted-foreground)]">
-              Les demandes d'inscription et de rendez-vous passent par des formulaires dedies pour eviter les oublis.
+              Les demandes d'inscription et de rendez-vous passent par des formulaires dédiés pour éviter les oublis.
             </p>
           </div>
 

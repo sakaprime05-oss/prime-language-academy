@@ -2,7 +2,7 @@ export const PLA_SESSION = {
     label: "Session de lancement",
     dates: "21 juin - 19 août 2026",
     duration: "2 mois",
-    location: "92VJ+R6, Abidjan, Cocody Angre 8e Tranche, Zone Bon Prix",
+    location: "92VJ+R6, Abidjan, Cocody Angré 8e Tranche, Zone Bon Prix",
     locationHint: "À 120 m en face du carrefour Pain du Quotidien",
     phone: "+225 01 61 33 78 64",
     whatsapp: "https://wa.me/2250161337864",

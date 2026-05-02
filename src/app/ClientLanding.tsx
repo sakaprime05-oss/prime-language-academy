@@ -352,7 +352,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
           <div style={{ textAlign:"center", marginBottom:48 }}>
             <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", marginBottom:16 }}>Questions frequentes</div>
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.2rem,4vw,3.2rem)", fontWeight:900, margin:"0 0 16px" }}>
-              Les points a clarifier<br/><em style={{ color:"#E7162A" }}>avant de reserver</em>
+              Les points à clarifier<br/><em style={{ color:"#E7162A" }}>avant de réserver</em>
             </h2>
           </div>
 

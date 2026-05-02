@@ -5,7 +5,7 @@ export const siteConfig = {
   name: "Prime Language Academy",
   shortName: "Prime Academy",
   description:
-    "Formation d'anglais a Abidjan Cocody Angre avec methode ISO+, cours en presentiel, English Club, test de niveau et accompagnement personnalise.",
+    "Formation d'anglais à Abidjan Cocody Angré avec méthode ISO+, cours en présentiel, English Club, test de niveau et accompagnement personnalisé.",
   url: "https://primelangageacademy.com",
   ogImage: "https://primelangageacademy.com/icon-512x512.png",
   links: {
@@ -15,7 +15,7 @@ export const siteConfig = {
   contact: {
     email: "contact@primelanguageacademy.com",
     phone: "+225 01 61 33 78 64",
-    address: "Cocody Angre 8e Tranche, Zone Bon Prix, Abidjan",
+    address: "Cocody Angré 8e Tranche, Zone Bon Prix, Abidjan",
   },
 };
 
