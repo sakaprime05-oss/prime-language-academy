@@ -1,8 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import PDFDocument from "pdfkit";
-import { existsSync } from "fs";
-import { join } from "path";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -44,64 +42,67 @@ function createInvoiceBuffer(transaction: InvoiceTransaction) {
         const student = transaction.paymentPlan.student;
         const receiptNumber = transaction.id.split("-")[0].toUpperCase();
         const method = clean(transaction.provider || transaction.method);
-        const logoPath = join(process.cwd(), "public", "logo.png");
 
         doc.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
         doc.on("error", reject);
         doc.on("end", () => resolve(Buffer.concat(chunks)));
 
-        doc
-            .rect(0, 0, doc.page.width, 112)
-            .fill("#21286E");
+        doc.rect(0, 0, doc.page.width, 12).fill("#E7162A");
 
         doc
-            .fillColor("#FFFFFF")
+            .fillColor("#111827")
             .font("Helvetica-Bold")
-            .fontSize(22)
-            .text("Prime Language Academy", 48, 34)
+            .fontSize(24)
+            .text("Prime Language Academy", 48, 48)
             .font("Helvetica")
             .fontSize(10)
-            .text("Abidjan, Angre 8e Tranche - Cote d'Ivoire", 48, 64)
-            .text("Tel: +225 01 61 33 78 64", 48, 80);
+            .fillColor("#4B5563")
+            .text("Abidjan, Angre 8e Tranche - Cote d'Ivoire", 48, 82)
+            .text("+225 01 61 33 78 64", 48, 98);
 
         doc
+            .roundedRect(366, 44, 182, 66, 10)
+            .fill("#21286E")
             .fillColor("#FFFFFF")
             .font("Helvetica-Bold")
-            .fontSize(18)
-            .text("RECU DE PAIEMENT", 360, 38, { align: "right" })
+            .fontSize(15)
+            .text("RECU DE PAIEMENT", 386, 62, { width: 142, align: "right" })
             .font("Helvetica")
-            .fontSize(10)
-            .text(`N. ${receiptNumber}`, 360, 66, { align: "right" });
+            .fontSize(9)
+            .text(`N. ${receiptNumber}`, 386, 84, { width: 142, align: "right" });
 
-        if (existsSync(logoPath)) {
-            doc.image(logoPath, 500, 24, { width: 42 });
-        }
+        doc
+            .moveTo(48, 130)
+            .lineTo(548, 130)
+            .strokeColor("#E5E7EB")
+            .lineWidth(1)
+            .stroke();
 
         doc
             .fillColor("#111827")
             .font("Helvetica-Bold")
             .fontSize(12)
-            .text("Recu pour", 48, 150)
+            .text("Recu pour", 48, 166)
             .font("Helvetica")
             .fontSize(10)
             .fillColor("#374151")
-            .text(clean(student.name), 48, 174)
-            .text(clean(student.email), 48, 190)
-            .text(`Niveau: ${clean(student.level?.name)}`, 48, 206);
+            .text(clean(student.name), 48, 190)
+            .text(clean(student.email), 48, 206)
+            .text(`Niveau: ${clean(student.level?.name)}`, 48, 222);
 
         doc
             .fillColor("#111827")
             .font("Helvetica-Bold")
             .fontSize(12)
-            .text("Details", 348, 150)
+            .text("Details du paiement", 348, 166)
             .font("Helvetica")
             .fontSize(10)
             .fillColor("#374151")
-            .text(`Date: ${formatDate(transaction.date)}`, 348, 174)
-            .text(`Reference: ${clean(transaction.referenceId)}`, 348, 190)
-            .text(`Paiement: ${method}`, 348, 206);
+            .text(`Date: ${formatDate(transaction.date)}`, 348, 190)
+            .text(`Reference: ${clean(transaction.referenceId)}`, 348, 206)
+            .text(`Paiement: ${method}`, 348, 222);
 
-        const tableTop = 268;
+        const tableTop = 294;
         doc
             .roundedRect(48, tableTop, 500, 38, 8)
             .fill("#F3F4F6")
@@ -125,7 +126,7 @@ function createInvoiceBuffer(transaction: InvoiceTransaction) {
             .text(formatMoney(transaction.amount), 438, tableTop + 68, { width: 90, align: "right" });
 
         doc
-            .roundedRect(328, tableTop + 128, 220, 48, 8)
+            .roundedRect(328, tableTop + 126, 220, 52, 8)
             .fill("#21286E")
             .fillColor("#FFFFFF")
             .font("Helvetica")
