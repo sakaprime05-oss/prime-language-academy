@@ -8,6 +8,8 @@ export const PLA_SESSION = {
     whatsapp: "https://wa.me/2250161337864",
 };
 
+export const PLA_CLUB_CAPACITY = 26;
+
 export const PLA_PLANS = [
     { id: "loisir", label: "Loisir", freq: "1 séance / semaine", shortFreq: "1x/sem", price: 50000, top: false },
     { id: "essentiel", label: "Essentiel", freq: "2 séances / semaine", shortFreq: "2x/sem", price: 70000, top: false },

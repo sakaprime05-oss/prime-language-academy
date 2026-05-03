@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getDictionary, getLocale } from "@/lib/i18n";
 import { LangToggle } from "@/components/lang-toggle";
+import { prisma } from "@/lib/prisma";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     const session = await auth();
@@ -20,6 +21,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
     const dict = await getDictionary();
     const currentLang = await getLocale();
+    const student = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { registrationType: true },
+    });
+    const studentMode = student?.registrationType === "CLUB" ? "CLUB" : "FORMATION";
 
     // ===== LAYOUT ÉTUDIANT — Expérience immersive =====
     return (
@@ -35,11 +41,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
                     </div>
                     {/* Titre sidebar — Inter, pas Playfair (trop grand en sidebar) */}
                     <p className="text-lg font-black text-[var(--foreground)] tracking-tight" style={{fontFamily:'Inter,sans-serif'}}>Prime</p>
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary/60 mt-0.5">Language Academy</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary/60 mt-0.5">
+                        {studentMode === "CLUB" ? "English Club" : "Formation"}
+                    </p>
                 </div>
 
                 <div className="flex-1 overflow-y-auto px-4 mt-4">
-                    <StudentSidebarNav dict={dict.nav} />
+                    <StudentSidebarNav dict={dict.nav} mode={studentMode} />
                 </div>
 
                 <div className="p-6 m-4 mt-auto rounded-3xl bg-[var(--surface-hover)] border border-[var(--foreground)]/5 flex items-center gap-4">
@@ -48,7 +56,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
                     </div>
                     <div className="min-w-0 flex-1">
                         <p className="font-bold text-sm text-[var(--foreground)] truncate">{session.user.name || "Étudiant"}</p>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Étudiant</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">
+                            {studentMode === "CLUB" ? "Membre Club" : "Apprenant"}
+                        </p>
                     </div>
                     <LangToggle currentLang={currentLang} />
                 </div>
@@ -59,7 +69,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 <header className="sticky top-0 z-40 bg-[var(--surface)]/80 backdrop-blur-3xl border-b border-white/20 dark:border-white/5 px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between shadow-sm">
                     <div className="flex items-center gap-3">
                         <LogoMark className="w-10 h-10" />
-                        <h1 className="text-xl font-black text-[var(--foreground)]">Prime</h1>
+                        <div>
+                            <h1 className="text-lg font-black leading-none text-[var(--foreground)]">Prime</h1>
+                            <p className="text-[9px] font-black uppercase tracking-widest text-primary/60">
+                                {studentMode === "CLUB" ? "Club" : "Formation"}
+                            </p>
+                        </div>
                     </div>
                     <div className="flex items-center gap-3">
                         <LangToggle currentLang={currentLang} />
@@ -75,7 +90,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 </main>
 
                 {/* Bottom Navigation (Mobile — Student) */}
-                <StudentMobileNav dict={dict.nav} />
+                <StudentMobileNav dict={dict.nav} mode={studentMode} />
             </div>
 
             {/* Main Content (Desktop) */}
@@ -98,10 +113,10 @@ import Link from "next/link";
 import { LogoMark } from "@/components/logo";
 import { StudentSidebarNavClient, StudentMobileNavClient } from "@/components/student-nav";
 
-function StudentSidebarNav({ dict }: { dict: any }) {
-    return <StudentSidebarNavClient dict={dict} />;
+function StudentSidebarNav({ dict, mode }: { dict: any; mode: "FORMATION" | "CLUB" }) {
+    return <StudentSidebarNavClient dict={dict} mode={mode} />;
 }
 
-function StudentMobileNav({ dict }: { dict: any }) {
-    return <StudentMobileNavClient dict={dict} />;
+function StudentMobileNav({ dict, mode }: { dict: any; mode: "FORMATION" | "CLUB" }) {
+    return <StudentMobileNavClient dict={dict} mode={mode} />;
 }

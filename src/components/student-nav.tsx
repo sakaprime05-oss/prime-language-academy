@@ -3,21 +3,32 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logoutAction } from "@/app/actions/logout";
+import { motion } from "framer-motion";
 
-export function StudentSidebarNavClient({ dict }: { dict?: any }) {
+type StudentMode = "FORMATION" | "CLUB";
+
+export function StudentSidebarNavClient({ dict, mode = "FORMATION" }: { dict?: any; mode?: StudentMode }) {
     const pathname = usePathname();
 
     const getLabel = (key: string, fallback: string) => dict?.[key] || fallback;
 
-    const studentLinks = [
-        { href: "/dashboard/student", label: getLabel("dashboard", "Accueil"), icon: HomeIcon, exact: true },
-        { href: "/dashboard/student/courses", label: getLabel("courses", "Mes Cours"), icon: BookIcon },
-        { href: "/dashboard/student/forum", label: getLabel("forum", "Forum"), icon: ChatIcon },
-        { href: "/dashboard/student/club", label: getLabel("club", "English Club"), icon: ClubIcon },
-        { href: "/dashboard/student/appointments", label: getLabel("appointments", "Rendez-vous"), icon: ClockIcon },
-        { href: "/dashboard/student/messages", label: getLabel("messages", "Messagerie"), icon: MessageIcon },
-        { href: "/dashboard/student/profile", label: getLabel("profile", "Mon Profil"), icon: UserIcon },
-    ];
+    const studentLinks = mode === "CLUB"
+        ? [
+            { href: "/dashboard/student", label: "Accueil Club", icon: HomeIcon, exact: true },
+            { href: "/dashboard/student/club", label: "Club", icon: ClubIcon },
+            { href: "/dashboard/student/appointments", label: "Sessions", icon: ClockIcon },
+            { href: "/dashboard/student/forum", label: getLabel("forum", "Forum"), icon: ChatIcon },
+            { href: "/dashboard/student/messages", label: getLabel("messages", "Messagerie"), icon: MessageIcon },
+            { href: "/dashboard/student/profile", label: getLabel("profile", "Profil"), icon: UserIcon },
+        ]
+        : [
+            { href: "/dashboard/student", label: getLabel("dashboard", "Accueil"), icon: HomeIcon, exact: true },
+            { href: "/dashboard/student/courses", label: getLabel("courses", "Cours"), icon: BookIcon },
+            { href: "/dashboard/student/payments", label: "Paiements", icon: WalletIcon },
+            { href: "/dashboard/student/appointments", label: getLabel("appointments", "Rendez-vous"), icon: ClockIcon },
+            { href: "/dashboard/student/messages", label: getLabel("messages", "Messages"), icon: MessageIcon },
+            { href: "/dashboard/student/profile", label: getLabel("profile", "Profil"), icon: UserIcon },
+        ];
 
     return (
         <nav className="flex flex-col gap-2">
@@ -60,24 +71,29 @@ export function StudentSidebarNavClient({ dict }: { dict?: any }) {
     );
 }
 
-export function StudentMobileNavClient({ dict }: { dict?: any }) {
+export function StudentMobileNavClient({ dict, mode = "FORMATION" }: { dict?: any; mode?: StudentMode }) {
     const pathname = usePathname();
 
     const getLabel = (key: string, fallback: string) => dict?.[key] || fallback;
 
-    const studentLinks = [
-        { href: "/dashboard/student", label: getLabel("dashboard", "Accueil"), icon: HomeIcon, exact: true },
-        { href: "/dashboard/student/courses", label: getLabel("courses", "Mes Cours"), icon: BookIcon },
-        { href: "/dashboard/student/forum", label: getLabel("forum", "Forum"), icon: ChatIcon },
-        { href: "/dashboard/student/club", label: getLabel("club", "English Club"), icon: ClubIcon },
-        { href: "/dashboard/student/appointments", label: getLabel("appointments", "Rendez-vous"), icon: ClockIcon },
-        { href: "/dashboard/student/messages", label: getLabel("messages", "Messagerie"), icon: MessageIcon },
-        { href: "/dashboard/student/profile", label: getLabel("profile", "Mon Profil"), icon: UserIcon },
-    ];
+    const studentLinks = mode === "CLUB"
+        ? [
+            { href: "/dashboard/student", label: "Accueil", icon: HomeIcon, exact: true },
+            { href: "/dashboard/student/club", label: "Club", icon: ClubIcon },
+            { href: "/dashboard/student/appointments", label: "Sessions", icon: ClockIcon },
+            { href: "/dashboard/student/forum", label: "Forum", icon: ChatIcon },
+            { href: "/dashboard/student/profile", label: "Profil", icon: UserIcon },
+        ]
+        : [
+            { href: "/dashboard/student", label: "Accueil", icon: HomeIcon, exact: true },
+            { href: "/dashboard/student/courses", label: "Cours", icon: BookIcon },
+            { href: "/dashboard/student/payments", label: "Payer", icon: WalletIcon },
+            { href: "/dashboard/student/appointments", label: "RDV", icon: ClockIcon },
+            { href: "/dashboard/student/profile", label: "Profil", icon: UserIcon },
+        ];
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--surface)]/95 backdrop-blur-3xl border-t border-white/10 dark:border-white/5 flex items-stretch justify-around shadow-2xl shadow-black/20"
-            style={{paddingBottom: 'env(safe-area-inset-bottom, 0px)'}}>
+        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--surface)]/95 backdrop-blur-2xl border-t border-white/10 dark:border-white/5 grid grid-cols-5 shadow-[0_-10px_40px_rgba(0,0,0,0.08)] pb-[env(safe-area-inset-bottom)]">
             {studentLinks.map((link) => {
                 const isActive = link.exact
                     ? pathname === link.href
@@ -86,21 +102,25 @@ export function StudentMobileNavClient({ dict }: { dict?: any }) {
                     <Link
                         key={link.href}
                         href={link.href}
-                        className={`flex flex-col flex-1 items-center justify-center gap-1 px-1 py-2.5 mx-0.5 rounded-xl transition-all duration-200 min-w-0 ${
+                        className={`relative flex flex-col flex-1 items-center justify-center gap-1 px-1 py-3 mx-0.5 min-w-0 tap-highlight-transparent ${
                             isActive
                             ? "text-primary"
-                            : "text-[var(--foreground)]/45 hover:text-[var(--foreground)]/70 hover:bg-[var(--foreground)]/5"
+                            : "text-[var(--foreground)]/40 hover:text-[var(--foreground)]/70 active:scale-95 transition-all duration-200"
                         }`}
                     >
-                        <link.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'scale-110' : ''} transition-transform`} />
-                        <span className={`text-[9px] font-bold tracking-wide leading-tight truncate max-w-[90%] text-center mt-0.5 ${
+                        {isActive && (
+                            <motion.div
+                                layoutId="mobile-nav-active"
+                                className="absolute inset-0 bg-primary/10 rounded-2xl -z-10"
+                                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                            />
+                        )}
+                        <link.icon className={`w-6 h-6 flex-shrink-0 transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-md' : ''}`} />
+                        <span className={`text-[10px] font-bold tracking-wide leading-none truncate max-w-[90%] text-center mt-1 transition-colors duration-300 ${
                             isActive ? 'text-primary' : 'opacity-60'
                         }`}>
                             {link.label}
                         </span>
-                        {isActive && (
-                            <div className="w-3 h-0.5 bg-primary rounded-full animate-in zoom-in duration-300"></div>
-                        )}
                     </Link>
                 );
             })}
@@ -140,4 +160,8 @@ function ClubIcon(props: any) {
 
 function MessageIcon(props: any) {
     return <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>;
+}
+
+function WalletIcon(props: any) {
+    return <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a3 3 0 00-3-3H6a3 3 0 00-3 3v10a3 3 0 003 3h12a3 3 0 003-3v-5a3 3 0 00-3-3H7m10 4h.01" /></svg>;
 }

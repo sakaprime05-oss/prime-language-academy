@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { LogoMark } from "@/components/logo";
 import { OwlMascot } from "@/components/owl-mascot";
 import ThemeToggle from "@/components/ThemeToggle";
-import { PLA_FAQ, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, PLA_FAQ, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 /* ── tiny helpers ── */
 const PLANS = [
@@ -421,7 +421,7 @@ export default function ClientLanding({ session, systemSettings }: { session: an
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Left — concept */}
             <div className="lg:row-span-2" style={{ border:"1px solid #E7162A", borderRadius:24, padding:"48px 40px", background:"rgba(231,22,42,0.04)", backdropFilter:"blur(16px)", boxShadow:"0 0 40px rgba(231,22,42,0.08)" }}>
-              <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:20 }}>Cercle Privé · B2 → C2</div>
+              <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:20 }}>Cercle prive · {PLA_CLUB_CAPACITY} membres max · B2 → C2</div>
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:900, color:"#E7162A", marginBottom:20, lineHeight:1.2 }}>Un club social anglophone pour l'élite d'Abidjan</h3>
               <p style={{ color:"var(--muted-foreground)", lineHeight:1.85, fontSize:15, marginBottom:32 }}>
                 Pour ceux qui maîtrisent déjà l'anglais et veulent <strong style={{ color:"var(--foreground)" }}>le vivre au quotidien</strong>. Un cercle chic et connecté — cadres, entrepreneurs, créatifs, profils international — où la langue est un passeport social.

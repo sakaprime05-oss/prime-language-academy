@@ -28,6 +28,9 @@ export default async function RegisterPage() {
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/40 mt-1">
               Établissement d'excellence
             </p>
+            <p className="mx-auto mt-3 max-w-sm text-xs font-bold leading-6 text-[var(--foreground)]/55">
+              Inscription Formation reguliere. Le English Club dispose d'un parcours d'inscription separe.
+            </p>
           </div>
         </div>
 

@@ -3,15 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/app/actions/auth-actions";
-import { signIn } from "next-auth/react";
+import { PLA_PLANS, formatFcfa } from "@/lib/pla-program";
 
 const memberships = [
-    { id: "loisir", name: "Social (1x/sem)", price: "52 000 FCFA" },
-    { id: "essentiel", name: "Connect (2x/sem)", price: "72 000 FCFA" },
-    { id: "equilibre", name: "Network (3x/sem)", price: "92 000 FCFA" },
-    { id: "performance", name: "Executive (4x/sem)", price: "112 000 FCFA" },
-    { id: "intensif", name: "Elite (5x/sem)", price: "132 000 FCFA" },
-    { id: "immersion", name: "Founder (6x/sem)", price: "152 000 FCFA" }
+    { id: "loisir", name: "Social (1x/sem)", price: formatFcfa(PLA_PLANS[0].price) },
+    { id: "essentiel", name: "Connect (2x/sem)", price: formatFcfa(PLA_PLANS[1].price) },
+    { id: "equilibre", name: "Network (3x/sem)", price: formatFcfa(PLA_PLANS[2].price) },
+    { id: "performance", name: "Executive (4x/sem)", price: formatFcfa(PLA_PLANS[3].price) },
+    { id: "intensif", name: "Elite (5x/sem)", price: formatFcfa(PLA_PLANS[4].price) },
+    { id: "immersion", name: "Founder (6x/sem)", price: formatFcfa(PLA_PLANS[5].price) }
 ];
 
 const levels = ["Intermédiaire (B1/B2)", "Avancé (C1/C2)"];
@@ -23,7 +23,7 @@ const communes = [
     "Yopougon", "Autre"
 ];
 
-export default function RegisterClubForm() {
+export default function RegisterClubForm({ isWaitlistMode, remainingSeats }: { isWaitlistMode: boolean; remainingSeats: number }) {
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -112,6 +112,11 @@ export default function RegisterClubForm() {
             if (res?.error) {
                 setError(res.error);
                 setLoading(false);
+                return;
+            }
+
+            if (res.waitlisted) {
+                router.push("/register-club/waitlist");
                 return;
             }
 
@@ -220,8 +225,13 @@ export default function RegisterClubForm() {
 
             {step === 3 && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
+                    {isWaitlistMode && (
+                        <div className="rounded-2xl border border-amber-500/25 bg-amber-500/10 p-4 text-xs font-bold leading-6 text-amber-600">
+                            Le Club est complet. Vous pouvez continuer pour rejoindre la liste d'attente, sans paiement immediat.
+                        </div>
+                    )}
                     <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Choisissez votre Membership</label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {memberships.map(plan => (
                             <button type="button" key={plan.id} onClick={() => setFormData({ ...formData, planId: plan.id })}
                                 className={`p-4 rounded-xl border text-center transition-all ${
@@ -276,7 +286,13 @@ export default function RegisterClubForm() {
                     </button>
                 ) : (
                     <button type="submit" disabled={loading} className="flex-1 btn-primary text-xs uppercase tracking-widest py-4 disabled:opacity-50 flex justify-center items-center gap-2">
-                        {loading ? <span className="w-4 h-4 border-2 border-[#080808]/20 border-t-[#080808] rounded-full animate-spin"></span> : "Rejoindre le Cercle"}
+                        {loading ? (
+                            <span className="w-4 h-4 border-2 border-[#080808]/20 border-t-[#080808] rounded-full animate-spin"></span>
+                        ) : isWaitlistMode ? (
+                            "Rejoindre la liste d'attente"
+                        ) : (
+                            `Reserver ma place (${remainingSeats} restantes)`
+                        )}
                     </button>
                 )}
             </div>

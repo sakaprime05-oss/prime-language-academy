@@ -21,9 +21,34 @@ export default async function StudentDashboardPage() {
     const dict = fullDict.dashboard;
 
     const isClub = user?.registrationType === "CLUB";
+    const isWaitlisted = user?.status === "WAITLIST";
     const memberSince = user?.createdAt
         ? new Date(user.createdAt).toLocaleDateString('fr-FR')
         : "";
+
+    if (isClub && isWaitlisted) {
+        return (
+            <div className="pb-24">
+                <section className="glass-card border-amber-500/25 bg-amber-500/[0.04] p-6 sm:p-8">
+                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-500">Liste d'attente Club</p>
+                    <h1 className="mt-3 text-2xl sm:text-4xl font-black text-[var(--foreground)]">
+                        Votre demande Club est bien enregistree.
+                    </h1>
+                    <p className="mt-4 text-sm leading-7 text-[var(--foreground)]/60">
+                        The English Club est limite a 26 membres pour garder une experience premium. Vous serez contacte des qu'une place se libere ou qu'une nouvelle vague Club est ouverte.
+                    </p>
+                    <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <Link href="/english-club" className="rounded-2xl border border-amber-500/30 px-5 py-4 text-center text-xs font-black uppercase tracking-widest text-amber-500">
+                            Voir le Club
+                        </Link>
+                        <Link href="/dashboard/student/profile" className="rounded-2xl bg-amber-500 px-5 py-4 text-center text-xs font-black uppercase tracking-widest text-white">
+                            Mon profil
+                        </Link>
+                    </div>
+                </section>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">

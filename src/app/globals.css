@@ -282,6 +282,27 @@
   }
   .btn-primary:hover::after { @apply opacity-100; }
 
+  @media (max-width: 640px) {
+    .glass-card {
+      border-radius: 1.1rem;
+      padding: 1rem;
+    }
+
+    .input-field {
+      min-height: 3.25rem;
+      border-radius: 0.9rem;
+      font-size: 1rem;
+    }
+
+    .btn-primary {
+      width: 100%;
+      min-height: 3.25rem;
+      border-radius: 0.95rem;
+      padding-inline: 1rem;
+      font-size: 0.75rem;
+    }
+  }
+
   /* ── GOLD TEXT ── */
   .text-gold { color: var(--gold); }
   .gradient-gold {

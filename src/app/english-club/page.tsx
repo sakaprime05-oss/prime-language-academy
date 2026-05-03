@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PLA_CLUB_CAPACITY } from "@/lib/pla-program";
 
 
 const ACTIVITIES = [
@@ -103,7 +104,7 @@ export default function EnglishClubPublicPage() {
 
           {/* Divider with tags */}
           <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
-            {["Networking", "100% Anglais", "Niveau B2 → C2", "Abidjan", "Global Mindset"].map(t => (
+            {[`${PLA_CLUB_CAPACITY} membres max`, "Networking", "100% Anglais", "Niveau B2 → C2", "Abidjan", "Global Mindset"].map(t => (
               <span key={t} style={{ fontSize: 11, color: "rgba(245,240,232,0.35)", border: "1px solid rgba(231,22,42,0.12)", borderRadius: 100, padding: "5px 14px", letterSpacing: "0.1em", textTransform: "uppercase" }}>{t}</span>
             ))}
           </div>

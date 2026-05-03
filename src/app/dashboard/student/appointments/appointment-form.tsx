@@ -24,6 +24,8 @@ import { format, addMinutes, startOfHour, setHours, setMinutes } from "date-fns"
 import { fr } from "date-fns/locale";
 import { CalendarIcon, Clock } from "lucide-react";
 
+import { motion, type Variants } from "framer-motion";
+
 export function AppointmentForm() {
     const [loading, setLoading] = useState(false);
     const [date, setDate] = useState<Date | undefined>(undefined);
@@ -99,10 +101,29 @@ export function AppointmentForm() {
         return isPast || (day !== 2 && day !== 4);
     };
 
+    const containerVariants: Variants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants: Variants = {
+        hidden: { opacity: 0, y: 10 },
+        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+    };
+
     return (
-        <form onSubmit={onSubmit} className="flex flex-col gap-5">
-            <div className="flex flex-col gap-1.5">
-                <label className="label-sm">
+        <motion.form 
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            onSubmit={onSubmit} 
+            className="flex flex-col gap-6"
+        >
+            <motion.div variants={itemVariants} className="flex flex-col gap-2">
+                <label className="label-sm text-[var(--foreground)]/80">
                     Date souhaitée
                 </label>
                 <Popover>
@@ -110,15 +131,15 @@ export function AppointmentForm() {
                         <Button
                             variant={"outline"}
                             className={cn(
-                                "input-field justify-start text-left font-medium hover:bg-[var(--surface-hover)]",
+                                "input-field justify-start text-left font-medium hover:bg-[var(--surface-hover)] min-h-[3.5rem] text-base",
                                 !date && "text-muted-foreground"
                             )}
                         >
-                            <CalendarIcon className="mr-2 h-4 w-4 text-[#E7162A]" />
+                            <CalendarIcon className="mr-3 h-5 w-5 text-[#E7162A]" />
                             {date ? format(date, "PPP", { locale: fr }) : <span>Choisir une date</span>}
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 rounded-2xl shadow-xl border-[#21286E]/10" align="start">
+                    <PopoverContent className="w-auto p-0 rounded-3xl shadow-2xl border-[#21286E]/10" align="start">
                         <Calendar
                             mode="single"
                             selected={date}
@@ -126,46 +147,51 @@ export function AppointmentForm() {
                             disabled={isDateDisabled}
                             initialFocus
                             locale={fr}
+                            className="p-4"
                         />
                     </PopoverContent>
                 </Popover>
-                <p className="text-[10px] text-muted-foreground font-medium px-1">
+                <p className="text-xs text-muted-foreground font-medium px-1">
                     Les rendez-vous sont disponibles les Mardis et Jeudis.
                 </p>
-            </div>
+            </motion.div>
 
-            <div className="flex flex-col gap-1.5 mt-2">
-                <label className="label-sm">
+            <motion.div variants={itemVariants} className="flex flex-col gap-2">
+                <label className="label-sm text-[var(--foreground)]/80">
                     Heure (Créneaux de 30 min)
                 </label>
                 <Select disabled={!date} value={time} onValueChange={(value) => setTime(value ?? "")}>
-                    <SelectTrigger className="input-field hover:bg-[var(--surface-hover)]">
+                    <SelectTrigger className="input-field hover:bg-[var(--surface-hover)] min-h-[3.5rem] text-base">
                         <div className="flex items-center">
-                            <Clock className="mr-2 h-4 w-4 text-[#E7162A]" />
+                            <Clock className="mr-3 h-5 w-5 text-[#E7162A]" />
                             <SelectValue placeholder={date ? "Choisir une heure" : "Sélectionnez d'abord une date"} />
                         </div>
                     </SelectTrigger>
-                    <SelectContent className="rounded-xl border-[#21286E]/10">
+                    <SelectContent className="rounded-2xl border-[#21286E]/10 shadow-xl max-h-[60vh]">
                         {timeSlots.length > 0 ? (
                             timeSlots.map((slot) => (
-                                <SelectItem key={slot} value={slot} className="rounded-lg">
+                                <SelectItem key={slot} value={slot} className="rounded-xl py-3 text-base cursor-pointer">
                                     {slot.replace(':', 'h')}
                                 </SelectItem>
                             ))
                         ) : (
-                            <div className="p-2 text-xs text-center text-muted-foreground">Aucun créneau disponible</div>
+                            <div className="p-4 text-sm text-center text-muted-foreground">Aucun créneau disponible</div>
                         )}
                     </SelectContent>
                 </Select>
                 {date && (
-                    <p className="text-[10px] text-muted-foreground font-medium px-1">
+                    <motion.p 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        className="text-xs text-muted-foreground font-medium px-1"
+                    >
                         {date.getDay() === 2 ? "Horaires du Mardi : 10h - 14h" : "Horaires du Jeudi : 09h - 14h"}
-                    </p>
+                    </motion.p>
                 )}
-            </div>
+            </motion.div>
 
-            <div className="flex flex-col gap-1.5 mt-2">
-                <label htmlFor="reason" className="label-sm">
+            <motion.div variants={itemVariants} className="flex flex-col gap-2">
+                <label htmlFor="reason" className="label-sm text-[var(--foreground)]/80">
                     Motif du rendez-vous
                 </label>
                 <Textarea
@@ -174,17 +200,20 @@ export function AppointmentForm() {
                     onChange={(e) => setReason(e.target.value)}
                     rows={4}
                     placeholder="De quoi souhaitez-vous discuter ?"
-                    className="input-field resize-none"
+                    className="input-field resize-none text-base p-4 min-h-[120px] rounded-2xl"
                 />
-            </div>
+            </motion.div>
 
-            <button
+            <motion.button
+                variants={itemVariants}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading || !date || !time}
-                className="btn-primary w-full mt-4"
+                className="btn-primary w-full mt-4 min-h-[3.5rem] text-base font-bold shadow-lg shadow-primary/20 rounded-2xl"
             >
                 {loading ? "Réservation en cours..." : "Confirmer la réservation"}
-            </button>
-        </form>
+            </motion.button>
+        </motion.form>
     );
 }

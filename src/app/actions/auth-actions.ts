@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { sendWelcomeEmail, sendAdminNewRegistrationEmail } from "@/lib/email";
 import { notifyTelegram } from "@/lib/notify";
-import { PLA_PLANS } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, PLA_PLANS } from "@/lib/pla-program";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 const planPrices = Object.fromEntries(PLA_PLANS.map((plan) => [plan.id, plan.price])) as Record<string, number>;
@@ -117,6 +117,9 @@ export async function registerUser(formData: FormData) {
 
         if (existingUser) {
             if (existingUser.status !== "PENDING") {
+                if (existingUser.status === "WAITLIST" && existingUser.registrationType === "CLUB") {
+                    return { success: true, waitlisted: true, redirectUrl: "/register-club/waitlist" };
+                }
                 return { error: "Cet email est déjà utilisé." };
             }
 
@@ -156,6 +159,7 @@ export async function registerUser(formData: FormData) {
         } catch (e) { }
 
         const registrationType = onboardingParams.type === "CLUB" ? "CLUB" : "FORMATION";
+        const isClubRegistration = registrationType === "CLUB";
 
         const pedagogicalLevelName = onboardingParams.level || "Débutant";
         let level = await prisma.level.findFirst({
@@ -175,6 +179,41 @@ export async function registerUser(formData: FormData) {
         const totalAmount = planPrices[planId];
         if (!totalAmount) {
             return { error: "Formule invalide. Veuillez choisir une formule de formation." };
+        }
+
+        if (isClubRegistration) {
+            const currentClubMembers = await prisma.user.count({
+                where: {
+                    registrationType: "CLUB",
+                    status: { in: ["PENDING", "ACTIVE"] },
+                },
+            });
+
+            if (currentClubMembers >= PLA_CLUB_CAPACITY) {
+                const waitlistedUser = await prisma.user.create({
+                    data: {
+                        name,
+                        email: normalizedEmail,
+                        passwordHash: hashedPassword,
+                        role: "STUDENT",
+                        status: "WAITLIST",
+                        levelId: level?.id,
+                        onboardingData,
+                        registrationType,
+                    },
+                });
+
+                sendAdminNewRegistrationEmail(waitlistedUser.name || "Nouveau", waitlistedUser.email, "English Club - liste d'attente")
+                    .catch(err => console.error("Could not send admin waitlist email", err));
+
+                notifyTelegram("new_registration", {
+                    name: waitlistedUser.name,
+                    email: waitlistedUser.email,
+                    type: "CLUB_WAITLIST",
+                }).catch(err => console.error("Telegram waitlist notify failed", err));
+
+                return { success: true, waitlisted: true, redirectUrl: "/register-club/waitlist" };
+            }
         }
 
         const amountToPay = onboardingParams.paymentOption === "fractionne" ? totalAmount * 0.5 : totalAmount;
