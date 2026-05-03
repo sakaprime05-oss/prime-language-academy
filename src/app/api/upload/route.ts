@@ -23,6 +23,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Non autorise." }, { status: 401 });
         }
 
+        if (session.user.role !== "ADMIN" && session.user.role !== "TEACHER") {
+            return NextResponse.json({ error: "Upload reserve a l'equipe pedagogique." }, { status: 403 });
+        }
+
         const formData = await request.formData();
         const file = formData.get("file") as File;
 

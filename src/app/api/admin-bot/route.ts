@@ -2,11 +2,91 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendWelcomeEmail, sendInvoiceEmail, sendAccountActivatedEmail, sendEmail } from "@/lib/email";
 import { sanitizeHtml } from "@/lib/sanitize-html";
+import crypto from "crypto";
+
+function isValidAdminBotKey(apiKey: string | null) {
+    const expected = process.env.ADMIN_BOT_KEY;
+    if (!expected || !apiKey || expected.length < 24) return false;
+
+    const expectedBuffer = Buffer.from(expected);
+    const actualBuffer = Buffer.from(apiKey);
+    return expectedBuffer.length === actualBuffer.length && crypto.timingSafeEqual(expectedBuffer, actualBuffer);
+}
+
+async function validatePaymentFromBot(params: any) {
+    const { email, amount } = params;
+    const numericAmount = parseFloat(String(amount || "").replace(/\s/g, ""));
+    if (!email || !Number.isFinite(numericAmount) || numericAmount <= 0) {
+        return NextResponse.json({ error: "Parametres invalides" }, { status: 400 });
+    }
+
+    const student = await prisma.user.findUnique({
+        where: { email: String(email).toLowerCase().trim() },
+        include: {
+            paymentPlans: {
+                orderBy: { createdAt: "desc" },
+            },
+        },
+    });
+
+    if (!student) return NextResponse.json({ error: "Etudiant non trouve" }, { status: 404 });
+
+    const plan = student.paymentPlans[0];
+    if (!plan) {
+        return NextResponse.json({ error: "Aucun plan de paiement actif pour cet etudiant." }, { status: 400 });
+    }
+
+    const remaining = Math.max(0, plan.totalAmount - plan.amountPaid);
+    if (remaining <= 0) {
+        return NextResponse.json({ error: "Ce plan est deja solde." }, { status: 400 });
+    }
+
+    if (numericAmount > remaining) {
+        return NextResponse.json({ error: "Le montant depasse le solde restant." }, { status: 400 });
+    }
+
+    const newAmountPaid = plan.amountPaid + numericAmount;
+    const newStatus = newAmountPaid >= plan.totalAmount ? "PAID" : "PARTIAL";
+
+    const transaction = await prisma.$transaction(async (tx) => {
+        const createdTransaction = await tx.transaction.create({
+            data: {
+                planId: plan.id,
+                amount: numericAmount,
+                method: "MANUAL",
+                status: "COMPLETED",
+                referenceId: `BOT-VAL-${Date.now()}`,
+            },
+        });
+
+        await tx.paymentPlan.update({
+            where: { id: plan.id },
+            data: { amountPaid: newAmountPaid, status: newStatus },
+        });
+
+        await tx.user.update({
+            where: { id: student.id },
+            data: { status: "ACTIVE" },
+        });
+
+        return createdTransaction;
+    });
+
+    await Promise.all([
+        sendAccountActivatedEmail(student.email, student.name || "Etudiant"),
+        sendInvoiceEmail(student.email, student.name || "Etudiant", numericAmount, transaction.id),
+    ]);
+
+    return NextResponse.json({
+        success: true,
+        message: `Paiement de ${numericAmount} valide pour ${student.name}. Facture envoyee.`,
+    });
+}
 
 export async function POST(req: Request) {
     try {
         const apiKey = req.headers.get("x-api-key");
-        if (!process.env.ADMIN_BOT_KEY || apiKey !== process.env.ADMIN_BOT_KEY) {
+        if (!isValidAdminBotKey(apiKey)) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -123,64 +203,8 @@ export async function POST(req: Request) {
             }
 
             case "validate_payment": {
-                const { email, amount } = params;
-                const numericAmount = parseFloat(amount.toString().replace(/\s/g, ''));
-                if (!email || !Number.isFinite(numericAmount) || numericAmount <= 0) {
-                    return NextResponse.json({ error: "Paramètres invalides" }, { status: 400 });
-                }
+                return validatePaymentFromBot(params);
 
-                const student = await prisma.user.findUnique({
-                    where: { email },
-                    include: { paymentPlans: true }
-                });
-
-                if (!student) return NextResponse.json({ error: "Étudiant non trouvé" }, { status: 404 });
-                
-                let plan = student.paymentPlans[0];
-                
-                // Si pas de plan, on en crée un par défaut pour le niveau 1 (exemple)
-                if (!plan) {
-                    const firstLevel = await prisma.level.findFirst();
-                    plan = await prisma.paymentPlan.create({
-                        data: {
-                            studentId: student.id,
-                            totalAmount: numericAmount, // On suppose que le montant payé est le total si on n'a rien
-                            amountPaid: 0,
-                            status: "PARTIAL"
-                        }
-                    });
-                }
-
-                const transaction = await prisma.transaction.create({
-                    data: {
-                        planId: plan.id,
-                        amount: numericAmount,
-                        method: "MANUAL",
-                        status: "COMPLETED",
-                        referenceId: `BOT-VAL-${Date.now()}`
-                    }
-                });
-
-                const newAmountPaid = plan.amountPaid + numericAmount;
-                const newStatus = newAmountPaid >= plan.totalAmount ? "PAID" : "PARTIAL";
-
-                await Promise.all([
-                    prisma.paymentPlan.update({
-                        where: { id: plan.id },
-                        data: { amountPaid: newAmountPaid, status: newStatus }
-                    }),
-                    prisma.user.update({
-                        where: { id: student.id },
-                        data: { status: "ACTIVE" }
-                    }),
-                    sendAccountActivatedEmail(student.email, student.name || "Étudiant"),
-                    sendInvoiceEmail(student.email, student.name || "Étudiant", numericAmount, transaction.id)
-                ]);
-
-                return NextResponse.json({ 
-                    success: true, 
-                    message: `Paiement de ${numericAmount} validé pour ${student.name}. Facture envoyée.` 
-                });
             }
 
             case "send_welcome_messages": {
