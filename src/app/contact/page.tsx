@@ -1,213 +1,91 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, CalendarDays, Clock, Mail, MapPin, MessageCircle, Phone, ShieldCheck } from "lucide-react";
+import { PLA_SESSION } from "@/lib/pla-program";
 import { siteConfig } from "@/lib/site-config";
-import { PLA_SESSION, PLA_TIME_SLOTS } from "@/lib/pla-program";
 
-export const metadata: Metadata = {
-  title: "Contact | Prime Language Academy Abidjan",
-  description:
-    "Contactez Prime Language Academy à Abidjan Cocody Angré pour une inscription, un test de niveau, un rendez-vous ou une question sur la formation d'anglais.",
-  alternates: {
-    canonical: "/contact",
-  },
+export const metadata = {
+    title: "Contact | Prime Language Academy",
+    description: "Contacter Prime Language Academy a Abidjan: WhatsApp, telephone, localisation et rendez-vous consultant.",
 };
-
-const whatsappMessage = encodeURIComponent(
-  "Bonjour Prime Language Academy, je souhaite avoir des informations sur la formation d'anglais."
-);
-
-const contactActions = [
-  {
-    label: "WhatsApp",
-    value: siteConfig.contact.phone,
-    href: `${siteConfig.links.whatsapp}?text=${whatsappMessage}`,
-    icon: MessageCircle,
-    tone: "primary",
-  },
-  {
-    label: "Appel direct",
-    value: siteConfig.contact.phone,
-    href: `tel:${siteConfig.contact.phone.replace(/\s/g, "")}`,
-    icon: Phone,
-    tone: "neutral",
-  },
-  {
-    label: "Email administratif",
-    value: siteConfig.contact.email,
-    href: `mailto:${siteConfig.contact.email}`,
-    icon: Mail,
-    tone: "neutral",
-  },
-];
-
-const quickLinks = [
-  { label: "S'inscrire", href: "/register", detail: "Réserver une place pour la session de lancement" },
-  { label: "Test de niveau", href: "/placement-test", detail: "Évaluer son niveau avant de choisir un parcours" },
-  { label: "Rendez-vous", href: "/rendez-vous", detail: "Planifier un échange avec un conseiller" },
-  { label: "Programme", href: "/programme", detail: "Voir les horaires, tarifs et formules disponibles" },
-];
 
 export default function ContactPage() {
-  return (
-    <main className="min-h-screen overflow-x-hidden bg-[var(--background)] text-[var(--foreground)]">
-      <section className="border-b border-[var(--border)] px-6 py-6 sm:px-8">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-          <Link href="/" className="text-sm font-black uppercase tracking-[0.18em] text-[var(--foreground)]">
-            Prime Academy
-          </Link>
-          <Link
-            href="/register"
-            className="inline-flex items-center gap-2 rounded-full bg-[#E7162A] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-white shadow-sm transition hover:bg-[#c51224]"
-          >
-            Inscription
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </section>
+    const whatsappText = encodeURIComponent("Bonjour Prime Language Academy, je souhaite avoir des informations sur la session 2026.");
 
-      <section className="px-5 py-14 sm:px-8 sm:py-16 lg:py-20">
-        <div className="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-          <div className="min-w-0">
-            <p className="mb-5 text-xs font-black uppercase tracking-[0.22em] text-[#E7162A]">
-              Contact & orientation
-            </p>
-            <h1 className="max-w-3xl break-words text-3xl font-black leading-[1.08] tracking-normal sm:text-5xl lg:text-6xl">
-              Parlez-nous de votre objectif en anglais.
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-[var(--muted-foreground)] sm:text-lg">
-              Pour une inscription, un test de niveau, un rendez-vous ou une question sur les formules, WhatsApp reste le
-              canal le plus rapide. L'équipe vous oriente vers le bon parcours selon votre niveau, votre disponibilité et
-              votre objectif.
-            </p>
+    return (
+        <main className="min-h-screen bg-[#080808] px-6 py-24 text-[#F5F0E8]">
+            <div className="mx-auto max-w-5xl space-y-12">
+                <header className="max-w-3xl space-y-5">
+                    <Link href="/" className="text-sm font-bold uppercase tracking-[0.18em] text-[#E7162A] hover:underline">
+                        Retour accueil
+                    </Link>
+                    <p className="text-xs font-black uppercase tracking-[0.25em] text-[#E7162A]">Contact et reservation</p>
+                    <h1 className="font-serif text-4xl font-black leading-tight md:text-6xl">
+                        Parlons de votre objectif en anglais.
+                    </h1>
+                    <p className="text-lg leading-8 text-[#F5F0E8]/60">
+                        Un consultant PLA peut vous orienter vers la formule, le niveau et la vague horaire les plus adaptes.
+                    </p>
+                </header>
 
-            <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <a
-                href={`${siteConfig.links.whatsapp}?text=${whatsappMessage}`}
-                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#E7162A] px-5 py-3 text-sm font-black uppercase tracking-[0.08em] text-white shadow-sm transition hover:bg-[#c51224] sm:w-auto sm:px-6 sm:tracking-[0.1em]"
-              >
-                <MessageCircle className="h-4 w-4" />
-                Écrire sur WhatsApp
-              </a>
-              <Link
-                href="/rendez-vous"
-                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-[var(--border)] px-5 py-3 text-sm font-black uppercase tracking-[0.08em] text-[var(--foreground)] transition hover:border-[#E7162A] hover:text-[#E7162A] sm:w-auto sm:px-6 sm:tracking-[0.1em]"
-              >
-                <CalendarDays className="h-4 w-4" />
-                Prendre rendez-vous
-              </Link>
+                <section className="grid gap-6 md:grid-cols-3">
+                    <article className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-7">
+                        <p className="mb-2 text-xs font-black uppercase tracking-[0.2em] text-[#E7162A]">WhatsApp</p>
+                        <h2 className="text-2xl font-black">{PLA_SESSION.phone}</h2>
+                        <p className="mt-3 text-sm leading-7 text-[#F5F0E8]/55">Le canal le plus rapide pour poser une question ou demander un rendez-vous.</p>
+                        <a
+                            href={`${PLA_SESSION.whatsapp}?text=${whatsappText}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-6 inline-flex rounded-full bg-[#25D366] px-5 py-3 text-sm font-black uppercase tracking-widest text-black"
+                        >
+                            Ecrire sur WhatsApp
+                        </a>
+                    </article>
+
+                    <article className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-7">
+                        <p className="mb-2 text-xs font-black uppercase tracking-[0.2em] text-[#E7162A]">Rendez-vous</p>
+                        <h2 className="text-2xl font-black">Mardi et jeudi</h2>
+                        <p className="mt-3 text-sm leading-7 text-[#F5F0E8]/55">
+                            Mardi 10h-14h et jeudi 9h-14h, en visio ou vocal, avec un consultant et le responsable du programme.
+                        </p>
+                        <Link href="/rendez-vous" className="mt-6 inline-flex rounded-full border border-[#E7162A]/40 px-5 py-3 text-sm font-black uppercase tracking-widest text-[#E7162A]">
+                            Prendre rendez-vous
+                        </Link>
+                    </article>
+
+                    <article className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-7">
+                        <p className="mb-2 text-xs font-black uppercase tracking-[0.2em] text-[#E7162A]">Adresse</p>
+                        <h2 className="text-2xl font-black">Cocody Angre</h2>
+                        <p className="mt-3 text-sm leading-7 text-[#F5F0E8]/55">
+                            {PLA_SESSION.location}. {PLA_SESSION.locationHint}.
+                        </p>
+                        <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(PLA_SESSION.location)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-6 inline-flex rounded-full border border-[#E7162A]/40 px-5 py-3 text-sm font-black uppercase tracking-widest text-[#E7162A]"
+                        >
+                            Voir la carte
+                        </a>
+                    </article>
+                </section>
+
+                <section className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-8">
+                    <h2 className="mb-4 text-2xl font-black">Avant de nous contacter</h2>
+                    <div className="grid gap-4 text-sm leading-7 text-[#F5F0E8]/60 md:grid-cols-3">
+                        <p><strong className="text-[#F5F0E8]">Test gratuit:</strong> utile si vous ne connaissez pas encore votre niveau.</p>
+                        <p><strong className="text-[#F5F0E8]">Programme:</strong> la session 2026 dure 2 mois, du 21 juin au 19 aout.</p>
+                        <p><strong className="text-[#F5F0E8]">Email:</strong> {siteConfig.contact.email}</p>
+                    </div>
+                    <div className="mt-7 flex flex-wrap gap-3">
+                        <Link href="/placement-test" className="rounded-full border border-[#E7162A]/40 px-6 py-3 text-sm font-black uppercase tracking-widest text-[#E7162A]">
+                            Faire le test
+                        </Link>
+                        <Link href="/programme" className="rounded-full bg-[#E7162A] px-6 py-3 text-sm font-black uppercase tracking-widest text-black">
+                            Voir le programme
+                        </Link>
+                    </div>
+                </section>
             </div>
-          </div>
-
-          <div className="min-w-0 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-sm sm:p-6">
-            <div className="grid gap-3">
-              {contactActions.map((action) => {
-                const Icon = action.icon;
-
-                return (
-                  <a
-                    key={action.label}
-                    href={action.href}
-                    className={`group flex min-w-0 max-w-full items-center gap-4 overflow-hidden rounded-xl border p-4 transition ${
-                      action.tone === "primary"
-                        ? "border-[#E7162A]/30 bg-[#E7162A]/10"
-                        : "border-[var(--border)] bg-[var(--background)]"
-                    }`}
-                  >
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--background)] text-[#E7162A] ring-1 ring-[var(--border)]">
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block text-xs font-black uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
-                        {action.label}
-                      </span>
-                      <span className="mt-1 block break-all text-sm font-bold text-[var(--foreground)] group-hover:text-[#E7162A]">
-                        {action.value}
-                      </span>
-                    </span>
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-y border-[var(--border)] bg-[var(--surface)] px-6 py-12 sm:px-8">
-        <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
-          <InfoPanel
-            icon={MapPin}
-            title="Adresse"
-            value={siteConfig.contact.address}
-            detail={`${PLA_SESSION.location}. ${PLA_SESSION.locationHint}.`}
-          />
-          <InfoPanel
-            icon={Clock}
-            title="Horaires des cours"
-            value={PLA_TIME_SLOTS.map((slot) => `${slot.label}: ${slot.time}`).join(" | ")}
-            detail="Rattrapage possible selon disponibilité et organisation de la semaine."
-          />
-          <InfoPanel
-            icon={ShieldCheck}
-            title="Session en cours"
-            value={PLA_SESSION.dates}
-            detail="Inscription offerte pour la session de lancement, place confirmée après validation du dossier."
-          />
-        </div>
-      </section>
-
-      <section className="px-6 py-14 sm:px-8">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-7 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#E7162A]">Accès rapide</p>
-              <h2 className="mt-3 text-2xl font-black tracking-normal sm:text-3xl">Choisissez la prochaine action</h2>
-            </div>
-            <p className="max-w-xl text-sm leading-7 text-[var(--muted-foreground)]">
-              Les demandes d'inscription et de rendez-vous passent par des formulaires dédiés pour éviter les oublis.
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {quickLinks.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="group rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-sm transition hover:border-[#E7162A]/60 hover:shadow-md"
-              >
-                <span className="block text-lg font-black text-[var(--foreground)] group-hover:text-[#E7162A]">
-                  {item.label}
-                </span>
-                <span className="mt-3 block text-sm leading-6 text-[var(--muted-foreground)]">{item.detail}</span>
-                <span className="mt-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.12em] text-[#E7162A]">
-                  Ouvrir
-                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-    </main>
-  );
-}
-
-type InfoPanelProps = {
-  icon: typeof MapPin;
-  title: string;
-  value: string;
-  detail: string;
-};
-
-function InfoPanel({ icon: Icon, title, value, detail }: InfoPanelProps) {
-  return (
-    <div className="rounded-2xl border border-[var(--border)] bg-[var(--background)] p-5 shadow-sm">
-      <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-full bg-[#E7162A]/10 text-[#E7162A]">
-        <Icon className="h-5 w-5" />
-      </div>
-      <h2 className="text-xs font-black uppercase tracking-[0.16em] text-[var(--muted-foreground)]">{title}</h2>
-      <p className="mt-3 text-base font-black leading-7 text-[var(--foreground)]">{value}</p>
-      <p className="mt-3 text-sm leading-6 text-[var(--muted-foreground)]">{detail}</p>
-    </div>
-  );
+        </main>
+    );
 }

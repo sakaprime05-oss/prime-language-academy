@@ -13,7 +13,7 @@ export const siteConfig = {
   },
   themeColor: "#E7162A",
   contact: {
-    email: "contact@primelanguageacademy.com",
+    email: "contact@primelangageacademy.com",
     phone: "+225 01 61 33 78 64",
     address: "Cocody Angré 8e Tranche, Zone Bon Prix, Abidjan",
   },

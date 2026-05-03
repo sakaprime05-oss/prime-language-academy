@@ -7,6 +7,24 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  name: siteConfig.name,
+  url: siteConfig.url,
+  logo: siteConfig.ogImage,
+  description: siteConfig.description,
+  telephone: siteConfig.contact.phone,
+  email: siteConfig.contact.email,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: siteConfig.contact.address,
+    addressLocality: "Abidjan",
+    addressCountry: "CI",
+  },
+  sameAs: [siteConfig.links.whatsapp],
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: `${siteConfig.shortName} | Hub d'Excellence 2026`,
@@ -56,6 +74,10 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content={siteConfig.shortName} />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         {/* Theme script to prevent flash */}
         <script
           dangerouslySetInnerHTML={{

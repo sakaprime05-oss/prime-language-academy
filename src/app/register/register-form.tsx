@@ -520,7 +520,12 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
                             <label className="flex items-start gap-3 p-3 cursor-pointer group">
                                 <input type="checkbox" name="agreement" checked={formData.agreement} onChange={handleChange} className="accent-primary mt-1" />
-                                <span className="text-xs text-[var(--foreground)]/80 group-hover:text-[var(--foreground)] font-bold transition-colors">Je confirme mon inscription au programme English Mastery et m'engage à respecter les règles de participation.</span>
+                                <span className="text-xs text-[var(--foreground)]/80 group-hover:text-[var(--foreground)] font-bold transition-colors">
+                                    Je confirme mon inscription au programme English Mastery et j'accepte les{" "}
+                                    <Link href="/conditions-generales" target="_blank" className="text-primary underline underline-offset-4">conditions generales</Link>, la{" "}
+                                    <Link href="/politique-confidentialite" target="_blank" className="text-primary underline underline-offset-4">politique de confidentialite</Link> et la{" "}
+                                    <Link href="/politique-remboursement" target="_blank" className="text-primary underline underline-offset-4">politique de remboursement</Link>.
+                                </span>
                             </label>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">

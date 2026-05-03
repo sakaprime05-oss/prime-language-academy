@@ -482,7 +482,9 @@ export default function ClientLanding({ session, systemSettings }: { session: an
           <Link href="/blog" style={{ color:"inherit", textDecoration:"none" }}>Blog</Link>
           <Link href="/english-club" style={{ color:"#E7162A", textDecoration:"none" }}>English Club</Link>
           <Link href="/placement-test" style={{ color:"inherit", textDecoration:"none" }}>Test</Link>
-          <Link href="/mentions-legales" style={{ color:"inherit", textDecoration:"none" }}>Mentions légales</Link>
+          <Link href="/conditions-generales" style={{ color:"inherit", textDecoration:"none" }}>CGV</Link>
+          <Link href="/politique-confidentialite" style={{ color:"inherit", textDecoration:"none" }}>Confidentialite</Link>
+          <Link href="/mentions-legales" style={{ color:"inherit", textDecoration:"none" }}>Mentions legales</Link>
           <Link href="/login" style={{ color:"inherit", textDecoration:"none" }}>Connexion</Link>
         </div>
         <div style={{ fontSize:11, color:"var(--muted-foreground)", letterSpacing:"0.1em" }}>© 2026 Prime Language Academy</div>
