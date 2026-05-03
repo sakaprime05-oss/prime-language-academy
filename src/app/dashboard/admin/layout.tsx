@@ -52,9 +52,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                             <p className="text-[9px] font-bold uppercase tracking-widest" style={{ color: "rgba(231,22,42,0.6)" }}>Administrateur</p>
                         </div>
                         <form action={logoutAction}>
-                            <button type="submit" title="Déconnexion" className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110" style={{ color: "rgba(255,255,255,0.3)" }}
-                                onMouseEnter={(e) => (e.currentTarget.style.color = "#E7162A")}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}>
+                            <button
+                                type="submit"
+                                title="Déconnexion"
+                                className="flex h-7 w-7 items-center justify-center rounded-lg text-white/30 transition-all hover:scale-110 hover:text-[#E7162A]"
+                            >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                 </svg>
