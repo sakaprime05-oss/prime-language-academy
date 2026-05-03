@@ -1,6 +1,8 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import PDFDocument from "pdfkit";
+import { existsSync } from "fs";
+import { join } from "path";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -38,10 +40,11 @@ function clean(value: string | null | undefined) {
 function createInvoiceBuffer(transaction: InvoiceTransaction) {
     return new Promise<Buffer>((resolve, reject) => {
         const chunks: Buffer[] = [];
-        const doc = new PDFDocument({ size: "A4", margin: 48, info: { Title: "Facture Prime Language Academy" } });
+        const doc = new PDFDocument({ size: "A4", margin: 48, info: { Title: "Recu Prime Language Academy" } });
         const student = transaction.paymentPlan.student;
-        const invoiceNumber = transaction.id.split("-")[0].toUpperCase();
+        const receiptNumber = transaction.id.split("-")[0].toUpperCase();
         const method = clean(transaction.provider || transaction.method);
+        const logoPath = join(process.cwd(), "public", "logo.png");
 
         doc.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
         doc.on("error", reject);
@@ -51,15 +54,25 @@ function createInvoiceBuffer(transaction: InvoiceTransaction) {
             .rect(0, 0, doc.page.width, 112)
             .fill("#21286E");
 
+        if (existsSync(logoPath)) {
+            doc.image(logoPath, 48, 24, { width: 88, height: 64, fit: [88, 64] });
+        } else {
+            doc
+                .fillColor("#FFFFFF")
+                .font("Helvetica-Bold")
+                .fontSize(18)
+                .text("Prime", 48, 32);
+        }
+
         doc
             .fillColor("#FFFFFF")
             .font("Helvetica-Bold")
-            .fontSize(22)
-            .text("Prime Language Academy", 48, 34)
+            .fontSize(20)
+            .text("Prime Language Academy", 150, 32)
             .font("Helvetica")
             .fontSize(10)
-            .text("Abidjan, Angre 8e Tranche - Cote d'Ivoire", 48, 64)
-            .text("Tel: +225 01 61 33 78 64", 48, 80);
+            .text("Abidjan, Angre 8e Tranche - Cote d'Ivoire", 150, 62)
+            .text("Tel: +225 01 61 33 78 64", 150, 78);
 
         doc
             .fillColor("#FFFFFF")
@@ -68,13 +81,13 @@ function createInvoiceBuffer(transaction: InvoiceTransaction) {
             .text("RECU DE PAIEMENT", 360, 38, { align: "right" })
             .font("Helvetica")
             .fontSize(10)
-            .text(`N. ${invoiceNumber}`, 360, 66, { align: "right" });
+            .text(`N. ${receiptNumber}`, 360, 66, { align: "right" });
 
         doc
             .fillColor("#111827")
             .font("Helvetica-Bold")
             .fontSize(12)
-            .text("Facture a", 48, 150)
+            .text("Recu pour", 48, 150)
             .font("Helvetica")
             .fontSize(10)
             .fillColor("#374151")
@@ -129,20 +142,6 @@ function createInvoiceBuffer(transaction: InvoiceTransaction) {
             .text(formatMoney(transaction.amount), 430, tableTop + 140, { width: 98, align: "right" });
 
         doc
-            .fillColor("#374151")
-            .font("Helvetica-Bold")
-            .fontSize(11)
-            .text("Note", 48, tableTop + 224)
-            .font("Helvetica")
-            .fontSize(10)
-            .text(
-                "Merci pour votre confiance. Ce recu est genere electroniquement par Prime Language Academy et tient lieu de justificatif de paiement.",
-                48,
-                tableTop + 246,
-                { width: 500, lineGap: 4 }
-            );
-
-        doc
             .moveTo(48, 760)
             .lineTo(548, 760)
             .strokeColor("#E5E7EB")
@@ -174,7 +173,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
     try {
         const pdfBuffer = await createInvoiceBuffer(transaction);
-        const invoiceNumber = transaction.id.split("-")[0].toUpperCase();
+        const receiptNumber = transaction.id.split("-")[0].toUpperCase();
 
         const pdfBody = new Uint8Array(pdfBuffer);
 
@@ -182,7 +181,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
             status: 200,
             headers: {
                 "Content-Type": "application/pdf",
-                "Content-Disposition": `attachment; filename="Facture_PRIME_${invoiceNumber}.pdf"`,
+                "Content-Disposition": `attachment; filename="Recu_PRIME_${receiptNumber}.pdf"`,
                 "Cache-Control": "private, no-store",
             },
         });
