@@ -66,6 +66,21 @@ export default async function RegisterClubPage() {
             </div>
           </div>
 
+          <div className="mb-6 grid gap-3 sm:grid-cols-2">
+            <Link href="/register" className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4 transition-colors hover:border-primary/40 hover:bg-primary/10">
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-primary">Formation</p>
+              <p className="mt-2 text-sm font-bold leading-6 text-[var(--foreground)]/60">
+                Cours structures, niveau, progression et accompagnement pedagogique.
+              </p>
+            </Link>
+            <div className="rounded-2xl border border-secondary/25 bg-secondary/10 p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-secondary">English Club</p>
+              <p className="mt-2 text-sm font-bold leading-6 text-[var(--foreground)]/75">
+                Pratique conversationnelle, communaute privee et places limitees.
+              </p>
+            </div>
+          </div>
+
           <RegisterClubForm isWaitlistMode={isWaitlistMode} remainingSeats={remainingSeats} />
 
           <div className="pt-8 flex flex-col items-center gap-4">

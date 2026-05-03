@@ -28,10 +28,22 @@ export default async function RegisterPage() {
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/40 mt-1">
               Établissement d'excellence
             </p>
-            <p className="mx-auto mt-3 max-w-sm text-xs font-bold leading-6 text-[var(--foreground)]/55">
-              Inscription Formation reguliere. Le English Club dispose d'un parcours d'inscription separe.
+          </div>
+        </div>
+
+        <div className="mb-6 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-2xl border border-primary/25 bg-primary/10 p-4">
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-primary">Formation</p>
+            <p className="mt-2 text-sm font-bold leading-6 text-[var(--foreground)]/75">
+              Programme structure pour progresser en anglais avec un niveau, des cours et un suivi pedagogique.
             </p>
           </div>
+          <Link href="/register-club" className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4 transition-colors hover:border-secondary/40 hover:bg-secondary/10">
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-secondary">English Club</p>
+            <p className="mt-2 text-sm font-bold leading-6 text-[var(--foreground)]/60">
+              Espace membership pour pratiquer, echanger et rejoindre une communaute limitee a 26 membres.
+            </p>
+          </Link>
         </div>
 
         <RegisterForm systemSettings={systemSettings} />

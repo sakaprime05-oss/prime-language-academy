@@ -24,7 +24,8 @@ async function initializePaystackCheckout(input: PaystackInitInput) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
 
     if (!secretKey) {
-        return { error: "Erreur de configuration: clé API Paystack manquante sur le serveur." };
+        console.error("[Registration] Missing PAYSTACK_SECRET_KEY");
+        return { error: "Le paiement n'a pas pu etre lance pour le moment. Contactez l'administration pour finaliser votre inscription." };
     }
 
     const paystackResponse = await fetch(PAYSTACK_API_URL, {
@@ -50,7 +51,8 @@ async function initializePaystackCheckout(input: PaystackInitInput) {
     const paystackData = await paystackResponse.json();
 
     if (!paystackData.status || !paystackData.data?.authorization_url) {
-        return { error: `Erreur Paystack: ${paystackData.message || "Impossible d'initialiser le paiement"}` };
+        console.error("[Registration] Paystack initialization failed:", paystackData.message || paystackData);
+        return { error: "Le paiement n'a pas pu etre lance pour le moment. Verifiez vos informations ou contactez l'administration." };
     }
 
     return { redirectUrl: paystackData.data.authorization_url as string };
