@@ -54,25 +54,15 @@ function createInvoiceBuffer(transaction: InvoiceTransaction) {
             .rect(0, 0, doc.page.width, 112)
             .fill("#21286E");
 
-        if (existsSync(logoPath)) {
-            doc.image(logoPath, 48, 24, { width: 88, height: 64, fit: [88, 64] });
-        } else {
-            doc
-                .fillColor("#FFFFFF")
-                .font("Helvetica-Bold")
-                .fontSize(18)
-                .text("Prime", 48, 32);
-        }
-
         doc
             .fillColor("#FFFFFF")
             .font("Helvetica-Bold")
-            .fontSize(20)
-            .text("Prime Language Academy", 150, 32)
+            .fontSize(22)
+            .text("Prime Language Academy", 48, 34)
             .font("Helvetica")
             .fontSize(10)
-            .text("Abidjan, Angre 8e Tranche - Cote d'Ivoire", 150, 62)
-            .text("Tel: +225 01 61 33 78 64", 150, 78);
+            .text("Abidjan, Angre 8e Tranche - Cote d'Ivoire", 48, 64)
+            .text("Tel: +225 01 61 33 78 64", 48, 80);
 
         doc
             .fillColor("#FFFFFF")
@@ -82,6 +72,10 @@ function createInvoiceBuffer(transaction: InvoiceTransaction) {
             .font("Helvetica")
             .fontSize(10)
             .text(`N. ${receiptNumber}`, 360, 66, { align: "right" });
+
+        if (existsSync(logoPath)) {
+            doc.image(logoPath, 500, 24, { width: 42 });
+        }
 
         doc
             .fillColor("#111827")
