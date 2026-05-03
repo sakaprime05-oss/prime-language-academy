@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import {
   Select,
   SelectContent,
@@ -126,8 +126,8 @@ export function AppointmentForm() {
                 <label className="label-sm text-[var(--foreground)]/80">
                     Date souhaitée
                 </label>
-                <Popover>
-                    <PopoverTrigger asChild>
+                <Drawer>
+                    <DrawerTrigger asChild>
                         <Button
                             variant={"outline"}
                             className={cn(
@@ -138,8 +138,9 @@ export function AppointmentForm() {
                             <CalendarIcon className="mr-3 h-5 w-5 text-[#E7162A]" />
                             {date ? format(date, "PPP", { locale: fr }) : <span>Choisir une date</span>}
                         </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 rounded-3xl shadow-2xl border-[#21286E]/10" align="start">
+                    </DrawerTrigger>
+                    <DrawerContent className="px-4 pb-8 pt-4 rounded-t-3xl border-[#21286E]/10 flex flex-col items-center shadow-2xl">
+                        <div className="w-12 h-1.5 rounded-full bg-muted/60 mb-6 mx-auto"></div>
                         <Calendar
                             mode="single"
                             selected={date}
@@ -147,10 +148,10 @@ export function AppointmentForm() {
                             disabled={isDateDisabled}
                             initialFocus
                             locale={fr}
-                            className="p-4"
+                            className="bg-transparent border-none p-0 scale-105 transform origin-top w-full flex justify-center"
                         />
-                    </PopoverContent>
-                </Popover>
+                    </DrawerContent>
+                </Drawer>
                 <p className="text-xs text-muted-foreground font-medium px-1">
                     Les rendez-vous sont disponibles les Mardis et Jeudis.
                 </p>
