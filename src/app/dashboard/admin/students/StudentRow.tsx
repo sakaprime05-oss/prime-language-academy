@@ -42,6 +42,8 @@ export default function StudentRow({ student, levels }: StudentRowProps) {
             case "ACTIVE": return "bg-green-500/10 text-green-600";
             case "SUSPENDED": return "bg-yellow-500/10 text-yellow-600";
             case "BLOCKED": return "bg-red-500/10 text-red-600";
+            case "WAITLIST": return "bg-amber-500/10 text-amber-600";
+            case "PENDING": return "bg-blue-500/10 text-blue-600";
             default: return "bg-gray-500/10 text-gray-600";
         }
     };
@@ -62,6 +64,9 @@ export default function StudentRow({ student, levels }: StudentRowProps) {
                 {/* Status Badge */}
                 <div className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider ${getStatusColor(status)}`}>
                     {status}
+                </div>
+                <div className="text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider bg-[var(--foreground)]/5 text-[var(--foreground)]/45">
+                    {student.registrationType === "CLUB" ? "Club" : "Formation"}
                 </div>
 
                 {/* Level Selection */}

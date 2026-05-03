@@ -132,7 +132,7 @@ model Transaction {
   planId        String
   paymentPlan   PaymentPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
   amount        Float
-  method        String      @default("PAYTECH")
+  method        String      @default("PAYSTACK")
   referenceId   String?     @unique // External reference ID from Pawapay
   provider      String?     // ORANGE, MTN, MOOV, WAVE
   failureReason String?     // Error message from Pawapay

@@ -256,6 +256,29 @@ export async function sendAdminNewRegistrationEmail(studentName: string, student
     return sendEmail({ to: adminEmail(), subject: title, html: emailLayout(title, body) });
 }
 
+export async function sendClubSeatAvailableEmail(to: string, name: string, planName: string, amount: number) {
+    const title = "Une place est disponible au English Club";
+    const body = `
+        ${paragraph(`Bonjour ${escapeHtml(name || "cher membre")},`)}
+        ${paragraph("Bonne nouvelle : une place vient de se liberer au English Club. Votre demande quitte la liste d'attente et vous pouvez maintenant finaliser votre inscription.")}
+        ${detailRows([
+            ["Formule Club", escapeHtml(planName || "Membership Club")],
+            ["Montant a regler", money(amount)],
+            ["Paiement", "Paystack securise"],
+        ])}
+        ${paragraph("Connectez-vous avec l'email et le mot de passe utilises lors de votre demande. Le montant a payer est calcule par la plateforme et ne peut pas etre modifie par le client.")}
+        ${button("Finaliser mon paiement", `${appUrl()}/dashboard/student/payments`, brand.color)}
+        ${paragraph("Si vous n'etes plus interesse, vous pouvez simplement ignorer ce message ou contacter l'administration.")}
+    `;
+    return sendEmail({
+        to,
+        subject: title,
+        html: emailLayout(title, body, {
+            preheader: "Votre place au English Club est disponible. Finalisez votre paiement Paystack.",
+        }),
+    });
+}
+
 export async function sendAdminPaymentProofEmail(studentName: string, provider: string, phone: string, amount: number) {
     const title = "Preuve de paiement à vérifier";
     const body = `
