@@ -1,24 +1,168 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import PDFDocument from "pdfkit";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+
+export const runtime = "nodejs";
+
+type InvoiceTransaction = NonNullable<Awaited<ReturnType<typeof getCompletedTransaction>>>;
+
+async function getCompletedTransaction(id: string) {
+    return prisma.transaction.findUnique({
+        where: { id },
+        include: {
+            paymentPlan: {
+                include: { student: { include: { level: true } } },
+            },
+        },
+    });
+}
+
+function formatMoney(amount: number) {
+    return `${Number(amount || 0).toLocaleString("fr-FR")} FCFA`;
+}
+
+function formatDate(date: Date) {
+    return new Date(date).toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+    });
+}
+
+function clean(value: string | null | undefined) {
+    return String(value || "Non renseigne").replace(/\s+/g, " ").trim();
+}
+
+function createInvoiceBuffer(transaction: InvoiceTransaction) {
+    return new Promise<Buffer>((resolve, reject) => {
+        const chunks: Buffer[] = [];
+        const doc = new PDFDocument({ size: "A4", margin: 48, info: { Title: "Facture Prime Language Academy" } });
+        const student = transaction.paymentPlan.student;
+        const invoiceNumber = transaction.id.split("-")[0].toUpperCase();
+        const method = clean(transaction.provider || transaction.method);
+
+        doc.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+        doc.on("error", reject);
+        doc.on("end", () => resolve(Buffer.concat(chunks)));
+
+        doc
+            .rect(0, 0, doc.page.width, 112)
+            .fill("#21286E");
+
+        doc
+            .fillColor("#FFFFFF")
+            .font("Helvetica-Bold")
+            .fontSize(22)
+            .text("Prime Language Academy", 48, 34)
+            .font("Helvetica")
+            .fontSize(10)
+            .text("Abidjan, Angre 8e Tranche - Cote d'Ivoire", 48, 64)
+            .text("Tel: +225 01 61 33 78 64", 48, 80);
+
+        doc
+            .fillColor("#FFFFFF")
+            .font("Helvetica-Bold")
+            .fontSize(18)
+            .text("RECU DE PAIEMENT", 360, 38, { align: "right" })
+            .font("Helvetica")
+            .fontSize(10)
+            .text(`N. ${invoiceNumber}`, 360, 66, { align: "right" });
+
+        doc
+            .fillColor("#111827")
+            .font("Helvetica-Bold")
+            .fontSize(12)
+            .text("Facture a", 48, 150)
+            .font("Helvetica")
+            .fontSize(10)
+            .fillColor("#374151")
+            .text(clean(student.name), 48, 174)
+            .text(clean(student.email), 48, 190)
+            .text(`Niveau: ${clean(student.level?.name)}`, 48, 206);
+
+        doc
+            .fillColor("#111827")
+            .font("Helvetica-Bold")
+            .fontSize(12)
+            .text("Details", 348, 150)
+            .font("Helvetica")
+            .fontSize(10)
+            .fillColor("#374151")
+            .text(`Date: ${formatDate(transaction.date)}`, 348, 174)
+            .text(`Reference: ${clean(transaction.referenceId)}`, 348, 190)
+            .text(`Paiement: ${method}`, 348, 206);
+
+        const tableTop = 268;
+        doc
+            .roundedRect(48, tableTop, 500, 38, 8)
+            .fill("#F3F4F6")
+            .fillColor("#111827")
+            .font("Helvetica-Bold")
+            .fontSize(10)
+            .text("Description", 68, tableTop + 14)
+            .text("Montant", 438, tableTop + 14, { width: 90, align: "right" });
+
+        doc
+            .roundedRect(48, tableTop + 46, 500, 58, 8)
+            .strokeColor("#E5E7EB")
+            .lineWidth(1)
+            .stroke()
+            .fillColor("#374151")
+            .font("Helvetica")
+            .fontSize(10)
+            .text("Frais de formation / membership Prime Language Academy", 68, tableTop + 68, { width: 320 })
+            .font("Helvetica-Bold")
+            .fillColor("#111827")
+            .text(formatMoney(transaction.amount), 438, tableTop + 68, { width: 90, align: "right" });
+
+        doc
+            .roundedRect(328, tableTop + 128, 220, 48, 8)
+            .fill("#21286E")
+            .fillColor("#FFFFFF")
+            .font("Helvetica")
+            .fontSize(10)
+            .text("Total paye", 348, tableTop + 144)
+            .font("Helvetica-Bold")
+            .fontSize(14)
+            .text(formatMoney(transaction.amount), 430, tableTop + 140, { width: 98, align: "right" });
+
+        doc
+            .fillColor("#374151")
+            .font("Helvetica-Bold")
+            .fontSize(11)
+            .text("Note", 48, tableTop + 224)
+            .font("Helvetica")
+            .fontSize(10)
+            .text(
+                "Merci pour votre confiance. Ce recu est genere electroniquement par Prime Language Academy et tient lieu de justificatif de paiement.",
+                48,
+                tableTop + 246,
+                { width: 500, lineGap: 4 }
+            );
+
+        doc
+            .moveTo(48, 760)
+            .lineTo(548, 760)
+            .strokeColor("#E5E7EB")
+            .stroke()
+            .fillColor("#6B7280")
+            .fontSize(9)
+            .text("Prime Language Academy - Document genere automatiquement", 48, 776, { align: "center" });
+
+        doc.end();
+    });
+}
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     const session = await auth();
-    // Allow admins to download any invoice, restrict students to their own
-    if (!session || !session.user) {
+    if (!session?.user) {
         return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const transaction = await prisma.transaction.findUnique({
-        where: { id },
-        include: {
-            paymentPlan: {
-                include: { student: { include: { level: true } } }
-            }
-        }
-    });
+    const transaction = await getCompletedTransaction(id);
 
     if (!transaction || transaction.status !== "COMPLETED") {
         return new NextResponse("Transaction not found or not completed", { status: 404 });
@@ -28,53 +172,22 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
         return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const student = transaction.paymentPlan.student;
-
-    const data = {
-        from: "Prime Language Academy\nAbidjan, Angré 8e Tranche\nCôte d'Ivoire\nTél: +225 01 61 33 78 64",
-        to: `${student.name}\n${student.email}\nNiveau: ${student.level?.name || "Non défini"}`,
-        logo: "https://primelanguageacademy.com/icon-512x512.png", // They need a real public URL for the logo, fallback if localhost
-        number: transaction.id.split("-")[0].toUpperCase(),
-        date: new Date(transaction.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-        currency: "XOF",
-        items: [
-            {
-                name: "Frais de scolarité - Session de formation",
-                quantity: 1,
-                unit_cost: transaction.amount
-            }
-        ],
-        notes: "Merci pour votre confiance. Ceci est un reçu généré électroniquement et tient lieu de justificatif de paiement.",
-        terms: `Réf Interne: ${transaction.referenceId || "N/A"}\nMoyen de paiement: ${transaction.provider || transaction.method}`,
-        custom_fields: [] // Can be used for extra info
-    };
-
     try {
-        const response = await fetch("https://invoice-generator.com", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                // "Authorization": "Bearer YOUR_API_KEY" // Optional, if they hit rate limits they can add a key
-            },
-            body: JSON.stringify(data)
-        });
+        const pdfBuffer = await createInvoiceBuffer(transaction);
+        const invoiceNumber = transaction.id.split("-")[0].toUpperCase();
 
-        if (!response.ok) {
-            console.error("Invoice generator error:", await response.text());
-            return new NextResponse("Failed to generate PDF invoice", { status: 500 });
-        }
+        const pdfBody = new Uint8Array(pdfBuffer);
 
-        const pdfBuffer = await response.arrayBuffer();
-
-        return new NextResponse(pdfBuffer, {
+        return new NextResponse(pdfBody, {
             status: 200,
             headers: {
                 "Content-Type": "application/pdf",
-                "Content-Disposition": `attachment; filename="Facture_PRIME_${data.number}.pdf"`
-            }
+                "Content-Disposition": `attachment; filename="Facture_PRIME_${invoiceNumber}.pdf"`,
+                "Cache-Control": "private, no-store",
+            },
         });
     } catch (error) {
-        console.error("PDF generation exception:", error);
-        return new NextResponse("Erreur serveur lors de la génération", { status: 500 });
+        console.error("Local invoice generation failed:", error);
+        return new NextResponse("Erreur serveur lors de la generation", { status: 500 });
     }
 }
