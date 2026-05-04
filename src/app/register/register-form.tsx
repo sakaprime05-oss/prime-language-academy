@@ -25,8 +25,8 @@ const plans = [
 ];
 
 const paymentMethods = [
-    { id: "WAVE", name: "Wave", detail: "Prioritaire a Abidjan via Paystack" },
-    { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov selon Paystack" },
+    { id: "WAVE", name: "Wave", detail: "Prioritaire a Abidjan" },
+    { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov" },
     { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard" },
 ];
 

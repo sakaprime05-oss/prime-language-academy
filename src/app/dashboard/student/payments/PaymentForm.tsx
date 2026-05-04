@@ -4,7 +4,7 @@ import { useState } from "react";
 import { initiatePayment } from "@/app/actions/payments";
 
 const paymentMethods = [
-    { id: "WAVE", name: "Wave", detail: "Rapide a Abidjan via Paystack" },
+    { id: "WAVE", name: "Wave", detail: "Rapide a Abidjan" },
     { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov" },
     { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard" },
 ];
@@ -31,7 +31,7 @@ export default function PaymentForm({ planId, maxAmount, stageLabel }: { planId:
             setError(res.error);
             setLoading(false);
         } else if (res.redirectUrl) {
-            setSuccess("Redirection vers Paystack...");
+            setSuccess(`Ouverture du paiement ${selectedPaymentMethod.name}...`);
             window.location.href = res.redirectUrl;
         }
     }
@@ -41,7 +41,7 @@ export default function PaymentForm({ planId, maxAmount, stageLabel }: { planId:
             <div className="space-y-1">
                 <h3 className="text-lg sm:text-xl font-black text-[var(--foreground)]">{stageLabel}</h3>
                 <p className="text-xs font-medium text-[var(--foreground)]/50">
-                    Effectuez un paiement securise via Paystack (Mobile Money ou Carte).
+                    Choisissez votre moyen de paiement. Le montant reste calcule automatiquement.
                 </p>
             </div>
 
@@ -110,7 +110,7 @@ export default function PaymentForm({ planId, maxAmount, stageLabel }: { planId:
                 disabled={loading || !!success}
                 className="btn-primary w-full min-h-12 py-4 sm:py-5 text-sm sm:text-lg shadow-xl shadow-primary/20"
             >
-                {loading ? "Traitement..." : "Payer avec Paystack"}
+                {loading ? "Traitement..." : `Payer avec ${selectedPaymentMethod.name}`}
             </button>
 
             <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 opacity-40">

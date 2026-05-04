@@ -39,7 +39,7 @@ export default async function AdminPaymentsPage() {
                         Paiements
                     </h1>
                     <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-white/45">
-                        Suivez les paiements Paystack et verifiez les paiements manuels avant activation des comptes.
+                        Suivez les paiements en ligne et verifiez les paiements manuels avant activation des comptes.
                     </p>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs font-bold text-white/45">

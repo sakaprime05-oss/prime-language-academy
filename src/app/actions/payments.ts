@@ -155,7 +155,7 @@ export async function initiatePayment(formData: FormData) {
             transactionId: transaction.id,
             redirectUrl: data.data.authorization_url,
             reference: data.data.reference,
-            message: "Redirection vers la page de paiement Paystack...",
+            message: "Ouverture de la page de paiement...",
         };
 
     } catch (e: any) {

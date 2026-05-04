@@ -264,7 +264,7 @@ export async function sendClubSeatAvailableEmail(to: string, name: string, planN
         ${detailRows([
             ["Formule Club", escapeHtml(planName || "Membership Club")],
             ["Montant a regler", money(amount)],
-            ["Paiement", "Paystack securise"],
+            ["Paiement", "Paiement en ligne securise"],
         ])}
         ${paragraph("Connectez-vous avec l'email et le mot de passe utilises lors de votre demande. Le montant a payer est calcule par la plateforme et ne peut pas etre modifie par le client.")}
         ${button("Finaliser mon paiement", `${appUrl()}/dashboard/student/payments`, brand.color)}
@@ -274,7 +274,7 @@ export async function sendClubSeatAvailableEmail(to: string, name: string, planN
         to,
         subject: title,
         html: emailLayout(title, body, {
-            preheader: "Votre place au English Club est disponible. Finalisez votre paiement Paystack.",
+            preheader: "Votre place au English Club est disponible. Finalisez votre paiement en ligne.",
         }),
     });
 }

@@ -85,7 +85,7 @@ export default async function AdminDashboardPage() {
                         <div>
                             <p className="text-[10px] font-black text-red-400/70 uppercase tracking-[0.2em] mb-3">English Club</p>
                             <h3 className="text-2xl font-black text-white">Capacite et liste d'attente</h3>
-                            <p className="mt-2 text-sm text-white/45">Le Club reste limite a {PLA_CLUB_CAPACITY} membres. Les invitations ouvrent le paiement Paystack seulement quand une place est libre.</p>
+                            <p className="mt-2 text-sm text-white/45">Le Club reste limite a {PLA_CLUB_CAPACITY} membres. Les invitations ouvrent le paiement en ligne seulement quand une place est libre.</p>
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-center">
                             <div className="rounded-xl bg-white/5 px-4 py-3">
