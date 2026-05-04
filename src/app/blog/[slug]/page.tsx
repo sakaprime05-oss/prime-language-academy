@@ -11,13 +11,14 @@ import Image from "next/image";
 import { ParticlesBackground } from "@/components/particles";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { sanitizeHtml } from "@/lib/sanitize-html";
+import { siteConfig } from "@/lib/site-config";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
   if (!article) return { title: "Article non trouvé | Prime Language Academy" };
 
-  const articleUrl = `https://primelanguageacademy.com/blog/${slug}`;
+  const articleUrl = `${siteConfig.url}/blog/${slug}`;
   const description = article.content.replace(/<[^>]*>/g, '').substring(0, 160) + "...";
 
   return {
@@ -31,7 +32,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       type: "article",
       publishedTime: new Date(article.createdAt).toISOString(),
       authors: [article.author?.name || "Prime Language Academy"],
-      images: [{ url: "https://primelanguageacademy.com/icon-512x512.png" }],
+      images: [{ url: siteConfig.ogImage }],
     },
     twitter: {
       card: "summary_large_image",
@@ -50,6 +51,7 @@ export default async function SingleArticlePage({ params }: { params: { slug: st
   }
 
   const safeContent = sanitizeHtml(article.content);
+  const articleUrl = `${siteConfig.url}/blog/${slug}`;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans selection:bg-[#E7162A]/30 overflow-x-hidden relative">
@@ -145,7 +147,7 @@ export default async function SingleArticlePage({ params }: { params: { slug: st
               <div className="flex items-center gap-2">
                 {/* Twitter */}
                 <a 
-                  href={`https://twitter.com/intent/tweet?url=https://primelanguageacademy.com/blog/${slug}&text=${encodeURIComponent(article.title)}`}
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(articleUrl)}&text=${encodeURIComponent(article.title)}`}
                   target="_blank" rel="noopener noreferrer"
                   className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-950 transition-colors"
                 >
@@ -153,7 +155,7 @@ export default async function SingleArticlePage({ params }: { params: { slug: st
                 </a>
                 {/* LinkedIn */}
                 <a 
-                  href={`https://www.linkedin.com/sharing/share-offsite/?url=https://primelanguageacademy.com/blog/${slug}`}
+                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(articleUrl)}`}
                   target="_blank" rel="noopener noreferrer"
                   className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
                 >
@@ -161,7 +163,7 @@ export default async function SingleArticlePage({ params }: { params: { slug: st
                 </a>
                 {/* Facebook */}
                 <a 
-                  href={`https://www.facebook.com/sharer/sharer.php?u=https://primelanguageacademy.com/blog/${slug}`}
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`}
                   target="_blank" rel="noopener noreferrer"
                   className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
                 >

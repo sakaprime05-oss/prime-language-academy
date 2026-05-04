@@ -134,7 +134,9 @@ export async function sendEmail({ to, subject, html, attachments }: SendEmailInp
 
     async function sendWithGmail() {
         if (!user || !pass) {
-            console.log("[email:simulation]", { to, subject, attachments: attachments?.length || 0 });
+            if (process.env.NODE_ENV !== "production") {
+                console.info("[email:simulation]", { subject, attachments: attachments?.length || 0 });
+            }
             return true;
         }
 
@@ -144,7 +146,7 @@ export async function sendEmail({ to, subject, html, attachments }: SendEmailInp
                 auth: { user, pass },
             });
 
-            const info = await transporter.sendMail({
+            await transporter.sendMail({
                 from: senderAddress(),
                 to,
                 subject,
@@ -152,7 +154,6 @@ export async function sendEmail({ to, subject, html, attachments }: SendEmailInp
                 attachments: attachments as any[] | undefined,
             });
 
-            console.log(`Email sent with Gmail to ${to} (${info.messageId})`);
             return true;
         } catch (error) {
             console.error("Gmail email send failed:", error);
@@ -163,7 +164,7 @@ export async function sendEmail({ to, subject, html, attachments }: SendEmailInp
     if (resendKey) {
         try {
             const resend = new Resend(resendKey);
-            const { data, error } = await resend.emails.send({
+            const { error } = await resend.emails.send({
                 from: senderAddress(),
                 to,
                 subject,
@@ -176,7 +177,6 @@ export async function sendEmail({ to, subject, html, attachments }: SendEmailInp
                 return sendWithGmail();
             }
 
-            console.log(`Email sent with Resend to ${to} (${data?.id})`);
             return true;
         } catch (error) {
             console.error("Resend email send failed:", error);
@@ -240,7 +240,7 @@ export async function sendInvoiceEmail(to: string, name: string, amount: number,
             ["Moyen de paiement", paymentMethodLabel(method)],
             ["Date", new Date().toLocaleDateString("fr-FR")],
         ])}
-        ${paragraph("La reference technique Paystack est conservee par l'administration, mais elle n'est pas necessaire pour votre suivi. Vous pouvez retrouver vos paiements dans votre espace et telecharger le recu PDF si besoin.")}
+        ${paragraph("Vous pouvez retrouver vos paiements dans votre espace et telecharger le recu PDF si besoin.")}
         ${button("Voir mon espace", `${appUrl()}/dashboard/student`, brand.color)}
     `;
     return sendEmail({

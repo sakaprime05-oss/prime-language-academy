@@ -10,6 +10,7 @@ import { fr } from "date-fns/locale";
 import Image from "next/image";
 import { ParticlesBackground } from "@/components/particles";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { siteConfig } from "@/lib/site-config";
 
 export const metadata = {
   title: "Blog & Articles | Prime Language Academy",
@@ -18,9 +19,9 @@ export const metadata = {
   openGraph: {
     title: "Blog | Prime Language Academy",
     description: "Conseils et astuces pour maîtriser l'anglais en Côte d'Ivoire.",
-    url: "https://primelanguageacademy.com/blog",
+    url: `${siteConfig.url}/blog`,
     siteName: "Prime Language Academy",
-    images: [{ url: "https://primelanguageacademy.com/icon-512x512.png" }],
+    images: [{ url: siteConfig.ogImage }],
     locale: "fr_FR",
     type: "website",
   },

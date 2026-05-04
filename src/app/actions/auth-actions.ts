@@ -271,8 +271,6 @@ export async function registerUser(formData: FormData) {
 
         const amountToPay = onboardingParams.paymentOption === "fractionne" ? totalAmount * 0.5 : totalAmount;
 
-        console.log(`[Registration] Creating user: ${normalizedEmail}, Plan: ${planId}, Amount: ${amountToPay}`);
-
         const user = await prisma.user.create({
             data: {
                 name,
@@ -296,8 +294,6 @@ export async function registerUser(formData: FormData) {
 
         const paymentPlan = user.paymentPlans[0];
 
-        console.log(`[Registration] User created ID: ${user.id}. Initializing Paystack checkout.`);
-
         const checkout = await createRegistrationCheckout({
             userId: user.id,
             email: user.email,
@@ -310,8 +306,6 @@ export async function registerUser(formData: FormData) {
             console.error("[Registration] Paystack Init Failed:", checkout.error);
             return { error: checkout.error };
         }
-
-        console.log("[Registration] Paystack Init Success, redirecting...");
 
         sendWelcomeEmail(user.email, user.name || "Étudiant", registrationType)
             .catch(err => console.error("Could not send welcome email", err));
