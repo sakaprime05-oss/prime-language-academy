@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { sendWelcomeEmail, sendAdminNewRegistrationEmail } from "@/lib/email";
 import { notifyTelegram } from "@/lib/notify";
 import { PLA_CLUB_CAPACITY, PLA_PLANS } from "@/lib/pla-program";
+import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 const planPrices = Object.fromEntries(PLA_PLANS.map((plan) => [plan.id, plan.price])) as Record<string, number>;
@@ -32,7 +33,11 @@ function paystackChannels(preferredPaymentMethod?: string) {
 
 async function initializePaystackCheckout(input: PaystackInitInput) {
     const secretKey = process.env.PAYSTACK_SECRET_KEY;
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const configuredBaseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL;
+    const baseUrl =
+        configuredBaseUrl && /^https:\/\/(www\.)?primelangageacademy\.com$/.test(configuredBaseUrl.replace(/\/$/, ""))
+            ? configuredBaseUrl.replace(/\/$/, "")
+            : "https://primelangageacademy.com";
 
     if (!secretKey) {
         console.error("[Registration] Missing PAYSTACK_SECRET_KEY");
@@ -82,6 +87,17 @@ async function createRegistrationCheckout(input: {
     const refPrefix = input.retry ? "REG-RETRY" : "REG";
     const refCommand = `${refPrefix}-${input.paymentPlanId}-${Date.now()}`;
 
+    await prisma.transaction.updateMany({
+        where: {
+            planId: input.paymentPlanId,
+            status: "PENDING",
+        },
+        data: {
+            status: "FAILED",
+            failureReason: "Nouvelle tentative de paiement creee.",
+        },
+    });
+
     const transaction = await prisma.transaction.create({
         data: {
             planId: input.paymentPlanId,
@@ -125,6 +141,11 @@ export async function registerUser(formData: FormData) {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+    const limited = rateLimit(rateLimitKey("register", normalizedEmail), 5, 15 * 60 * 1000);
+    if (!limited.ok) {
+        return { error: "Trop de tentatives. Veuillez patienter quelques minutes avant de reessayer." };
+    }
+
     let onboardingParams: any = {};
     try {
         onboardingParams = JSON.parse(onboardingData);

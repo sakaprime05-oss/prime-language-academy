@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getStudentPhase } from "@/app/actions/student-phase";
+import { requireInitialPayment } from "@/lib/student-payment-gate";
 
 const ACTIVITIES = [
   { icon:"🥂", title:"English Social Nights",   freq:"Mensuel",    desc:"Soirées networking thématiques — Business, Tech, Culture, Cinéma. Ambiance feutrée, 100% anglais." },
@@ -15,6 +16,7 @@ const ACTIVITIES = [
 export default async function EnglishClubPage() {
   const session = await auth();
   if (!session || session.user?.role !== "STUDENT") redirect("/login");
+  await requireInitialPayment(session.user.id);
 
   const phase = await getStudentPhase();
 

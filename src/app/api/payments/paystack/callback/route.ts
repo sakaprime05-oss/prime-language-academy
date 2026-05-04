@@ -4,7 +4,11 @@ import { completePaystackTransaction } from "@/lib/paystack-registration";
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const reference = url.searchParams.get("reference") || url.searchParams.get("trxref");
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || url.origin;
+  const configuredBaseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL;
+  const baseUrl =
+    configuredBaseUrl && /^https:\/\/(www\.)?primelangageacademy\.com$/.test(configuredBaseUrl.replace(/\/$/, ""))
+      ? configuredBaseUrl.replace(/\/$/, "")
+      : "https://primelangageacademy.com";
 
   if (!reference) {
     return NextResponse.redirect(`${baseUrl}/login?status=payment_error`);

@@ -3,10 +3,12 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CreatePostForm } from "./ForumClient";
+import { requireInitialPayment } from "@/lib/student-payment-gate";
 
 export default async function ForumPage() {
     const session = await auth();
     if (!session) redirect("/login");
+    await requireInitialPayment(session.user.id);
 
     const posts = await prisma.post.findMany({
         orderBy: { createdAt: 'desc' },

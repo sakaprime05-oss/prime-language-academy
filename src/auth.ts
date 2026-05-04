@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "./lib/prisma";
 import { authConfig } from "./auth.config";
+import { rateLimit, rateLimitKey } from "./lib/rate-limit";
 
 declare module "next-auth" {
     interface Session {
@@ -30,8 +31,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 if (!credentials?.email || !credentials?.password) return null;
 
                 try {
+                    const email = String(credentials.email).toLowerCase().trim();
+                    const limited = rateLimit(rateLimitKey("login", email), 8, 15 * 60 * 1000);
+                    if (!limited.ok) return null;
+
                     const user = await prisma.user.findUnique({
-                        where: { email: credentials.email as string }
+                        where: { email }
                     });
 
                     if (!user) return null;

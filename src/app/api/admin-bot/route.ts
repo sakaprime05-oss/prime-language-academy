@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendWelcomeEmail, sendInvoiceEmail, sendAccountActivatedEmail, sendEmail } from "@/lib/email";
 import { sanitizeHtml } from "@/lib/sanitize-html";
+import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
 import crypto from "crypto";
 
 function isValidAdminBotKey(apiKey: string | null) {
@@ -85,6 +86,13 @@ async function validatePaymentFromBot(params: any) {
 
 export async function POST(req: Request) {
     try {
+        const forwardedFor = req.headers.get("x-forwarded-for");
+        const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : req.headers.get("x-real-ip") || "unknown";
+        const limited = rateLimit(rateLimitKey("admin-bot", ip), 30, 60 * 1000);
+        if (!limited.ok) {
+            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+        }
+
         const apiKey = req.headers.get("x-api-key");
         if (!isValidAdminBotKey(apiKey)) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

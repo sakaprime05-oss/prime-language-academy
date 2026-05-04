@@ -1,16 +1,18 @@
 "use server";
 
 import { auth } from "@/auth";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { sendMail } from "@/lib/mail";
-
-const prisma = new PrismaClient();
+import { hasInitialPayment } from "@/lib/student-payment-gate";
 
 export async function createAppointment(data: { date: Date; startTime: Date; endTime: Date; reason?: string }) {
     const session = await auth();
     if (!session || !session.user?.id) {
         throw new Error("Non autorise");
+    }
+    if (session.user.role === "STUDENT" && !(await hasInitialPayment(session.user.id))) {
+        throw new Error("Paiement requis");
     }
 
     const appointment = await prisma.appointment.create({

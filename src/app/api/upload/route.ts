@@ -7,6 +7,22 @@ import { auth } from "@/auth";
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024;
 const ALLOWED_UPLOAD_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "application/pdf"]);
 
+function matchesMagicBytes(buffer: Buffer, type: string) {
+    if (type === "image/jpeg") {
+        return buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+    }
+    if (type === "image/png") {
+        return buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+    }
+    if (type === "image/webp") {
+        return buffer.length >= 12 && buffer.subarray(0, 4).toString("ascii") === "RIFF" && buffer.subarray(8, 12).toString("ascii") === "WEBP";
+    }
+    if (type === "application/pdf") {
+        return buffer.length >= 5 && buffer.subarray(0, 5).toString("ascii") === "%PDF-";
+    }
+    return false;
+}
+
 function safeUploadName(name: string, type: string) {
     const extension = type === "application/pdf" ? "pdf" : type === "image/png" ? "png" : type === "image/webp" ? "webp" : "jpg";
     const base = name
@@ -43,6 +59,10 @@ export async function POST(request: Request) {
         }
 
         const buffer = Buffer.from(await file.arrayBuffer());
+        if (!matchesMagicBytes(buffer, file.type)) {
+            return NextResponse.json({ error: "Le contenu du fichier ne correspond pas au format annonce." }, { status: 400 });
+        }
+
         const filename = safeUploadName(file.name, file.type);
 
         // Si Vercel Blob est configuré (recommandé pour la production)

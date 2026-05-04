@@ -2,14 +2,26 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { hasInitialPayment } from "@/lib/student-payment-gate";
 import { revalidatePath } from "next/cache";
 
-export async function createPost(formData: FormData) {
+async function requireForumAccess() {
     const session = await auth();
-    if (!session || !session.user) return { error: "Non autorisé" };
+    if (!session?.user) return { error: "Non autorise" as const };
 
-    const title = formData.get("title") as string;
-    const content = formData.get("content") as string;
+    if (session.user.role === "STUDENT" && !(await hasInitialPayment(session.user.id))) {
+        return { error: "Finalisez d'abord votre paiement pour participer au forum." as const };
+    }
+
+    return { user: session.user };
+}
+
+export async function createPost(formData: FormData) {
+    const access = await requireForumAccess();
+    if ("error" in access) return { error: access.error };
+
+    const title = String(formData.get("title") || "").trim().slice(0, 160);
+    const content = String(formData.get("content") || "").trim().slice(0, 5000);
 
     if (!title || !content) return { error: "Veuillez remplir tous les champs." };
 
@@ -18,8 +30,8 @@ export async function createPost(formData: FormData) {
             data: {
                 title,
                 content,
-                authorId: session.user.id
-            }
+                authorId: access.user.id,
+            },
         });
 
         revalidatePath("/dashboard/student/forum");
@@ -30,10 +42,10 @@ export async function createPost(formData: FormData) {
 }
 
 export async function createComment(postId: string, formData: FormData) {
-    const session = await auth();
-    if (!session || !session.user) return { error: "Non autorisé" };
+    const access = await requireForumAccess();
+    if ("error" in access) return { error: access.error };
 
-    const content = formData.get("content") as string;
+    const content = String(formData.get("content") || "").trim().slice(0, 3000);
 
     if (!content) return { error: "Veuillez entrer un commentaire." };
 
@@ -42,23 +54,22 @@ export async function createComment(postId: string, formData: FormData) {
             data: {
                 content,
                 postId,
-                authorId: session.user.id
+                authorId: access.user.id,
             },
             include: {
-                post: { include: { author: true } }
-            }
+                post: { include: { author: true } },
+            },
         });
 
-        // Notify post author if commenter is not the author
-        if (comment.post.authorId !== session.user.id && comment.post.author.email) {
+        if (comment.post.authorId !== access.user.id && comment.post.author.email) {
             const { sendForumCommentEmail } = await import("@/lib/email");
             await sendForumCommentEmail(
                 comment.post.author.email,
-                comment.post.author.name || "Étudiant",
-                session.user.name || "Un autre étudiant",
+                comment.post.author.name || "Etudiant",
+                access.user.name || "Un autre etudiant",
                 comment.post.title,
                 postId
-            ).catch(err => console.error("Could not send forum notification", err));
+            ).catch((err) => console.error("Could not send forum notification", err));
         }
 
         revalidatePath(`/dashboard/student/forum/${postId}`);

@@ -3,11 +3,13 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CreateCommentForm } from "../ForumClient";
+import { requireInitialPayment } from "@/lib/student-payment-gate";
 
 export default async function PostPage(props: { params: Promise<{ postId: string }> }) {
     const params = await props.params;
     const session = await auth();
     if (!session) redirect("/login");
+    await requireInitialPayment(session.user.id);
 
     const post = await prisma.post.findUnique({
         where: { id: params.postId },

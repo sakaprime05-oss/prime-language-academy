@@ -1,12 +1,14 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { MessagingClient } from "@/components/messaging-client";
+import { requireInitialPayment } from "@/lib/student-payment-gate";
 
 export default async function StudentMessagesPage() {
     const session = await auth();
     if (!session || session.user?.role !== "STUDENT") {
         redirect("/login");
     }
+    await requireInitialPayment(session.user.id);
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-24 max-w-5xl mx-auto">

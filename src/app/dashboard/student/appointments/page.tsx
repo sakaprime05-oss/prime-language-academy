@@ -1,7 +1,14 @@
 import { getStudentAppointments } from "@/app/actions/appointments";
 import { AppointmentForm } from "./appointment-form";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { requireInitialPayment } from "@/lib/student-payment-gate";
 
 export default async function StudentAppointmentsPage() {
+    const session = await auth();
+    if (!session || session.user?.role !== "STUDENT") redirect("/login");
+    await requireInitialPayment(session.user.id);
+
     const appointments = await getStudentAppointments();
 
     return (

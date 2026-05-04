@@ -2,12 +2,16 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { hasInitialPayment } from "@/lib/student-payment-gate";
 import { revalidatePath } from "next/cache";
 
 async function checkUser() {
     const session = await auth();
     if (!session || !session.user) {
         throw new Error("Unauthorized");
+    }
+    if (session.user.role === "STUDENT" && !(await hasInitialPayment(session.user.id))) {
+        throw new Error("Payment required");
     }
     return session.user;
 }

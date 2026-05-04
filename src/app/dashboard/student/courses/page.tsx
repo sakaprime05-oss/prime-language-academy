@@ -7,10 +7,12 @@ import LessonItem from "./LessonItem";
 import StudentQuizList from "./QuizList";
 import { getStudentPhase } from "@/app/actions/student-phase";
 import { PLA_SESSION } from "@/lib/pla-program";
+import { requireInitialPayment } from "@/lib/student-payment-gate";
 
 export default async function StudentCoursesPage() {
     const session = await auth();
     if (!session || session.user?.role !== "STUDENT") redirect("/login");
+    await requireInitialPayment(session.user.id);
 
     const phase = await getStudentPhase();
 

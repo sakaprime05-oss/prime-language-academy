@@ -36,6 +36,10 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
     return { ok: true, reason: "Transaction deja traitee." };
   }
 
+  if (transaction.status !== "PENDING") {
+    return { ok: true, reason: "Transaction inactive, evenement ignore." };
+  }
+
   const expectedAmount = paystackAmount(transaction.amount);
   const receivedAmount = Number(data.amount);
   const receivedCurrency = String(data.currency || "").toUpperCase();

@@ -4,9 +4,10 @@ import { getStudentPaymentStatus } from "@/app/actions/payments";
 import Link from "next/link";
 import PaymentForm from "./PaymentForm";
 
-export default async function StudentPaymentsPage() {
+export default async function StudentPaymentsPage({ searchParams }: { searchParams?: Promise<{ locked?: string }> }) {
     const session = await auth();
     if (!session || session.user?.role !== "STUDENT") redirect("/login");
+    const params = await searchParams;
 
     const paymentPlan = await getStudentPaymentStatus(session.user.id);
 
@@ -41,6 +42,11 @@ export default async function StudentPaymentsPage() {
                 <p className="text-[var(--foreground)]/50 font-medium">Consultez votre solde et reglez la Prise en Charge puis la Reservation.</p>
             </header>
 
+            {params?.locked === "1" && (
+                <div className="rounded-2xl border border-amber-500/25 bg-amber-500/10 p-4 text-sm font-bold leading-6 text-amber-600">
+                    Votre compte est cree, mais l'espace cours reste verrouille jusqu'a la confirmation de la Prise en Charge.
+                </div>
+            )}
 
             <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <div className={`glass-card !p-5 border-primary/20 ${paymentPlan.amountPaid > 0 ? "bg-emerald-500/5 border-emerald-500/20" : "bg-primary/[0.03]"}`}>

@@ -18,7 +18,9 @@ export async function POST(req: Request) {
     }
 
     const hash = crypto.createHmac("sha512", secret).update(body).digest("hex");
-    if (hash !== signature) {
+    const expected = Buffer.from(hash);
+    const received = Buffer.from(signature || "");
+    if (expected.length !== received.length || !crypto.timingSafeEqual(expected, received)) {
       console.warn(`Invalid Paystack signature from IP: ${clientIp || "unknown"}`);
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }

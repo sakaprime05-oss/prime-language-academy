@@ -4,12 +4,14 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import LessonContentVideo from "./LessonContentVideo";
 import LessonContentPdf from "./LessonContentPdf";
+import { requireInitialPayment } from "@/lib/student-payment-gate";
 
 export default async function LessonPage(props: { params: Promise<{ lessonId: string }> }) {
     const params = await props.params;
     const session = await auth();
     // La vérification de rôle STUDENT est déjà assurée par src/app/dashboard/student/layout.tsx
     if (!session) redirect("/login");
+    await requireInitialPayment(session.user.id);
 
     const lesson = await prisma.lesson.findUnique({
         where: { id: params.lessonId },

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendMail } from "@/lib/mail";
+import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
 
 const MAX_FIELD_LENGTH = 500;
 
@@ -22,6 +23,13 @@ function isValidEmail(value: string) {
 
 export async function POST(req: NextRequest) {
     try {
+        const forwardedFor = req.headers.get("x-forwarded-for");
+        const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : req.headers.get("x-real-ip") || "unknown";
+        const limited = rateLimit(rateLimitKey("public-appointment", ip), 3, 15 * 60 * 1000);
+        if (!limited.ok) {
+            return NextResponse.json({ error: "Trop de demandes. Veuillez patienter quelques minutes." }, { status: 429 });
+        }
+
         const body = await req.json();
         const name = cleanText(body.name, 120);
         const email = cleanText(body.email, 180).toLowerCase();

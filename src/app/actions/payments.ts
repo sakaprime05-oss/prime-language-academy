@@ -2,7 +2,11 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
 import { revalidatePath } from "next/cache";
+import { mkdir, writeFile } from "fs/promises";
+import { join } from "path";
+import { put } from "@vercel/blob";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 
@@ -16,6 +20,19 @@ function paystackChannels(preferredPaymentMethod?: string) {
     return ["mobile_money", "card"];
 }
 
+function matchesImageMagicBytes(buffer: Buffer, type: string) {
+    if (type === "image/jpeg") {
+        return buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+    }
+    if (type === "image/png") {
+        return buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+    }
+    if (type === "image/webp") {
+        return buffer.length >= 12 && buffer.subarray(0, 4).toString("ascii") === "RIFF" && buffer.subarray(8, 12).toString("ascii") === "WEBP";
+    }
+    return false;
+}
+
 /**
  * Initiate a payment via Paystack and return a redirect URL
  * The student is then redirected to Paystack's checkout page
@@ -25,6 +42,10 @@ export async function initiatePayment(formData: FormData) {
     if (!session || !session.user) return { error: "Non autorisé" };
 
     if (session.user?.role !== "STUDENT") return { error: "Non autorise" };
+    const limited = rateLimit(rateLimitKey("student-payment", session.user.id), 6, 10 * 60 * 1000);
+    if (!limited.ok) {
+        return { error: "Trop de tentatives de paiement. Veuillez patienter quelques minutes." };
+    }
 
     const planId = formData.get("planId") as string;
     const paymentMethod = formData.get("paymentMethod") as string;
@@ -63,6 +84,17 @@ export async function initiatePayment(formData: FormData) {
 
         // Generate a unique reference for this command
         const refCommand = `PRIME-${planId}-${Date.now()}`;
+
+        await prisma.transaction.updateMany({
+            where: {
+                planId,
+                status: "PENDING",
+            },
+            data: {
+                status: "FAILED",
+                failureReason: "Nouvelle tentative de paiement creee.",
+            },
+        });
 
         // Store the transaction in PENDING state with our ref_command
         const transaction = await prisma.transaction.create({
@@ -218,9 +250,6 @@ export async function submitManualPayment(formData: FormData) {
     }
 }
 
-import { mkdir, writeFile } from "fs/promises";
-import { join } from "path";
-
 export async function confirmWavePayment(formData: FormData) {
     const session = await auth();
     if (!session || session.user?.role !== "STUDENT") return { error: "Non autorise" };
@@ -258,15 +287,27 @@ export async function confirmWavePayment(formData: FormData) {
         // Sauvegarder le fichier
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
+        if (!matchesImageMagicBytes(buffer, file.type)) {
+            return { error: "Le contenu du fichier ne correspond pas au format annonce." };
+        }
         
         const extension = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
         const filename = `proof-${existingTx.id}-${Date.now()}.${extension}`;
-        const uploadDir = join(process.cwd(), "public", "uploads", "proofs");
-        const filePath = join(uploadDir, filename);
-        
-        await mkdir(uploadDir, { recursive: true });
-        await writeFile(filePath, buffer);
-        const proofUrl = `/uploads/proofs/${filename}`;
+        let proofUrl: string;
+
+        if (process.env.BLOB_READ_WRITE_TOKEN) {
+            const blob = await put(`proofs/${filename}`, buffer, {
+                access: "public",
+                contentType: file.type,
+            });
+            proofUrl = blob.url;
+        } else {
+            const uploadDir = join(process.cwd(), "public", "uploads", "proofs");
+            const filePath = join(uploadDir, filename);
+            await mkdir(uploadDir, { recursive: true });
+            await writeFile(filePath, buffer);
+            proofUrl = `/uploads/proofs/${filename}`;
+        }
 
         const transaction = await prisma.transaction.update({
             where: { id: transactionId },
