@@ -50,16 +50,38 @@ export async function POST(req: NextRequest) {
         }
 
         const [year, month, day] = date.split("-").map(Number);
-        const [hours] = time.split(":").map(Number);
+        const [hours, minutes] = time.split(":").map(Number);
         const selectedDate = new Date(year, month - 1, day);
+        const selectedStart = new Date(year, month - 1, day, hours, minutes, 0, 0);
+        const now = new Date();
+        const maxDate = new Date();
+        maxDate.setDate(maxDate.getDate() + 90);
 
         if (
             !Number.isFinite(selectedDate.getTime()) ||
+            !Number.isInteger(hours) ||
+            !Number.isInteger(minutes) ||
             selectedDate.getFullYear() !== year ||
             selectedDate.getMonth() !== month - 1 ||
-            selectedDate.getDate() !== day
+            selectedDate.getDate() !== day ||
+            hours < 0 ||
+            hours > 23 ||
+            minutes < 0 ||
+            minutes > 59
         ) {
             return NextResponse.json({ error: "Date invalide." }, { status: 400 });
+        }
+
+        if (selectedStart <= now) {
+            return NextResponse.json({ error: "Veuillez choisir un rendez-vous a venir." }, { status: 400 });
+        }
+
+        if (selectedStart > maxDate) {
+            return NextResponse.json({ error: "Les rendez-vous se prennent au maximum 90 jours a l'avance." }, { status: 400 });
+        }
+
+        if (minutes !== 0 && minutes !== 30) {
+            return NextResponse.json({ error: "Choisissez un creneau a l'heure pile ou a la demi-heure." }, { status: 400 });
         }
 
         const dayOfWeek = selectedDate.getDay();

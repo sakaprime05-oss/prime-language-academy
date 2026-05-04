@@ -30,11 +30,11 @@ export default function LoginForm() {
           const statusRes = await fetch(`/api/check-email?email=${encodeURIComponent(email)}`);
           const data = await statusRes.json();
 
-          if (data.status === "PENDING") {
+          if (data.canResumePayment) {
             setError(
               "Votre paiement n'est pas encore confirme. Reprenez votre inscription avec le meme email et le meme mot de passe pour finaliser le paiement."
             );
-          } else if (data.status === "SUSPENDED" || data.status === "BLOCKED") {
+          } else if (data.accountUnavailable) {
             setError("Votre compte est bloqué. Contactez l'administration pour le réactiver.");
           } else {
             setError("Email ou mot de passe incorrect.");
