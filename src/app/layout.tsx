@@ -41,6 +41,15 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icons/icon-192x192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icons/icon-512x512.png", type: "image/png", sizes: "512x512" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/icons/icon-192x192.png",
+  },
   openGraph: {
     title: siteConfig.name,
     description: siteConfig.description,
