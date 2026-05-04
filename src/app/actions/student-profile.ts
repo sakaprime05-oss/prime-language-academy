@@ -74,6 +74,10 @@ export async function updateStudentProfile(formData: FormData) {
       learningGoal: String(formData.get("learningGoal") || "").trim().slice(0, 220),
       emergencyContact: String(formData.get("emergencyContact") || "").trim().slice(0, 80),
       bio: String(formData.get("bio") || "").trim().slice(0, 280),
+      birthDate: String(formData.get("birthDate") || "").trim().slice(0, 20),
+      availability: String(formData.get("availability") || "").trim().slice(0, 160),
+      estimatedLevel: String(formData.get("estimatedLevel") || "").trim().slice(0, 40),
+      learningPreference: String(formData.get("learningPreference") || "").trim().slice(0, 80),
       profilePhotoUrl,
     };
 

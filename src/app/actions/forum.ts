@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { hasInitialPayment } from "@/lib/student-payment-gate";
-import { stringifyForumContent } from "@/lib/forum-content";
+import { parseForumContent, stringifyForumContent } from "@/lib/forum-content";
 import { put } from "@vercel/blob";
 import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
@@ -119,4 +119,79 @@ export async function createComment(postId: string, formData: FormData) {
     } catch (e: any) {
         return { error: e.message || "Une erreur est survenue." };
     }
+}
+
+async function requireAdmin() {
+    const session = await auth();
+    if (!session?.user || session.user.role !== "ADMIN") return { error: "Action reservee a l'administration." as const };
+    return { user: session.user };
+}
+
+export async function reportPost(postId: string) {
+    const access = await requireForumAccess();
+    if ("error" in access) return { error: access.error };
+
+    const post = await prisma.post.findUnique({ where: { id: postId }, select: { content: true } });
+    if (!post) return { error: "Discussion introuvable." };
+
+    const content = parseForumContent(post.content);
+    await prisma.post.update({
+        where: { id: postId },
+        data: {
+            content: stringifyForumContent({
+                ...content,
+                reportedBy: [...(content.reportedBy || []), access.user.id],
+                reportedAt: new Date().toISOString(),
+            }),
+        },
+    });
+
+    revalidatePath("/dashboard/student/forum");
+    revalidatePath(`/dashboard/student/forum/${postId}`);
+    revalidatePath("/dashboard/admin/forum");
+    return { success: true };
+}
+
+export async function reportComment(commentId: string) {
+    const access = await requireForumAccess();
+    if ("error" in access) return { error: access.error };
+
+    const comment = await prisma.comment.findUnique({ where: { id: commentId }, select: { content: true, postId: true } });
+    if (!comment) return { error: "Reponse introuvable." };
+
+    const content = parseForumContent(comment.content);
+    await prisma.comment.update({
+        where: { id: commentId },
+        data: {
+            content: stringifyForumContent({
+                ...content,
+                reportedBy: [...(content.reportedBy || []), access.user.id],
+                reportedAt: new Date().toISOString(),
+            }),
+        },
+    });
+
+    revalidatePath(`/dashboard/student/forum/${comment.postId}`);
+    revalidatePath("/dashboard/admin/forum");
+    return { success: true };
+}
+
+export async function deletePost(postId: string) {
+    const admin = await requireAdmin();
+    if ("error" in admin) return { error: admin.error };
+
+    await prisma.post.delete({ where: { id: postId } });
+    revalidatePath("/dashboard/student/forum");
+    revalidatePath("/dashboard/admin/forum");
+    return { success: true };
+}
+
+export async function deleteComment(commentId: string) {
+    const admin = await requireAdmin();
+    if ("error" in admin) return { error: admin.error };
+
+    const comment = await prisma.comment.delete({ where: { id: commentId }, select: { postId: true } });
+    revalidatePath(`/dashboard/student/forum/${comment.postId}`);
+    revalidatePath("/dashboard/admin/forum");
+    return { success: true };
 }

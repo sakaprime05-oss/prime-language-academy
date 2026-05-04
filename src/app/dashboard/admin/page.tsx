@@ -5,6 +5,8 @@ import { getPaymentStats } from "@/app/actions/admin-payments";
 import { StatsCharts } from "@/components/admin/StatsCharts";
 import { prisma } from "@/lib/prisma";
 import { PLA_CLUB_CAPACITY } from "@/lib/pla-program";
+import { parseForumContent } from "@/lib/forum-content";
+import { hasRequiredProfilePhoto } from "@/lib/student-profile";
 import Link from "next/link";
 
 export default async function AdminDashboardPage() {
@@ -18,9 +20,11 @@ export default async function AdminDashboardPage() {
     let clubActive = 0;
     let clubPending = 0;
     let clubWaitlist = 0;
+    let incompleteProfiles = 0;
+    let reportedForumItems = 0;
 
     try {
-        const [s, c, studentCount, levelCount, activeCount, pendingCount, waitlistCount] = await Promise.all([
+        const [s, c, studentCount, levelCount, activeCount, pendingCount, waitlistCount, profileRows, forumPosts] = await Promise.all([
             getPaymentStats().catch(() => ({ totalRevenue: 0, overdueCount: 0 })),
             getAdminStats().catch(() => ({ revenueData: [], studentData: [], levelData: [] })),
             prisma.user.count({ where: { role: "STUDENT" } }).catch(() => 0),
@@ -28,6 +32,8 @@ export default async function AdminDashboardPage() {
             prisma.user.count({ where: { role: "STUDENT", registrationType: "CLUB", status: "ACTIVE" } }).catch(() => 0),
             prisma.user.count({ where: { role: "STUDENT", registrationType: "CLUB", status: "PENDING" } }).catch(() => 0),
             prisma.user.count({ where: { role: "STUDENT", registrationType: "CLUB", status: "WAITLIST" } }).catch(() => 0),
+            prisma.user.findMany({ where: { role: "STUDENT" }, select: { onboardingData: true } }).catch(() => []),
+            prisma.post.findMany({ select: { content: true, comments: { select: { content: true } } } }).catch(() => []),
         ]);
 
         if (s) stats = s;
@@ -37,6 +43,12 @@ export default async function AdminDashboardPage() {
         clubActive = activeCount;
         clubPending = pendingCount;
         clubWaitlist = waitlistCount;
+        incompleteProfiles = profileRows.filter((student) => !hasRequiredProfilePhoto(student.onboardingData)).length;
+        reportedForumItems = forumPosts.reduce((count, post) => {
+            const postReports = (parseForumContent(post.content).reportedBy || []).length > 0 ? 1 : 0;
+            const commentReports = post.comments.filter((comment) => (parseForumContent(comment.content).reportedBy || []).length > 0).length;
+            return count + postReports + commentReports;
+        }, 0);
     } catch (e) {
         console.error("Dashboard data fetching error:", e);
     }
@@ -76,6 +88,19 @@ export default async function AdminDashboardPage() {
                 <Link href="/dashboard/admin/courses" className="p-6 bg-[#12121e] rounded-2xl border border-white/5 group hover:scale-[1.02] transition-all">
                     <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-3">Niveaux</p>
                     <p className="text-3xl font-black text-white">{totalLevels}</p>
+                </Link>
+            </section>
+
+            <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <Link href="/dashboard/admin/students" className="p-6 bg-[#12121e] rounded-2xl border border-amber-500/10 group hover:border-amber-500/30 transition-all">
+                    <p className="text-[10px] font-black text-amber-300/70 uppercase tracking-[0.2em] mb-3">Profils incomplets</p>
+                    <p className="text-3xl font-black text-white">{incompleteProfiles}</p>
+                    <p className="mt-2 text-sm text-white/45">Etudiants sans photo obligatoire ou profil finalise.</p>
+                </Link>
+                <Link href="/dashboard/admin/forum" className="p-6 bg-[#12121e] rounded-2xl border border-red-500/10 group hover:border-red-500/30 transition-all">
+                    <p className="text-[10px] font-black text-red-300/70 uppercase tracking-[0.2em] mb-3">Forum a verifier</p>
+                    <p className="text-3xl font-black text-white">{reportedForumItems}</p>
+                    <p className="mt-2 text-sm text-white/45">Discussions ou reponses signalees par les etudiants.</p>
                 </Link>
             </section>
 

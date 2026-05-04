@@ -23,9 +23,8 @@ export default function LessonItem({ lesson, isCompleted: initialCompleted }: Le
         try {
             await markLessonComplete(lesson.id);
             setCompleted(true);
-            alert("Leçon marquée comme terminée !");
         } catch (error) {
-            alert("Erreur lors de la mise à jour");
+            alert("Erreur lors de la mise a jour");
         } finally {
             setLoading(false);
         }

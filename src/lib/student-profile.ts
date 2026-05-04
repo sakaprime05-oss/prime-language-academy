@@ -11,6 +11,10 @@ export type StudentProfileData = {
   bio?: string;
   preferredName?: string;
   profilePhotoUrl?: string;
+  birthDate?: string;
+  availability?: string;
+  estimatedLevel?: string;
+  learningPreference?: string;
   days?: string[];
   timeSlot?: string;
   courseMode?: string;

@@ -13,6 +13,7 @@ const adminLinks = [
     { href: "/dashboard/admin/courses", label: "Cours", icon: BookIcon },
     { href: "/dashboard/admin/resources", label: "Doc. Formation", icon: WalletIcon },
     { href: "/dashboard/admin/payments", label: "Paiements", icon: WalletIcon },
+    { href: "/dashboard/admin/forum", label: "Forum", icon: MessageIcon },
     { href: "/dashboard/admin/appointments", label: "Rendez-vous", icon: ClockIcon },
     { href: "/dashboard/admin/articles", label: "Gestion Blog", icon: BlogIcon },
     { href: "/dashboard/admin/messages", label: "Messagerie", icon: MessageIcon },

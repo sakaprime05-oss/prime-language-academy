@@ -51,12 +51,19 @@ export default function StudentRow({ student, levels }: StudentRowProps) {
     return (
         <div className="glass-card hover:border-[var(--primary)]/30 transition-all group !p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center font-bold text-lg">
-                    {student.name?.[0] || student.email[0].toUpperCase()}
+                <div className="w-12 h-12 overflow-hidden rounded-full bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center font-bold text-lg">
+                    {student.profilePhotoUrl ? (
+                        <img src={student.profilePhotoUrl} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                        student.name?.[0] || student.email[0].toUpperCase()
+                    )}
                 </div>
                 <div>
                     <h3 className="font-bold text-[var(--foreground)]">{student.name || "Sans Nom"}</h3>
                     <p className="text-xs text-[var(--foreground)]/50">{student.email}</p>
+                    <p className="mt-1 text-[10px] font-bold text-[var(--foreground)]/35">
+                        {student.phone || "Telephone manquant"} {student.commune ? `- ${student.commune}` : ""}
+                    </p>
                 </div>
             </div>
 
@@ -67,6 +74,9 @@ export default function StudentRow({ student, levels }: StudentRowProps) {
                 </div>
                 <div className="text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider bg-[var(--foreground)]/5 text-[var(--foreground)]/45">
                     {student.registrationType === "CLUB" ? "Club" : "Formation"}
+                </div>
+                <div className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider ${student.profileComplete ? "bg-green-500/10 text-green-600" : "bg-amber-500/10 text-amber-600"}`}>
+                    {student.profileComplete ? "Profil ok" : "Profil incomplet"}
                 </div>
 
                 {/* Level Selection */}

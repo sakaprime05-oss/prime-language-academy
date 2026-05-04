@@ -5,6 +5,7 @@ import Link from "next/link";
 import LessonContentVideo from "./LessonContentVideo";
 import LessonContentPdf from "./LessonContentPdf";
 import { requireInitialPayment } from "@/lib/student-payment-gate";
+import { LessonCompleteButton } from "./LessonCompleteButton";
 
 export default async function LessonPage(props: { params: Promise<{ lessonId: string }> }) {
     const params = await props.params;
@@ -69,9 +70,7 @@ export default async function LessonPage(props: { params: Promise<{ lessonId: st
                     <h4 className="font-bold text-lg">Avez-vous terminé cette leçon ?</h4>
                     <p className="text-sm text-[var(--foreground)]/60 mt-1">Marquez-la comme terminée pour suivre votre progression.</p>
                 </div>
-                <Link href="/dashboard/student/courses" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
-                    {isCompleted ? "✓ Déjà terminée" : "Continuer"}
-                </Link>
+                <LessonCompleteButton lessonId={lesson.id} isCompleted={isCompleted} />
             </div>
         </div>
     );

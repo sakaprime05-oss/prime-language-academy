@@ -51,6 +51,26 @@ export default async function StudentProfilePage({ searchParams }: { searchParam
 
       <StudentProfileForm values={profile} />
 
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="glass-card space-y-3 p-5 sm:p-6">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40">Preferences de suivi</p>
+          <div className="grid gap-3 text-sm font-bold text-[var(--foreground)]/70">
+            <p>Disponibilites : {profile.availability || "Non renseigne"}</p>
+            <p>Niveau estime : {profile.estimatedLevel || "Non renseigne"}</p>
+            <p>Preference : {profile.learningPreference || "Non renseigne"}</p>
+          </div>
+        </div>
+        <div className="glass-card space-y-3 p-5 sm:p-6">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40">Securite</p>
+          <p className="text-sm font-medium leading-6 text-[var(--foreground)]/60">
+            Votre email de connexion est {user.email}. Pour changer le mot de passe, utilisez la recuperation depuis la page de connexion.
+          </p>
+          <a href="/forgot-password" className="inline-flex rounded-xl border border-[var(--foreground)]/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-primary hover:border-primary/40">
+            Modifier mon mot de passe
+          </a>
+        </div>
+      </section>
+
       {user.badges.length > 0 && (
         <section className="glass-card space-y-4 p-5 sm:p-8">
           <h3 className="text-lg font-black text-[var(--foreground)]">Badges</h3>

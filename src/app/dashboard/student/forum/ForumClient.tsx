@@ -115,3 +115,51 @@ export function CreateCommentForm({ postId }: { postId: string }) {
         </form>
     );
 }
+
+export function ReportPostButton({ postId }: { postId: string }) {
+    const [loading, setLoading] = useState(false);
+    const [done, setDone] = useState(false);
+    const router = useRouter();
+
+    async function handleClick() {
+        setLoading(true);
+        const { reportPost } = await import("@/app/actions/forum");
+        const result = await reportPost(postId);
+        if (result.error) alert(result.error);
+        else {
+            setDone(true);
+            router.refresh();
+        }
+        setLoading(false);
+    }
+
+    return (
+        <button type="button" onClick={handleClick} disabled={loading || done} className="rounded-xl border border-[var(--foreground)]/10 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/45 hover:border-amber-500/40 hover:text-amber-600 disabled:opacity-50">
+            {done ? "Signale" : loading ? "..." : "Signaler"}
+        </button>
+    );
+}
+
+export function ReportCommentButton({ commentId }: { commentId: string }) {
+    const [loading, setLoading] = useState(false);
+    const [done, setDone] = useState(false);
+    const router = useRouter();
+
+    async function handleClick() {
+        setLoading(true);
+        const { reportComment } = await import("@/app/actions/forum");
+        const result = await reportComment(commentId);
+        if (result.error) alert(result.error);
+        else {
+            setDone(true);
+            router.refresh();
+        }
+        setLoading(false);
+    }
+
+    return (
+        <button type="button" onClick={handleClick} disabled={loading || done} className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/30 hover:text-amber-600 disabled:opacity-50">
+            {done ? "Signale" : "Signaler"}
+        </button>
+    );
+}

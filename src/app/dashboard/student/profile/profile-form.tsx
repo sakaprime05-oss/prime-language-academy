@@ -13,6 +13,10 @@ type ProfileValues = {
   emergencyContact?: string;
   bio?: string;
   profilePhotoUrl?: string;
+  birthDate?: string;
+  availability?: string;
+  estimatedLevel?: string;
+  learningPreference?: string;
 };
 
 export function StudentProfileForm({ values }: { values: ProfileValues }) {
@@ -82,11 +86,33 @@ export function StudentProfileForm({ values }: { values: ProfileValues }) {
           <Field label="Commune">
             <input name="commune" defaultValue={values.commune || ""} className="input-field" placeholder="Cocody, Yopougon..." />
           </Field>
+          <Field label="Date de naissance">
+            <input type="date" name="birthDate" defaultValue={values.birthDate || ""} className="input-field" />
+          </Field>
+          <Field label="Niveau estime">
+            <select name="estimatedLevel" defaultValue={values.estimatedLevel || ""} className="input-field">
+              <option value="">A choisir</option>
+              <option value="debutant">Debutant</option>
+              <option value="intermediaire">Intermediaire</option>
+              <option value="avance">Avance</option>
+            </select>
+          </Field>
           <Field label="Contact d'urgence">
             <input name="emergencyContact" defaultValue={values.emergencyContact || ""} className="input-field" placeholder="Nom + numero" />
           </Field>
           <Field label="Objectif principal">
             <input name="learningGoal" defaultValue={values.learningGoal || ""} className="input-field" placeholder="Parler en reunion, voyage..." />
+          </Field>
+          <Field label="Disponibilites">
+            <input name="availability" defaultValue={values.availability || ""} className="input-field" placeholder="Soir, week-end, mardi/jeudi..." />
+          </Field>
+          <Field label="Preference">
+            <select name="learningPreference" defaultValue={values.learningPreference || ""} className="input-field">
+              <option value="">A choisir</option>
+              <option value="pdf">PDF et exercices</option>
+              <option value="oral">Pratique orale</option>
+              <option value="mixte">Mixte</option>
+            </select>
           </Field>
           <div className="sm:col-span-2">
             <Field label="Bio courte">

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import StudentRow from "./StudentRow";
 import Link from "next/link";
+import { hasRequiredProfilePhoto, parseStudentProfileData } from "@/lib/student-profile";
 
 export default async function AdminStudentsPage() {
     const session = await auth();
@@ -36,13 +37,23 @@ export default async function AdminStudentsPage() {
                         <p className="text-[var(--foreground)]/50">Aucun étudiant inscrit pour le moment.</p>
                     </div>
                 ) : (
-                    students.map(student => (
+                    students.map(student => {
+                        const profile = parseStudentProfileData(student.onboardingData);
+                        return (
                         <StudentRow
                             key={student.id}
-                            student={student}
+                            student={{
+                                ...student,
+                                profileComplete: hasRequiredProfilePhoto(student.onboardingData),
+                                profilePhotoUrl: profile.profilePhotoUrl,
+                                phone: profile.phone,
+                                commune: profile.commune,
+                                learningGoal: profile.learningGoal || profile.objective,
+                            }}
                             levels={levels}
                         />
-                    ))
+                        );
+                    })
                 )}
             </div>
         </div>

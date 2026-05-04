@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CreateCommentForm } from "../ForumClient";
+import { CreateCommentForm, ReportCommentButton, ReportPostButton } from "../ForumClient";
 import { requireInitialPayment } from "@/lib/student-payment-gate";
 import { parseForumContent } from "@/lib/forum-content";
 
@@ -33,7 +33,8 @@ export default async function PostPage(props: { params: Promise<{ postId: string
           Retour au forum
         </Link>
         <div className="glass-card space-y-4 p-6 md:p-8">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 font-black text-primary">
               {post.author.name?.[0] || "?"}
             </div>
@@ -46,6 +47,8 @@ export default async function PostPage(props: { params: Promise<{ postId: string
               </p>
               <p className="text-xs text-[var(--foreground)]/40">{new Date(post.createdAt).toLocaleString("fr-FR")}</p>
             </div>
+            </div>
+            <ReportPostButton postId={post.id} />
           </div>
 
           <h2 className="text-2xl font-black tracking-tight text-[var(--foreground)]">{post.title}</h2>
@@ -80,7 +83,10 @@ export default async function PostPage(props: { params: Promise<{ postId: string
                       <img src={content.imageUrl} alt="" className="max-h-80 w-full object-cover" />
                     </div>
                   )}
-                  <p className="mt-2 text-[10px] font-bold text-[var(--foreground)]/30">{new Date(comment.createdAt).toLocaleString("fr-FR")}</p>
+                  <div className="mt-2 flex items-center justify-between gap-3">
+                    <p className="text-[10px] font-bold text-[var(--foreground)]/30">{new Date(comment.createdAt).toLocaleString("fr-FR")}</p>
+                    <ReportCommentButton commentId={comment.id} />
+                  </div>
                 </div>
               </div>
             );
