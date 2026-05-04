@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { approveTransaction, rejectTransaction } from "@/app/actions/payments";
 import { useRouter } from "next/navigation";
+import { paymentMethodLabel } from "@/lib/payment-methods";
 
 type Student = {
     name: string | null;
@@ -68,10 +69,11 @@ function statusClass(status: string) {
 }
 
 function providerDot(provider: string | null) {
-    if (provider === "ORANGE") return "bg-orange-400";
-    if (provider === "WAVE") return "bg-sky-400";
-    if (provider === "MTN") return "bg-yellow-300";
-    if (provider === "PAYSTACK") return "bg-emerald-400";
+    const label = paymentMethodLabel(provider).toLowerCase();
+    if (label.includes("wave")) return "bg-sky-400";
+    if (label.includes("mobile")) return "bg-orange-400";
+    if (label.includes("carte")) return "bg-emerald-400";
+    if (label.includes("manuel")) return "bg-yellow-300";
     return "bg-white/35";
 }
 
@@ -298,7 +300,7 @@ function StudentBlock({ tx }: { tx: Transaction }) {
 
 function PaymentDetails({ tx }: { tx: Transaction }) {
     const proofIsUpload = Boolean(tx.proof?.startsWith("/uploads/"));
-    const provider = tx.provider || tx.method || "Non precise";
+    const provider = paymentMethodLabel(tx.provider || tx.method);
 
     return (
         <div className="min-w-0 space-y-1.5">
@@ -318,7 +320,7 @@ function PaymentDetails({ tx }: { tx: Transaction }) {
                 </a>
             ) : (
                 <p className="truncate text-xs font-semibold text-white/35">
-                    Ref : {tx.proof || tx.referenceId || "-"}
+                    Recu : {tx.id ? `PLA-${tx.id.slice(0, 8).toUpperCase()}` : "-"}
                 </p>
             )}
             {tx.failureReason && <p className="text-xs font-semibold text-red-300/80">{tx.failureReason}</p>}

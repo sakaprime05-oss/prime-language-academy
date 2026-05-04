@@ -7,17 +7,12 @@ import { revalidatePath } from "next/cache";
 import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 import { put } from "@vercel/blob";
+import { paystackChannels } from "@/lib/payment-methods";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 
 function paystackAmount(amount: number) {
     return Math.round(amount * 100);
-}
-
-function paystackChannels(preferredPaymentMethod?: string) {
-    if (preferredPaymentMethod === "CARD") return ["card"];
-    if (preferredPaymentMethod === "WAVE" || preferredPaymentMethod === "MOBILE_MONEY") return ["mobile_money"];
-    return ["mobile_money", "card"];
 }
 
 function matchesImageMagicBytes(buffer: Buffer, type: string) {
@@ -49,14 +44,18 @@ export async function initiatePayment(formData: FormData) {
 
     const planId = formData.get("planId") as string;
     const paymentMethod = formData.get("paymentMethod") as string;
-    const studentEmail = session.user.email || "student@primelanguageacademy.com";
+    const studentEmail = session.user.email || "student@primelangageacademy.com";
 
     if (!planId) {
         return { error: "Données de paiement incomplètes." };
     }
 
     const secretKey = process.env.PAYSTACK_SECRET_KEY;
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const configuredBaseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL;
+    const baseUrl =
+        configuredBaseUrl && /^https:\/\/(www\.)?primelangageacademy\.com$/.test(configuredBaseUrl.replace(/\/$/, ""))
+            ? configuredBaseUrl.replace(/\/$/, "")
+            : "https://primelangageacademy.com";
 
     if (!secretKey) {
         console.error("Paystack API key is missing");
@@ -101,7 +100,7 @@ export async function initiatePayment(formData: FormData) {
             data: {
                 planId,
                 amount,
-                method: "PAYSTACK",
+                method: paymentMethod || "PAYSTACK",
                 status: "PENDING",
                 referenceId: refCommand,
             }
@@ -113,7 +112,7 @@ export async function initiatePayment(formData: FormData) {
             reference: refCommand,
             currency: "XOF",
             channels: paystackChannels(paymentMethod),
-            callback_url: `${baseUrl}/dashboard/student/payments?status=success`,
+            callback_url: `${baseUrl}/api/payments/paystack/callback?reference=${encodeURIComponent(refCommand)}&next=${encodeURIComponent("/dashboard/student/payments?status=success")}`,
             metadata: {
                 transactionId: transaction.id,
                 planId,

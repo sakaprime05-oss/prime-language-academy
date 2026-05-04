@@ -4,6 +4,7 @@ import { getStudentPaymentStatus } from "@/app/actions/payments";
 import Link from "next/link";
 import PaymentForm from "./PaymentForm";
 import { SupportLink } from "@/components/support-link";
+import { paymentMethodLabel } from "@/lib/payment-methods";
 
 export default async function StudentPaymentsPage({ searchParams }: { searchParams?: Promise<{ locked?: string }> }) {
     const session = await auth();
@@ -130,7 +131,7 @@ export default async function StudentPaymentsPage({ searchParams }: { searchPara
                                         </div>
                                         <div>
                                             <p className="text-sm font-black text-[var(--foreground)]">{t.amount.toLocaleString()} FCFA</p>
-                                            <p className="text-[10px] font-black uppercase text-[var(--foreground)]/30 tracking-widest">{t.method} • {new Date(t.date).toLocaleDateString()}</p>
+                                            <p className="text-[10px] font-black uppercase text-[var(--foreground)]/30 tracking-widest">{paymentMethodLabel(t.provider || t.method)} - {new Date(t.date).toLocaleDateString("fr-FR")}</p>
                                         </div>
                                     </div>
                                     <div className="flex flex-wrap items-center gap-3 sm:gap-4">

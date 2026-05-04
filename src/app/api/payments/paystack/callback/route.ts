@@ -4,20 +4,29 @@ import { completePaystackTransaction } from "@/lib/paystack-registration";
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const reference = url.searchParams.get("reference") || url.searchParams.get("trxref");
+  const next = url.searchParams.get("next");
   const configuredBaseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL;
   const baseUrl =
     configuredBaseUrl && /^https:\/\/(www\.)?primelangageacademy\.com$/.test(configuredBaseUrl.replace(/\/$/, ""))
       ? configuredBaseUrl.replace(/\/$/, "")
       : "https://primelangageacademy.com";
 
+  const successPath = next && next.startsWith("/") && !next.startsWith("//") ? next : "/login?status=payment_success";
+  const pendingPath = successPath.startsWith("/dashboard")
+    ? successPath.replace("status=success", "status=pending")
+    : "/login?status=payment_pending";
+  const errorPath = successPath.startsWith("/dashboard")
+    ? successPath.replace("status=success", "status=error")
+    : "/login?status=payment_error";
+
   if (!reference) {
-    return NextResponse.redirect(`${baseUrl}/login?status=payment_error`);
+    return NextResponse.redirect(`${baseUrl}${errorPath}`);
   }
 
   const secretKey = process.env.PAYSTACK_SECRET_KEY;
   if (!secretKey) {
     console.error("Paystack callback: missing server key");
-    return NextResponse.redirect(`${baseUrl}/login?status=payment_error`);
+    return NextResponse.redirect(`${baseUrl}${errorPath}`);
   }
 
   try {
@@ -31,19 +40,19 @@ export async function GET(req: Request) {
 
     if (!payload.status || !payload.data) {
       console.error("Paystack callback verification failed:", payload.message || payload);
-      return NextResponse.redirect(`${baseUrl}/login?status=payment_pending`);
+      return NextResponse.redirect(`${baseUrl}${pendingPath}`);
     }
 
     const result = await completePaystackTransaction(payload.data);
 
     if (!result.ok) {
       console.error("Paystack callback processing failed:", result.reason);
-      return NextResponse.redirect(`${baseUrl}/login?status=payment_pending`);
+      return NextResponse.redirect(`${baseUrl}${pendingPath}`);
     }
 
-    return NextResponse.redirect(`${baseUrl}/login?status=payment_success`);
+    return NextResponse.redirect(`${baseUrl}${successPath}`);
   } catch (error) {
     console.error("Paystack callback error:", error);
-    return NextResponse.redirect(`${baseUrl}/login?status=payment_pending`);
+    return NextResponse.redirect(`${baseUrl}${pendingPath}`);
   }
 }

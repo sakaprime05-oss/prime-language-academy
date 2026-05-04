@@ -6,6 +6,7 @@ import { sendWelcomeEmail, sendAdminNewRegistrationEmail } from "@/lib/email";
 import { notifyTelegram } from "@/lib/notify";
 import { PLA_CLUB_CAPACITY, PLA_PLANS } from "@/lib/pla-program";
 import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
+import { paystackChannels } from "@/lib/payment-methods";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 const planPrices = Object.fromEntries(PLA_PLANS.map((plan) => [plan.id, plan.price])) as Record<string, number>;
@@ -23,12 +24,6 @@ type PaystackInitInput = {
 
 function paystackAmount(amount: number) {
     return Math.round(amount * 100);
-}
-
-function paystackChannels(preferredPaymentMethod?: string) {
-    if (preferredPaymentMethod === "CARD") return ["card"];
-    if (preferredPaymentMethod === "WAVE" || preferredPaymentMethod === "MOBILE_MONEY") return ["mobile_money"];
-    return ["mobile_money", "card"];
 }
 
 async function initializePaystackCheckout(input: PaystackInitInput) {
@@ -102,7 +97,7 @@ async function createRegistrationCheckout(input: {
         data: {
             planId: input.paymentPlanId,
             amount: Number(input.amount),
-            method: "PAYSTACK",
+            method: input.preferredPaymentMethod || "PAYSTACK",
             status: "PENDING",
             referenceId: refCommand,
         },

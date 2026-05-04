@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { sendAdminNotificationEmail, sendInvoiceEmail } from "@/lib/email";
 import { notifyTelegram } from "@/lib/notify";
+import { paymentProviderLabel } from "@/lib/payment-methods";
 
 type PaystackTransactionData = {
   reference?: string;
@@ -8,6 +9,9 @@ type PaystackTransactionData = {
   currency?: string;
   status?: string;
   channel?: string;
+  metadata?: {
+    preferredPaymentMethod?: string;
+  };
 };
 
 function paystackAmount(amount: number) {
@@ -66,11 +70,13 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
     return { ok: false, reason: failureReason };
   }
 
+  const providerLabel = paymentProviderLabel(data.metadata?.preferredPaymentMethod || transaction.method, data.channel);
+
   const completed = await prisma.transaction.updateMany({
     where: { id: transaction.id, status: { not: "COMPLETED" } },
     data: {
       status: "COMPLETED",
-      provider: `PAYSTACK (${data.channel || "unknown"})`,
+      provider: providerLabel,
     },
   });
 
@@ -99,12 +105,12 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
   ]);
 
   if (isFirstPayment && student.email) {
-    await sendInvoiceEmail(student.email, student.name || "Etudiant", transaction.amount, transaction.id, `PAYSTACK (${data.channel || "online"})`).catch(
+    await sendInvoiceEmail(student.email, student.name || "Etudiant", transaction.amount, transaction.id, providerLabel).catch(
       console.error
     );
   }
 
-  await sendAdminNotificationEmail(student.name || "Etudiant inconnu", transaction.amount, transaction.id, `PAYSTACK (${data.channel || "online"})`).catch(
+  await sendAdminNotificationEmail(student.name || "Etudiant inconnu", transaction.amount, transaction.id, providerLabel).catch(
     console.error
   );
 
@@ -112,8 +118,8 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
     name: student.name || "Etudiant inconnu",
     email: student.email,
     amount: transaction.amount,
-    provider: `PAYSTACK (${data.channel || "unknown"})`,
-    phone: "Via Paystack",
+    provider: providerLabel,
+    phone: "Paiement en ligne confirme",
   }).catch(console.error);
 
   return { ok: true, reason: "Paiement confirme." };
