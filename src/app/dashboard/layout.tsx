@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getDictionary, getLocale } from "@/lib/i18n";
 import { LangToggle } from "@/components/lang-toggle";
 import { prisma } from "@/lib/prisma";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     const session = await auth();
@@ -50,7 +51,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                     <StudentSidebarNav dict={dict.nav} mode={studentMode} />
                 </div>
 
-                <div className="p-6 m-4 mt-auto rounded-3xl bg-[var(--surface-hover)] border border-[var(--foreground)]/5 flex items-center gap-4">
+                <div className="p-6 m-4 mt-auto rounded-3xl bg-[var(--surface-hover)] border border-[var(--foreground)]/5 flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-500 flex items-center justify-center font-black shadow-inner">
                         {session.user.name?.[0] || session.user.email?.[0].toUpperCase()}
                     </div>
@@ -60,6 +61,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                             {studentMode === "CLUB" ? "Membre Club" : "Apprenant"}
                         </p>
                     </div>
+                    <ThemeToggle />
                     <LangToggle currentLang={currentLang} />
                 </div>
             </aside>
@@ -77,6 +79,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
+                        <ThemeToggle />
                         <LangToggle currentLang={currentLang} />
                         <a href="/dashboard/student/profile" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-primary/20 flex items-center justify-center text-xs sm:text-sm font-bold text-primary shadow-sm hover:scale-105 transition-transform">
                             {session.user.name?.[0] || session.user.email?.[0].toUpperCase()}

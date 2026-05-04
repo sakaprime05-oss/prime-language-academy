@@ -6,6 +6,7 @@ import { siteConfig } from "@/lib/site-config";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
+import { PlatformThemeToggle } from "@/components/platform-theme-toggle";
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
@@ -112,6 +113,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <PlatformThemeToggle />
           <ServiceWorkerRegister />
           <WhatsAppButton />
           <PWAInstallPrompt />
