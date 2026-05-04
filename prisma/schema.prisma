@@ -133,16 +133,16 @@ model Transaction {
   paymentPlan   PaymentPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
   amount        Float
   method        String      @default("PAYSTACK")
-  referenceId   String?     @unique // External reference ID from Pawapay
+  referenceId   String?     @unique // External payment reference
   provider      String?     // ORANGE, MTN, MOOV, WAVE
-  failureReason String?     // Error message from Pawapay
+  failureReason String?     // Payment failure message
   status        String      @default("PENDING") // COMPLETED, FAILED, PENDING
   date          DateTime    @default(now())
 
   // MANUAL PAYMENT FIELDS
-  senderPhone   String?     // Numéro de téléphone de l'expéditeur
-  proof         String?     // N° de transaction secret ou référence SMS
-  invoiceUrl    String?     // Chemin vers la facture PDF générée
+  senderPhone   String?     // Sender phone number
+  proof         String?     // Transaction proof or receipt reference
+  invoiceUrl    String?     // Generated receipt PDF path
 }
 
 // FORUM / COMMUNITY MODELS
@@ -210,7 +210,7 @@ model TeacherSchedule {
   location     String?   // class room or center
   type         String    @default("COURS") // COURS, CLUB
   isRecurring  Boolean   @default(true)
-  specificDate String?   // "2026-05-14" — null for recurring events
+  specificDate String?   // "2026-05-14" or null for recurring events
   notes        String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -266,7 +266,7 @@ model Badge {
   id          String   @id @default(uuid())
   name        String   @unique
   description String?
-  icon        String   @default("🏅") // emoji or icon name
+  icon        String   @default("badge") // icon name
   color       String   @default("#FFD700")
   criteria    String?  // JSON: {"type": "attendance", "threshold": 10}
   createdAt   DateTime @default(now())
