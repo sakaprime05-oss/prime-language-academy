@@ -6,6 +6,8 @@ import { CreatePostForm } from "./ForumClient";
 import { requireInitialPayment } from "@/lib/student-payment-gate";
 import { parseForumContent } from "@/lib/forum-content";
 
+const AUTO_HIDE_REPORTS = 3;
+
 export default async function ForumPage() {
   const session = await auth();
   if (!session) redirect("/login");
@@ -18,6 +20,8 @@ export default async function ForumPage() {
       _count: { select: { comments: true } },
     },
   });
+
+  const visiblePosts = posts.filter((post) => (parseForumContent(post.content).reportedBy || []).length < AUTO_HIDE_REPORTS);
 
   return (
     <div className="space-y-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -32,13 +36,13 @@ export default async function ForumPage() {
       </header>
 
       <div className="space-y-4">
-        {posts.length === 0 ? (
+        {visiblePosts.length === 0 ? (
           <div className="glass-card py-16 text-center opacity-50">
             <p className="font-bold">Aucune discussion pour le moment.</p>
             <p className="text-sm">Soyez le premier a lancer un sujet !</p>
           </div>
         ) : (
-          posts.map((post) => {
+          visiblePosts.map((post) => {
             const content = parseForumContent(post.content);
             return (
               <Link key={post.id} href={`/dashboard/student/forum/${post.id}`} className="glass-card block space-y-4 p-5 transition-colors hover:border-primary/50">

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { updateStudentStatus, assignStudentLevel } from "@/app/actions/admin-students";
+import Link from "next/link";
 
 interface StudentRowProps {
     student: any; // User with level include
@@ -59,7 +60,9 @@ export default function StudentRow({ student, levels }: StudentRowProps) {
                     )}
                 </div>
                 <div>
-                    <h3 className="font-bold text-[var(--foreground)]">{student.name || "Sans Nom"}</h3>
+                    <Link href={`/dashboard/admin/students/${student.id}`} className="font-bold text-[var(--foreground)] hover:text-primary">
+                        {student.name || "Sans Nom"}
+                    </Link>
                     <p className="text-xs text-[var(--foreground)]/50">{student.email}</p>
                     <p className="mt-1 text-[10px] font-bold text-[var(--foreground)]/35">
                         {student.phone || "Telephone manquant"} {student.commune ? `- ${student.commune}` : ""}
@@ -97,6 +100,9 @@ export default function StudentRow({ student, levels }: StudentRowProps) {
 
                 {/* Actions */}
                 <div className="flex items-center gap-2 ml-auto md:ml-0">
+                    <Link href={`/dashboard/admin/students/${student.id}`} className="text-[10px] font-bold text-primary border border-primary/20 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors">
+                        Fiche
+                    </Link>
                     {status === "ACTIVE" ? (
                         <button
                             disabled={loading}

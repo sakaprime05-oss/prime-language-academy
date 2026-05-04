@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getStudentPaymentStatus } from "@/app/actions/payments";
 import Link from "next/link";
 import PaymentForm from "./PaymentForm";
+import { SupportLink } from "@/components/support-link";
 
 export default async function StudentPaymentsPage({ searchParams }: { searchParams?: Promise<{ locked?: string }> }) {
     const session = await auth();
@@ -40,6 +41,7 @@ export default async function StudentPaymentsPage({ searchParams }: { searchPara
                 </Link>
                 <h2 className="text-2xl sm:text-3xl font-black text-[var(--foreground)] tracking-tight">Gestion des Paiements</h2>
                 <p className="text-[var(--foreground)]/50 font-medium">Consultez votre solde et reglez la Prise en Charge puis la Reservation.</p>
+                <SupportLink context="payment" className="mt-3" />
             </header>
 
             {params?.locked === "1" && (

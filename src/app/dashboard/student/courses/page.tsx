@@ -8,6 +8,7 @@ import StudentQuizList from "./QuizList";
 import { getStudentPhase } from "@/app/actions/student-phase";
 import { PLA_SESSION } from "@/lib/pla-program";
 import { requireInitialPayment } from "@/lib/student-payment-gate";
+import { SupportLink } from "@/components/support-link";
 
 export default async function StudentCoursesPage() {
     const session = await auth();
@@ -65,6 +66,7 @@ export default async function StudentCoursesPage() {
                 <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-[var(--foreground)]/55">
                     Vos cours sont organises comme un programme progressif. Les supports sont principalement des PDF a ouvrir ou telecharger, puis a marquer comme termines.
                 </p>
+                <SupportLink context="courses" className="mt-4" />
                 <div className="flex items-center gap-4 mt-2">
                     <div className="flex-1 h-2 bg-[var(--surface-hover)] rounded-full overflow-hidden">
                         <div className="h-full bg-[var(--primary)]" style={{ width: `${progressData.percentage}%` }}></div>

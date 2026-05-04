@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getStudentProgressData } from "@/app/actions/student-progress";
 import { parseStudentProfileData } from "@/lib/student-profile";
 import { StudentProfileForm } from "./profile-form";
+import { SupportLink } from "@/components/support-link";
 
 export default async function StudentProfilePage({ searchParams }: { searchParams?: Promise<{ complete?: string }> }) {
   const session = await auth();
@@ -34,6 +35,7 @@ export default async function StudentProfilePage({ searchParams }: { searchParam
         <p className="text-sm font-medium text-[var(--foreground)]/50">
           Ajoutez votre photo, vos contacts utiles et vos objectifs de progression.
         </p>
+        <SupportLink context="profile" />
       </header>
 
       {params?.complete === "1" && !profile.profilePhotoUrl && (

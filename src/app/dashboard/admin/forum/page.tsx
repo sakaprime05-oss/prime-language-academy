@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+const AUTO_HIDE_REPORTS = 3;
+
 async function removePost(formData: FormData) {
   "use server";
   await deletePost(String(formData.get("postId") || ""));
@@ -66,14 +68,15 @@ export default async function AdminForumPage() {
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-lg font-black text-white">{post.title}</h3>
                       {reports > 0 && <Badge>{reports} signalement(s)</Badge>}
+                      {reports >= AUTO_HIDE_REPORTS && <Badge>masque aux etudiants</Badge>}
                     </div>
                     <p className="mt-2 line-clamp-3 text-sm leading-6 text-white/60">{content.text}</p>
                     <p className="mt-3 text-[10px] font-black uppercase tracking-widest text-white/30">
                       {post.author.name || post.author.email} - {new Date(post.createdAt).toLocaleString("fr-FR")}
                     </p>
                     {content.imageUrl && (
-                      <a href={content.imageUrl} target="_blank" rel="noreferrer" className="mt-3 inline-flex rounded-xl border border-white/10 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white/50 hover:border-white/25">
-                        Voir image
+                      <a href={content.imageUrl} target="_blank" rel="noreferrer" className="mt-3 block max-w-sm overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
+                        <img src={content.imageUrl} alt="" className="max-h-48 w-full object-cover" />
                       </a>
                     )}
                   </div>
@@ -102,8 +105,14 @@ export default async function AdminForumPage() {
                               <div className="flex flex-wrap items-center gap-2">
                                 <p className="text-xs font-black text-white/70">{comment.author.name || comment.author.email}</p>
                                 {commentReports > 0 && <Badge>{commentReports} signalement(s)</Badge>}
+                                {commentReports >= AUTO_HIDE_REPORTS && <Badge>masque aux etudiants</Badge>}
                               </div>
                               <p className="mt-1 text-sm leading-6 text-white/55">{commentContent.text}</p>
+                              {commentContent.imageUrl && (
+                                <a href={commentContent.imageUrl} target="_blank" rel="noreferrer" className="mt-2 block max-w-xs overflow-hidden rounded-lg border border-white/10 bg-white/[0.03]">
+                                  <img src={commentContent.imageUrl} alt="" className="max-h-32 w-full object-cover" />
+                                </a>
+                              )}
                             </div>
                             <form action={removeComment}>
                               <input type="hidden" name="commentId" value={comment.id} />

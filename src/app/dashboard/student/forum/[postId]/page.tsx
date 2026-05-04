@@ -6,6 +6,8 @@ import { CreateCommentForm, ReportCommentButton, ReportPostButton } from "../For
 import { requireInitialPayment } from "@/lib/student-payment-gate";
 import { parseForumContent } from "@/lib/forum-content";
 
+const AUTO_HIDE_REPORTS = 3;
+
 export default async function PostPage(props: { params: Promise<{ postId: string }> }) {
   const params = await props.params;
   const session = await auth();
@@ -25,6 +27,10 @@ export default async function PostPage(props: { params: Promise<{ postId: string
 
   if (!post) redirect("/dashboard/student/forum");
   const postContent = parseForumContent(post.content);
+  if ((postContent.reportedBy || []).length >= AUTO_HIDE_REPORTS && session.user.role !== "ADMIN") {
+    redirect("/dashboard/student/forum");
+  }
+  const visibleComments = post.comments.filter((comment) => (parseForumContent(comment.content).reportedBy || []).length < AUTO_HIDE_REPORTS);
 
   return (
     <div className="space-y-8 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -62,10 +68,10 @@ export default async function PostPage(props: { params: Promise<{ postId: string
       </header>
 
       <div className="space-y-6">
-        <h3 className="text-lg font-black">Reponses ({post.comments.length})</h3>
+        <h3 className="text-lg font-black">Reponses ({visibleComments.length})</h3>
 
         <div className="space-y-4">
-          {post.comments.map((comment) => {
+          {visibleComments.map((comment) => {
             const content = parseForumContent(comment.content);
             return (
               <div key={comment.id} className={`flex gap-4 rounded-2xl p-4 shadow-sm ${comment.author.role === "TEACHER" ? "border border-primary/20 bg-primary/5" : "border border-[var(--foreground)]/5 bg-[var(--surface)]"}`}>
