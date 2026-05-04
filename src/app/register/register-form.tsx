@@ -491,15 +491,15 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 <label className={`flex p-4 rounded-xl border cursor-pointer transition-all gap-3 ${formData.paymentOption === 'total' ? 'bg-primary/5 border-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10'}`}>
                                     <input type="radio" name="paymentOption" value="total" checked={formData.paymentOption === 'total'} onChange={handleChange} className="accent-primary mt-0.5" />
                                     <div>
-                                        <span className="font-bold block text-sm">Paiement Total</span>
-                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">Règlement du coût total de la formation dès l'inscription.</span>
+                                        <span className="font-bold block text-sm">Paiement total</span>
+                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">Reglez la Prise en Charge et la Reservation en une seule fois.</span>
                                     </div>
                                 </label>
                                 <label className={`flex p-4 rounded-xl border cursor-pointer transition-all gap-3 ${formData.paymentOption === 'fractionne' ? 'bg-primary/5 border-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10'}`}>
                                     <input type="radio" name="paymentOption" value="fractionne" checked={formData.paymentOption === 'fractionne'} onChange={handleChange} className="accent-primary mt-0.5" />
                                     <div>
-                                        <span className="font-bold block text-sm">Paiement en 2 fois (Fractionné)</span>
-                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">Payez 50% maintenant pour valider l'inscription, et les 50% restants avant le début de la formation.</span>
+                                        <span className="font-bold block text-sm">Paiement en 2 fois</span>
+                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">1ere moitie : la Prise en Charge, qui donne acces a la documentation, aux conseils, a la plateforme et au suivi. 2e moitie : la Reservation de votre place.</span>
                                     </div>
                                 </label>
                             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { PLA_CLUB_CAPACITY } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, PLA_PLANS, formatFcfa } from "@/lib/pla-program";
 
 
 const ACTIVITIES = [
@@ -32,12 +32,12 @@ const ACTIVITIES = [
 ];
 
 const MEMBERSHIPS = [
-  { id: "loisir",      freq: "1 session / semaine", price: "50 000", label: "Social" },
-  { id: "essentiel",   freq: "2 sessions / semaine", price: "70 000", label: "Connect" },
-  { id: "equilibre",   freq: "3 sessions / semaine", price: "90 000", label: "Network" },
-  { id: "performance", freq: "4 sessions / semaine", price: "110 000", label: "Executive" },
-  { id: "intensif",    freq: "5 sessions / semaine", price: "130 000", label: "Elite" },
-  { id: "immersion",   freq: "6 sessions / semaine", price: "150 000", label: "Founder", top: true },
+  { id: "loisir",      freq: "1 session / semaine", price: formatFcfa(PLA_PLANS[0].price).replace(" FCFA", ""), label: "Social" },
+  { id: "essentiel",   freq: "2 sessions / semaine", price: formatFcfa(PLA_PLANS[1].price).replace(" FCFA", ""), label: "Connect" },
+  { id: "equilibre",   freq: "3 sessions / semaine", price: formatFcfa(PLA_PLANS[2].price).replace(" FCFA", ""), label: "Network" },
+  { id: "performance", freq: "4 sessions / semaine", price: formatFcfa(PLA_PLANS[3].price).replace(" FCFA", ""), label: "Executive" },
+  { id: "intensif",    freq: "5 sessions / semaine", price: formatFcfa(PLA_PLANS[4].price).replace(" FCFA", ""), label: "Elite" },
+  { id: "immersion",   freq: "6 sessions / semaine", price: formatFcfa(PLA_PLANS[5].price).replace(" FCFA", ""), label: "Founder", top: true },
 ];
 
 export default function EnglishClubPublicPage() {
@@ -57,7 +57,7 @@ export default function EnglishClubPublicPage() {
         </Link>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
           <Link href="/" style={{ fontSize: 13, color: "rgba(245,240,232,0.5)", textDecoration: "none", letterSpacing: "0.08em", textTransform: "uppercase" }}>Formation</Link>
-          <Link href="/register" style={{
+          <Link href="/register-club" style={{
             fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase",
             background: "linear-gradient(135deg,#E7162A,#FF4D5E,#B30012)", color: "#080808",
             padding: "10px 22px", borderRadius: 100, textDecoration: "none",

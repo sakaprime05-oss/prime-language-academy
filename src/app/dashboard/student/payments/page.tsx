@@ -28,6 +28,8 @@ export default async function StudentPaymentsPage() {
     }
 
     const remaining = paymentPlan.totalAmount - paymentPlan.amountPaid;
+    const halfAmount = paymentPlan.totalAmount / 2;
+    const nextPaymentStage = paymentPlan.amountPaid <= 0 ? "Prise en Charge" : "Reservation";
 
     return (
         <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-24">
@@ -36,9 +38,26 @@ export default async function StudentPaymentsPage() {
                     ← Retour
                 </Link>
                 <h2 className="text-2xl sm:text-3xl font-black text-[var(--foreground)] tracking-tight">Gestion des Paiements</h2>
-                <p className="text-[var(--foreground)]/50 font-medium">Consultez votre solde et effectuez vos règlements Mobile Money.</p>
+                <p className="text-[var(--foreground)]/50 font-medium">Consultez votre solde et reglez la Prise en Charge puis la Reservation.</p>
             </header>
 
+
+            <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <div className={`glass-card !p-5 border-primary/20 ${paymentPlan.amountPaid > 0 ? "bg-emerald-500/5 border-emerald-500/20" : "bg-primary/[0.03]"}`}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">1. Prise en Charge</p>
+                    <h3 className="mt-2 text-xl font-black text-[var(--foreground)]">{halfAmount.toLocaleString()} FCFA</h3>
+                    <p className="mt-2 text-xs font-bold leading-6 text-[var(--foreground)]/55">
+                        Donne acces a la documentation, aux conseils, a la plateforme et au suivi.
+                    </p>
+                </div>
+                <div className={`glass-card !p-5 border-secondary/20 ${remaining <= 0 ? "bg-emerald-500/5 border-emerald-500/20" : "bg-secondary/[0.03]"}`}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary">2. Reservation</p>
+                    <h3 className="mt-2 text-xl font-black text-[var(--foreground)]">{halfAmount.toLocaleString()} FCFA</h3>
+                    <p className="mt-2 text-xs font-bold leading-6 text-[var(--foreground)]/55">
+                        Confirme definitivement votre place dans la session et complete le solde.
+                    </p>
+                </div>
+            </section>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
                 {/* Status Card */}
                 <div className="glass-card !p-5 sm:!p-8 flex flex-col justify-between relative overflow-hidden h-fit">
@@ -70,7 +89,7 @@ export default async function StudentPaymentsPage() {
 
                 {/* Payment Card */}
                 {remaining > 0 ? (
-                    <PaymentForm planId={paymentPlan.id} maxAmount={remaining} />
+                    <PaymentForm planId={paymentPlan.id} maxAmount={remaining} stageLabel={nextPaymentStage} />
                 ) : (
                     <div className="glass-card !p-6 sm:!p-10 flex flex-col items-center justify-center text-center space-y-4 border-emerald-500/20 bg-emerald-500/5">
                         <div className="w-16 h-16 rounded-3xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
@@ -113,10 +132,10 @@ export default async function StudentPaymentsPage() {
                                                 target="_blank"
                                                 download
                                                 className="hidden sm:flex text-[10px] font-black uppercase tracking-widest text-[#21286E] hover:text-[#E7162A] hover:underline items-center gap-1 bg-[#21286E]/10 px-3 py-1.5 rounded-full transition-colors"
-                                                title="Télécharger la Facture PDF"
+                                                title="Telecharger le recu PDF"
                                             >
                                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                                <span>Facture PDF</span>
+                                                <span>Recu PDF</span>
                                             </Link>
                                         )}
                                         <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${t.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-500' : t.status === 'PENDING' ? 'bg-amber-500/10 text-amber-500' : 'bg-red-500/10 text-red-500'}`}>

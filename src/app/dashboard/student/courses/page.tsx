@@ -6,6 +6,7 @@ import Link from "next/link";
 import LessonItem from "./LessonItem";
 import StudentQuizList from "./QuizList";
 import { getStudentPhase } from "@/app/actions/student-phase";
+import { PLA_SESSION } from "@/lib/pla-program";
 
 export default async function StudentCoursesPage() {
     const session = await auth();
@@ -31,6 +32,8 @@ export default async function StudentCoursesPage() {
     const progressData = await getStudentProgressData(session.user.id);
     const studentId = session.user.id!;
     const quizzes = await getQuizzes((session.user as any).levelId);
+    const modules = progressData.modules || [];
+    const pdfLessons = modules.flatMap((module: any) => module.lessons || []).filter((lesson: any) => lesson.type === "PDF");
 
     if (!progressData.levelName) {
         return (
@@ -55,7 +58,11 @@ export default async function StudentCoursesPage() {
                 <Link href="/dashboard/student" className="text-xs font-bold text-[var(--primary)] hover:underline flex items-center gap-1 mb-2">
                     ← Retour
                 </Link>
-                <h2 className="text-3xl font-extrabold text-[var(--foreground)]">{progressData.levelName}</h2>
+                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[var(--primary)]">Programme de suivi</p>
+                <h2 className="mt-2 text-3xl font-extrabold text-[var(--foreground)]">{progressData.levelName}</h2>
+                <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-[var(--foreground)]/55">
+                    Vos cours sont organises comme un programme progressif. Les supports sont principalement des PDF a ouvrir ou telecharger, puis a marquer comme termines.
+                </p>
                 <div className="flex items-center gap-4 mt-2">
                     <div className="flex-1 h-2 bg-[var(--surface-hover)] rounded-full overflow-hidden">
                         <div className="h-full bg-[var(--primary)]" style={{ width: `${progressData.percentage}%` }}></div>
@@ -64,9 +71,43 @@ export default async function StudentCoursesPage() {
                 </div>
             </header>
 
+            <section className="grid grid-cols-1 gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+                <div className="glass-card !p-5 border-primary/20 bg-primary/[0.03]">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Session</p>
+                    <h3 className="mt-2 text-xl font-black text-[var(--foreground)]">{PLA_SESSION.dates}</h3>
+                    <p className="mt-2 text-xs font-bold leading-6 text-[var(--foreground)]/55">
+                        Duree : {PLA_SESSION.duration}. Avancement : {progressData.completedLessons} / {progressData.totalLessons} contenus termines.
+                    </p>
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                        <div className="rounded-2xl bg-[var(--foreground)]/5 p-3">
+                            <p className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/35">Modules</p>
+                            <p className="mt-1 text-2xl font-black text-[var(--foreground)]">{modules.length}</p>
+                        </div>
+                        <div className="rounded-2xl bg-[var(--foreground)]/5 p-3">
+                            <p className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/35">PDF</p>
+                            <p className="mt-1 text-2xl font-black text-[var(--primary)]">{pdfLessons.length}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="glass-card !p-5">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/35">Calendrier de progression</p>
+                    <h3 className="mt-1 text-lg font-black text-[var(--foreground)]">Ordre conseille</h3>
+                    <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                        {modules.map((module: any, index: number) => (
+                            <a key={module.id} href={`#module-${module.id}`} className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/[0.03] p-3 transition-colors hover:border-primary/30">
+                                <p className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/35">Semaine {index + 1}</p>
+                                <p className="mt-1 truncate text-sm font-black text-[var(--foreground)]">{module.title}</p>
+                                <p className="mt-1 text-[11px] font-bold text-[var(--foreground)]/45">{module.lessons?.length || 0} supports</p>
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             <div className="space-y-12">
                 {progressData.modules?.map((module: any) => (
-                    <section key={module.id} className="space-y-4">
+                    <section key={module.id} id={`module-${module.id}`} className="scroll-mt-24 space-y-4">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center font-bold text-sm">
                                 {module.order + 1}

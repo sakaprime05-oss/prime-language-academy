@@ -69,7 +69,7 @@ export const LevelModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
                         className="w-full bg-[var(--surface-hover)] border-none rounded-2xl px-4 py-3 text-[var(--foreground)] focus:ring-2 focus:ring-[var(--primary)] outline-none"
-                        placeholder="Ex: 50000"
+                        placeholder="Ex: 52000"
                     />
                 </div>
                 <button

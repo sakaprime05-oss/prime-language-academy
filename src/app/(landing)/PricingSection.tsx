@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { PLA_PLANS } from "@/lib/pla-program";
 
 const levels = [
   {
     id: "loisir",
     name: "Parcours Loisir",
-    price: 50000,
+    price: PLA_PLANS[0].price,
     emoji: "🌱",
     tag: "Initiation",
     tagColor: "emerald",
@@ -22,7 +23,7 @@ const levels = [
   {
     id: "essentiel",
     name: "Parcours Essentiel",
-    price: 70000,
+    price: PLA_PLANS[1].price,
     emoji: "📘",
     tag: "Populaire",
     tagColor: "blue",
@@ -37,7 +38,7 @@ const levels = [
   {
     id: "equilibre",
     name: "Parcours Équilibre",
-    price: 90000,
+    price: PLA_PLANS[2].price,
     emoji: "⚖️",
     tag: "Recommandé",
     tagColor: "indigo",
@@ -52,7 +53,7 @@ const levels = [
   {
     id: "performance",
     name: "Parcours Performance",
-    price: 110000,
+    price: PLA_PLANS[3].price,
     emoji: "🚀",
     tag: "Intense",
     tagColor: "orange",
@@ -67,7 +68,7 @@ const levels = [
   {
     id: "intensif",
     name: "Parcours Intensif",
-    price: 130000,
+    price: PLA_PLANS[4].price,
     emoji: "🔥",
     tag: "Transformation",
     tagColor: "red",
@@ -82,7 +83,7 @@ const levels = [
   {
     id: "immersion",
     name: "Parcours Immersion",
-    price: 150000,
+    price: PLA_PLANS[5].price,
     emoji: "🏆",
     tag: "Élite",
     tagColor: "amber",

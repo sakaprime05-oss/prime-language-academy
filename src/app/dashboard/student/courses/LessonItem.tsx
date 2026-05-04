@@ -12,6 +12,7 @@ interface LessonItemProps {
 export default function LessonItem({ lesson, isCompleted: initialCompleted }: LessonItemProps) {
     const [completed, setCompleted] = useState(initialCompleted);
     const [loading, setLoading] = useState(false);
+    const isPdf = lesson.type === "PDF";
 
     const handleToggle = async (e: React.MouseEvent) => {
         e.preventDefault();
@@ -45,7 +46,7 @@ export default function LessonItem({ lesson, isCompleted: initialCompleted }: Le
                         {lesson.title}
                     </h4>
                     <p className="text-[9px] sm:text-[10px] uppercase font-black tracking-widest truncate text-[var(--foreground)]/30 group-hover:text-[var(--primary)]/70 transition-colors">
-                        {lesson.type} • VOIR LE CONTENU
+                        {isPdf ? "PDF - ouvrir / telecharger" : `${lesson.type} - voir le contenu`}
                     </p>
                 </div>
             </div>
