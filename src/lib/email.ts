@@ -51,6 +51,23 @@ function money(amount: number) {
     return `${Number(amount || 0).toLocaleString("fr-FR")} FCFA`;
 }
 
+function receiptNumber(transactionId: string) {
+    const clean = String(transactionId || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    return clean ? `PLA-${clean.slice(0, 8)}` : `PLA-${Date.now().toString().slice(-8)}`;
+}
+
+function paymentMethodLabel(method?: string | null) {
+    const value = String(method || "").toUpperCase();
+    if (value.includes("WAVE")) return "Wave";
+    if (value.includes("ORANGE")) return "Orange Money";
+    if (value.includes("MTN")) return "MTN Mobile Money";
+    if (value.includes("MOOV")) return "Moov Money";
+    if (value.includes("CARD") || value.includes("CARTE")) return "Carte bancaire";
+    if (value.includes("PAYSTACK")) return "Paiement en ligne";
+    if (value.includes("MANUAL")) return "Paiement mobile money";
+    return method ? escapeHtml(String(method)) : "Paiement en ligne";
+}
+
 function emailLayout(title: string, body: string, options: { preheader?: string; footer?: string } = {}) {
     return `
         <div style="margin:0;padding:0;background:#f4f6fb;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
@@ -211,29 +228,41 @@ export async function sendPaymentReminderEmail(to: string, name: string, amount:
     return sendEmail({ to, subject: title, html: emailLayout(title, body) });
 }
 
-export async function sendInvoiceEmail(to: string, name: string, amount: number, transactionId: string) {
-    const title = "Reçu de paiement";
+export async function sendInvoiceEmail(to: string, name: string, amount: number, transactionId: string, method?: string | null) {
+    const title = "Recu de paiement";
+    const receipt = receiptNumber(transactionId);
     const body = `
-        ${paragraph(`Bonjour ${escapeHtml(name || "cher étudiant")},`)}
-        ${paragraph("Nous confirmons la réception de votre paiement. Merci pour votre confiance.")}
+        ${paragraph(`Bonjour ${escapeHtml(name || "cher etudiant")},`)}
+        ${paragraph("Nous confirmons la reception de votre paiement pour Prime Language Academy.")}
         ${detailRows([
-            ["Référence", escapeHtml(transactionId)],
-            ["Montant réglé", money(amount)],
+            ["Numero du recu", receipt],
+            ["Montant regle", money(amount)],
+            ["Moyen de paiement", paymentMethodLabel(method)],
             ["Date", new Date().toLocaleDateString("fr-FR")],
         ])}
+        ${paragraph("La reference technique Paystack est conservee par l'administration, mais elle n'est pas necessaire pour votre suivi. Vous pouvez retrouver vos paiements dans votre espace et telecharger le recu PDF si besoin.")}
         ${button("Voir mon espace", `${appUrl()}/dashboard/student`, brand.color)}
     `;
-    return sendEmail({ to, subject: title, html: emailLayout(title, body) });
+    return sendEmail({
+        to,
+        subject: title,
+        html: emailLayout(title, body, {
+            preheader: `${receipt} - paiement confirme de ${money(amount)}`,
+        }),
+    });
 }
 
-export async function sendAdminNotificationEmail(studentName: string, amount: number, transactionId: string) {
-    const title = "Paiement confirmé";
+export async function sendAdminNotificationEmail(studentName: string, amount: number, transactionId: string, method?: string | null) {
+    const title = "Paiement confirme";
+    const receipt = receiptNumber(transactionId);
     const body = `
-        ${paragraph(`Le paiement de ${escapeHtml(studentName || "un étudiant")} vient d'être confirmé.`)}
+        ${paragraph(`Le paiement de ${escapeHtml(studentName || "un etudiant")} vient d'etre confirme.`)}
         ${detailRows([
-            ["Étudiant", escapeHtml(studentName || "Non renseigné")],
+            ["Etudiant", escapeHtml(studentName || "Non renseigne")],
             ["Montant", money(amount)],
-            ["Référence", escapeHtml(transactionId)],
+            ["Recu", receipt],
+            ["Moyen", paymentMethodLabel(method)],
+            ["Reference interne", escapeHtml(transactionId)],
             ["Date", new Date().toLocaleDateString("fr-FR")],
         ])}
         ${button("Ouvrir le dashboard", `${appUrl()}/dashboard/admin`, brand.color)}

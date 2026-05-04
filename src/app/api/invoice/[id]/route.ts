@@ -96,7 +96,7 @@ function createInvoiceBuffer(transaction: InvoiceTransaction) {
         line(`Niveau: ${clean(student.level?.name)}`, 48, 616, 10),
         line("Details du paiement", 348, 672, 12, "F2"),
         line(`Date: ${formatDate(transaction.date)}`, 348, 648, 10),
-        line(`Reference: ${clean(transaction.referenceId)}`, 348, 632, 10),
+        line(`Numero recu: PLA-${receiptNumber}`, 348, 632, 10),
         line(`Paiement: ${method}`, 348, 616, 10),
         rect(48, 510, 500, 38, "0.953 0.957 0.965"),
         line("Description", 68, 524, 10, "F2"),

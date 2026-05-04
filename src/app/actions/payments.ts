@@ -400,7 +400,8 @@ export async function approveTransaction(transactionId: string) {
                 student.email,
                 student.name || "Étudiant",
                 transaction.amount,
-                transaction.id
+                transaction.id,
+                transaction.provider || transaction.method
             ).catch(console.error);
         }
 
@@ -432,3 +433,4 @@ export async function rejectTransaction(transactionId: string, reason: string) {
         return { error: "Erreur lors du rejet" };
     }
 }
+

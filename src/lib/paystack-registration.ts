@@ -99,12 +99,12 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
   ]);
 
   if (isFirstPayment && student.email) {
-    await sendInvoiceEmail(student.email, student.name || "Etudiant", transaction.amount, transaction.id).catch(
+    await sendInvoiceEmail(student.email, student.name || "Etudiant", transaction.amount, transaction.id, `PAYSTACK (${data.channel || "online"})`).catch(
       console.error
     );
   }
 
-  await sendAdminNotificationEmail(student.name || "Etudiant inconnu", transaction.amount, transaction.id).catch(
+  await sendAdminNotificationEmail(student.name || "Etudiant inconnu", transaction.amount, transaction.id, `PAYSTACK (${data.channel || "online"})`).catch(
     console.error
   );
 

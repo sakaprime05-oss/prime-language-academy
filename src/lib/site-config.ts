@@ -11,7 +11,7 @@ export const siteConfig = {
   links: {
     whatsapp: "https://wa.me/2250161337864",
   },
-  themeColor: "#E7162A",
+  themeColor: "#ffffff",
   contact: {
     email: "contact@primelangageacademy.com",
     phone: "+225 01 61 33 78 64",

@@ -11,19 +11,16 @@ export default async function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-[var(--background)] relative overflow-hidden">
-      <div className="bg-blob w-[500px] h-[500px] bg-primary -top-20 -left-20 animate-float"></div>
-      <div className="bg-blob w-[400px] h-[400px] bg-secondary bottom-0 right-0 animate-float" style={{ animationDelay: "-3s" }}></div>
-      <div className="bg-blob w-[300px] h-[300px] bg-accent top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10"></div>
+    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-white relative overflow-hidden">
 
-      <div className="w-full max-w-sm glass-card relative z-10 border-white/20 dark:border-white/10 shadow-2xl">
+      <div className="w-full max-w-sm glass-card relative z-10 border-slate-200 bg-white shadow-xl">
         <div className="text-center space-y-4 mb-10">
-          <div className="mx-auto flex h-20 w-24 items-center justify-center rounded-[2rem] bg-white p-3 shadow-lg shadow-primary/15 ring-1 ring-black/5">
-            <LogoMark className="h-12 w-16" />
+          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-2xl bg-white p-4 ring-1 ring-black/10">
+            <LogoMark className="h-16 w-16" />
           </div>
           <div>
-            <h1 className="text-3xl font-black text-[var(--foreground)] tracking-tight">Prime Academy</h1>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/40 mt-1">
+            <h1 className="text-3xl font-black text-slate-950 tracking-tight">Prime Academy</h1>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 mt-1">
               Plateforme d'excellence
             </p>
           </div>
@@ -32,8 +29,8 @@ export default async function LoginPage() {
         <LoginForm />
 
         <div className="pt-8 flex flex-col items-center gap-4">
-          <div className="h-px w-12 bg-gradient-to-r from-transparent via-[var(--foreground)]/10 to-transparent"></div>
-          <p className="text-[10px] uppercase font-bold tracking-[0.3em] text-[var(--foreground)]/30">
+          <div className="h-px w-12 bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+          <p className="text-[10px] uppercase font-bold tracking-[0.3em] text-slate-400">
             © {new Date().getFullYear()} Precision Learning
           </p>
         </div>

@@ -9,7 +9,7 @@
   "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait-primary",
   "background_color": "#ffffff",
-  "theme_color": "#E7162A",
+  "theme_color": "#ffffff",
   "categories": ["education", "language"],
   "lang": "fr",
   "dir": "ltr",

@@ -1,4 +1,4 @@
-const CACHE_NAME = "prime-academy-v3";
+const CACHE_NAME = "prime-academy-v4";
 const OFFLINE_URL = "/offline.html";
 
 const PRECACHE_ASSETS = [

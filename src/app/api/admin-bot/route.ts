@@ -75,7 +75,7 @@ async function validatePaymentFromBot(params: any) {
 
     await Promise.all([
         sendAccountActivatedEmail(student.email, student.name || "Etudiant"),
-        sendInvoiceEmail(student.email, student.name || "Etudiant", numericAmount, transaction.id),
+        sendInvoiceEmail(student.email, student.name || "Etudiant", numericAmount, transaction.id, transaction.provider || transaction.method),
     ]);
 
     return NextResponse.json({
