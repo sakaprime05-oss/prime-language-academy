@@ -4,6 +4,8 @@ import { getDictionary, getLocale } from "@/lib/i18n";
 import { LangToggle } from "@/components/lang-toggle";
 import { prisma } from "@/lib/prisma";
 import ThemeToggle from "@/components/ThemeToggle";
+import { headers } from "next/headers";
+import { hasRequiredProfilePhoto } from "@/lib/student-profile";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     const session = await auth();
@@ -24,9 +26,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
     const currentLang = await getLocale();
     const student = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { registrationType: true },
+        select: { registrationType: true, onboardingData: true },
     });
     const studentMode = student?.registrationType === "CLUB" ? "CLUB" : "FORMATION";
+    const currentPath = (await headers()).get("x-url") || "";
+    if (!hasRequiredProfilePhoto(student?.onboardingData) && !currentPath.startsWith("/dashboard/student/profile")) {
+        redirect("/dashboard/student/profile?complete=1");
+    }
 
     // ===== LAYOUT ÉTUDIANT — Expérience immersive =====
     return (

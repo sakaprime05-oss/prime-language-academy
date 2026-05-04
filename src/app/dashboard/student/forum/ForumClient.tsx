@@ -60,6 +60,14 @@ export function CreatePostForm() {
                     className="w-full bg-[var(--foreground)]/5 border border-transparent focus:border-primary/50 rounded-xl px-4 py-3 outline-none transition-colors text-sm resize-none"
                 />
             </div>
+            <div>
+                <input
+                    type="file"
+                    name="image"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="block w-full text-xs font-bold text-[var(--foreground)]/55 file:mr-3 file:rounded-xl file:border-0 file:bg-[var(--foreground)]/10 file:px-3 file:py-2 file:text-xs file:font-black file:text-[var(--foreground)]"
+                />
+            </div>
             <button type="submit" disabled={loading} className="btn-primary text-sm py-3">
                 {loading ? "Publication..." : "Publier"}
             </button>
@@ -88,12 +96,18 @@ export function CreateCommentForm({ postId }: { postId: string }) {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
             <input
                 name="content"
                 placeholder="Écrire une réponse..."
                 required
                 className="flex-1 bg-[var(--foreground)]/5 border border-transparent focus:border-primary/50 rounded-xl px-4 py-3 outline-none transition-colors text-sm"
+            />
+            <input
+                type="file"
+                name="image"
+                accept="image/jpeg,image/png,image/webp"
+                className="max-w-full text-xs font-bold text-[var(--foreground)]/45 file:rounded-xl file:border-0 file:bg-[var(--foreground)]/10 file:px-3 file:py-3 file:text-xs file:font-black file:text-[var(--foreground)] sm:max-w-[180px]"
             />
             <button type="submit" disabled={loading} className="bg-primary hover:bg-primary/90 text-white px-6 rounded-xl font-bold text-sm transition-colors disabled:opacity-50">
                 {loading ? "..." : "Répondre"}

@@ -5,6 +5,41 @@ import { getStudentProgressData } from "@/app/actions/student-progress";
 import { getSystemSettings } from "@/app/actions/system-settings";
 import { getDictionary } from "@/lib/i18n";
 import Link from "next/link";
+import { PLA_SESSION, PLA_TIME_SLOTS } from "@/lib/pla-program";
+import { parseStudentProfileData } from "@/lib/student-profile";
+
+function daysUntil(date: Date) {
+    const now = new Date();
+    return Math.max(0, Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+}
+
+const dayIndex: Record<string, number> = {
+    Dimanche: 0,
+    Lundi: 1,
+    Mardi: 2,
+    Mercredi: 3,
+    Jeudi: 4,
+    Vendredi: 5,
+    Samedi: 6,
+};
+
+function countRemainingSessions(days: string[], endDate: Date) {
+    const targets = new Set(days.map((day) => dayIndex[day]).filter((value) => value !== undefined));
+    if (!targets.size) return 0;
+
+    const cursor = new Date();
+    cursor.setHours(0, 0, 0, 0);
+    const end = new Date(endDate);
+    end.setHours(0, 0, 0, 0);
+    let count = 0;
+
+    while (cursor <= end) {
+        if (targets.has(cursor.getDay())) count += 1;
+        cursor.setDate(cursor.getDate() + 1);
+    }
+
+    return count;
+}
 
 export default async function StudentDashboardPage() {
     const session = await auth();
@@ -19,6 +54,11 @@ export default async function StudentDashboardPage() {
     const systemSettings = await getSystemSettings();
     const fullDict = await getDictionary();
     const dict = fullDict.dashboard;
+    const profile = parseStudentProfileData(user?.onboardingData);
+    const sessionEnd = new Date("2026-08-19T23:59:59");
+    const remainingDays = daysUntil(sessionEnd);
+    const remainingSessions = countRemainingSessions(profile.days || [], sessionEnd);
+    const selectedSlot = PLA_TIME_SLOTS.find((slot) => slot.id === profile.timeSlot);
 
     const isClub = user?.registrationType === "CLUB";
     const isWaitlisted = user?.status === "WAITLIST";
@@ -122,6 +162,58 @@ export default async function StudentDashboardPage() {
                 </div>
             )}
 
+            {!isClub && (
+                <section className="grid grid-cols-1 gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+                    <div className="glass-card space-y-5 p-5 sm:p-6">
+                        <div className="flex items-start justify-between gap-4">
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Programme</p>
+                                <h3 className="mt-1 text-xl font-black text-[var(--foreground)]">{PLA_SESSION.label}</h3>
+                                <p className="mt-1 text-xs font-bold text-[var(--foreground)]/45">{PLA_SESSION.dates} - {PLA_SESSION.duration}</p>
+                            </div>
+                            <div className="rounded-2xl bg-primary/10 px-4 py-3 text-center text-primary">
+                                <p className="text-2xl font-black">{remainingDays}</p>
+                                <p className="text-[9px] font-black uppercase tracking-widest">jours</p>
+                            </div>
+                        </div>
+
+                        <div className="grid gap-3 sm:grid-cols-3">
+                            <MiniStat label="Seances restantes" value={String(remainingSessions)} />
+                            <MiniStat label="Lecons restantes" value={String(Math.max(0, (progressData.totalLessons || 0) - (progressData.completedLessons || 0)))} />
+                            <MiniStat label="Avancement" value={`${progressData.percentage}%`} />
+                        </div>
+
+                        <div className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4">
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40">Objectif</p>
+                            <p className="mt-2 text-sm font-bold leading-6 text-[var(--foreground)]/70">
+                                {profile.learningGoal || profile.objective || "Ajoutez votre objectif dans le profil pour mieux suivre votre progression."}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="glass-card space-y-4 p-5 sm:p-6">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary">Emploi du temps</p>
+                        <div className="space-y-3">
+                            {(profile.days || []).length > 0 ? (
+                                profile.days?.map((day) => (
+                                    <div key={day} className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 px-4 py-3">
+                                        <span className="text-sm font-black text-[var(--foreground)]">{day}</span>
+                                        <span className="text-xs font-bold text-[var(--foreground)]/55">{selectedSlot?.time || "Horaire a confirmer"}</span>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 text-xs font-bold leading-6 text-amber-600">
+                                    Aucun jour choisi. Verifiez votre profil ou contactez l'administration.
+                                </p>
+                            )}
+                        </div>
+                        <p className="text-[11px] font-medium leading-5 text-[var(--foreground)]/45">
+                            Lieu : {PLA_SESSION.location}. {PLA_SESSION.locationHint}
+                        </p>
+                    </div>
+                </section>
+            )}
+
             {/* Next Lesson CTA (Only for FORMATION) */}
             {!isClub && progressData.currentLesson && (
                 <section className="glass-card border-l-4 border-l-primary p-6 flex flex-col md:flex-row justify-between items-center gap-6">
@@ -182,13 +274,22 @@ export default async function StudentDashboardPage() {
                     <span className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/60">{isClub ? dict.private_meet : fullDict.nav?.appointments || "Rendez-vous"}</span>
                 </Link>
 
-                <Link href="/dashboard/student/settings" className="glass-card flex flex-col items-center justify-center gap-3 p-6 hover:border-primary/50 transition-all group">
+                <Link href="/dashboard/student/profile" className="glass-card flex flex-col items-center justify-center gap-3 p-6 hover:border-primary/50 transition-all group">
                     <div className="w-12 h-12 rounded-2xl bg-slate-500/10 text-slate-500 flex items-center justify-center group-hover:bg-slate-500 group-hover:text-white transition-all shadow-sm">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/60">{dict.account}</span>
                 </Link>
             </div>
+        </div>
+    );
+}
+
+function MiniStat({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--background)]/60 p-4">
+            <p className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/35">{label}</p>
+            <p className="mt-1 text-xl font-black text-[var(--foreground)]">{value}</p>
         </div>
     );
 }
