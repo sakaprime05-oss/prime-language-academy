@@ -35,7 +35,7 @@ function senderAddress() {
 }
 
 function adminEmail() {
-    return process.env.ADMIN_EMAIL || process.env.EMAIL_USER || "admin@primelanguageacademy.com";
+    return process.env.ADMIN_EMAIL || process.env.EMAIL_USER || "admin@primelangageacademy.com";
 }
 
 function escapeHtml(value: string) {
