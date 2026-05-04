@@ -6,6 +6,16 @@ import { revalidatePath } from "next/cache";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 
+function paystackAmount(amount: number) {
+    return Math.round(amount * 100);
+}
+
+function paystackChannels(preferredPaymentMethod?: string) {
+    if (preferredPaymentMethod === "CARD") return ["card"];
+    if (preferredPaymentMethod === "WAVE" || preferredPaymentMethod === "MOBILE_MONEY") return ["mobile_money"];
+    return ["mobile_money", "card"];
+}
+
 /**
  * Initiate a payment via Paystack and return a redirect URL
  * The student is then redirected to Paystack's checkout page
@@ -17,6 +27,7 @@ export async function initiatePayment(formData: FormData) {
     if (session.user?.role !== "STUDENT") return { error: "Non autorise" };
 
     const planId = formData.get("planId") as string;
+    const paymentMethod = formData.get("paymentMethod") as string;
     const studentEmail = session.user.email || "student@primelanguageacademy.com";
 
     if (!planId) {
@@ -64,18 +75,18 @@ export async function initiatePayment(formData: FormData) {
             }
         });
 
-        // Build the Paystack payment request body
-        // NOTE: XOF (Franc CFA) does NOT use subunits on Paystack — do NOT multiply by 100
         const paymentBody = {
             email: studentEmail,
-            amount: Math.round(amount), // XOF: no × 100 needed (unlike NGN/GHS/KES)
+            amount: paystackAmount(amount),
             reference: refCommand,
             currency: "XOF",
+            channels: paystackChannels(paymentMethod),
             callback_url: `${baseUrl}/dashboard/student/payments?status=success`,
             metadata: {
                 transactionId: transaction.id,
                 planId,
                 studentId: session.user.id,
+                preferredPaymentMethod: paymentMethod || "PAYSTACK",
                 custom_fields: [
                     {
                         display_name: "Plan ID",

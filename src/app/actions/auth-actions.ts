@@ -16,8 +16,19 @@ type PaystackInitInput = {
     transactionId: string;
     planId: string;
     studentId: string;
+    preferredPaymentMethod?: string;
     callbackPath?: string;
 };
+
+function paystackAmount(amount: number) {
+    return Math.round(amount * 100);
+}
+
+function paystackChannels(preferredPaymentMethod?: string) {
+    if (preferredPaymentMethod === "CARD") return ["card"];
+    if (preferredPaymentMethod === "WAVE" || preferredPaymentMethod === "MOBILE_MONEY") return ["mobile_money"];
+    return ["mobile_money", "card"];
+}
 
 async function initializePaystackCheckout(input: PaystackInitInput) {
     const secretKey = process.env.PAYSTACK_SECRET_KEY;
@@ -36,14 +47,16 @@ async function initializePaystackCheckout(input: PaystackInitInput) {
         },
         body: JSON.stringify({
             email: input.email,
-            amount: Math.round(input.amount), // XOF: no subunit multiplier in this integration
+            amount: paystackAmount(input.amount),
             reference: input.reference,
             currency: "XOF",
+            channels: paystackChannels(input.preferredPaymentMethod),
             callback_url: `${baseUrl}${input.callbackPath || "/login?status=payment_success"}`,
             metadata: {
                 transactionId: input.transactionId,
                 planId: input.planId,
                 studentId: input.studentId,
+                preferredPaymentMethod: input.preferredPaymentMethod || "PAYSTACK",
             },
         }),
     });
@@ -63,6 +76,7 @@ async function createRegistrationCheckout(input: {
     email: string;
     paymentPlanId: string;
     amount: number;
+    preferredPaymentMethod?: string;
     retry?: boolean;
 }) {
     const refPrefix = input.retry ? "REG-RETRY" : "REG";
@@ -85,6 +99,7 @@ async function createRegistrationCheckout(input: {
         transactionId: transaction.id,
         planId: input.paymentPlanId,
         studentId: input.userId,
+        preferredPaymentMethod: input.preferredPaymentMethod,
         callbackPath: `/api/payments/paystack/callback?reference=${encodeURIComponent(refCommand)}`,
     });
 
@@ -110,6 +125,10 @@ export async function registerUser(formData: FormData) {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+    let onboardingParams: any = {};
+    try {
+        onboardingParams = JSON.parse(onboardingData);
+    } catch (e) { }
 
     try {
         const existingUser = await prisma.user.findUnique({
@@ -135,16 +154,37 @@ export async function registerUser(formData: FormData) {
                 return { error: "Compte en attente incomplet. Contactez le support pour finaliser votre inscription." };
             }
 
-            const remaining = Math.max(0, paymentPlan.totalAmount - paymentPlan.amountPaid);
+            const submittedTotalAmount = planPrices[planId];
+            const updatedTotalAmount = submittedTotalAmount || paymentPlan.totalAmount;
+            const remaining = Math.max(0, updatedTotalAmount - paymentPlan.amountPaid);
             if (remaining <= 0) {
                 return { error: "Votre paiement est déjà complet. Patientez quelques instants puis connectez-vous." };
             }
+
+            if (submittedTotalAmount && (paymentPlan.totalAmount !== submittedTotalAmount || existingUser.onboardingData !== onboardingData)) {
+                await prisma.$transaction([
+                    prisma.paymentPlan.update({
+                        where: { id: paymentPlan.id },
+                        data: { totalAmount: submittedTotalAmount },
+                    }),
+                    prisma.user.update({
+                        where: { id: existingUser.id },
+                        data: { onboardingData },
+                    }),
+                ]);
+            }
+
+            const amountToPay =
+                onboardingParams.paymentOption === "fractionne" && paymentPlan.amountPaid <= 0
+                    ? updatedTotalAmount * 0.5
+                    : remaining;
 
             const checkout = await createRegistrationCheckout({
                 userId: existingUser.id,
                 email: existingUser.email,
                 paymentPlanId: paymentPlan.id,
-                amount: remaining,
+                amount: amountToPay,
+                preferredPaymentMethod: onboardingParams.paymentMethod,
                 retry: true,
             });
 
@@ -154,11 +194,6 @@ export async function registerUser(formData: FormData) {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        let onboardingParams: any = {};
-        try {
-            onboardingParams = JSON.parse(onboardingData);
-        } catch (e) { }
 
         const registrationType = onboardingParams.type === "CLUB" ? "CLUB" : "FORMATION";
         const isClubRegistration = registrationType === "CLUB";
@@ -252,6 +287,7 @@ export async function registerUser(formData: FormData) {
             email: user.email,
             paymentPlanId: paymentPlan.id,
             amount: amountToPay,
+            preferredPaymentMethod: onboardingParams.paymentMethod,
         });
 
         if (checkout.error) {

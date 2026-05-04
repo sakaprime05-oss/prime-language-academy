@@ -6,12 +6,18 @@ import { registerUser } from "@/app/actions/auth-actions";
 import { PLA_PLANS, formatFcfa } from "@/lib/pla-program";
 
 const memberships = [
-    { id: "loisir", name: "Social (1x/sem)", price: formatFcfa(PLA_PLANS[0].price) },
-    { id: "essentiel", name: "Connect (2x/sem)", price: formatFcfa(PLA_PLANS[1].price) },
-    { id: "equilibre", name: "Network (3x/sem)", price: formatFcfa(PLA_PLANS[2].price) },
-    { id: "performance", name: "Executive (4x/sem)", price: formatFcfa(PLA_PLANS[3].price) },
-    { id: "intensif", name: "Elite (5x/sem)", price: formatFcfa(PLA_PLANS[4].price) },
-    { id: "immersion", name: "Founder (6x/sem)", price: formatFcfa(PLA_PLANS[5].price) }
+    { id: "loisir", name: "Social (1x/sem)", price: formatFcfa(PLA_PLANS[0].price), amount: PLA_PLANS[0].price },
+    { id: "essentiel", name: "Connect (2x/sem)", price: formatFcfa(PLA_PLANS[1].price), amount: PLA_PLANS[1].price },
+    { id: "equilibre", name: "Network (3x/sem)", price: formatFcfa(PLA_PLANS[2].price), amount: PLA_PLANS[2].price },
+    { id: "performance", name: "Executive (4x/sem)", price: formatFcfa(PLA_PLANS[3].price), amount: PLA_PLANS[3].price },
+    { id: "intensif", name: "Elite (5x/sem)", price: formatFcfa(PLA_PLANS[4].price), amount: PLA_PLANS[4].price },
+    { id: "immersion", name: "Founder (6x/sem)", price: formatFcfa(PLA_PLANS[5].price), amount: PLA_PLANS[5].price }
+];
+
+const paymentMethods = [
+    { id: "WAVE", name: "Wave", detail: "Prioritaire a Abidjan via Paystack" },
+    { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov selon Paystack" },
+    { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard" },
 ];
 
 const levels = ["Intermédiaire (B1/B2)", "Avancé (C1/C2)"];
@@ -40,9 +46,16 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats }: { i
         commune: "",
         communeOther: "",
         planId: "essentiel",
+        paymentOption: "fractionne",
+        paymentMethod: "WAVE",
         agreement: false,
         signature: ""
     });
+
+    const selectedMembership = memberships.find((plan) => plan.id === formData.planId) || memberships[1];
+    const immediateAmount = formData.paymentOption === "fractionne" ? selectedMembership.amount * 0.5 : selectedMembership.amount;
+    const reservationAmount = selectedMembership.amount - immediateAmount;
+    const selectedPaymentMethod = paymentMethods.find((method) => method.id === formData.paymentMethod) || paymentMethods[0];
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const target = e.target as HTMLInputElement | HTMLSelectElement;
@@ -97,7 +110,9 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats }: { i
             level: formData.level,
             commune: formData.commune === "Autre" ? formData.communeOther : formData.commune,
             signature: formData.signature,
-            phone: formData.phone
+            phone: formData.phone,
+            paymentOption: formData.paymentOption,
+            paymentMethod: formData.paymentMethod,
         };
 
         const form = new FormData();
@@ -249,12 +264,55 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats }: { i
 
             {step === 4 && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+                    {!isWaitlistMode && (
+                        <>
+                            <div className="space-y-3">
+                                <h4 className="text-sm font-black text-[var(--foreground)]">Moyen de paiement</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                    {paymentMethods.map((method) => (
+                                        <label key={method.id} className={`p-4 rounded-xl border cursor-pointer transition-all ${formData.paymentMethod === method.id ? 'bg-secondary/10 border-secondary text-secondary' : 'border-[var(--foreground)]/10 text-[var(--foreground)]/70 hover:border-secondary/30'}`}>
+                                            <input type="radio" name="paymentMethod" value={method.id} checked={formData.paymentMethod === method.id} onChange={handleChange} className="sr-only" />
+                                            <span className="block text-xs font-black">{method.name}</span>
+                                            <span className="mt-1 block text-[10px] font-bold opacity-60">{method.detail}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <h4 className="text-sm font-black text-[var(--foreground)]">Option de paiement</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <label className={`p-4 rounded-xl border cursor-pointer transition-all ${formData.paymentOption === 'total' ? 'bg-secondary/10 border-secondary text-secondary' : 'border-[var(--foreground)]/10 text-[var(--foreground)]/70 hover:border-secondary/30'}`}>
+                                        <input type="radio" name="paymentOption" value="total" checked={formData.paymentOption === 'total'} onChange={handleChange} className="sr-only" />
+                                        <span className="block text-xs font-black">Paiement total</span>
+                                        <span className="mt-1 block text-[10px] font-bold opacity-60">Prise en Charge + Reservation.</span>
+                                    </label>
+                                    <label className={`p-4 rounded-xl border cursor-pointer transition-all ${formData.paymentOption === 'fractionne' ? 'bg-secondary/10 border-secondary text-secondary' : 'border-[var(--foreground)]/10 text-[var(--foreground)]/70 hover:border-secondary/30'}`}>
+                                        <input type="radio" name="paymentOption" value="fractionne" checked={formData.paymentOption === 'fractionne'} onChange={handleChange} className="sr-only" />
+                                        <span className="block text-xs font-black">Paiement en 2 fois</span>
+                                        <span className="mt-1 block text-[10px] font-bold opacity-60">Prise en Charge maintenant, Reservation ensuite.</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
                     <div className="p-4 rounded-xl bg-secondary/5 border border-secondary/20">
                         <h4 className="text-sm font-black text-secondary mb-2">Récapitulatif</h4>
                         <ul className="space-y-2 text-xs font-medium text-[var(--foreground)]/70">
                             <li><span className="opacity-50">Nom:</span> {formData.name}</li>
                             <li><span className="opacity-50">Profil:</span> {formData.profession} ({formData.level})</li>
-                            <li><span className="opacity-50">Membership:</span> {memberships.find(p => p.id === formData.planId)?.name}</li>
+                            <li><span className="opacity-50">Membership:</span> {selectedMembership.name}</li>
+                            {!isWaitlistMode && (
+                                <>
+                                    <li><span className="opacity-50">Moyen:</span> {selectedPaymentMethod.name}</li>
+                                    <li><span className="opacity-50">Option:</span> {formData.paymentOption === "fractionne" ? "Paiement en 2 fois" : "Paiement total"}</li>
+                                    <li><span className="opacity-50">A payer maintenant:</span> <strong className="text-secondary">{formatFcfa(immediateAmount)}</strong></li>
+                                    {formData.paymentOption === "fractionne" && (
+                                        <li><span className="opacity-50">Reservation restante:</span> {formatFcfa(reservationAmount)}</li>
+                                    )}
+                                </>
+                            )}
                         </ul>
                     </div>
 

@@ -24,6 +24,12 @@ const plans = [
     { id: "immersion", name: "Immersion (6 séances/sem)", price: formatFcfa(PLA_PLANS[5].price), desc: "Maîtrise totale" }
 ];
 
+const paymentMethods = [
+    { id: "WAVE", name: "Wave", detail: "Prioritaire a Abidjan via Paystack" },
+    { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov selon Paystack" },
+    { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard" },
+];
+
 const availableDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 
 const objectives = [
@@ -76,10 +82,17 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
         timeSlot: "",
 
         paymentOption: "total",
+        paymentMethod: "WAVE",
         agreement: false,
         signature: "",
         signDate: new Date().toISOString().split("T")[0]
     });
+
+    const selectedPlan = plans.find((plan) => plan.id === formData.planId) || plans[1];
+    const selectedPlanAmount = PLA_PLANS.find((plan) => plan.id === formData.planId)?.price || PLA_PLANS[1].price;
+    const selectedPaymentMethod = paymentMethods.find((method) => method.id === formData.paymentMethod) || paymentMethods[0];
+    const immediateAmount = formData.paymentOption === "fractionne" ? selectedPlanAmount * 0.5 : selectedPlanAmount;
+    const reservationAmount = selectedPlanAmount - immediateAmount;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const target = e.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
@@ -486,6 +499,19 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                 {step === 4 && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
                         <div className="space-y-3">
+                            <h3 className="font-black text-[var(--foreground)] text-lg">Moyen de paiement</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                {paymentMethods.map((method) => (
+                                    <label key={method.id} className={`flex flex-col gap-1 p-4 rounded-xl border cursor-pointer transition-all ${formData.paymentMethod === method.id ? 'bg-primary/5 border-primary text-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 text-[var(--foreground)]/70 hover:border-[var(--foreground)]/20'}`}>
+                                        <input type="radio" name="paymentMethod" value={method.id} checked={formData.paymentMethod === method.id} onChange={handleChange} className="sr-only" />
+                                        <span className="font-black text-sm">{method.name}</span>
+                                        <span className="text-[11px] font-medium leading-snug opacity-70">{method.detail}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="space-y-3">
                             <h3 className="font-black text-[var(--foreground)] text-lg">6. Modalités de paiement</h3>
                             <div className="flex flex-col gap-2">
                                 <label className={`flex p-4 rounded-xl border cursor-pointer transition-all gap-3 ${formData.paymentOption === 'total' ? 'bg-primary/5 border-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10'}`}>
@@ -502,6 +528,25 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                         <span className="text-xs text-[var(--foreground)]/60 mt-1 block">1ere moitie : la Prise en Charge, qui donne acces a la documentation, aux conseils, a la plateforme et au suivi. 2e moitie : la Reservation de votre place.</span>
                                     </div>
                                 </label>
+                            </div>
+                        </div>
+
+                        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:p-5 space-y-3">
+                            <h3 className="text-sm font-black text-primary">Recapitulatif avant paiement</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold text-[var(--foreground)]/70">
+                                <div><span className="block opacity-50">Formule</span>{selectedPlan.name}</div>
+                                <div><span className="block opacity-50">Moyen</span>{selectedPaymentMethod.name}</div>
+                                <div><span className="block opacity-50">Cout total</span>{formatFcfa(selectedPlanAmount)}</div>
+                                <div><span className="block opacity-50">Option</span>{formData.paymentOption === "fractionne" ? "Paiement en 2 fois" : "Paiement total"}</div>
+                            </div>
+                            <div className="rounded-xl bg-[var(--background)]/70 border border-[var(--foreground)]/10 p-4">
+                                <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[var(--foreground)]/45">Montant a valider maintenant</div>
+                                <div className="mt-1 text-2xl font-black text-[var(--foreground)]">{formatFcfa(immediateAmount)}</div>
+                                {formData.paymentOption === "fractionne" && (
+                                    <p className="mt-2 text-xs font-medium text-[var(--foreground)]/60">
+                                        Cette premiere moitie correspond a la Prise en Charge. La Reservation restante sera de {formatFcfa(reservationAmount)}.
+                                    </p>
+                                )}
                             </div>
                         </div>
 

@@ -10,6 +10,10 @@ type PaystackTransactionData = {
   channel?: string;
 };
 
+function paystackAmount(amount: number) {
+  return Math.round(amount * 100);
+}
+
 export async function completePaystackTransaction(data: PaystackTransactionData) {
   const refCommand = data.reference;
 
@@ -32,7 +36,7 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
     return { ok: true, reason: "Transaction deja traitee." };
   }
 
-  const expectedAmount = Math.round(transaction.amount);
+  const expectedAmount = paystackAmount(transaction.amount);
   const receivedAmount = Number(data.amount);
   const receivedCurrency = String(data.currency || "").toUpperCase();
   const paymentStatus = String(data.status || "").toLowerCase();
