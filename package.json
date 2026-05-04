@@ -47,5 +47,9 @@
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
+  },
+  "overrides": {
+    "postcss": "8.5.13",
+    "svix": "1.92.2"
   }
 }

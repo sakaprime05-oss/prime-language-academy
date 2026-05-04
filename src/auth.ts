@@ -41,10 +41,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                     if (!user) return null;
 
-                    const canAccess =
-                        user.status === "ACTIVE" || (user.role === "STUDENT" && user.status === "PENDING");
-
-                    if (!canAccess) return null;
+                    if (user.status !== "ACTIVE") return null;
 
                     const isPasswordValid = await bcrypt.compare(
                         credentials.password as string,

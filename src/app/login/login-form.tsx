@@ -32,7 +32,7 @@ export default function LoginForm() {
 
           if (data.status === "PENDING") {
             setError(
-              "Votre compte est en attente de paiement ou de validation. Utilisez le même mot de passe dans l'inscription pour reprendre le paiement."
+              "Votre paiement n'est pas encore confirme. Reprenez votre inscription avec le meme email et le meme mot de passe pour finaliser le paiement."
             );
           } else if (data.status === "SUSPENDED" || data.status === "BLOCKED") {
             setError("Votre compte est bloqué. Contactez l'administration pour le réactiver.");
