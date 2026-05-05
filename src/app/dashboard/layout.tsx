@@ -31,8 +31,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
   });
   const studentMode = student?.registrationType === "CLUB" ? "CLUB" : "FORMATION";
   const currentPath = (await headers()).get("x-url") || "";
+  const canCompleteSetupLater =
+    currentPath.startsWith("/dashboard/student/profile") ||
+    currentPath.startsWith("/dashboard/student/payments");
 
-  if (!hasRequiredProfilePhoto(student?.onboardingData) && !currentPath.startsWith("/dashboard/student/profile")) {
+  if (!hasRequiredProfilePhoto(student?.onboardingData) && !canCompleteSetupLater) {
     redirect("/dashboard/student/profile?complete=1");
   }
 
