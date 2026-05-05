@@ -474,27 +474,37 @@ export function getRecommendedLevel(totalScore: number): {
   level: string;
   description: string;
   color: string;
+  path: "FORMATION" | "CLUB";
+  cta: string;
+  secondaryCta?: string;
 } {
   if (totalScore <= 10) {
     return {
       level: "Débutant",
       description:
-        "Vous êtes au début de votre apprentissage. Notre Formation Régulière vous aidera à construire des bases solides en grammaire, vocabulaire et compréhension.",
+        "Vous êtes au début de votre apprentissage. La Formation régulière est le bon parcours pour construire des bases solides avant de viser la fluidité.",
       color: "emerald",
+      path: "FORMATION",
+      cta: "Continuer vers la Formation",
     };
   } else if (totalScore <= 17) {
     return {
       level: "Intermédiaire",
       description:
-        "Vous avez des bases en anglais et pouvez communiquer dans des situations simples. Notre programme vous aidera à gagner en fluidité et en confiance.",
+        "Vous avez déjà des bases et pouvez communiquer dans des situations simples. La Formation régulière vous aidera à gagner en structure, fluidité et confiance.",
       color: "amber",
+      path: "FORMATION",
+      cta: "Continuer vers la Formation",
     };
   } else {
     return {
       level: "Avancé",
       description:
-        "Vous maîtrisez bien l'anglais ! Notre programme vous perfectionnera et vous préparera à des échanges professionnels et académiques de haut niveau.",
+        "Votre niveau semble déjà solide. Si vous êtes à l'aise à l'oral, le English Club est probablement plus adapté : pratique, networking et immersion sociale en anglais.",
       color: "violet",
+      path: "CLUB",
+      cta: "Rejoindre le English Club",
+      secondaryCta: "Choisir quand même la Formation",
     };
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense, useRef } from "react";
+import { useEffect, useState, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { registerUser } from "@/app/actions/auth-actions";
@@ -98,6 +98,10 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const immediateAmount = formData.paymentOption === "fractionne" ? selectedPlanAmount * 0.5 : selectedPlanAmount;
     const reservationAmount = selectedPlanAmount - immediateAmount;
 
+    useEffect(() => {
+        formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, [step]);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const target = e.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
         const name = target.name;
@@ -175,13 +179,11 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
             return;
         }
         setStep(prev => Math.min(prev + 1, 4));
-        requestAnimationFrame(() => formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
     };
 
     const prevStep = () => {
         setError("");
         setStep(prev => Math.max(prev - 1, 1));
-        requestAnimationFrame(() => formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -395,6 +397,16 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 ))}
                             </div>
 
+                            {formData.level === "Avancé" && (
+                                <div className="rounded-lg border border-secondary/25 bg-secondary/10 p-4 text-xs font-bold leading-6 text-[var(--foreground)]/70">
+                                    Votre niveau semble déjà solide. Si votre objectif principal est la pratique orale, le networking et l'immersion sociale, le{" "}
+                                    <Link href="/register-club" className="font-black text-secondary underline underline-offset-4">
+                                        English Club
+                                    </Link>{" "}
+                                    peut être plus adapté que la formation de base.
+                                </div>
+                            )}
+
                             {/* Placement Test CTA */}
                             <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
                                 <p className="mb-2 text-sm font-black text-primary">
@@ -512,12 +524,12 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
                 {/* STEP 4: Paiement & Contrat */}
                 {step === 4 && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+                    <div className="space-y-5 animate-in fade-in slide-in-from-right-4">
                         <div className="space-y-3">
-                            <h3 className="font-black text-[var(--foreground)] text-lg">Moyen de paiement</h3>
+                            <h3 className="text-lg font-black text-[var(--foreground)]">Moyen de paiement</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 {paymentMethods.map((method) => (
-                                    <label key={method.id} className={`flex flex-col gap-1 p-4 rounded-xl border cursor-pointer transition-all ${formData.paymentMethod === method.id ? 'bg-primary/5 border-primary text-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 text-[var(--foreground)]/70 hover:border-[var(--foreground)]/20'}`}>
+                                    <label key={method.id} className={`flex cursor-pointer flex-col gap-1 rounded-lg border p-3 transition-colors ${formData.paymentMethod === method.id ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/70 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="paymentMethod" value={method.id} checked={formData.paymentMethod === method.id} onChange={handleChange} className="sr-only" />
                                         <span className="font-black text-sm">{method.name}</span>
                                         <span className="text-[11px] font-medium leading-snug opacity-70">{method.detail}</span>
@@ -527,16 +539,16 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         </div>
 
                         <div className="space-y-3">
-                            <h3 className="font-black text-[var(--foreground)] text-lg">6. Modalités de paiement</h3>
+                            <h3 className="text-lg font-black text-[var(--foreground)]">6. Modalités de paiement</h3>
                             <div className="flex flex-col gap-2">
-                                <label className={`flex p-4 rounded-xl border cursor-pointer transition-all gap-3 ${formData.paymentOption === 'total' ? 'bg-primary/5 border-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10'}`}>
+                                <label className={`flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors ${formData.paymentOption === 'total' ? 'border-primary bg-primary/10' : 'border-[var(--foreground)]/10 bg-white/55 dark:bg-white/5'}`}>
                                     <input type="radio" name="paymentOption" value="total" checked={formData.paymentOption === 'total'} onChange={handleChange} className="accent-primary mt-0.5" />
                                     <div>
                                         <span className="font-bold block text-sm">Paiement total</span>
                                         <span className="text-xs text-[var(--foreground)]/60 mt-1 block">Reglez la Prise en Charge et la Reservation en une seule fois.</span>
                                     </div>
                                 </label>
-                                <label className={`flex p-4 rounded-xl border cursor-pointer transition-all gap-3 ${formData.paymentOption === 'fractionne' ? 'bg-primary/5 border-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10'}`}>
+                                <label className={`flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors ${formData.paymentOption === 'fractionne' ? 'border-primary bg-primary/10' : 'border-[var(--foreground)]/10 bg-white/55 dark:bg-white/5'}`}>
                                     <input type="radio" name="paymentOption" value="fractionne" checked={formData.paymentOption === 'fractionne'} onChange={handleChange} className="accent-primary mt-0.5" />
                                     <div>
                                         <span className="font-bold block text-sm">Paiement en 2 fois</span>
@@ -546,7 +558,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:p-5 space-y-3">
+                        <div className="space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-4 sm:p-5">
                             <h3 className="text-sm font-black text-primary">Recapitulatif avant paiement</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold text-[var(--foreground)]/70">
                                 <div><span className="block opacity-50">Formule</span>{selectedPlan.name}</div>
@@ -554,7 +566,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 <div><span className="block opacity-50">Cout total</span>{formatFcfa(selectedPlanAmount)}</div>
                                 <div><span className="block opacity-50">Option</span>{formData.paymentOption === "fractionne" ? "Paiement en 2 fois" : "Paiement total"}</div>
                             </div>
-                            <div className="rounded-xl bg-[var(--background)]/70 border border-[var(--foreground)]/10 p-4">
+                            <div className="rounded-lg border border-[var(--foreground)]/10 bg-white/70 p-4 dark:bg-white/5">
                                 <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[var(--foreground)]/45">Montant a valider maintenant</div>
                                 <div className="mt-1 text-2xl font-black text-[var(--foreground)]">{formatFcfa(immediateAmount)}</div>
                                 {formData.paymentOption === "fractionne" && (
@@ -565,11 +577,11 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
                         </div>
 
-                        <div className="space-y-4 pt-4 border-t border-[var(--foreground)]/10">
-                            <h3 className="font-black text-[var(--foreground)] text-lg">7. Règles et Engagement</h3>
+                        <div className="space-y-4 border-t border-[var(--foreground)]/10 pt-4">
+                            <h3 className="text-lg font-black text-[var(--foreground)]">7. Règles et Engagement</h3>
 
-                            <div className="bg-slate-900 text-white p-5 rounded-xl text-xs font-bold leading-relaxed border-l-4 border-primary shadow-lg shadow-black/10">
-                                <ul className="list-disc pl-4 space-y-2">
+                            <div className="rounded-lg border border-[var(--foreground)]/10 bg-white/65 p-4 text-xs font-bold leading-relaxed text-[var(--foreground)]/75 dark:bg-white/5">
+                                <ul className="list-disc space-y-2 pl-4">
                                     <li>L'inscription offerte est réservée aux premiers inscrits.</li>
                                     <li>Le solde total doit obligatoirement être réglé avant le début de la formation.</li>
                                     <li><strong>Condition de remboursement :</strong> En cas d'annulation notifiée avant le début de la formation, un remboursement est possible. Aucun remboursement ne sera effectué une fois les cours commencés.</li>
@@ -578,7 +590,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 </ul>
                             </div>
 
-                            <label className="flex items-start gap-3 p-3 cursor-pointer group">
+                            <label className="group flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--foreground)]/10 bg-white/55 p-3 dark:bg-white/5">
                                 <input type="checkbox" name="agreement" checked={formData.agreement} onChange={handleChange} className="accent-primary mt-1" />
                                 <span className="text-xs text-[var(--foreground)]/80 group-hover:text-[var(--foreground)] font-bold transition-colors">
                                     Je confirme mon inscription au programme English Mastery et j'accepte les{" "}
@@ -588,20 +600,20 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 </span>
                             </label>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Signature (Nom complet) *</label>
-                                    <input type="text" name="signature" required value={formData.signature} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none" placeholder="Ex: Jean Dupont" />
+                                    <label className={fieldLabelClass}>Signature (Nom complet) *</label>
+                                    <input type="text" name="signature" required value={formData.signature} onChange={handleChange} className={fieldClass} placeholder="Ex: Jean Dupont" />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Date</label>
-                                    <input type="date" name="signDate" disabled value={formData.signDate} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 opacity-70 rounded-xl px-4 py-3 text-sm outline-none cursor-not-allowed" />
+                                    <label className={fieldLabelClass}>Date</label>
+                                    <input type="date" name="signDate" disabled value={formData.signDate} className={`${fieldClass} cursor-not-allowed opacity-70`} />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-[0.8fr_1.2fr] gap-3 pt-6 border-t border-[var(--foreground)]/10">
-                            <button type="button" onClick={prevStep} className="min-h-12 px-4 py-3 rounded-xl bg-[var(--foreground)]/5 font-bold hover:bg-[var(--foreground)]/10 text-[var(--foreground)] transition-all">Retour</button>
+                        <div className="grid grid-cols-[0.8fr_1.2fr] gap-3 border-t border-[var(--foreground)]/10 pt-5">
+                            <button type="button" onClick={prevStep} className="min-h-12 rounded-lg bg-[var(--foreground)]/5 px-4 py-3 font-bold text-[var(--foreground)] transition-colors hover:bg-[var(--foreground)]/10">Retour</button>
                             <button type="submit" className="btn-primary min-h-12" disabled={loading}>
                                 {loading ? "Création en cours..." : "Valider l'inscription"}
                             </button>

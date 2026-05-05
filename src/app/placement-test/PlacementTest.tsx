@@ -152,11 +152,22 @@ export default function PlacementTest() {
     }
   };
 
-  const handleUseLevel = (level: string) => {
-    // Build the return URL with level pre-selected
+  const buildFormationUrl = (level: string) => {
     const plan = searchParams.get("plan") || "";
-    const returnUrl = `/register?level=${encodeURIComponent(level)}${plan ? `&plan=${plan}` : ""}`;
-    router.push(returnUrl);
+    return `/register?level=${encodeURIComponent(level)}${plan ? `&plan=${plan}` : ""}`;
+  };
+
+  const handleUseLevel = (level: string) => {
+    router.push(buildFormationUrl(level));
+  };
+
+  const handleUseRecommendation = (recommendation: ReturnType<typeof getRecommendedLevel>) => {
+    if (recommendation.path === "CLUB") {
+      router.push(`/register-club?level=${encodeURIComponent(recommendation.level)}`);
+      return;
+    }
+
+    router.push(buildFormationUrl(recommendation.level));
   };
 
   // ============================================================
@@ -215,6 +226,15 @@ export default function PlacementTest() {
           <p className="max-w-md mx-auto text-sm text-[var(--foreground)]/60 font-medium leading-relaxed">
             {recommendation.description}
           </p>
+
+          <div className="mx-auto max-w-md rounded-2xl border border-primary/15 bg-primary/5 p-4 text-left">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Orientation PLA</p>
+            <p className="mt-2 text-sm font-bold leading-6 text-[var(--foreground)]/70">
+              {recommendation.path === "CLUB"
+                ? "Ce test sert surtout à identifier les profils déjà trop avancés pour reprendre les bases. Pour vous, le Club est conseillé si vous cherchez surtout à pratiquer, échanger et réseauter en anglais."
+                : "Ce test sert à déterminer le bon point d'entrée. Pour vous, la Formation régulière est conseillée afin d'apprendre ou consolider avant de passer au Club."}
+            </p>
+          </div>
         </div>
 
         {/* Section Breakdown */}
@@ -238,11 +258,21 @@ export default function PlacementTest() {
         <div className="flex flex-col gap-3 pt-4">
           <button
             type="button"
-            onClick={() => handleUseLevel(recommendation.level)}
+            onClick={() => handleUseRecommendation(recommendation)}
             className="btn-primary w-full"
           >
-            ✓ Utiliser ce niveau ({recommendation.level}) et continuer l'inscription
+            ✓ {recommendation.cta} ({recommendation.level})
           </button>
+
+          {recommendation.secondaryCta && (
+            <button
+              type="button"
+              onClick={() => handleUseLevel(recommendation.level)}
+              className="w-full rounded-xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 px-4 py-3 text-sm font-black text-[var(--foreground)]/70 transition-colors hover:bg-[var(--foreground)]/10"
+            >
+              {recommendation.secondaryCta}
+            </button>
+          )}
 
           {/* Let user override */}
           <div className="text-center">

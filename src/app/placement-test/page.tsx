@@ -44,7 +44,8 @@ export default function PlacementTestPage() {
           </h1>
           <p className="text-xs text-[var(--foreground)]/50 font-medium max-w-sm mx-auto">
             Ce test évalue votre niveau en anglais à travers la compréhension, la grammaire,
-            l'écoute, l'expression orale et écrite. Durée estimée : 15–20 minutes.
+            l'écoute, l'expression orale et écrite. Il sert surtout à vous orienter :
+            Formation pour apprendre ou consolider, English Club si votre niveau est déjà fort.
           </p>
         </div>
 

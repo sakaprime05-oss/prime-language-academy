@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 const WA_NUMBER = "2250161337864";
@@ -10,9 +11,29 @@ const HIDDEN_PREFIXES = ["/contact", "/login", "/register", "/register-club", "/
 
 export function WhatsAppButton() {
   const pathname = usePathname();
+  const [showMobileHomeButton, setShowMobileHomeButton] = useState(false);
   const shouldHide = HIDDEN_PREFIXES.some((prefix) => pathname?.startsWith(prefix));
+  const isHome = pathname === "/";
 
-  if (shouldHide) return null;
+  useEffect(() => {
+    if (!isHome) return;
+
+    const updateVisibility = () => {
+      const isMobile = window.matchMedia("(max-width: 639px)").matches;
+      setShowMobileHomeButton(!isMobile || window.scrollY > 260);
+    };
+
+    updateVisibility();
+    window.addEventListener("scroll", updateVisibility, { passive: true });
+    window.addEventListener("resize", updateVisibility);
+
+    return () => {
+      window.removeEventListener("scroll", updateVisibility);
+      window.removeEventListener("resize", updateVisibility);
+    };
+  }, [isHome]);
+
+  if (shouldHide || (isHome && !showMobileHomeButton)) return null;
 
   return (
     <>
@@ -60,6 +81,21 @@ export function WhatsAppButton() {
 
         .wa-tooltip {
           display: none;
+        }
+
+        @media (max-width: 639px) {
+          .wa-float {
+            right: 14px;
+            bottom: calc(16px + env(safe-area-inset-bottom));
+            width: 46px;
+            height: 46px;
+            box-shadow: 0 3px 16px rgba(37,211,102,0.32), 0 0 0 0 rgba(37,211,102,0.22);
+          }
+
+          .wa-float svg {
+            width: 25px;
+            height: 25px;
+          }
         }
 
         @media (min-width: 640px) {

@@ -57,10 +57,10 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
   }, []);
 
   return (
-    <div className="bg-[var(--background)] text-[var(--foreground)]" style={{ fontFamily:"'Inter', sans-serif", overflowX:"hidden" }}>
+    <div className="landing-page bg-[var(--background)] text-[var(--foreground)]" style={{ fontFamily:"'Inter', sans-serif", overflowX:"hidden" }}>
 
       {/* ══════════ NAV ══════════ */}
-      <nav style={{
+      <nav className="landing-nav" style={{
         position:"fixed", top:0, width:"100%", zIndex:100,
         background: scrolled ? "var(--surface)" : "transparent",
         backdropFilter: scrolled ? "blur(20px)" : "none",
@@ -72,7 +72,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
       }}>
         <Link href="/" style={{ display:"flex", alignItems:"center", gap:"12px", textDecoration:"none" }}>
           {/* Remplacez '/logo.png' par le nom exact de votre fichier logo s'il est différent (ex: '/logo.svg') */}
-          <LogoMark className="h-14 w-14 sm:h-20 sm:w-20" />
+          <LogoMark className="landing-logo h-14 w-14 sm:h-20 sm:w-20" />
         </Link>
 
         <div className="hidden lg:flex gap-10 text-[13px] font-medium tracking-widest uppercase text-[var(--foreground)]/55">
@@ -91,7 +91,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
           ) : (
             <>
               <Link href="/login" className="hidden sm:inline text-[var(--foreground)]/55 hover:text-[var(--primary)]" style={{ fontSize:13, textDecoration:"none", letterSpacing:"0.05em" }}>Connexion</Link>
-              <Link href="/register" className="btn-primary" style={{ textDecoration:"none", padding:"10px clamp(14px, 3vw, 24px)", fontSize:11, whiteSpace:"nowrap" }}>
+              <Link href="/register" className="landing-nav-cta btn-primary" style={{ textDecoration:"none", padding:"10px clamp(14px, 3vw, 24px)", fontSize:11, whiteSpace:"nowrap" }}>
                 S'inscrire
               </Link>
             </>
@@ -101,37 +101,37 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
       </nav>
 
       {/* ══════════ HERO ══════════ */}
-      <section style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", padding:"120px 2rem 80px", overflow:"hidden" }}>
+      <section className="landing-hero" style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", padding:"120px 2rem 80px", overflow:"hidden" }}>
         {/* Glow blobs */}
-        <div style={{ position:"absolute", top:"20%", left:"15%", width:500, height:500, borderRadius:"50%", background:"rgba(231,22,42,0.06)", filter:"blur(100px)", pointerEvents:"none" }}/>
-        <div style={{ position:"absolute", bottom:"10%", right:"10%", width:400, height:400, borderRadius:"50%", background:"rgba(231,22,42,0.04)", filter:"blur(120px)", pointerEvents:"none" }}/>
+        <div className="landing-glow" style={{ position:"absolute", top:"20%", left:"15%", width:500, height:500, borderRadius:"50%", background:"rgba(231,22,42,0.06)", filter:"blur(100px)", pointerEvents:"none" }}/>
+        <div className="landing-glow" style={{ position:"absolute", bottom:"10%", right:"10%", width:400, height:400, borderRadius:"50%", background:"rgba(231,22,42,0.04)", filter:"blur(120px)", pointerEvents:"none" }}/>
         {/* Grid lines */}
-        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(231,22,42,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(231,22,42,0.03) 1px, transparent 1px)", backgroundSize:"80px 80px", pointerEvents:"none" }}/>
+        <div className="landing-grid" style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(231,22,42,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(231,22,42,0.03) 1px, transparent 1px)", backgroundSize:"80px 80px", pointerEvents:"none" }}/>
 
-        <div style={{ maxWidth:900, margin:"0 auto", display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center", position:"relative", zIndex:1 }}>
+        <div className="landing-hero-inner" style={{ maxWidth:900, margin:"0 auto", display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center", position:"relative", zIndex:1 }}>
 
           {/* Left */}
           <div>
-            <div style={{ display:"inline-flex", alignItems:"center", gap:8, border:"1px solid rgba(231,22,42,0.3)", borderRadius:100, padding:"6px 18px", marginBottom:32, background:"rgba(231,22,42,0.06)" }}>
+            <div className="landing-hero-badge" style={{ display:"inline-flex", alignItems:"center", gap:8, border:"1px solid rgba(231,22,42,0.3)", borderRadius:100, padding:"6px 18px", marginBottom:32, background:"rgba(231,22,42,0.06)" }}>
               <span style={{ width:6, height:6, borderRadius:"50%", background:"#E7162A", display:"inline-block", animation:"ping 2s infinite" }}/>
               <span style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", fontWeight:600 }}>{PLA_SESSION.dates}</span>
             </div>
 
-            <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(3rem,6vw,5.5rem)", lineHeight:1.05, fontWeight:900, marginBottom:28, letterSpacing:"-0.02em" }}>
+            <h1 className="landing-hero-title" style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(3rem,6vw,5.5rem)", lineHeight:1.05, fontWeight:900, marginBottom:28, letterSpacing:"-0.02em" }}>
               Parlez anglais.<br/>
               <em style={{ color:"#E7162A", fontStyle:"italic" }}>Vivez des</em><br/>
               opportunités.
             </h1>
 
-            <p style={{ fontSize:17, lineHeight:1.75, color:"var(--muted-foreground)", maxWidth:600, marginBottom:44, marginLeft:"auto", marginRight:"auto" }}>
+            <p className="landing-hero-copy" style={{ fontSize:17, lineHeight:1.75, color:"var(--muted-foreground)", maxWidth:600, marginBottom:44, marginLeft:"auto", marginRight:"auto" }}>
               Prime Language Academy accompagne professionnels, étudiants et entrepreneurs francophones vers une maîtrise confiante et efficace de l'anglais.
             </p>
 
-            <div style={{ display:"flex", gap:16, flexWrap:"wrap", justifyContent:"center" }}>
-              <Link href="/register" className="btn-primary" style={{ textDecoration:"none", display:"inline-block" }}>
+            <div className="landing-hero-actions" style={{ display:"flex", gap:16, flexWrap:"wrap", justifyContent:"center" }}>
+              <Link href="/register" className="landing-hero-primary btn-primary" style={{ textDecoration:"none", display:"inline-block" }}>
                 Rejoindre la session →
               </Link>
-              <Link href="/placement-test" style={{
+              <Link href="/placement-test" className="landing-hero-secondary" style={{
                 display:"inline-flex", alignItems:"center", gap:8,
                 padding:"14px 28px", borderRadius:100,
                 border:"1px solid rgba(231,22,42,0.25)", color:"#E7162A",
@@ -145,11 +145,11 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
             </div>
 
             {/* Stats */}
-            <div style={{ display:"flex", gap:40, marginTop:56, paddingTop:40, borderTop:"1px solid rgba(231,22,42,0.12)", justifyContent:"center", width:"100%" }}>
+            <div className="landing-hero-stats" style={{ display:"flex", gap:40, marginTop:56, paddingTop:40, borderTop:"1px solid rgba(231,22,42,0.12)", justifyContent:"center", width:"100%" }}>
               {[["6","Formules adaptées"],["2","Vagues horaires"],["21 juin","Début session"]].map(([v,l])=>(
-                <div key={l}>
-                  <div style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:900, color:"#E7162A", lineHeight:1 }}>{v}</div>
-                  <div style={{ fontSize:11, color:"var(--muted-foreground)", marginTop:6, textTransform:"uppercase", letterSpacing:"0.1em" }}>{l}</div>
+                <div className="landing-stat" key={l}>
+                  <div className="landing-stat-value" style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:900, color:"#E7162A", lineHeight:1 }}>{v}</div>
+                  <div className="landing-stat-label" style={{ fontSize:11, color:"var(--muted-foreground)", marginTop:6, textTransform:"uppercase", letterSpacing:"0.1em" }}>{l}</div>
                 </div>
               ))}
             </div>
