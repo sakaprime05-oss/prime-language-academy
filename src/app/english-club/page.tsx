@@ -42,10 +42,10 @@ const MEMBERSHIPS = [
 
 export default function EnglishClubPublicPage() {
   return (
-    <div style={{ background: "#080808", color: "#F5F0E8", fontFamily: "'Inter', sans-serif", minHeight: "100vh" }}>
+    <div className="english-club-page" style={{ background: "#080808", color: "#F5F0E8", fontFamily: "'Inter', sans-serif", minHeight: "100vh" }}>
 
       {/* ── NAV ── */}
-      <nav style={{
+      <nav className="english-club-nav" style={{
         position: "fixed", top: 0, width: "100%", zIndex: 100,
         background: "rgba(8,8,8,0.88)", backdropFilter: "blur(20px)",
         borderBottom: "1px solid rgba(231,22,42,0.1)",
@@ -57,7 +57,7 @@ export default function EnglishClubPublicPage() {
         </Link>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
           <Link href="/" style={{ fontSize: 13, color: "rgba(245,240,232,0.5)", textDecoration: "none", letterSpacing: "0.08em", textTransform: "uppercase" }}>Formation</Link>
-          <Link href="/register-club" style={{
+          <Link href="/register-club" className="english-club-nav-cta" style={{
             fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase",
             background: "linear-gradient(135deg,#E7162A,#FF4D5E,#B30012)", color: "#080808",
             padding: "10px 22px", borderRadius: 100, textDecoration: "none",
@@ -67,13 +67,13 @@ export default function EnglishClubPublicPage() {
       </nav>
 
       {/* ── HERO ── */}
-      <section style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "110px 2rem 80px", position: "relative", overflow: "hidden" }}>
+      <section className="english-club-hero" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "110px 2rem 80px", position: "relative", overflow: "hidden" }}>
         {/* Background elements */}
         <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(231,22,42,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
         <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(231,22,42,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(231,22,42,0.025) 1px, transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
 
         {/* Citation clé du catalogue */}
-        <div style={{ maxWidth: 900, margin: "0 auto 72px", textAlign: "center", position: "relative", zIndex: 1 }}>
+        <div className="english-club-quote" style={{ maxWidth: 900, margin: "0 auto 72px", textAlign: "center", position: "relative", zIndex: 1 }}>
           <blockquote style={{ border: "1px solid rgba(231,22,42,0.25)", borderRadius: 24, padding: "48px 40px", background: "rgba(231,22,42,0.04)", backdropFilter: "blur(16px)" }}>
             <p style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", lineHeight: 1.6, fontWeight: 700, color: "#F5F0E8", marginBottom: 20 }}>
               « En Côte d'Ivoire, le problème n'est pas d'apprendre l'anglais.<br/>
@@ -83,7 +83,7 @@ export default function EnglishClubPublicPage() {
           </blockquote>
         </div>
 
-        <div style={{ maxWidth: 900, textAlign: "center", position: "relative", zIndex: 1 }}>
+        <div className="english-club-hero-copy" style={{ maxWidth: 900, textAlign: "center", position: "relative", zIndex: 1 }}>
           {/* Badge */}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(231,22,42,0.3)", borderRadius: 100, padding: "8px 22px", marginBottom: 40, background: "rgba(231,22,42,0.06)" }}>
             <span style={{ fontSize: 16 }}>🔑</span>
