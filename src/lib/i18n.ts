@@ -11,33 +11,33 @@ export const dictionaries = {
       messages: "Messagerie",
       profile: "Mon Profil",
       logout: "Déconnexion",
-      navigation: "Navigation"
+      navigation: "Navigation",
     },
     dashboard: {
       welcome: "Salut",
       ready_course: "Prêt pour votre séance d'anglais ?",
       ready_club: "Prêt pour votre prochaine session de networking ?",
-      plan_pending: "Plan en attente d'activation",
-      plan_pending_desc: "L'administration valide votre inscription. Merci de votre patience !",
-      your_plan: "Votre Formule Actualisée",
+      plan_pending: "Paiement à finaliser",
+      plan_pending_desc: "Votre accès s'active automatiquement après confirmation du paiement.",
+      your_plan: "Votre formule actuelle",
       your_club: "Votre Membership English Club",
       member_since: "Membre depuis",
       start_date: "Début",
-      progress: "Progression Globale",
+      progress: "Progression globale",
       lessons_left: "Leçons à venir",
-      club_status: "Status Membre",
+      club_status: "Statut membre",
       active: "ACTIF",
       get_ready: "Préparez-vous !",
       continue: "Continuer l'apprentissage",
       resume: "Reprendre",
-      next_session: "Next Session",
+      next_session: "Prochaine session",
       book_talk: "Réservez votre place pour le prochain Talk",
       book: "Réserver",
       my_courses: "Mes Cours",
-      community: "Community",
-      private_meet: "Private Meet",
-      account: "Compte"
-    }
+      community: "Communauté",
+      private_meet: "Rendez-vous privé",
+      account: "Compte",
+    },
   },
   en: {
     nav: {
@@ -49,14 +49,14 @@ export const dictionaries = {
       messages: "Messages",
       profile: "My Profile",
       logout: "Logout",
-      navigation: "Navigation"
+      navigation: "Navigation",
     },
     dashboard: {
       welcome: "Hello",
       ready_course: "Ready for your English session?",
       ready_club: "Ready for your next networking session?",
-      plan_pending: "Plan pending activation",
-      plan_pending_desc: "The administration is validating your registration. Thank you for your patience!",
+      plan_pending: "Payment to complete",
+      plan_pending_desc: "Your access activates automatically after payment confirmation.",
       your_plan: "Your Current Plan",
       your_club: "Your English Club Membership",
       member_since: "Member since",
@@ -74,9 +74,9 @@ export const dictionaries = {
       my_courses: "My Courses",
       community: "Community",
       private_meet: "Private Meet",
-      account: "Account"
-    }
-  }
+      account: "Account",
+    },
+  },
 };
 
 export async function getDictionary() {

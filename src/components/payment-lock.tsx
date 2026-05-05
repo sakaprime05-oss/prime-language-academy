@@ -16,24 +16,24 @@ export function PaymentLock() {
 
         <div className="space-y-3">
           <h2 className="text-3xl font-black text-[#21286E] dark:text-white tracking-tight leading-tight">
-            Accès en attente de <span className="text-[#E7162A]">validation</span>
+            Accès en attente de <span className="text-[#E7162A]">paiement</span>
           </h2>
           <p className="text-[#21286E]/60 dark:text-white/40 text-sm font-medium leading-relaxed px-4">
-            Pour accéder à vos cours et aux ressources de l'académie, vous devez d'abord régulariser votre inscription.
+            Pour accéder à vos cours et aux ressources de l'académie, vous devez d'abord finaliser votre paiement.
           </p>
         </div>
 
         <div className="glass-card bg-[#E7162A]/5 border-[#E7162A]/20 p-6 rounded-2xl space-y-4">
           <p className="text-xs font-black text-[#E7162A] uppercase tracking-widest">Étape suivante</p>
           <p className="text-sm font-bold text-[#21286E] dark:text-white/80">
-            Effectuez votre paiement via Mobile Money et transmettez votre preuve de dépôt.
+            Choisissez votre moyen de paiement, suivez les instructions, puis revenez à votre espace après confirmation.
           </p>
 
           <Link
-            href="/dashboard/student/payments/manual"
+            href="/dashboard/student/payments"
             className="flex items-center justify-center gap-2 w-full py-4 bg-[#E7162A] hover:bg-[#c41222] text-white rounded-xl font-black text-sm transition-all shadow-lg shadow-[#E7162A]/25 active:scale-95 group"
           >
-            Instructions de Paiement
+            Continuer le paiement
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>

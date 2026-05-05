@@ -559,15 +559,15 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         </div>
 
                         <div className="space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-4 sm:p-5">
-                            <h3 className="text-sm font-black text-primary">Recapitulatif avant paiement</h3>
+                            <h3 className="text-sm font-black text-primary">Récapitulatif avant paiement</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold text-[var(--foreground)]/70">
                                 <div><span className="block opacity-50">Formule</span>{selectedPlan.name}</div>
                                 <div><span className="block opacity-50">Moyen</span>{selectedPaymentMethod.name}</div>
-                                <div><span className="block opacity-50">Cout total</span>{formatFcfa(selectedPlanAmount)}</div>
+                                <div><span className="block opacity-50">Coût total</span>{formatFcfa(selectedPlanAmount)}</div>
                                 <div><span className="block opacity-50">Option</span>{formData.paymentOption === "fractionne" ? "Paiement en 2 fois" : "Paiement total"}</div>
                             </div>
                             <div className="rounded-lg border border-[var(--foreground)]/10 bg-white/70 p-4 dark:bg-white/5">
-                                <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[var(--foreground)]/45">Montant à valider maintenant</div>
+                                <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[var(--foreground)]/45">Montant à payer maintenant</div>
                                 <div className="mt-1 text-2xl font-black text-[var(--foreground)]">{formatFcfa(immediateAmount)}</div>
                                 {formData.paymentOption === "fractionne" && (
                                     <p className="mt-2 text-xs font-medium text-[var(--foreground)]/60">
@@ -594,8 +594,8 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 <input type="checkbox" name="agreement" checked={formData.agreement} onChange={handleChange} className="accent-primary mt-1" />
                                 <span className="text-xs text-[var(--foreground)]/80 group-hover:text-[var(--foreground)] font-bold transition-colors">
                                     Je confirme mon inscription au programme English Mastery et j'accepte les{" "}
-                                    <Link href="/conditions-generales" target="_blank" className="text-primary underline underline-offset-4">conditions generales</Link>, la{" "}
-                                    <Link href="/politique-confidentialite" target="_blank" className="text-primary underline underline-offset-4">politique de confidentialite</Link> et la{" "}
+                                    <Link href="/conditions-generales" target="_blank" className="text-primary underline underline-offset-4">conditions générales</Link>, la{" "}
+                                    <Link href="/politique-confidentialite" target="_blank" className="text-primary underline underline-offset-4">politique de confidentialité</Link> et la{" "}
                                     <Link href="/politique-remboursement" target="_blank" className="text-primary underline underline-offset-4">politique de remboursement</Link>.
                                 </span>
                             </label>

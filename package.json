@@ -49,6 +49,7 @@
     "typescript": "^5"
   },
   "overrides": {
+    "ip-address": "10.2.0",
     "postcss": "8.5.13",
     "svix": "1.92.2"
   }
