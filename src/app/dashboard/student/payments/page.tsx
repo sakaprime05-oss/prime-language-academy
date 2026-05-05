@@ -140,10 +140,10 @@ export default async function StudentPaymentsPage({ searchParams }: { searchPara
                                                 target="_blank"
                                                 download
                                                 className="hidden items-center gap-1 rounded border border-primary/20 bg-primary/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-primary transition-colors hover:bg-primary/15 hover:underline sm:flex"
-                                                title="Telecharger le recu PDF"
+                                                title="Télécharger le reçu PDF"
                                             >
                                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                                <span>Recu PDF</span>
+                                                <span>Reçu PDF</span>
                                             </Link>
                                         )}
                                         <span className={`status-badge ${t.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-600' : t.status === 'PENDING' ? 'bg-amber-500/10 text-amber-600' : 'bg-red-500/10 text-red-600'}`}>

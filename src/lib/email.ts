@@ -290,15 +290,15 @@ export async function sendClubSeatAvailableEmail(to: string, name: string, planN
     const title = "Une place est disponible au English Club";
     const body = `
         ${paragraph(`Bonjour ${escapeHtml(name || "cher membre")},`)}
-        ${paragraph("Bonne nouvelle : une place vient de se liberer au English Club. Votre demande quitte la liste d'attente et vous pouvez maintenant finaliser votre inscription.")}
+        ${paragraph("Bonne nouvelle : une place vient de se libérer au English Club. Votre demande quitte la liste d'attente et vous pouvez maintenant finaliser votre inscription.")}
         ${detailRows([
             ["Formule Club", escapeHtml(planName || "Membership Club")],
-            ["Montant a regler", money(amount)],
-            ["Paiement", "Paiement en ligne securise"],
+            ["Montant à régler", money(amount)],
+            ["Paiement", "Paiement en ligne sécurisé"],
         ])}
-        ${paragraph("Connectez-vous avec l'email et le mot de passe utilises lors de votre demande. Le montant a payer est calcule par la plateforme et ne peut pas etre modifie par le client.")}
+        ${paragraph("Connectez-vous avec l'email et le mot de passe utilisés lors de votre demande. Le montant à payer est calculé par la plateforme et ne peut pas être modifié par le client.")}
         ${button("Finaliser mon paiement", `${appUrl()}/dashboard/student/payments`, brand.color)}
-        ${paragraph("Si vous n'etes plus interesse, vous pouvez simplement ignorer ce message ou contacter l'administration.")}
+        ${paragraph("Si vous n'êtes plus intéressé, vous pouvez simplement ignorer ce message ou contacter l'administration.")}
     `;
     return sendEmail({
         to,

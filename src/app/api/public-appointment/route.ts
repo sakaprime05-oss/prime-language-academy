@@ -136,36 +136,36 @@ export async function POST(req: NextRequest) {
             </table>
           </div>
           <div style="padding: 20px 32px; background: #f9f9f9; text-align: center; border-top: 1px solid #eee;">
-            <p style="color: #999; font-size: 12px; margin: 0;">Prime Language Academy - Systeme de prise de rendez-vous public</p>
+            <p style="color: #999; font-size: 12px; margin: 0;">Prime Language Academy - Système de prise de rendez-vous public</p>
           </div>
         </div>`;
 
         if (process.env.EMAIL_USER) {
             await sendMail(
                 process.env.EMAIL_USER,
-                `[RDV Public] ${name} - ${dateLabel} a ${time}`,
-                `Nouvelle demande de RDV de ${name} (${email}) pour le ${dateLabel} a ${time}. Motif : ${reason || "Non precise"}`,
+                `[RDV Public] ${name} - ${dateLabel} à ${time}`,
+                `Nouvelle demande de RDV de ${name} (${email}) pour le ${dateLabel} à ${time}. Motif : ${reason || "Non précisé"}`,
                 html
             );
 
             await sendMail(
                 email,
                 "Votre demande de rendez-vous - Prime Language Academy",
-                `Bonjour ${name},\n\nVotre demande de rendez-vous a bien ete recue.\nDate : ${dateLabel} a ${time}\nMotif : ${reason || "Non precise"}\n\nNous vous contacterons tres prochainement pour confirmer.\n\nCordialement,\nL'equipe Prime Language Academy`,
+                `Bonjour ${name},\n\nVotre demande de rendez-vous a bien été reçue.\nDate : ${dateLabel} à ${time}\nMotif : ${reason || "Non précisé"}\n\nNous vous contacterons très prochainement pour confirmer.\n\nCordialement,\nL'équipe Prime Language Academy`,
                 `<div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto;">
                   <div style="background: #21286E; padding: 28px; text-align: center; border-radius: 12px 12px 0 0;">
-                    <h2 style="color: white; margin: 0;">Demande recue</h2>
+                    <h2 style="color: white; margin: 0;">Demande reçue</h2>
                   </div>
                   <div style="background: white; padding: 28px; border-radius: 0 0 12px 12px; border: 1px solid #eee;">
                     <p>Bonjour <strong>${safeName}</strong>,</p>
-                    <p>Votre demande de rendez-vous a bien ete enregistree :</p>
+                    <p>Votre demande de rendez-vous a bien été enregistrée :</p>
                     <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
                       <p style="margin: 4px 0;"><strong>Date :</strong> ${dateLabel}</p>
                       <p style="margin: 4px 0;"><strong>Heure :</strong> ${safeTime}</p>
                       <p style="margin: 4px 0;"><strong>Motif :</strong> ${safeReason}</p>
                     </div>
-                    <p>Nous vous contacterons tres prochainement pour confirmer votre creneau.</p>
-                    <p style="color: #999; font-size: 13px;">L'equipe Prime Language Academy</p>
+                    <p>Nous vous contacterons très prochainement pour confirmer votre créneau.</p>
+                    <p style="color: #999; font-size: 13px;">L'équipe Prime Language Academy</p>
                   </div>
                 </div>`
             );
@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
     } catch (err) {
         console.error("Public appointment error:", err);
         return NextResponse.json(
-            { error: "Une erreur est survenue. Veuillez reessayer." },
+            { error: "Une erreur est survenue. Veuillez réessayer." },
             { status: 500 }
         );
     }

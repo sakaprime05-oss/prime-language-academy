@@ -25,7 +25,7 @@ const plans = [
 ];
 
 const paymentMethods = [
-    { id: "WAVE", name: "Wave", detail: "Prioritaire a Abidjan" },
+    { id: "WAVE", name: "Wave", detail: "Prioritaire à Abidjan" },
     { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov" },
     { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard" },
 ];
@@ -545,14 +545,14 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                     <input type="radio" name="paymentOption" value="total" checked={formData.paymentOption === 'total'} onChange={handleChange} className="accent-primary mt-0.5" />
                                     <div>
                                         <span className="font-bold block text-sm">Paiement total</span>
-                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">Reglez la Prise en Charge et la Reservation en une seule fois.</span>
+                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">Réglez la Prise en charge et la Réservation en une seule fois.</span>
                                     </div>
                                 </label>
                                 <label className={`flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors ${formData.paymentOption === 'fractionne' ? 'border-primary bg-primary/10' : 'border-[var(--foreground)]/10 bg-white/55 dark:bg-white/5'}`}>
                                     <input type="radio" name="paymentOption" value="fractionne" checked={formData.paymentOption === 'fractionne'} onChange={handleChange} className="accent-primary mt-0.5" />
                                     <div>
                                         <span className="font-bold block text-sm">Paiement en 2 fois</span>
-                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">1ere moitie : la Prise en Charge, qui donne acces a la documentation, aux conseils, a la plateforme et au suivi. 2e moitie : la Reservation de votre place.</span>
+                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">1re moitié : la Prise en charge, qui donne accès à la documentation, aux conseils, à la plateforme et au suivi. 2e moitié : la Réservation de votre place.</span>
                                     </div>
                                 </label>
                             </div>
@@ -567,11 +567,11 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 <div><span className="block opacity-50">Option</span>{formData.paymentOption === "fractionne" ? "Paiement en 2 fois" : "Paiement total"}</div>
                             </div>
                             <div className="rounded-lg border border-[var(--foreground)]/10 bg-white/70 p-4 dark:bg-white/5">
-                                <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[var(--foreground)]/45">Montant a valider maintenant</div>
+                                <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[var(--foreground)]/45">Montant à valider maintenant</div>
                                 <div className="mt-1 text-2xl font-black text-[var(--foreground)]">{formatFcfa(immediateAmount)}</div>
                                 {formData.paymentOption === "fractionne" && (
                                     <p className="mt-2 text-xs font-medium text-[var(--foreground)]/60">
-                                        Cette premiere moitie correspond a la Prise en Charge. La Reservation restante sera de {formatFcfa(reservationAmount)}.
+                                        Cette première moitié correspond à la Prise en charge. La Réservation restante sera de {formatFcfa(reservationAmount)}.
                                     </p>
                                 )}
                             </div>

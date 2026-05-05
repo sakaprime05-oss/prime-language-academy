@@ -15,7 +15,7 @@ const memberships = [
 ];
 
 const paymentMethods = [
-    { id: "WAVE", name: "Wave", detail: "Prioritaire a Abidjan" },
+    { id: "WAVE", name: "Wave", detail: "Prioritaire à Abidjan" },
     { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov" },
     { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard" },
 ];
@@ -29,7 +29,7 @@ const communes = [
     "Yopougon", "Autre"
 ];
 
-export default function RegisterClubForm({ isWaitlistMode, remainingSeats }: { isWaitlistMode: boolean; remainingSeats: number }) {
+export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initialLevel = "" }: { isWaitlistMode: boolean; remainingSeats: number; initialLevel?: string }) {
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -42,7 +42,7 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats }: { i
         password: "",
         profession: "",
         company: "",
-        level: "",
+        level: initialLevel,
         commune: "",
         communeOther: "",
         planId: "essentiel",
@@ -221,7 +221,10 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats }: { i
                         <input type="text" name="company" value={formData.company} onChange={handleChange} className="input-field" placeholder="Nom de votre structure" />
                     </div>
                     <div>
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Niveau Actuel</label>
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Niveau actuel</label>
+                        <p className="mb-3 rounded-xl border border-secondary/15 bg-secondary/10 p-3 text-xs font-bold leading-6 text-[var(--foreground)]/65">
+                            Le Club est pensé pour les profils déjà autonomes en anglais. Si vous êtes débutant ou encore hésitant, la Formation régulière reste le meilleur point d'entrée.
+                        </p>
                         <div className="grid grid-cols-1 gap-2">
                             {levels.map(lvl => (
                                 <button type="button" key={lvl} onClick={() => setFormData({ ...formData, level: lvl })}
@@ -233,16 +236,16 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats }: { i
                                     {lvl}
                                 </button>
                             ))}
+                            </div>
                         </div>
                     </div>
-                </div>
             )}
 
             {step === 3 && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
                     {isWaitlistMode && (
                         <div className="rounded-2xl border border-amber-500/25 bg-amber-500/10 p-4 text-xs font-bold leading-6 text-amber-600">
-                            Le Club est complet. Vous pouvez continuer pour rejoindre la liste d'attente, sans paiement immediat.
+                            Le Club est complet. Vous pouvez continuer pour rejoindre la liste d'attente, sans paiement immédiat.
                         </div>
                     )}
                     <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Choisissez votre Membership</label>
@@ -285,12 +288,12 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats }: { i
                                     <label className={`p-4 rounded-xl border cursor-pointer transition-all ${formData.paymentOption === 'total' ? 'bg-secondary/10 border-secondary text-secondary' : 'border-[var(--foreground)]/10 text-[var(--foreground)]/70 hover:border-secondary/30'}`}>
                                         <input type="radio" name="paymentOption" value="total" checked={formData.paymentOption === 'total'} onChange={handleChange} className="sr-only" />
                                         <span className="block text-xs font-black">Paiement total</span>
-                                        <span className="mt-1 block text-[10px] font-bold opacity-60">Prise en Charge + Reservation.</span>
+                                        <span className="mt-1 block text-[10px] font-bold opacity-60">Prise en charge + Réservation.</span>
                                     </label>
                                     <label className={`p-4 rounded-xl border cursor-pointer transition-all ${formData.paymentOption === 'fractionne' ? 'bg-secondary/10 border-secondary text-secondary' : 'border-[var(--foreground)]/10 text-[var(--foreground)]/70 hover:border-secondary/30'}`}>
                                         <input type="radio" name="paymentOption" value="fractionne" checked={formData.paymentOption === 'fractionne'} onChange={handleChange} className="sr-only" />
                                         <span className="block text-xs font-black">Paiement en 2 fois</span>
-                                        <span className="mt-1 block text-[10px] font-bold opacity-60">Prise en Charge maintenant, Reservation ensuite.</span>
+                                        <span className="mt-1 block text-[10px] font-bold opacity-60">Prise en charge maintenant, Réservation ensuite.</span>
                                     </label>
                                 </div>
                             </div>
@@ -307,9 +310,9 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats }: { i
                                 <>
                                     <li><span className="opacity-50">Moyen:</span> {selectedPaymentMethod.name}</li>
                                     <li><span className="opacity-50">Option:</span> {formData.paymentOption === "fractionne" ? "Paiement en 2 fois" : "Paiement total"}</li>
-                                    <li><span className="opacity-50">A payer maintenant:</span> <strong className="text-secondary">{formatFcfa(immediateAmount)}</strong></li>
+                                    <li><span className="opacity-50">À payer maintenant:</span> <strong className="text-secondary">{formatFcfa(immediateAmount)}</strong></li>
                                     {formData.paymentOption === "fractionne" && (
-                                        <li><span className="opacity-50">Reservation restante:</span> {formatFcfa(reservationAmount)}</li>
+                                        <li><span className="opacity-50">Réservation restante:</span> {formatFcfa(reservationAmount)}</li>
                                     )}
                                 </>
                             )}

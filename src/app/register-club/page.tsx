@@ -6,8 +6,9 @@ import RegisterClubForm from "./register-club-form";
 import { prisma } from "@/lib/prisma";
 import { PLA_CLUB_CAPACITY } from "@/lib/pla-program";
 
-export default async function RegisterClubPage() {
+export default async function RegisterClubPage({ searchParams }: { searchParams?: Promise<{ level?: string }> }) {
   const session = await auth();
+  const params = await searchParams;
 
   if (session) {
     redirect("/dashboard");
@@ -21,6 +22,11 @@ export default async function RegisterClubPage() {
   });
   const remainingSeats = Math.max(0, PLA_CLUB_CAPACITY - activeClubMembers);
   const isWaitlistMode = remainingSeats === 0;
+  const initialLevel = params?.level?.toLowerCase().includes("avanc")
+    ? "Avancé (C1/C2)"
+    : params?.level?.toLowerCase().includes("inter")
+      ? "Intermédiaire (B1/B2)"
+      : "";
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-6 sm:p-6 bg-[var(--background)] relative overflow-hidden">
@@ -30,14 +36,14 @@ export default async function RegisterClubPage() {
       <div className="w-full max-w-5xl relative z-10 grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
         <section className="glass-card border-secondary/20 bg-[#0D0D14] text-[#F5F0E8] shadow-2xl">
           <div className="space-y-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-secondary/70">Membership prive</p>
-            <h2 className="text-3xl font-black leading-tight">The English Club est limite a 26 membres.</h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-secondary/70">Membership privé</p>
+            <h2 className="text-3xl font-black leading-tight">The English Club est limité à 26 membres.</h2>
             <p className="text-sm leading-7 text-[#F5F0E8]/60">
-              Pour garder des echanges utiles, un vrai suivi et une communaute premium, les inscriptions Club sont volontairement limitees.
+              Pour garder des échanges utiles, un vrai suivi et une communauté premium, les inscriptions Club sont volontairement limitées.
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-2xl border border-secondary/15 bg-white/[0.04] p-4">
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#F5F0E8]/40">Capacite</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#F5F0E8]/40">Capacité</p>
                 <p className="mt-1 text-3xl font-black text-secondary">{PLA_CLUB_CAPACITY}</p>
               </div>
               <div className="rounded-2xl border border-secondary/15 bg-white/[0.04] p-4">
@@ -47,8 +53,8 @@ export default async function RegisterClubPage() {
             </div>
             <p className="rounded-2xl border border-secondary/15 bg-secondary/10 p-4 text-xs font-bold leading-6 text-[#F5F0E8]/75">
               {isWaitlistMode
-                ? "Le Club est complet. Votre demande sera enregistree en liste d'attente, sans paiement immediat."
-                : "Votre paiement reserve votre place. Une fois les 26 places atteintes, les nouvelles demandes passent en liste d'attente."}
+                ? "Le Club est complet. Votre demande sera enregistrée en liste d'attente, sans paiement immédiat."
+                : "Votre paiement réserve votre place. Une fois les 26 places atteintes, les nouvelles demandes passent en liste d'attente."}
             </p>
           </div>
         </section>
@@ -61,7 +67,7 @@ export default async function RegisterClubPage() {
             <div>
               <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">The English Club</h1>
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary mt-1">
-                {isWaitlistMode ? "Liste d'attente" : "Cercle prive - Membership"}
+                {isWaitlistMode ? "Liste d'attente" : "Cercle privé - Membership"}
               </p>
             </div>
           </div>
@@ -70,22 +76,22 @@ export default async function RegisterClubPage() {
             <Link href="/register" className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4 transition-colors hover:border-primary/40 hover:bg-primary/10">
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-primary">Formation</p>
               <p className="mt-2 text-sm font-bold leading-6 text-[var(--foreground)]/60">
-                Cours structures, niveau, progression et accompagnement pedagogique.
+                Cours structurés, niveau, progression et accompagnement pédagogique.
               </p>
             </Link>
             <div className="rounded-2xl border border-secondary/25 bg-secondary/10 p-4">
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-secondary">English Club</p>
               <p className="mt-2 text-sm font-bold leading-6 text-[var(--foreground)]/75">
-                Pratique conversationnelle, communaute privee et places limitees.
+                Pratique conversationnelle, communauté privée et places limitées.
               </p>
             </div>
           </div>
 
-          <RegisterClubForm isWaitlistMode={isWaitlistMode} remainingSeats={remainingSeats} />
+          <RegisterClubForm isWaitlistMode={isWaitlistMode} remainingSeats={remainingSeats} initialLevel={initialLevel} />
 
           <div className="pt-8 flex flex-col items-center gap-4">
             <p className="text-xs font-bold text-[var(--foreground)]/50">
-              Deja membre ?{" "}
+              Déjà membre ?{" "}
               <Link href="/login" className="text-secondary hover:underline underline-offset-4">
                 Se connecter
               </Link>
