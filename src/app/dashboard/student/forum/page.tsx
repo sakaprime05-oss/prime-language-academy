@@ -27,7 +27,7 @@ export default async function ForumPage() {
     <div className="space-y-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <header className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h2 className="text-3xl font-black tracking-tight text-[var(--foreground)]">Forum etudiant</h2>
+          <h2 className="text-3xl font-black tracking-tight text-[var(--foreground)]">Forum étudiant</h2>
           <p className="font-medium text-[var(--foreground)]/50">Discutez, partagez des images et entraidez-vous.</p>
         </div>
         <div className="w-full md:w-auto">
@@ -39,7 +39,7 @@ export default async function ForumPage() {
         {visiblePosts.length === 0 ? (
           <div className="glass-card py-16 text-center opacity-50">
             <p className="font-bold">Aucune discussion pour le moment.</p>
-            <p className="text-sm">Soyez le premier a lancer un sujet !</p>
+            <p className="text-sm">Soyez le premier à lancer un sujet !</p>
           </div>
         ) : (
           visiblePosts.map((post) => {
@@ -54,7 +54,7 @@ export default async function ForumPage() {
                     <h3 className="mb-1 text-lg font-black text-[var(--foreground)] transition-colors hover:text-primary">{post.title}</h3>
                     <p className="mb-2 line-clamp-2 text-sm text-[var(--foreground)]/60">{content.text}</p>
                     <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40">
-                      <span className="text-primary">{post.author.name || "Etudiant"}</span>
+                      <span className="text-primary">{post.author.name || "Étudiant"}</span>
                       <span>-</span>
                       <span>{new Date(post.createdAt).toLocaleDateString("fr-FR")}</span>
                     </div>

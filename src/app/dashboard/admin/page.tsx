@@ -95,12 +95,12 @@ export default async function AdminDashboardPage() {
                 <Link href="/dashboard/admin/students" className="p-6 bg-[#12121e] rounded-2xl border border-amber-500/10 group hover:border-amber-500/30 transition-all">
                     <p className="text-[10px] font-black text-amber-300/70 uppercase tracking-[0.2em] mb-3">Profils incomplets</p>
                     <p className="text-3xl font-black text-white">{incompleteProfiles}</p>
-                    <p className="mt-2 text-sm text-white/45">Etudiants sans photo obligatoire ou profil finalise.</p>
+                    <p className="mt-2 text-sm text-white/45">Étudiants sans photo obligatoire ou profil finalisé.</p>
                 </Link>
                 <Link href="/dashboard/admin/forum" className="p-6 bg-[#12121e] rounded-2xl border border-red-500/10 group hover:border-red-500/30 transition-all">
-                    <p className="text-[10px] font-black text-red-300/70 uppercase tracking-[0.2em] mb-3">Forum a verifier</p>
+                    <p className="text-[10px] font-black text-red-300/70 uppercase tracking-[0.2em] mb-3">Forum à vérifier</p>
                     <p className="text-3xl font-black text-white">{reportedForumItems}</p>
-                    <p className="mt-2 text-sm text-white/45">Discussions ou reponses signalees par les etudiants.</p>
+                    <p className="mt-2 text-sm text-white/45">Discussions ou réponses signalées par les étudiants.</p>
                 </Link>
             </section>
 
@@ -109,8 +109,8 @@ export default async function AdminDashboardPage() {
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <div>
                             <p className="text-[10px] font-black text-red-400/70 uppercase tracking-[0.2em] mb-3">English Club</p>
-                            <h3 className="text-2xl font-black text-white">Capacite et liste d'attente</h3>
-                            <p className="mt-2 text-sm text-white/45">Le Club reste limite a {PLA_CLUB_CAPACITY} membres. Les invitations ouvrent le paiement en ligne seulement quand une place est libre.</p>
+                            <h3 className="text-2xl font-black text-white">Capacité et liste d'attente</h3>
+                            <p className="mt-2 text-sm text-white/45">Le Club reste limité à {PLA_CLUB_CAPACITY} membres. Les invitations ouvrent le paiement en ligne seulement quand une place est libre.</p>
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-center">
                             <div className="rounded-xl bg-white/5 px-4 py-3">

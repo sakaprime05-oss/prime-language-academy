@@ -64,7 +64,7 @@ export default async function StudentCoursesPage() {
                 <p className="platform-eyebrow">Programme de suivi</p>
                 <h2 className="platform-title">{progressData.levelName}</h2>
                 <p className="platform-subtitle">
-                    Vos cours sont organises comme un programme progressif. Les supports sont principalement des PDF a ouvrir ou telecharger, puis a marquer comme termines.
+                    Vos cours sont organisés comme un programme progressif. Les supports sont principalement des PDF à ouvrir ou télécharger, puis à marquer comme terminés.
                 </p>
                 <SupportLink context="courses" className="mt-4" />
                 <div className="mt-3 flex items-center gap-4">
@@ -80,7 +80,7 @@ export default async function StudentCoursesPage() {
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Session</p>
                     <h3 className="mt-2 text-xl font-black text-[var(--foreground)]">{PLA_SESSION.dates}</h3>
                     <p className="mt-2 text-xs font-bold leading-6 text-[var(--foreground)]/55">
-                        Duree : {PLA_SESSION.duration}. Avancement : {progressData.completedLessons} / {progressData.totalLessons} contenus termines.
+                        Durée : {PLA_SESSION.duration}. Avancement : {progressData.completedLessons} / {progressData.totalLessons} contenus terminés.
                     </p>
                     <div className="mt-4 grid grid-cols-2 gap-2">
                             <div className="rounded-lg bg-[var(--foreground)]/5 p-3">
@@ -96,7 +96,7 @@ export default async function StudentCoursesPage() {
 
                 <div className="glass-card !p-4 sm:!p-5">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/35">Calendrier de progression</p>
-                    <h3 className="mt-1 text-lg font-black text-[var(--foreground)]">Ordre conseille</h3>
+                    <h3 className="mt-1 text-lg font-black text-[var(--foreground)]">Ordre conseillé</h3>
                     <div className="mt-4 grid gap-2 sm:grid-cols-2">
                         {modules.map((module: any, index: number) => (
                             <a key={module.id} href={`#module-${module.id}`} className="mobile-list-row">

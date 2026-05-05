@@ -12,14 +12,14 @@ export default function LessonContentPdf({ url }: LessonContentPdfProps) {
             <div className="flex flex-col gap-3 border-b border-white/10 bg-black/35 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/45">Support PDF</p>
-                    <p className="mt-1 text-sm font-bold text-white/80">Ouvrez le document ici ou telechargez-le pour travailler hors ligne.</p>
+                    <p className="mt-1 text-sm font-bold text-white/80">Ouvrez le document ici ou téléchargez-le pour travailler hors ligne.</p>
                 </div>
                 <div className="flex gap-2">
                     <a href={url} target="_blank" rel="noreferrer" className="rounded-xl border border-white/15 px-4 py-2 text-xs font-black uppercase tracking-widest text-white/70 hover:border-white/30 hover:text-white">
                         Ouvrir
                     </a>
                     <a href={url} download className="rounded-xl bg-primary px-4 py-2 text-xs font-black uppercase tracking-widest text-white hover:opacity-90">
-                        Telecharger
+                        Télécharger
                     </a>
                 </div>
             </div>

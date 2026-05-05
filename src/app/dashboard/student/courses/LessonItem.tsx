@@ -16,7 +16,7 @@ export default function LessonItem({ lesson, isCompleted: initialCompleted }: Le
 
     const handleToggle = async (e: React.MouseEvent) => {
         e.preventDefault();
-        e.stopPropagation(); // Prevenir la navigation si on clique sur le bouton
+        e.stopPropagation(); // Prévenir la navigation si on clique sur le bouton
         if (completed) return;
 
         setLoading(true);
@@ -24,7 +24,7 @@ export default function LessonItem({ lesson, isCompleted: initialCompleted }: Le
             await markLessonComplete(lesson.id);
             setCompleted(true);
         } catch (error) {
-            alert("Erreur lors de la mise a jour");
+            alert("Erreur lors de la mise à jour");
         } finally {
             setLoading(false);
         }
@@ -45,7 +45,7 @@ export default function LessonItem({ lesson, isCompleted: initialCompleted }: Le
                         {lesson.title}
                     </h4>
                     <p className="text-[9px] sm:text-[10px] uppercase font-black tracking-widest truncate text-[var(--foreground)]/30 group-hover:text-[var(--primary)]/70 transition-colors">
-                        {isPdf ? "PDF - ouvrir / telecharger" : `${lesson.type} - voir le contenu`}
+                        {isPdf ? "PDF - ouvrir / télécharger" : `${lesson.type} - voir le contenu`}
                     </p>
                 </div>
             </div>

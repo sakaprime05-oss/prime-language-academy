@@ -45,9 +45,9 @@ export default async function StudentProfilePage({ searchParams }: { searchParam
       )}
 
       <section className="grid gap-4 md:grid-cols-4">
-        <Stat label="Niveau" value={user.level?.name || "A definir"} />
+        <Stat label="Niveau" value={user.level?.name || "À définir"} />
         <Stat label="Progression" value={`${progressData.percentage}%`} />
-        <Stat label="Lecons faites" value={`${progressData.completedLessons || 0}/${progressData.totalLessons || 0}`} />
+        <Stat label="Leçons faites" value={`${progressData.completedLessons || 0}/${progressData.totalLessons || 0}`} />
         <Stat label="Statut" value={user.status === "ACTIVE" ? "Actif" : user.status} />
       </section>
 
@@ -55,17 +55,17 @@ export default async function StudentProfilePage({ searchParams }: { searchParam
 
       <section className="grid gap-4 md:grid-cols-2">
         <div className="glass-card space-y-3 p-5 sm:p-6">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40">Preferences de suivi</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40">Préférences de suivi</p>
           <div className="grid gap-3 text-sm font-bold text-[var(--foreground)]/70">
-            <p>Disponibilites : {profile.availability || "Non renseigne"}</p>
-            <p>Niveau estime : {profile.estimatedLevel || "Non renseigne"}</p>
-            <p>Preference : {profile.learningPreference || "Non renseigne"}</p>
+            <p>Disponibilités : {profile.availability || "Non renseigné"}</p>
+            <p>Niveau estimé : {profile.estimatedLevel || "Non renseigné"}</p>
+            <p>Préférence : {profile.learningPreference || "Non renseigné"}</p>
           </div>
         </div>
         <div className="glass-card space-y-3 p-5 sm:p-6">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40">Securite</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40">Sécurité</p>
           <p className="text-sm font-medium leading-6 text-[var(--foreground)]/60">
-            Votre email de connexion est {user.email}. Pour changer le mot de passe, utilisez la recuperation depuis la page de connexion.
+            Votre email de connexion est {user.email}. Pour changer le mot de passe, utilisez la récupération depuis la page de connexion.
           </p>
           <a href="/forgot-password" className="inline-flex rounded-xl border border-[var(--foreground)]/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-primary hover:border-primary/40">
             Modifier mon mot de passe
@@ -89,7 +89,7 @@ export default async function StudentProfilePage({ searchParams }: { searchParam
 
       {user.gradesReceived.length > 0 && (
         <section className="glass-card space-y-4 p-5 sm:p-8">
-          <h3 className="text-lg font-black text-[var(--foreground)]">Evaluations et retours</h3>
+          <h3 className="text-lg font-black text-[var(--foreground)]">Évaluations et retours</h3>
           <div className="grid gap-3 md:grid-cols-2">
             {user.gradesReceived.map((grade) => (
               <div key={grade.id} className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4">

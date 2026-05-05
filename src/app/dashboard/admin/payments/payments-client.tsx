@@ -34,10 +34,10 @@ type Transaction = {
 
 const filters = [
     { key: "ALL", label: "Tous" },
-    { key: "VERIFYING", label: "A verifier" },
+    { key: "VERIFYING", label: "À vérifier" },
     { key: "PENDING", label: "En attente" },
-    { key: "COMPLETED", label: "Valides" },
-    { key: "FAILED", label: "Rejetes" },
+    { key: "COMPLETED", label: "Validés" },
+    { key: "FAILED", label: "Rejetés" },
 ];
 
 function money(value: number) {
@@ -54,9 +54,9 @@ function formatDate(value: Date | string) {
 }
 
 function statusLabel(status: string) {
-    if (status === "VERIFYING") return "A verifier";
-    if (status === "COMPLETED") return "Valide";
-    if (status === "FAILED") return "Rejete";
+    if (status === "VERIFYING") return "À vérifier";
+    if (status === "COMPLETED") return "Validé";
+    if (status === "FAILED") return "Rejeté";
     if (status === "PENDING") return "En attente";
     return status;
 }
@@ -98,7 +98,7 @@ export default function AdminPaymentsClient({ initialTransactions }: { initialTr
     }, [activeFilter, initialTransactions]);
 
     const handleApprove = async (id: string) => {
-        if (!confirm("Confirmer la reception de ce paiement ? Le compte de l'etudiant sera active.")) return;
+        if (!confirm("Confirmer la réception de ce paiement ? Le compte de l'étudiant sera activé.")) return;
         setLoadingId(id);
         const res = await approveTransaction(id);
         if (res.error) alert(res.error);
@@ -107,7 +107,7 @@ export default function AdminPaymentsClient({ initialTransactions }: { initialTr
     };
 
     const handleReject = async (id: string) => {
-        const reason = prompt("Raison du rejet ? Exemple : paiement non recu");
+        const reason = prompt("Raison du rejet ? Exemple : paiement non reçu");
         if (!reason) return;
         setLoadingId(id);
         const res = await rejectTransaction(id, reason);
@@ -119,18 +119,18 @@ export default function AdminPaymentsClient({ initialTransactions }: { initialTr
     return (
         <div className="space-y-5">
             <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                <StatCard label="A verifier" value={stats.verifying.toString()} tone="text-amber-300" />
+                <StatCard label="À vérifier" value={stats.verifying.toString()} tone="text-amber-300" />
                 <StatCard label="En attente" value={stats.pending.toString()} tone="text-white" />
-                <StatCard label="Deja encaisse" value={money(stats.completedAmount)} tone="text-emerald-300" />
-                <StatCard label="Rejetes" value={stats.failed.toString()} tone="text-red-300" />
+                <StatCard label="Déjà encaissé" value={money(stats.completedAmount)} tone="text-emerald-300" />
+                <StatCard label="Rejetés" value={stats.failed.toString()} tone="text-red-300" />
             </section>
 
             <section className="rounded-2xl border border-white/10 bg-[#10101a] shadow-2xl shadow-black/20">
                 <div className="flex flex-col gap-4 border-b border-white/10 p-4 lg:flex-row lg:items-center lg:justify-between">
                     <div>
-                        <h2 className="text-lg font-black text-white">Transactions recentes</h2>
+                        <h2 className="text-lg font-black text-white">Transactions récentes</h2>
                         <p className="mt-1 text-xs font-semibold text-white/40">
-                            Les paiements a verifier affichent les actions de validation.
+                            Les paiements à vérifier affichent les actions de validation.
                         </p>
                     </div>
                     <div className="flex gap-2 overflow-x-auto pb-1">
@@ -172,7 +172,7 @@ export default function AdminPaymentsClient({ initialTransactions }: { initialTr
                         <thead>
                             <tr className="border-b border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-white/35">
                                 <th className="px-5 py-4">Date</th>
-                                <th className="px-5 py-4">Etudiant</th>
+                                <th className="px-5 py-4">Étudiant</th>
                                 <th className="px-5 py-4">Paiement</th>
                                 <th className="px-5 py-4">Montant</th>
                                 <th className="px-5 py-4">Statut</th>
@@ -289,8 +289,8 @@ function StudentBlock({ tx }: { tx: Transaction }) {
 
     return (
         <div className="min-w-0">
-            <p className="truncate text-sm font-black text-white">{student?.name || "Etudiant sans nom"}</p>
-            <p className="mt-1 truncate text-xs font-semibold text-white/40">{student?.email || "Email non renseigne"}</p>
+            <p className="truncate text-sm font-black text-white">{student?.name || "Étudiant sans nom"}</p>
+            <p className="mt-1 truncate text-xs font-semibold text-white/40">{student?.email || "Email non renseigné"}</p>
             <p className="mt-2 inline-flex rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-white/35">
                 {student?.registrationType === "CLUB" ? "Club" : "Formation"}
             </p>
@@ -308,7 +308,7 @@ function PaymentDetails({ tx }: { tx: Transaction }) {
                 <span className={`h-2.5 w-2.5 rounded-full ${providerDot(provider)}`} />
                 {provider}
             </p>
-            <p className="text-xs font-semibold text-white/45">Expediteur : {tx.senderPhone || "-"}</p>
+            <p className="text-xs font-semibold text-white/45">Expéditeur : {tx.senderPhone || "-"}</p>
             {proofIsUpload ? (
                 <a
                     href={tx.proof || "#"}
@@ -316,11 +316,11 @@ function PaymentDetails({ tx }: { tx: Transaction }) {
                     rel="noopener noreferrer"
                     className="inline-flex text-xs font-black text-sky-300 hover:text-sky-200 hover:underline"
                 >
-                    Voir la capture recue
+                    Voir la capture reçue
                 </a>
             ) : (
                 <p className="truncate text-xs font-semibold text-white/35">
-                    Recu : {tx.id ? `PLA-${tx.id.slice(0, 8).toUpperCase()}` : "-"}
+                    Reçu : {tx.id ? `PLA-${tx.id.slice(0, 8).toUpperCase()}` : "-"}
                 </p>
             )}
             {tx.failureReason && <p className="text-xs font-semibold text-red-300/80">{tx.failureReason}</p>}

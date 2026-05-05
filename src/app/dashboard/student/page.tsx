@@ -178,8 +178,8 @@ export default async function StudentDashboardPage() {
                         </div>
 
                         <div className="grid gap-3 sm:grid-cols-3">
-                            <MiniStat label="Seances restantes" value={String(remainingSessions)} />
-                            <MiniStat label="Lecons restantes" value={String(Math.max(0, (progressData.totalLessons || 0) - (progressData.completedLessons || 0)))} />
+                            <MiniStat label="Séances restantes" value={String(remainingSessions)} />
+                            <MiniStat label="Leçons restantes" value={String(Math.max(0, (progressData.totalLessons || 0) - (progressData.completedLessons || 0)))} />
                             <MiniStat label="Avancement" value={`${progressData.percentage}%`} />
                         </div>
 
@@ -198,12 +198,12 @@ export default async function StudentDashboardPage() {
                                 profile.days?.map((day) => (
                                     <div key={day} className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 px-4 py-3">
                                         <span className="text-sm font-black text-[var(--foreground)]">{day}</span>
-                                        <span className="text-xs font-bold text-[var(--foreground)]/55">{selectedSlot?.time || "Horaire a confirmer"}</span>
+                                        <span className="text-xs font-bold text-[var(--foreground)]/55">{selectedSlot?.time || "Horaire à confirmer"}</span>
                                     </div>
                                 ))
                             ) : (
                                 <p className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 text-xs font-bold leading-6 text-amber-600">
-                                    Aucun jour choisi. Verifiez votre profil ou contactez l'administration.
+                                    Aucun jour choisi. Vérifiez votre profil ou contactez l'administration.
                                 </p>
                             )}
                         </div>
