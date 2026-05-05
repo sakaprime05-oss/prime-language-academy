@@ -177,12 +177,25 @@ export default function PlacementTest() {
     const recommendation = getRecommendedLevel(totalScore);
     const percentage = Math.round((totalScore / TOTAL_TEST_POINTS) * 100);
 
-    const colorMap: Record<string, string> = {
-      emerald: "emerald-500",
-      amber: "amber-500",
-      violet: "violet-500",
+    const styleMap: Record<string, { text: string; badge: string }> = {
+      emerald: {
+        text: "text-emerald-500",
+        badge: "border-emerald-500/20 bg-emerald-500/10 text-emerald-600",
+      },
+      amber: {
+        text: "text-amber-500",
+        badge: "border-amber-500/20 bg-amber-500/10 text-amber-600",
+      },
+      violet: {
+        text: "text-violet-500",
+        badge: "border-violet-500/20 bg-violet-500/10 text-violet-600",
+      },
     };
-    const color = colorMap[recommendation.color] || "primary";
+    const styles = styleMap[recommendation.color] || {
+      text: "text-primary",
+      badge: "border-primary/20 bg-primary/10 text-primary",
+    };
+    const pathLabel = recommendation.path === "CLUB" ? "English Club" : "Formation régulière";
 
     return (
       <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -209,7 +222,7 @@ export default function PlacementTest() {
                 strokeWidth="8"
                 strokeLinecap="round"
                 strokeDasharray={`${percentage * 3.27} 327`}
-                className={`text-${color}`}
+                className={styles.text}
                 style={{ transition: "stroke-dasharray 1.5s ease-out" }}
               />
             </svg>
@@ -221,8 +234,11 @@ export default function PlacementTest() {
 
           <h2 className="text-3xl font-black text-[var(--foreground)]">
             Niveau recommandé :{" "}
-            <span className={`text-${color}`}>{recommendation.level}</span>
+            <span className={styles.text}>{recommendation.level}</span>
           </h2>
+          <div className={`mx-auto inline-flex rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] ${styles.badge}`}>
+            Parcours conseillé : {pathLabel}
+          </div>
           <p className="max-w-md mx-auto text-sm text-[var(--foreground)]/60 font-medium leading-relaxed">
             {recommendation.description}
           </p>

@@ -43,6 +43,158 @@ const MEMBERSHIPS = [
 export default function EnglishClubPublicPage() {
   return (
     <div className="english-club-page" style={{ background: "#080808", color: "#F5F0E8", fontFamily: "'Inter', sans-serif", minHeight: "100vh" }}>
+      <style>{`
+        @media (max-width: 640px) {
+          .english-club-page {
+            overflow-x: hidden;
+          }
+
+          .english-club-nav {
+            height: 64px !important;
+            padding: 0 1rem !important;
+            gap: 0.75rem !important;
+          }
+
+          .english-club-nav img {
+            height: 34px !important;
+            max-width: 88px !important;
+            object-fit: contain !important;
+          }
+
+          .english-club-nav > div {
+            gap: 0.5rem !important;
+            min-width: 0 !important;
+          }
+
+          .english-club-nav > div > a:first-child {
+            display: none !important;
+          }
+
+          .english-club-nav-cta {
+            color: #ffffff !important;
+            max-width: 11.5rem !important;
+            padding: 0.75rem 1rem !important;
+            border-radius: 0.95rem !important;
+            font-size: 0.68rem !important;
+            line-height: 1.15 !important;
+            text-align: center !important;
+            letter-spacing: 0.08em !important;
+          }
+
+          .english-club-hero {
+            min-height: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            justify-content: flex-start !important;
+            gap: 1rem !important;
+            padding: 88px 1rem 2.5rem !important;
+          }
+
+          .english-club-hero > div[style*="background"] {
+            display: none !important;
+          }
+
+          .english-club-quote,
+          .english-club-hero-copy {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            text-align: left !important;
+          }
+
+          .english-club-quote blockquote {
+            padding: 1rem !important;
+            border-radius: 1rem !important;
+          }
+
+          .english-club-quote p:first-child {
+            font-family: var(--font-lexend), var(--font-manrope), sans-serif !important;
+            font-size: 1rem !important;
+            line-height: 1.55 !important;
+            margin-bottom: 0.85rem !important;
+          }
+
+          .english-club-hero-copy > div:first-child {
+            margin-bottom: 1rem !important;
+            padding: 0.45rem 0.85rem !important;
+          }
+
+          .english-club-hero-copy h1 {
+            font-family: var(--font-lexend), var(--font-manrope), sans-serif !important;
+            font-size: clamp(2.25rem, 11vw, 3rem) !important;
+            line-height: 1.02 !important;
+            letter-spacing: 0 !important;
+            margin-bottom: 1rem !important;
+          }
+
+          .english-club-hero-copy h1 em,
+          .english-club-page h2 em {
+            font-style: normal !important;
+          }
+
+          .english-club-hero-copy p {
+            font-size: 0.95rem !important;
+            line-height: 1.62 !important;
+            margin-bottom: 1.35rem !important;
+          }
+
+          .english-club-hero-copy > div[style*="display: flex"] {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 0.7rem !important;
+            margin-bottom: 1.35rem !important;
+          }
+
+          .english-club-hero-copy a {
+            width: 100% !important;
+            justify-content: center !important;
+            text-align: center !important;
+            border-radius: 0.95rem !important;
+            padding: 0.9rem 1rem !important;
+            color: #ffffff !important;
+          }
+
+          .english-club-page > section:not(.english-club-hero) {
+            padding: 3.5rem 1rem !important;
+          }
+
+          .english-club-page section div[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+            gap: 0.9rem !important;
+          }
+
+          .english-club-page h2,
+          .english-club-page h3 {
+            font-family: var(--font-lexend), var(--font-manrope), sans-serif !important;
+            letter-spacing: 0 !important;
+          }
+
+          .english-club-page h2 {
+            font-size: clamp(1.75rem, 8vw, 2.35rem) !important;
+            line-height: 1.08 !important;
+          }
+
+          .english-club-page section p {
+            font-size: 0.94rem !important;
+            line-height: 1.62 !important;
+          }
+
+          .english-club-page section div[style*="padding: 48px"],
+          .english-club-page section div[style*="padding: 40px"],
+          .english-club-page section div[style*="padding: 36px"],
+          .english-club-page section div[style*="padding: 32px"],
+          .english-club-page section div[style*="padding: 30px"],
+          .english-club-page section div[style*="padding: 28px"] {
+            padding: 1.15rem !important;
+            border-radius: 1rem !important;
+          }
+
+          .english-club-page a[style*="linear-gradient"] {
+            color: #ffffff !important;
+          }
+        }
+      `}</style>
 
       {/* ── NAV ── */}
       <nav className="english-club-nav" style={{
