@@ -7,7 +7,7 @@ export const metadata = {
   title: "Éditeur d'Article | Prime Academy",
 };
 
-export default async function EditorPage({ searchParams }: { searchParams: { id?: string } }) {
+export default async function EditorPage({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") {
     redirect("/dashboard");

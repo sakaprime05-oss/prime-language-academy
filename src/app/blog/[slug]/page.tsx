@@ -13,7 +13,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { sanitizeHtml } from "@/lib/sanitize-html";
 import { siteConfig } from "@/lib/site-config";
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
   if (!article) return { title: "Article non trouvé | Prime Language Academy" };
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function SingleArticlePage({ params }: { params: { slug: string } }) {
+export default async function SingleArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
 
