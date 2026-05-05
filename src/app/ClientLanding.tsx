@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { LogoMark } from "@/components/logo";
-import { OwlMascot } from "@/components/owl-mascot";
 import ThemeToggle from "@/components/ThemeToggle";
 import { PLA_CLUB_CAPACITY, PLA_FAQ, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
@@ -613,7 +612,6 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
         </div>
         <div style={{ fontSize:11, color:"var(--muted-foreground)", letterSpacing:"0.1em" }}>© 2026 Prime Language Academy</div>
       </footer>
-      <OwlMascot size={120} className="hidden sm:block" />
     </div>
   );
 }
