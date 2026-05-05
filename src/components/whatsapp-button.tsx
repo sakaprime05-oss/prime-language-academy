@@ -7,20 +7,17 @@ const WA_NUMBER = "2250161337864";
 const WA_MESSAGE = encodeURIComponent("Bonjour ! Je souhaite avoir des informations sur Prime Language Academy.");
 const WA_URL = `https://wa.me/${WA_NUMBER}?text=${WA_MESSAGE}`;
 
-const HIDDEN_PREFIXES = ["/contact", "/login", "/register", "/register-club", "/forgot-password", "/reset-password", "/dashboard"];
+const HIDDEN_PREFIXES = ["/contact", "/login", "/register", "/register-club", "/forgot-password", "/reset-password", "/dashboard", "/placement-test"];
 
 export function WhatsAppButton() {
   const pathname = usePathname();
-  const [showMobileHomeButton, setShowMobileHomeButton] = useState(false);
+  const [showMobileFloatingButton, setShowMobileFloatingButton] = useState(false);
   const shouldHide = HIDDEN_PREFIXES.some((prefix) => pathname?.startsWith(prefix));
-  const isHome = pathname === "/";
 
   useEffect(() => {
-    if (!isHome) return;
-
     const updateVisibility = () => {
       const isMobile = window.matchMedia("(max-width: 639px)").matches;
-      setShowMobileHomeButton(!isMobile || window.scrollY > 260);
+      setShowMobileFloatingButton(!isMobile || window.scrollY > 260);
     };
 
     updateVisibility();
@@ -31,9 +28,9 @@ export function WhatsAppButton() {
       window.removeEventListener("scroll", updateVisibility);
       window.removeEventListener("resize", updateVisibility);
     };
-  }, [isHome]);
+  }, [pathname]);
 
-  if (shouldHide || (isHome && !showMobileHomeButton)) return null;
+  if (shouldHide || !showMobileFloatingButton) return null;
 
   return (
     <>
