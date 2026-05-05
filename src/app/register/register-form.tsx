@@ -48,6 +48,9 @@ const levels = ["Débutant", "Intermédiaire", "Avancé"];
 const timeSlots = PLA_TIME_SLOTS.map((slot) => ({ id: slot.id, name: `${slot.label} (${slot.time})` }));
 
 const steps = ["Infos requises", "Objectifs", "Formule & Jours", "Engagement"];
+const fieldLabelClass = "px-1 text-[10px] font-black uppercase tracking-[0.12em] text-[var(--foreground)]/55";
+const fieldClass = "w-full rounded-lg border border-[var(--foreground)]/15 bg-white/60 px-3 py-2.5 text-sm font-medium text-[var(--foreground)] outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/15 dark:bg-white/5";
+const choiceClass = "flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition-colors";
 
 function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const searchParams = useSearchParams();
@@ -58,6 +61,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const [error, setError] = useState("");
     const [emailStatus, setEmailStatus] = useState<"idle" | "checking" | "available" | "pending" | "taken">("idle");
     const emailDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const formTopRef = useRef<HTMLDivElement | null>(null);
 
     const [formData, setFormData] = useState({
         type: "FORMATION",
@@ -151,27 +155,33 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
         setError("");
         if (step === 1 && (!formData.name || !formData.email || !formData.password || !formData.phone)) {
             setError("Veuillez remplir les informations obligatoires (Nom, Email, Téléphone, Mot de passe).");
+            formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
             return;
         }
         if (step === 1 && emailStatus === "taken") {
             setError("Cet email est déjà associé à un compte. Veuillez vous connecter ou utiliser un autre email.");
+            formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
             return;
         }
         if (step === 2 && (!formData.objective || !formData.level)) {
             setError("Veuillez choisir un objectif et un niveau d'anglais.");
+            formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
             return;
         }
         const requiredDays = planSessions[formData.planId] || 2;
         if (step === 3 && (formData.days.length !== requiredDays || !formData.timeSlot)) {
             setError(`Veuillez choisir exactement ${requiredDays} jour(s) de base et un créneau horaire.`);
+            formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
             return;
         }
         setStep(prev => Math.min(prev + 1, 4));
+        requestAnimationFrame(() => formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
     };
 
     const prevStep = () => {
         setError("");
         setStep(prev => Math.max(prev - 1, 1));
+        requestAnimationFrame(() => formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -217,58 +227,63 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     };
 
     return (
-        <div className="space-y-6">
-            {/* Step Indicators */}
-            <div className="grid grid-cols-4 gap-2 mb-6 sm:mb-8">
-                {steps.map((label, idx) => {
-                    const stepNum = idx + 1;
-                    const isActive = step >= stepNum;
-                    const isCurrent = step === stepNum;
-                    return (
-                        <div key={idx} className="min-w-0">
-                            <div className={`flex flex-col items-center gap-1 ${isActive ? 'text-primary' : 'text-[var(--foreground)]/40'}`}>
-                                <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-black text-xs sm:text-sm ${isActive ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-[var(--foreground)]/10 text-[var(--foreground)]/60 border border-[var(--foreground)]/20'}`}>
-                                    {stepNum}
-                                </div>
-                                <span className={`text-[7px] sm:text-[9px] uppercase tracking-[0.08em] sm:tracking-widest text-center leading-tight ${isCurrent ? 'font-black opacity-100' : 'font-bold opacity-60'}`}>{label}</span>
-                            </div>
-                        </div>
-                    );
-                })}
+        <div ref={formTopRef} className="scroll-mt-4 space-y-4 sm:space-y-6">
+            {/* Step Indicator */}
+            <div className="mb-4 space-y-2 sm:mb-8">
+                <div className="flex items-center justify-between gap-3">
+                    <p className="text-[11px] font-black uppercase tracking-[0.12em] text-primary">
+                        Étape {step} sur 4
+                    </p>
+                    <p className="truncate text-right text-[11px] font-bold text-[var(--foreground)]/55">
+                        {steps[step - 1]}
+                    </p>
+                </div>
+                <div className="grid grid-cols-4 gap-1.5">
+                    {steps.map((label, idx) => {
+                        const stepNum = idx + 1;
+                        const isActive = step >= stepNum;
+                        return (
+                            <div
+                                key={label}
+                                className={`h-2 rounded-full transition-colors ${isActive ? "bg-primary" : "bg-[var(--foreground)]/12"}`}
+                            />
+                        );
+                    })}
+                </div>
             </div>
 
             {error && (
-                <div className="p-4 text-xs font-bold text-red-500 bg-red-500/10 border border-red-500/20 rounded-2xl text-center">
+                <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-center text-xs font-bold text-red-500">
                     {error}
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
                 {/* STEP 1: Informations Personnelles */}
                 {step === 1 && (
-                    <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                        <h3 className="font-black text-[var(--foreground)] text-lg mb-2">1. Informations personnelles</h3>
+                    <div className="space-y-3 animate-in fade-in slide-in-from-right-4 sm:space-y-4">
+                        <h3 className="mb-1 text-lg font-black text-[var(--foreground)]">1. Informations personnelles</h3>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/40 uppercase tracking-[0.2em]">Nom et Prénoms *</label>
-                                <input type="text" name="name" required value={formData.name} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)] font-medium" />
+                                <label className={fieldLabelClass}>Nom et Prénoms *</label>
+                                <input type="text" name="name" required value={formData.name} onChange={handleChange} className={fieldClass} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Date de naissance</label>
-                                <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" />
+                                <label className={fieldLabelClass}>Date de naissance</label>
+                                <input type="date" name="dob" value={formData.dob} onChange={handleChange} className={fieldClass} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Téléphone *</label>
-                                <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" />
+                                <label className={fieldLabelClass}>Téléphone *</label>
+                                <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} className={fieldClass} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Email *</label>
+                                <label className={fieldLabelClass}>Email *</label>
                                 <div className="relative">
                                     <input
                                         type="email" name="email" required
                                         value={formData.email} onChange={handleChange}
-                                        className={`w-full bg-[var(--foreground)]/5 border rounded-xl px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)] transition-colors ${
+                                        className={`${fieldClass} pr-10 ${
                                             emailStatus === "taken" ? "border-red-500/70 bg-red-500/5" :
                                             emailStatus === "available" ? "border-green-500/70 bg-green-500/5" :
                                             emailStatus === "pending" ? "border-amber-500/70 bg-amber-500/5" :
@@ -314,83 +329,83 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Profession</label>
-                                <input type="text" name="profession" value={formData.profession} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" />
+                                <label className={fieldLabelClass}>Profession</label>
+                                <input type="text" name="profession" value={formData.profession} onChange={handleChange} className={fieldClass} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Entreprise / Institution</label>
-                                <input type="text" name="company" value={formData.company} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" />
+                                <label className={fieldLabelClass}>Entreprise / Institution</label>
+                                <input type="text" name="company" value={formData.company} onChange={handleChange} className={fieldClass} />
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Commune de résidence</label>
-                                <select name="commune" value={formData.commune} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]">
+                                <label className={fieldLabelClass}>Commune de résidence</label>
+                                <select name="commune" value={formData.commune} onChange={handleChange} className={fieldClass}>
                                     <option value="" disabled>Sélectionner une commune</option>
                                     {communes.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                             </div>
                             {formData.commune === "Autre" && (
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Précisez</label>
-                                    <input type="text" name="communeOther" value={formData.communeOther} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" placeholder="Votre ville/quartier" />
+                                    <label className={fieldLabelClass}>Précisez</label>
+                                    <input type="text" name="communeOther" value={formData.communeOther} onChange={handleChange} className={fieldClass} placeholder="Votre ville/quartier" />
                                 </div>
                             )}
                         </div>
 
-                        <div className="space-y-1 pt-2">
-                            <label className="text-[10px] font-black px-1 text-[var(--foreground)]/60 uppercase tracking-[0.2em]">Mot de passe (Compte) *</label>
-                            <input type="password" name="password" required value={formData.password} onChange={handleChange} className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/20 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)] outline-none text-[var(--foreground)]" placeholder="••••••••" />
+                        <div className="space-y-1 pt-1">
+                            <label className={fieldLabelClass}>Mot de passe (Compte) *</label>
+                            <input type="password" name="password" required value={formData.password} onChange={handleChange} className={fieldClass} placeholder="••••••••" />
                         </div>
 
-                        <button type="button" onClick={nextStep} className="btn-primary w-full mt-6 min-h-12">Suivant →</button>
+                        <button type="button" onClick={nextStep} className="btn-primary mt-4 min-h-12 w-full">Suivant →</button>
                     </div>
                 )}
 
                 {/* STEP 2: Objectif & Niveau */}
                 {step === 2 && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+                    <div className="space-y-5 animate-in fade-in slide-in-from-right-4">
                         <div className="space-y-3">
-                            <h3 className="font-black text-[var(--foreground)] text-lg">2. Objectif principal</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <h3 className="text-lg font-black text-[var(--foreground)]">2. Objectif principal</h3>
+                            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                                 {objectives.map(obj => (
-                                    <label key={obj} className={`flex items-center gap-3 p-3 rounded-xl border text-sm cursor-pointer transition-all ${formData.objective === obj ? 'bg-primary/10 border-primary text-[var(--foreground)]' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20'}`}>
+                                    <label key={obj} className={`${choiceClass} ${formData.objective === obj ? 'border-primary bg-primary/10 text-[var(--foreground)]' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="objective" value={obj} checked={formData.objective === obj} onChange={handleChange} className="accent-primary" />
                                         <span className="font-bold">{obj}</span>
                                     </label>
                                 ))}
                             </div>
                             {formData.objective === "Autre" && (
-                                <input type="text" name="objectiveOther" placeholder="Précisez votre objectif..." value={formData.objectiveOther} onChange={handleChange} className="w-full mt-2 bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none" />
+                                <input type="text" name="objectiveOther" placeholder="Précisez votre objectif..." value={formData.objectiveOther} onChange={handleChange} className={`${fieldClass} mt-2`} />
                             )}
                         </div>
 
 
-                        <div className="space-y-3 pt-4 border-t border-[var(--foreground)]/10">
-                            <h3 className="font-black text-[var(--foreground)] text-lg">3. Niveau en anglais</h3>
+                        <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
+                            <h3 className="text-lg font-black text-[var(--foreground)]">3. Niveau en anglais</h3>
                             <div className="grid grid-cols-1 gap-2">
                                 {levels.map(lvl => (
-                                    <label key={lvl} className={`flex items-center gap-3 p-3 rounded-xl border-2 text-sm cursor-pointer transition-all ${formData.level === lvl ? 'bg-primary/10 border-primary text-[var(--foreground)]' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20'}`}>
-                                        <input type="radio" name="level" value={lvl} checked={formData.level === lvl} onChange={handleChange} className="accent-primary w-4 h-4" />
+                                    <label key={lvl} className={`${choiceClass} ${formData.level === lvl ? 'border-primary bg-primary/10 text-[var(--foreground)]' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
+                                        <input type="radio" name="level" value={lvl} checked={formData.level === lvl} onChange={handleChange} className="h-4 w-4 accent-primary" />
                                         <span className="font-black">{lvl}</span>
                                     </label>
                                 ))}
                             </div>
 
                             {/* Placement Test CTA */}
-                            <div className="mt-4 p-5 bg-indigo-500/10 border-2 border-indigo-500/30 rounded-2xl shadow-lg shadow-indigo-500/5">
-                                <p className="text-sm font-black text-indigo-600 dark:text-indigo-400 mb-3">
+                            <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
+                                <p className="mb-2 text-sm font-black text-primary">
                                     <span className="text-xl">🤔</span> Vous ne connaissez pas votre niveau ?
                                 </p>
-                                <p className="text-xs font-bold text-[var(--foreground)]/70 mb-4 leading-relaxed">
+                                <p className="mb-3 text-xs font-bold leading-relaxed text-[var(--foreground)]/70">
                                     Passez notre test de placement gratuit pour découvrir votre profil linguistique exact !
                                 </p>
                                 <Link
                                     href={`/placement-test${formData.planId ? `?plan=${formData.planId}` : ''}`}
-                                    className="flex items-center justify-center gap-2 w-full px-5 py-4 rounded-xl bg-indigo-600 text-white font-black text-sm hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md shadow-indigo-600/20"
+                                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-primary/20 bg-white/70 px-4 py-3 text-sm font-black text-primary transition-colors hover:bg-primary/10 dark:bg-white/5"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
@@ -401,8 +416,8 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         </div>
 
 
-                        <div className="grid grid-cols-[0.8fr_1.2fr] gap-3 pt-2">
-                            <button type="button" onClick={prevStep} className="min-h-12 px-4 py-3 rounded-xl bg-[var(--foreground)]/5 font-bold hover:bg-[var(--foreground)]/10 text-[var(--foreground)] transition-all">Retour</button>
+                        <div className="grid grid-cols-[0.8fr_1.2fr] gap-3 pt-1">
+                            <button type="button" onClick={prevStep} className="min-h-12 rounded-lg bg-[var(--foreground)]/5 px-4 py-3 font-bold text-[var(--foreground)] transition-colors hover:bg-[var(--foreground)]/10">Retour</button>
                             <button type="button" onClick={nextStep} className="btn-primary min-h-12">Suivant →</button>
                         </div>
                     </div>
@@ -410,18 +425,18 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
                 {/* STEP 3: Formule & Jours */}
                 {step === 3 && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+                    <div className="space-y-5 animate-in fade-in slide-in-from-right-4">
                         {/* Type & Mode */}
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             <div className="space-y-3">
-                                <h3 className="font-black text-[var(--foreground)] text-lg">Type d'étudiant</h3>
+                                <h3 className="text-lg font-black text-[var(--foreground)]">Type d'étudiant</h3>
                                 <div className="grid grid-cols-2 gap-2">
-                                    <label className={`flex items-center justify-center p-3 rounded-xl border text-sm font-bold cursor-pointer transition-all ${formData.studentType === 'INDIVIDUEL' ? 'bg-primary/10 border-primary text-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20 text-[var(--foreground)]/60'}`}>
+                                    <label className={`flex cursor-pointer items-center justify-center rounded-lg border p-3 text-sm font-bold transition-colors ${formData.studentType === 'INDIVIDUEL' ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/60 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="studentType" value="INDIVIDUEL" checked={formData.studentType === 'INDIVIDUEL'} onChange={handleChange} className="sr-only" />
                                         Particulier
                                     </label>
                                     {(systemSettings?.enableCorporateRegistration ?? true) && (
-                                        <label className={`flex items-center justify-center p-3 rounded-xl border text-sm font-bold cursor-pointer transition-all ${formData.studentType === 'ENTREPRISE' ? 'bg-primary/10 border-primary text-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20 text-[var(--foreground)]/60'}`}>
+                                        <label className={`flex cursor-pointer items-center justify-center rounded-lg border p-3 text-sm font-bold transition-colors ${formData.studentType === 'ENTREPRISE' ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/60 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                             <input type="radio" name="studentType" value="ENTREPRISE" checked={formData.studentType === 'ENTREPRISE'} onChange={handleChange} className="sr-only" />
                                             Entreprise
                                         </label>
@@ -429,15 +444,15 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 </div>
                             </div>
 
-                            <div className="space-y-3 pt-4 border-t border-[var(--foreground)]/10">
-                                <h3 className="font-black text-[var(--foreground)] text-lg">Format des cours</h3>
+                            <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
+                                <h3 className="text-lg font-black text-[var(--foreground)]">Format des cours</h3>
                                 <div className="grid grid-cols-2 gap-2">
-                                    <label className={`flex items-center justify-center p-3 rounded-xl border text-sm font-bold cursor-pointer transition-all ${formData.courseMode === 'PRESENTIEL' ? 'bg-primary/10 border-primary text-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20 text-[var(--foreground)]/60'}`}>
+                                    <label className={`flex cursor-pointer items-center justify-center rounded-lg border p-3 text-sm font-bold transition-colors ${formData.courseMode === 'PRESENTIEL' ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/60 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="courseMode" value="PRESENTIEL" checked={formData.courseMode === 'PRESENTIEL'} onChange={handleChange} className="sr-only" />
                                         Présentiel
                                     </label>
                                     {(systemSettings?.enableOnlineRegistration ?? true) && (
-                                        <label className={`flex items-center justify-center p-3 rounded-xl border text-sm font-bold cursor-pointer transition-all ${formData.courseMode === 'ONLINE' ? 'bg-primary/10 border-primary text-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20 text-[var(--foreground)]/60'}`}>
+                                        <label className={`flex cursor-pointer items-center justify-center rounded-lg border p-3 text-sm font-bold transition-colors ${formData.courseMode === 'ONLINE' ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/60 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                             <input type="radio" name="courseMode" value="ONLINE" checked={formData.courseMode === 'ONLINE'} onChange={handleChange} className="sr-only" />
                                             En Ligne
                                         </label>
@@ -446,42 +461,42 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
                         </div>
 
-                        <div className="space-y-3 pt-4 border-t border-[var(--foreground)]/10">
-                            <h3 className="font-black text-[var(--foreground)] text-lg">Formule choisie</h3>
+                        <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
+                            <h3 className="text-lg font-black text-[var(--foreground)]">Formule choisie</h3>
                             <div className="space-y-2">
                                 {plans.map(plan => (
-                                    <label key={plan.id} className={`flex flex-col p-4 rounded-xl border cursor-pointer transition-all ${formData.planId === plan.id ? 'bg-primary/10 border-primary' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20'}`}>
+                                    <label key={plan.id} className={`flex cursor-pointer flex-col rounded-lg border p-3 transition-colors ${formData.planId === plan.id ? 'border-primary bg-primary/10' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <div className="flex items-center gap-3">
                                             <input type="radio" name="planId" value={plan.id} checked={formData.planId === plan.id} onChange={handleChange} className="accent-primary" />
                                             <span className="font-black text-[var(--foreground)] text-sm">{plan.name}</span>
                                         </div>
-                                        <div className="ml-7 mt-1 text-xs text-[var(--foreground)]/60 font-medium"> Organisation : {plan.desc}</div>
-                                        <div className="ml-7 mt-2 font-black text-primary text-sm">{plan.price}</div>
+                                        <div className="ml-7 mt-1 text-xs font-medium text-[var(--foreground)]/60">Organisation : {plan.desc}</div>
+                                        <div className="ml-7 mt-1 text-sm font-black text-primary">{plan.price}</div>
                                     </label>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="space-y-3 pt-4 border-t border-[var(--foreground)]/10">
-                            <h3 className="font-black text-[var(--foreground)] text-lg">5. Créneau Horaire</h3>
+                        <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
+                            <h3 className="text-lg font-black text-[var(--foreground)]">5. Créneau Horaire</h3>
                             <p className="text-xs text-[var(--foreground)]/60 mb-2">Choisissez votre vague horaire préférée.</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 {timeSlots.map(slot => (
-                                    <label key={slot.id} className={`flex items-center gap-3 p-3 rounded-xl border text-sm cursor-pointer transition-all ${formData.timeSlot === slot.id ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-500' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20'}`}>
-                                        <input type="radio" name="timeSlot" value={slot.id} checked={formData.timeSlot === slot.id} onChange={handleChange} className="accent-indigo-500" />
+                                    <label key={slot.id} className={`${choiceClass} ${formData.timeSlot === slot.id ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
+                                        <input type="radio" name="timeSlot" value={slot.id} checked={formData.timeSlot === slot.id} onChange={handleChange} className="accent-primary" />
                                         <span className="font-bold">{slot.name}</span>
                                     </label>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="space-y-3 pt-4 border-t border-[var(--foreground)]/10">
-                            <h3 className="font-black text-[var(--foreground)] text-lg">6. Jours de base</h3>
+                        <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
+                            <h3 className="text-lg font-black text-[var(--foreground)]">6. Jours de base</h3>
                             <p className="text-xs text-[var(--foreground)]/60 mb-2">Choisissez vos jours de base ({planSessions[formData.planId]} jour{planSessions[formData.planId] > 1 ? 's' : ''} requis).</p>
                             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                                 {availableDays.map(day => (
-                                    <label key={day} className={`flex items-center gap-2 p-3 rounded-xl border text-sm cursor-pointer transition-all ${formData.days.includes(day) ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-500' : 'bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--foreground)]/20'}`}>
-                                        <input type="checkbox" checked={formData.days.includes(day)} onChange={() => handleDayToggle(day)} className="accent-indigo-500 border-indigo-500/50 rounded" />
+                                    <label key={day} className={`flex cursor-pointer items-center gap-2 rounded-lg border p-3 text-sm transition-colors ${formData.days.includes(day) ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
+                                        <input type="checkbox" checked={formData.days.includes(day)} onChange={() => handleDayToggle(day)} className="rounded border-primary/50 accent-primary" />
                                         <span className="font-bold">{day}</span>
                                     </label>
                                 ))}
@@ -489,7 +504,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         </div>
 
                         <div className="grid grid-cols-[0.8fr_1.2fr] gap-3 pt-2">
-                            <button type="button" onClick={prevStep} className="min-h-12 px-4 py-3 rounded-xl bg-[var(--foreground)]/5 font-bold hover:bg-[var(--foreground)]/10 text-[var(--foreground)] transition-all">Retour</button>
+                            <button type="button" onClick={prevStep} className="min-h-12 rounded-lg bg-[var(--foreground)]/5 px-4 py-3 font-bold text-[var(--foreground)] transition-colors hover:bg-[var(--foreground)]/10">Retour</button>
                             <button type="button" onClick={nextStep} className="btn-primary min-h-12">Suivant →</button>
                         </div>
                     </div>

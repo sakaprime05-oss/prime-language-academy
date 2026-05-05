@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { sendAdminNotificationEmail, sendInvoiceEmail } from "@/lib/email";
+import { sendAccountActivatedEmail, sendAdminNotificationEmail, sendInvoiceEmail } from "@/lib/email";
 import { notifyTelegram } from "@/lib/notify";
 import { paymentProviderLabel } from "@/lib/payment-methods";
 
@@ -16,6 +16,13 @@ type PaystackTransactionData = {
 
 function paystackAmount(amount: number) {
   return Math.round(amount * 100);
+}
+
+function paymentStageLabel(amountPaidBefore: number, amount: number, totalAmount: number) {
+  if (amountPaidBefore <= 0 && amount >= totalAmount) return "Paiement total";
+  if (amountPaidBefore <= 0) return "Prise en charge";
+  if (amountPaidBefore + amount >= totalAmount) return "Réservation";
+  return "Paiement partiel";
 }
 
 export async function completePaystackTransaction(data: PaystackTransactionData) {
@@ -87,6 +94,7 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
   const plan = transaction.paymentPlan;
   const student = plan.student;
   const isFirstPayment = plan.amountPaid === 0;
+  const stageLabel = paymentStageLabel(plan.amountPaid, transaction.amount, plan.totalAmount);
   const newAmountPaid = plan.amountPaid + transaction.amount;
   const newPlanStatus = newAmountPaid >= plan.totalAmount ? "PAID" : "PARTIAL";
 
@@ -104,10 +112,12 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
     }),
   ]);
 
-  if (isFirstPayment && student.email) {
-    await sendInvoiceEmail(student.email, student.name || "Etudiant", transaction.amount, transaction.id, providerLabel).catch(
-      console.error
-    );
+  if (student.email) {
+    if (isFirstPayment) {
+      await sendAccountActivatedEmail(student.email, student.name || "Etudiant").catch(console.error);
+    }
+
+    await sendInvoiceEmail(student.email, student.name || "Etudiant", transaction.amount, transaction.id, providerLabel, stageLabel).catch(console.error);
   }
 
   await sendAdminNotificationEmail(student.name || "Etudiant inconnu", transaction.amount, transaction.id, providerLabel).catch(

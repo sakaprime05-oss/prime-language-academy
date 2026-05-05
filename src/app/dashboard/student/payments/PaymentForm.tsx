@@ -4,7 +4,7 @@ import { useState } from "react";
 import { initiatePayment } from "@/app/actions/payments";
 
 const paymentMethods = [
-    { id: "WAVE", name: "Wave", detail: "Rapide a Abidjan" },
+    { id: "WAVE", name: "Wave", detail: "Rapide à Abidjan" },
     { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov" },
     { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard" },
 ];
@@ -41,7 +41,7 @@ export default function PaymentForm({ planId, maxAmount, stageLabel }: { planId:
             <div className="space-y-1">
                 <h3 className="text-lg sm:text-xl font-black text-[var(--foreground)]">{stageLabel}</h3>
                 <p className="text-xs font-medium text-[var(--foreground)]/50">
-                    Choisissez votre moyen de paiement. Le montant reste calcule automatiquement.
+                    Choisissez votre moyen de paiement. Le montant reste calculé automatiquement.
                 </p>
             </div>
 
@@ -82,14 +82,14 @@ export default function PaymentForm({ planId, maxAmount, stageLabel }: { planId:
 
                 <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 px-1">
-                        Montant a payer (FCFA)
+                        Montant à payer (FCFA)
                     </label>
                     <input name="amount" type="hidden" value={maxAmount} readOnly />
                     <div className="w-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-2xl px-5 py-4 font-black text-base sm:text-lg">
                         {maxAmount.toLocaleString()} FCFA
                     </div>
                     <p className="text-[11px] font-medium text-[var(--foreground)]/45 px-1">
-                        Ce montant est calcule automatiquement depuis votre solde restant.
+                        Ce montant est calculé automatiquement depuis votre solde restant.
                     </p>
                 </div>
 

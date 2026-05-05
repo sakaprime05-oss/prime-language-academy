@@ -228,39 +228,40 @@ export async function sendPaymentReminderEmail(to: string, name: string, amount:
     return sendEmail({ to, subject: title, html: emailLayout(title, body) });
 }
 
-export async function sendInvoiceEmail(to: string, name: string, amount: number, transactionId: string, method?: string | null) {
-    const title = "Recu de paiement";
+export async function sendInvoiceEmail(to: string, name: string, amount: number, transactionId: string, method?: string | null, stageLabel?: string | null) {
+    const title = "Reçu de paiement";
     const receipt = receiptNumber(transactionId);
     const body = `
-        ${paragraph(`Bonjour ${escapeHtml(name || "cher etudiant")},`)}
-        ${paragraph("Nous confirmons la reception de votre paiement pour Prime Language Academy.")}
+        ${paragraph(`Bonjour ${escapeHtml(name || "cher étudiant")},`)}
+        ${paragraph("Nous confirmons la réception de votre paiement pour Prime Language Academy.")}
         ${detailRows([
-            ["Numero du recu", receipt],
-            ["Montant regle", money(amount)],
+            ["Numéro du reçu", receipt],
+            ["Paiement concerné", escapeHtml(stageLabel || "Formation Prime Language Academy")],
+            ["Montant réglé", money(amount)],
             ["Moyen de paiement", paymentMethodLabel(method)],
             ["Date", new Date().toLocaleDateString("fr-FR")],
         ])}
-        ${paragraph("Vous pouvez retrouver vos paiements dans votre espace et telecharger le recu PDF si besoin.")}
+        ${paragraph("Vous pouvez retrouver vos paiements dans votre espace et télécharger le reçu PDF si besoin.")}
         ${button("Voir mon espace", `${appUrl()}/dashboard/student`, brand.color)}
     `;
     return sendEmail({
         to,
         subject: title,
         html: emailLayout(title, body, {
-            preheader: `${receipt} - paiement confirme de ${money(amount)}`,
+            preheader: `${receipt} - paiement confirmé de ${money(amount)}`,
         }),
     });
 }
 
 export async function sendAdminNotificationEmail(studentName: string, amount: number, transactionId: string, method?: string | null) {
-    const title = "Paiement confirme";
+    const title = "Paiement confirmé";
     const receipt = receiptNumber(transactionId);
     const body = `
-        ${paragraph(`Le paiement de ${escapeHtml(studentName || "un etudiant")} vient d'etre confirme.`)}
+        ${paragraph(`Le paiement de ${escapeHtml(studentName || "un étudiant")} vient d'être confirmé.`)}
         ${detailRows([
-            ["Etudiant", escapeHtml(studentName || "Non renseigne")],
+            ["Étudiant", escapeHtml(studentName || "Non renseigné")],
             ["Montant", money(amount)],
-            ["Recu", receipt],
+            ["Reçu", receipt],
             ["Moyen", paymentMethodLabel(method)],
             ["Reference interne", escapeHtml(transactionId)],
             ["Date", new Date().toLocaleDateString("fr-FR")],

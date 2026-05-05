@@ -15,6 +15,13 @@ function paystackAmount(amount: number) {
     return Math.round(amount * 100);
 }
 
+function paymentStageLabel(amountPaidBefore: number, amount: number, totalAmount: number) {
+    if (amountPaidBefore <= 0 && amount >= totalAmount) return "Paiement total";
+    if (amountPaidBefore <= 0) return "Prise en charge";
+    if (amountPaidBefore + amount >= totalAmount) return "Réservation";
+    return "Paiement partiel";
+}
+
 function matchesImageMagicBytes(buffer: Buffer, type: string) {
     if (type === "image/jpeg") {
         return buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
@@ -366,6 +373,7 @@ export async function approveTransaction(transactionId: string) {
         const student = plan.student;
         
         // Update plan and transaction
+        const stageLabel = paymentStageLabel(plan.amountPaid, transaction.amount, plan.totalAmount);
         const newAmountPaid = plan.amountPaid + transaction.amount;
         const newPlanStatus = newAmountPaid >= plan.totalAmount ? "PAID" : "PARTIAL";
 
@@ -388,11 +396,12 @@ export async function approveTransaction(transactionId: string) {
         if (student.email) {
             const { sendInvoiceEmail, sendAccountActivatedEmail } = await import("@/lib/email");
             
-            // 1. Envoyer l'email de félicitations et redirection
-            await sendAccountActivatedEmail(
-                student.email,
-                student.name || "Étudiant"
-            ).catch(console.error);
+            if (plan.amountPaid <= 0) {
+                await sendAccountActivatedEmail(
+                    student.email,
+                    student.name || "Étudiant"
+                ).catch(console.error);
+            }
 
             // 2. Envoyer la facture
             await sendInvoiceEmail(
@@ -400,7 +409,8 @@ export async function approveTransaction(transactionId: string) {
                 student.name || "Étudiant",
                 transaction.amount,
                 transaction.id,
-                transaction.provider || transaction.method
+                transaction.provider || transaction.method,
+                stageLabel
             ).catch(console.error);
         }
 

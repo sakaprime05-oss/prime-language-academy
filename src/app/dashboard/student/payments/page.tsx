@@ -32,7 +32,7 @@ export default async function StudentPaymentsPage({ searchParams }: { searchPara
 
     const remaining = paymentPlan.totalAmount - paymentPlan.amountPaid;
     const halfAmount = paymentPlan.totalAmount / 2;
-    const nextPaymentStage = paymentPlan.amountPaid <= 0 ? "Prise en Charge" : "Reservation";
+    const nextPaymentStage = paymentPlan.amountPaid <= 0 ? "Prise en charge" : "Réservation";
 
     return (
         <div className="platform-page animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -42,29 +42,29 @@ export default async function StudentPaymentsPage({ searchParams }: { searchPara
                 </Link>
                 <p className="platform-eyebrow">Paiement formation</p>
                 <h2 className="platform-title">Solde et reçus</h2>
-                <p className="platform-subtitle">Consultez votre solde et reglez la Prise en Charge puis la Reservation.</p>
+                <p className="platform-subtitle">Consultez votre solde et réglez la Prise en charge puis la Réservation.</p>
                 <SupportLink context="payment" className="mt-3" />
             </header>
 
             {params?.locked === "1" && (
                 <div className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-4 text-sm font-bold leading-6 text-amber-700 dark:text-amber-400">
-                    Votre compte est cree, mais l'espace cours reste verrouille jusqu'a la confirmation de la Prise en Charge.
+                    Votre compte est créé, mais l'espace cours reste verrouillé jusqu'à la confirmation de la Prise en charge.
                 </div>
             )}
 
             <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <div className={`glass-card !p-4 sm:!p-5 border-primary/20 ${paymentPlan.amountPaid > 0 ? "bg-emerald-500/5 border-emerald-500/20" : "bg-primary/[0.03]"}`}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">1. Prise en Charge</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">1. Prise en charge</p>
                     <h3 className="mt-2 text-xl font-black text-[var(--foreground)]">{halfAmount.toLocaleString()} FCFA</h3>
                     <p className="mt-2 text-xs font-bold leading-6 text-[var(--foreground)]/55">
-                        Donne acces a la documentation, aux conseils, a la plateforme et au suivi.
+                        Donne accès à la documentation, aux conseils, à la plateforme et au suivi.
                     </p>
                 </div>
                 <div className={`glass-card !p-4 sm:!p-5 border-secondary/20 ${remaining <= 0 ? "bg-emerald-500/5 border-emerald-500/20" : "bg-secondary/[0.03]"}`}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/60">2. Reservation</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/60">2. Réservation</p>
                     <h3 className="mt-2 text-xl font-black text-[var(--foreground)]">{halfAmount.toLocaleString()} FCFA</h3>
                     <p className="mt-2 text-xs font-bold leading-6 text-[var(--foreground)]/55">
-                        Confirme definitivement votre place dans la session et complete le solde.
+                        Confirme définitivement votre place dans la session et complète le solde.
                     </p>
                 </div>
             </section>
