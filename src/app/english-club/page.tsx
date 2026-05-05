@@ -72,6 +72,17 @@ export default function EnglishClubPublicPage() {
         <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(231,22,42,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
         <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(231,22,42,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(231,22,42,0.025) 1px, transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
 
+        {/* Citation clé du catalogue */}
+        <div style={{ maxWidth: 900, margin: "0 auto 72px", textAlign: "center", position: "relative", zIndex: 1 }}>
+          <blockquote style={{ border: "1px solid rgba(231,22,42,0.25)", borderRadius: 24, padding: "48px 40px", background: "rgba(231,22,42,0.04)", backdropFilter: "blur(16px)" }}>
+            <p style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", lineHeight: 1.6, fontWeight: 700, color: "#F5F0E8", marginBottom: 20 }}>
+              « En Côte d'Ivoire, le problème n'est pas d'apprendre l'anglais.<br/>
+              <em style={{ color: "#E7162A" }}>C'est de ne pas le perdre.</em> »
+            </p>
+            <p style={{ fontSize: 13, color: "rgba(245,240,232,0.4)", letterSpacing: "0.15em", textTransform: "uppercase", margin: 0 }}>Prime Language Academy — Abidjan</p>
+          </blockquote>
+        </div>
+
         <div style={{ maxWidth: 900, textAlign: "center", position: "relative", zIndex: 1 }}>
           {/* Badge */}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(231,22,42,0.3)", borderRadius: 100, padding: "8px 22px", marginBottom: 40, background: "rgba(231,22,42,0.06)" }}>
@@ -257,8 +268,9 @@ export default function EnglishClubPublicPage() {
           <p style={{ color: "rgba(245,240,232,0.4)", fontSize: 14, marginBottom: 48 }}>Vous vous reconnaissez dans l'un de ces profils ?</p>
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 12 }}>
             {[
-              "Cadres & Managers", "Entrepreneurs", "Créatifs & Designers", "Consultants",
-              "Étudiants Internationaux", "Freelances Global", "Diplomates", "Profils Tech & Startups",
+              "Anciens apprenants PLA", "Cadres & Managers", "Entrepreneurs", "Professionnels",
+              "Créatifs & Designers", "Consultants",
+              "Étudiants en langues", "Freelances Global", "Diplomates", "Profils Tech & Startups",
               "Professionnels de la finance", "Communicants & Marketeurs",
             ].map(p => (
               <span key={p} style={{ border: "1px solid rgba(231,22,42,0.2)", borderRadius: 100, padding: "10px 20px", fontSize: 13, color: "rgba(245,240,232,0.65)" }}>{p}</span>

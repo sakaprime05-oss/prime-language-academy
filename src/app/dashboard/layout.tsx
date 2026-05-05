@@ -34,16 +34,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
         redirect("/dashboard/student/profile?complete=1");
     }
 
-    // ===== LAYOUT ÉTUDIANT — Expérience immersive =====
+    // ===== LAYOUT ÉTUDIANT — Expérience plateforme =====
     return (
-        <div className="min-h-screen bg-[var(--background)] flex flex-col md:flex-row bg-gradient-to-br from-[var(--background)] via-[var(--background)] to-indigo-950/5 dark:to-indigo-950/20">
+        <div className="platform-shell min-h-screen bg-[var(--background)] flex flex-col md:flex-row">
 
             {/* Desktop Sidebar — Étudiants */}
-            <aside className="hidden md:flex w-72 flex-col bg-[var(--surface)]/80 backdrop-blur-3xl border-r border-white/20 dark:border-white/5 sticky top-0 h-screen z-50 shadow-2xl shadow-indigo-500/5">
-                <div className="p-8 pb-4">
+            <aside className="platform-sidebar hidden md:flex w-72 flex-col border-r sticky top-0 h-screen z-50">
+                <div className="px-6 pt-7 pb-4">
                     <div className="mb-4">
                         <Link href="/dashboard">
-                            <LogoMark className="w-20 h-20 lg:w-24 lg:h-24 -ml-2" />
+                            <LogoMark className="w-20 h-20 -ml-2" />
                         </Link>
                     </div>
                     {/* Titre sidebar — Inter, pas Playfair (trop grand en sidebar) */}
@@ -57,8 +57,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
                     <StudentSidebarNav dict={dict.nav} mode={studentMode} />
                 </div>
 
-                <div className="p-6 m-4 mt-auto rounded-3xl bg-[var(--surface-hover)] border border-[var(--foreground)]/5 flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-500 flex items-center justify-center font-black shadow-inner">
+                <div className="platform-user-card p-4 m-4 mt-auto flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-black">
                         {session.user.name?.[0] || session.user.email?.[0].toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -74,7 +74,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
             {/* Mobile Header (Student only) */}
             <div className="md:hidden flex flex-col w-full min-h-screen pb-24">
-                <header className="sticky top-0 z-40 bg-[var(--surface)]/80 backdrop-blur-3xl border-b border-white/20 dark:border-white/5 px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between shadow-sm">
+                <header className="platform-mobile-header sticky top-0 z-40 border-b px-4 sm:px-6 py-3.5 flex items-center justify-between shadow-sm">
                     <div className="flex items-center gap-3">
                         <LogoMark className="w-10 h-10" />
                         <div>
@@ -87,7 +87,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                     <div className="flex items-center gap-3">
                         <ThemeToggle />
                         <LangToggle currentLang={currentLang} />
-                        <a href="/dashboard/student/profile" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-primary/20 flex items-center justify-center text-xs sm:text-sm font-bold text-primary shadow-sm hover:scale-105 transition-transform">
+                        <a href="/dashboard/student/profile" className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-xs font-bold text-primary shadow-sm hover:bg-primary/15 transition-colors">
                             {session.user.name?.[0] || session.user.email?.[0].toUpperCase()}
                         </a>
                     </div>
@@ -103,11 +103,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </div>
 
             {/* Main Content (Desktop) */}
-            <main className="hidden md:block flex-1 p-10 lg:p-14 w-full h-screen overflow-y-auto relative">
-                {/* Decorative blobs */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 blur-3xl rounded-full mix-blend-multiply dark:mix-blend-screen pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-80 h-80 bg-secondary/5 blur-3xl rounded-full mix-blend-multiply dark:mix-blend-screen pointer-events-none"></div>
-
+            <main className="hidden md:block flex-1 p-8 lg:p-10 w-full h-screen overflow-y-auto relative">
                 <div className="max-w-6xl mx-auto relative z-10">
                     {children}
                 </div>

@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { logoutAction } from "@/app/actions/logout";
-import { AdminNav } from "@/components/admin-nav";
+import { AdminMobileNav, AdminNav } from "@/components/admin-nav";
 import { LogoMark } from "@/components/logo";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -83,7 +83,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                         </button>
                     </form>
                 </header>
-                <main className="flex-1 p-5" style={{ background: "#07070f", color: "#F0EDE8" }}>
+                <AdminMobileNav />
+                <main className="flex-1 p-4 sm:p-5" style={{ background: "#07070f", color: "#F0EDE8" }}>
                     {children}
                 </main>
             </div>

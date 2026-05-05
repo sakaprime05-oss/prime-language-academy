@@ -60,6 +60,37 @@ export function AdminNav() {
     );
 }
 
+export function AdminMobileNav() {
+    const pathname = usePathname();
+
+    return (
+        <nav className="sticky top-[73px] z-30 border-b border-red-500/10 bg-[#0a0a14]/95 px-3 py-2 backdrop-blur-xl md:hidden">
+            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {adminLinks.map((link) => {
+                    const isActive = link.exact
+                        ? pathname === link.href
+                        : pathname === link.href || pathname.startsWith(link.href + "/");
+
+                    return (
+                        <Link
+                            key={link.href}
+                            href={link.href}
+                            className={`flex min-h-10 shrink-0 items-center gap-2 rounded-lg border px-3 text-xs font-black transition-colors ${
+                                isActive
+                                    ? "border-red-500/30 bg-red-500/15 text-red-300"
+                                    : "border-white/10 bg-white/[0.03] text-white/55 hover:text-white"
+                            }`}
+                        >
+                            <link.icon className="h-4 w-4 shrink-0" />
+                            <span>{link.label}</span>
+                        </Link>
+                    );
+                })}
+            </div>
+        </nav>
+    );
+}
+
 // ====== ICONS ======
 function DashIcon(props: any) {
     return <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;

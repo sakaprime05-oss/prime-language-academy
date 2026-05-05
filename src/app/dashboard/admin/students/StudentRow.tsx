@@ -40,19 +40,19 @@ export default function StudentRow({ student, levels }: StudentRowProps) {
 
     const getStatusColor = (s: string) => {
         switch (s) {
-            case "ACTIVE": return "bg-green-500/10 text-green-600";
-            case "SUSPENDED": return "bg-yellow-500/10 text-yellow-600";
-            case "BLOCKED": return "bg-red-500/10 text-red-600";
-            case "WAITLIST": return "bg-amber-500/10 text-amber-600";
-            case "PENDING": return "bg-blue-500/10 text-blue-600";
-            default: return "bg-gray-500/10 text-gray-600";
+            case "ACTIVE": return "bg-green-500/10 text-green-300";
+            case "SUSPENDED": return "bg-yellow-500/10 text-yellow-300";
+            case "BLOCKED": return "bg-red-500/10 text-red-300";
+            case "WAITLIST": return "bg-amber-500/10 text-amber-300";
+            case "PENDING": return "bg-blue-500/10 text-blue-300";
+            default: return "bg-gray-500/10 text-gray-300";
         }
     };
 
     return (
-        <div className="glass-card hover:border-[var(--primary)]/30 transition-all group !p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 transition-colors hover:border-red-500/25 md:flex md:items-center md:justify-between md:gap-4">
             <div className="flex items-center gap-4">
-                <div className="w-12 h-12 overflow-hidden rounded-full bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center font-bold text-lg">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-red-500/10 text-base font-bold text-red-300">
                     {student.profilePhotoUrl ? (
                         <img src={student.profilePhotoUrl} alt="" className="h-full w-full object-cover" />
                     ) : (
@@ -60,36 +60,36 @@ export default function StudentRow({ student, levels }: StudentRowProps) {
                     )}
                 </div>
                 <div>
-                    <Link href={`/dashboard/admin/students/${student.id}`} className="font-bold text-[var(--foreground)] hover:text-primary">
+                    <Link href={`/dashboard/admin/students/${student.id}`} className="font-bold text-white hover:text-red-300">
                         {student.name || "Sans Nom"}
                     </Link>
-                    <p className="text-xs text-[var(--foreground)]/50">{student.email}</p>
-                    <p className="mt-1 text-[10px] font-bold text-[var(--foreground)]/35">
+                    <p className="text-xs text-white/45">{student.email}</p>
+                    <p className="mt-1 text-[10px] font-bold text-white/30">
                         {student.phone || "Telephone manquant"} {student.commune ? `- ${student.commune}` : ""}
                     </p>
                 </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="mt-3 flex flex-wrap items-center gap-2 md:mt-0 md:justify-end">
                 {/* Status Badge */}
-                <div className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider ${getStatusColor(status)}`}>
+                <div className={`status-badge ${getStatusColor(status)}`}>
                     {status}
                 </div>
-                <div className="text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider bg-[var(--foreground)]/5 text-[var(--foreground)]/45">
+                <div className="status-badge bg-white/5 text-white/45">
                     {student.registrationType === "CLUB" ? "Club" : "Formation"}
                 </div>
-                <div className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider ${student.profileComplete ? "bg-green-500/10 text-green-600" : "bg-amber-500/10 text-amber-600"}`}>
+                <div className={`status-badge ${student.profileComplete ? "bg-green-500/10 text-green-300" : "bg-amber-500/10 text-amber-300"}`}>
                     {student.profileComplete ? "Profil ok" : "Profil incomplet"}
                 </div>
 
                 {/* Level Selection */}
                 <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">Niveau:</span>
+                    <span className="text-[10px] font-bold text-white/35 uppercase tracking-widest">Niveau:</span>
                     <select
                         disabled={loading}
                         value={levelId}
                         onChange={(e) => handleLevelChange(e.target.value)}
-                        className="bg-[var(--surface-hover)] border-none text-xs font-bold rounded-lg px-2 py-1 outline-none text-[var(--foreground)]"
+                        className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs font-bold text-white outline-none"
                     >
                         <option value="">Non assigné</option>
                         {levels.map(l => (
@@ -99,8 +99,8 @@ export default function StudentRow({ student, levels }: StudentRowProps) {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 ml-auto md:ml-0">
-                    <Link href={`/dashboard/admin/students/${student.id}`} className="text-[10px] font-bold text-primary border border-primary/20 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors">
+                <div className="ml-auto flex items-center gap-2 md:ml-0">
+                    <Link href={`/dashboard/admin/students/${student.id}`} className="rounded-lg border border-red-500/25 px-3 py-1.5 text-[10px] font-bold text-red-300 transition-colors hover:bg-red-500/10">
                         Fiche
                     </Link>
                     {status === "ACTIVE" ? (

@@ -43,9 +43,9 @@ export function StudentSidebarNavClient({ dict, mode = "FORMATION" }: { dict?: a
                     <Link
                         key={link.href}
                         href={link.href}
-                        className={`flex items-center gap-4 px-4 py-4 rounded-2xl font-bold transition-all duration-200 group ${isActive
-                            ? "bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/20"
-                            : "text-[var(--foreground)]/50 hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)]"
+                        className={`flex items-center gap-3 px-4 py-3.5 rounded-lg font-bold transition-colors duration-200 group ${isActive
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "text-[var(--foreground)]/58 hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)]"
                             }`}
                     >
                         <link.icon className={`w-5 h-5 flex-shrink-0 transition-transform duration-200 ${isActive ? '' : 'group-hover:scale-110'}`} />
@@ -55,13 +55,13 @@ export function StudentSidebarNavClient({ dict, mode = "FORMATION" }: { dict?: a
             })}
 
             {/* Separator */}
-            <div className="h-px bg-[var(--foreground)]/5 my-4 mx-2"></div>
+            <div className="h-px bg-[var(--foreground)]/8 my-4 mx-2"></div>
 
             {/* Logout */}
             <form action={logoutAction}>
                 <button
                     type="submit"
-                    className="flex items-center gap-4 px-4 py-4 rounded-2xl font-bold text-red-500/60 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200 w-full"
+                    className="flex items-center gap-3 px-4 py-3.5 rounded-lg font-bold text-red-500/65 hover:bg-red-500/10 hover:text-red-500 transition-colors duration-200 w-full"
                 >
                     <LogoutIcon className="w-5 h-5 flex-shrink-0" />
                     {dict?.logout || "Déconnexion"}
@@ -93,7 +93,7 @@ export function StudentMobileNavClient({ dict, mode = "FORMATION" }: { dict?: an
         ];
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--surface)]/95 backdrop-blur-2xl border-t border-white/10 dark:border-white/5 grid grid-cols-5 shadow-[0_-10px_40px_rgba(0,0,0,0.08)] pb-[env(safe-area-inset-bottom)]">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--surface)]/95 backdrop-blur-2xl border-t border-[var(--glass-border)] grid grid-cols-5 shadow-[0_-10px_28px_rgba(0,0,0,0.08)] px-1 pb-[env(safe-area-inset-bottom)]">
             {studentLinks.map((link) => {
                 const isActive = link.exact
                     ? pathname === link.href
@@ -102,7 +102,7 @@ export function StudentMobileNavClient({ dict, mode = "FORMATION" }: { dict?: an
                     <Link
                         key={link.href}
                         href={link.href}
-                        className={`relative flex flex-col flex-1 items-center justify-center gap-1 px-1 py-3 mx-0.5 min-w-0 tap-highlight-transparent ${
+                        className={`relative flex min-h-[68px] flex-col flex-1 items-center justify-center gap-1 px-1 py-2 mx-0.5 min-w-0 tap-highlight-transparent ${
                             isActive
                             ? "text-primary"
                             : "text-[var(--foreground)]/40 hover:text-[var(--foreground)]/70 active:scale-95 transition-all duration-200"
@@ -111,12 +111,12 @@ export function StudentMobileNavClient({ dict, mode = "FORMATION" }: { dict?: an
                         {isActive && (
                             <motion.div
                                 layoutId="mobile-nav-active"
-                                className="absolute inset-0 bg-primary/10 rounded-2xl -z-10"
+                                className="absolute inset-x-1 inset-y-2 bg-primary/10 rounded-lg -z-10"
                                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
                             />
                         )}
-                        <link.icon className={`w-6 h-6 flex-shrink-0 transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-md' : ''}`} />
-                        <span className={`text-[10px] font-bold tracking-wide leading-none truncate max-w-[90%] text-center mt-1 transition-colors duration-300 ${
+                        <link.icon className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-md' : ''}`} />
+                        <span className={`text-[9px] font-black tracking-wide leading-tight truncate max-w-[92%] text-center mt-0.5 transition-colors duration-300 ${
                             isActive ? 'text-primary' : 'opacity-60'
                         }`}>
                             {link.label}

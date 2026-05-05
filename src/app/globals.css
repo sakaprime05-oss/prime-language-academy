@@ -5,41 +5,41 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-inter: Arial, Helvetica, sans-serif;
-  --font-playfair: Georgia, "Times New Roman", serif;
+  --font-inter: var(--font-lexend), Arial, Helvetica, sans-serif;
+  --font-playfair: var(--font-manrope), Arial, Helvetica, sans-serif;
 
-  /* Brand Palette - Deep Blue & Prime Red */
-  --surface: rgba(255, 255, 255, 0.9);
-  --surface-hover: rgba(33, 40, 110, 0.05);
+  /* Brand Palette - Prime Red, ink, and warm neutrals */
+  --surface: rgba(255, 248, 247, 0.94);
+  --surface-hover: rgba(231, 22, 42, 0.06);
 
-  --primary: oklch(0.205 0 0);
+  --primary: #E7162A;
   --primary-glow: rgba(231, 22, 42, 0.3);
-  --secondary: oklch(0.97 0 0);
+  --secondary: #1A1C1E;
   --accent: oklch(0.97 0 0);
 
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --glass-border: rgba(13, 13, 20, 0.08);
+  --glass-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+  --background: #fff8f7;
+  --foreground: #291715;
+  --card: #ffffff;
+  --card-foreground: #291715;
+  --popover: #ffffff;
+  --popover-foreground: #291715;
+  --primary-foreground: #ffffff;
+  --secondary-foreground: #ffffff;
+  --muted: #fff0ef;
+  --muted-foreground: #5e3f3d;
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  --border: #e7bcb9;
+  --input: #e7bcb9;
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  --radius: 0.5rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -74,7 +74,7 @@
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
-  --background:    #080808;
+  --background:    #0F1113;
   --foreground:    #F5F0E8;
   --surface:       rgba(20, 20, 30, 0.85);
   --surface-hover: rgba(231,22,42, 0.08);
@@ -82,8 +82,8 @@
   --primary-glow:  rgba(231,22,42, 0.35);
   --secondary:     #F5F0E8;
   --glass-border:  rgba(231,22,42, 0.15);
-  --glass-shadow:  0 8px 40px 0 rgba(0,0,0,0.6);
-  --card:          #111118;
+  --glass-shadow:  0 12px 34px rgba(0,0,0,0.42);
+  --card:          #17191C;
   --card-foreground: #F5F0E8;
   --popover:       #111118;
   --popover-foreground: #F5F0E8;
@@ -147,7 +147,7 @@
   body {
     background: var(--background);
     color: var(--foreground);
-    font-family: var(--font-inter), 'Space Grotesk', sans-serif;
+    font-family: var(--font-inter), sans-serif;
     font-size: 0.9375rem; /* 15px — base confortable */
     line-height: 1.6;
     letter-spacing: 0;
@@ -172,7 +172,7 @@
     font-weight: 700;
   }
   h3 {
-    /* h3 reste en Inter pour le UI — plus lisible dans les cards */
+    /* h3 reste en Lexend pour le UI, plus lisible dans les cards */
     font-family: var(--font-inter), sans-serif;
     font-size: clamp(1rem, 1.5vw, 1.125rem);
     line-height: 1.35;
@@ -207,15 +207,69 @@
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
-    border-radius: 1.5rem;
-    @apply p-6 transition-all duration-300;
+    border-radius: 0.875rem;
+    @apply p-6 transition-colors duration-200;
   }
   @media (hover: hover) and (pointer: fine) {
     .glass-card:hover {
-      border-color: rgba(231,22,42, 0.3);
-      transform: translateY(-2px);
-      box-shadow: 0 16px 50px rgba(0,0,0,0.7), 0 0 0 1px rgba(231,22,42,0.2);
+      border-color: rgba(231,22,42, 0.28);
     }
+  }
+
+  .platform-shell {
+    background:
+      linear-gradient(135deg, rgba(231,22,42,0.035), transparent 34%),
+      var(--background);
+  }
+
+  .platform-sidebar {
+    background: var(--surface);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-color: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .platform-user-card {
+    border: 1px solid var(--glass-border);
+    background: color-mix(in oklab, var(--surface-hover), transparent 20%);
+    border-radius: 0.875rem;
+  }
+
+  .platform-mobile-header {
+    background: color-mix(in oklab, var(--surface), transparent 6%);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-color: var(--glass-border);
+  }
+
+  .platform-page {
+    @apply mx-auto w-full max-w-6xl space-y-5 pb-24 md:space-y-8 md:pb-12;
+  }
+
+  .platform-page-header {
+    @apply space-y-2;
+  }
+
+  .platform-eyebrow {
+    @apply text-[11px] font-black uppercase tracking-[0.12em] text-primary;
+  }
+
+  .platform-title {
+    font-family: var(--font-playfair), sans-serif;
+    @apply text-2xl font-bold leading-tight tracking-normal text-[var(--foreground)] sm:text-3xl;
+  }
+
+  .platform-subtitle {
+    @apply max-w-2xl text-sm font-medium leading-6 text-[var(--muted-foreground)];
+  }
+
+  .status-badge {
+    @apply inline-flex min-h-6 items-center rounded px-2 text-[10px] font-black uppercase tracking-[0.08em];
+  }
+
+  .mobile-list-row {
+    @apply rounded-lg border border-[var(--border)]/60 bg-card p-3 transition-colors hover:border-primary/30;
   }
 
   /* ── INPUT FIELD (classe utilitaire manquante) ── */

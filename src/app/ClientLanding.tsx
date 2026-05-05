@@ -24,10 +24,10 @@ const CLUB_PLANS = [
 const MARQUEE_WORDS = ["Speaking","Confidence","Fluency","Excellence","Bilinguisme","Impact","Immersion","Mastery","Progress","Growth","Networking","Community"];
 
 const WHY = [
-  { n:"01", title:"Méthode ISO+", desc:"Input → Structure → Output → Automatisation. Votre cerveau pense directement en anglais." },
-  { n:"02", title:"Formateurs experts", desc:"Suivi personnalisé, corrections actives, mentorat continu pour chaque apprenant." },
-  { n:"03", title:"Flexibilité totale", desc:"1 à 6 séances par semaine. Rattrapage possible le même jour sur une autre vague." },
-  { n:"04", title:"Certification CECRL", desc:"Attestation officielle A1→C2 remise en fin de session, reconnue à l'international." },
+  { n:"01", title:"Méthode ISO+", desc:"Input → Structure → Output → Automatisation. Une approche pratique orientée communication — votre cerveau pense directement en anglais." },
+  { n:"02", title:"Formateurs experts", desc:"Cadre professionnel et dynamique. Suivi personnalisé, corrections actives, mentorat continu pour chaque apprenant." },
+  { n:"03", title:"Flexibilité totale", desc:"1 à 6 séances par semaine. Possibilité d'accélérer sa progression. Rattrapage possible le même jour sur une autre vague." },
+  { n:"04", title:"Immersion 100%", desc:"Environnement 100% immersif. Forte pratique orale dès le début pour parler avec confiance, spontanéité et efficacité." },
 ];
 
 export default function ClientLanding({ session, systemSettings }: { session: any, systemSettings?: any, latestArticles?: any[] }) {
@@ -246,6 +246,9 @@ export default function ClientLanding({ session, systemSettings }: { session: an
             <p style={{ fontSize:16, lineHeight:1.85, color:"var(--muted-foreground)", marginBottom:20 }}>
               Dans l'espace francophone africain, la maîtrise des langues étrangères reste un frein majeur. Prime Language Academy est née d'un constat simple : les offres existantes ne prennent pas en compte les réalités spécifiques des apprenants francophones.
             </p>
+            <p style={{ fontSize:16, lineHeight:1.85, color:"var(--muted-foreground)", marginBottom:20 }}>
+              Notre méthode est pensée pour les francophones, ancrée dans des situations réelles et orientée vers des résultats concrets. Grâce à l'intégration de l'automatisation et à une forte pratique orale dès le début, elle permet aux apprenants de parler anglais avec <strong style={{ color:"var(--foreground)" }}>confiance, spontanéité et efficacité</strong>.
+            </p>
             <p style={{ fontSize:16, lineHeight:1.85, color:"var(--muted-foreground)" }}>
               Les blocages psychologiques à l'oral, la peur de faire des fautes, l'absence d'un cadre progressif et adapté. <strong style={{ color:"var(--foreground)" }}>Nous connaissons notre public.</strong>
             </p>
@@ -369,6 +372,73 @@ export default function ClientLanding({ session, systemSettings }: { session: an
             <Link href="/programme" style={{ color:"#E7162A", textDecoration:"underline", textUnderlineOffset:4, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase" }}>
               Voir le programme complet
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ AVANTAGES IMMÉDIATS ══════════ */}
+      <section style={{ padding:"100px 2rem", background:"rgba(231,22,42,0.02)" }}>
+        <div style={{ maxWidth:1100, margin:"0 auto" }}>
+          <div style={{ textAlign:"center", marginBottom:56 }}>
+            <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", marginBottom:16 }}>Dès votre inscription</div>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2rem,4vw,3rem)", fontWeight:900, margin:"0 0 16px" }}>
+              N'attendez pas le <em style={{ color:"#E7162A" }}>21 Juin</em>
+            </h2>
+            <p style={{ color:"var(--muted-foreground)", fontSize:15, maxWidth:520, margin:"0 auto" }}>Inscrivez-vous dès maintenant et bénéficiez immédiatement de tout ceci :</p>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
+            {[
+              { icon:"📱", title:"Accès plateforme", desc:"Accès immédiat à notre plateforme de formation en ligne" },
+              { icon:"📚", title:"Documentation", desc:"Documentation pédagogique complète disponible dès le 1er jour" },
+              { icon:"🚀", title:"Préformation", desc:"Une séquence de préformation pour bien démarrer avant le début officiel" },
+              { icon:"💻", title:"Séances Visio", desc:"Séances en visioconférence disponibles dès votre inscription" },
+              { icon:"🤝", title:"Accompagnement", desc:"Nos consultants et formateurs vous accompagnent immédiatement" },
+            ].map(({icon,title,desc}) => (
+              <div key={title} style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"32px 24px", background:"var(--surface)", backdropFilter:"blur(16px)", textAlign:"center" }}>
+                <div style={{ fontSize:36, marginBottom:16 }}>{icon}</div>
+                <div style={{ fontSize:14, fontWeight:800, color:"var(--foreground)", marginBottom:8 }}>{title}</div>
+                <div style={{ fontSize:13, color:"var(--muted-foreground)", lineHeight:1.65 }}>{desc}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ textAlign:"center", marginTop:40 }}>
+            <Link href="/register" className="btn-primary" style={{ textDecoration:"none" }}>Commencer dès maintenant →</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ NOS SERVICES ══════════ */}
+      <section style={{ padding:"100px 2rem" }}>
+        <div style={{ maxWidth:1100, margin:"0 auto" }}>
+          <div style={{ textAlign:"center", marginBottom:56 }}>
+            <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", marginBottom:16 }}>Autres Prestations</div>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2rem,4vw,3rem)", fontWeight:900, margin:"0 0 16px" }}>
+              Nos <em style={{ color:"#E7162A" }}>services</em>
+            </h2>
+            <p style={{ color:"var(--muted-foreground)", fontSize:15, maxWidth:560, margin:"0 auto" }}>Prime Language Academy offre des services divers dans le Grand Abidjan dans le domaine de la Linguistique, Consulting en Maîtrise de Langues et Communication.</p>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))", gap:20 }}>
+            {[
+              { icon:"🎯", title:"Formations Professionnels", desc:"Programmes adaptés pour les cadres et professionnels souhaitant renforcer leur anglais métier." },
+              { icon:"🎓", title:"Formations Étudiants", desc:"Parcours spécifiques pour les étudiants avec des objectifs académiques et d'insertion professionnelle." },
+              { icon:"👥", title:"Formations Groupes & Asso.", desc:"Formation des groupes, collectifs et associations avec des formats flexibles et adaptables." },
+              { icon:"🏠", title:"Formation Privée", desc:"Cours individuels 100% personnalisés selon votre rythme, vos objectifs et votre emploi du temps." },
+              { icon:"🏢", title:"Formation en Entreprise", desc:"Solutions intra-muros pour vos équipes : coaching exécutif, anglais professionnel et communication." },
+              { icon:"💬", title:"Consulting Linguistique", desc:"Conseils et accompagnement en maîtrise des langues et communication. Prenez RDV pour en savoir plus." },
+            ].map(({icon,title,desc}) => (
+              <div key={title} style={{ border:"1px solid rgba(231,22,42,0.12)", borderRadius:20, padding:"36px 28px", background:"var(--surface)", backdropFilter:"blur(16px)" }}
+                onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.borderColor="rgba(231,22,42,0.4)"; (e.currentTarget as HTMLElement).style.transform="translateY(-4px)";}}
+                onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.borderColor="rgba(231,22,42,0.12)"; (e.currentTarget as HTMLElement).style.transform="translateY(0)";}}>
+                <div style={{ fontSize:32, marginBottom:16 }}>{icon}</div>
+                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:18, fontWeight:800, marginBottom:10, color:"var(--foreground)" }}>{title}</h3>
+                <p style={{ fontSize:13, color:"var(--muted-foreground)", lineHeight:1.7, margin:0 }}>{desc}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{ textAlign:"center", marginTop:40 }}>
+            <a href={PLA_SESSION.whatsapp} target="_blank" rel="noopener noreferrer" style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"14px 32px", borderRadius:100, border:"1px solid rgba(231,22,42,0.3)", color:"#E7162A", textDecoration:"none", fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase" }}>
+              Prendre RDV pour en savoir plus
+            </a>
           </div>
         </div>
       </section>

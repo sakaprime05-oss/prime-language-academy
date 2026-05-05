@@ -45,6 +45,14 @@ export const PLA_FAQ = [
         question: "Formation régulière et English Club, est-ce pareil ?",
         answer: "Non. La formation régulière construit les bases et la structure. Le English Club est dédié à la pratique, la fluidité et l'immersion sociale. Les deux parcours sont distincts.",
     },
+    {
+        question: "Y a-t-il des frais d'inscription ?",
+        answer: "Non. Les frais d'inscription sont offerts (0 FCFA) pour toutes nos offres. Vous ne payez que vos cours — aucun frais caché.",
+    },
+    {
+        question: "Puis-je accéder à la plateforme avant le début officiel ?",
+        answer: "Oui ! Dès votre inscription, vous accédez immédiatement à notre plateforme de formation, à la documentation pédagogique complète et à une préformation pour bien démarrer. N'attendez pas le 21 Juin pour progresser.",
+    },
 ] as const;
 
 export function formatFcfa(amount: number) {

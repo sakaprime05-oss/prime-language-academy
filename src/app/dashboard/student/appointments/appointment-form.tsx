@@ -105,13 +105,13 @@ export function AppointmentForm() {
         hidden: { opacity: 0 },
         show: {
             opacity: 1,
-            transition: { staggerChildren: 0.1 }
+            transition: { staggerChildren: 0.15 }
         }
     };
 
     const itemVariants: Variants = {
-        hidden: { opacity: 0, y: 10 },
-        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+        hidden: { opacity: 0, y: 15 },
+        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 350, damping: 25 } }
     };
 
     return (
@@ -123,7 +123,7 @@ export function AppointmentForm() {
             className="flex flex-col gap-6"
         >
             <motion.div variants={itemVariants} className="flex flex-col gap-2">
-                <label className="label-sm text-[var(--foreground)]/80">
+                <label className="text-sm font-semibold text-[var(--foreground)]/80 ml-1">
                     Date souhaitée
                 </label>
                 <Drawer>
@@ -131,7 +131,7 @@ export function AppointmentForm() {
                         <Button
                             variant={"outline"}
                             className={cn(
-                                "input-field justify-start text-left font-medium hover:bg-[var(--surface-hover)] min-h-[3.5rem] text-base",
+                                "justify-start text-left font-medium min-h-[3.5rem] text-base rounded-2xl border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 dark:border-white/5 dark:bg-black/20 dark:hover:bg-black/40 transition-all",
                                 !date && "text-muted-foreground"
                             )}
                         >
@@ -158,11 +158,11 @@ export function AppointmentForm() {
             </motion.div>
 
             <motion.div variants={itemVariants} className="flex flex-col gap-2">
-                <label className="label-sm text-[var(--foreground)]/80">
+                <label className="text-sm font-semibold text-[var(--foreground)]/80 ml-1">
                     Heure (Créneaux de 30 min)
                 </label>
                 <Select disabled={!date} value={time} onValueChange={(value) => setTime(value ?? "")}>
-                    <SelectTrigger className="input-field hover:bg-[var(--surface-hover)] min-h-[3.5rem] text-base">
+                    <SelectTrigger className="min-h-[3.5rem] text-base rounded-2xl border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 dark:border-white/5 dark:bg-black/20 dark:hover:bg-black/40 transition-all">
                         <div className="flex items-center">
                             <Clock className="mr-3 h-5 w-5 text-[#E7162A]" />
                             <SelectValue placeholder={date ? "Choisir une heure" : "Sélectionnez d'abord une date"} />
@@ -192,7 +192,7 @@ export function AppointmentForm() {
             </motion.div>
 
             <motion.div variants={itemVariants} className="flex flex-col gap-2">
-                <label htmlFor="reason" className="label-sm text-[var(--foreground)]/80">
+                <label htmlFor="reason" className="text-sm font-semibold text-[var(--foreground)]/80 ml-1">
                     Motif du rendez-vous
                 </label>
                 <Textarea
@@ -201,17 +201,17 @@ export function AppointmentForm() {
                     onChange={(e) => setReason(e.target.value)}
                     rows={4}
                     placeholder="De quoi souhaitez-vous discuter ?"
-                    className="input-field resize-none text-base p-4 min-h-[120px] rounded-2xl"
+                    className="resize-none text-base p-4 min-h-[120px] rounded-2xl border-white/10 bg-white/5 backdrop-blur-md focus:bg-white/10 dark:border-white/5 dark:bg-black/20 dark:focus:bg-black/40 transition-all placeholder:text-muted-foreground/60"
                 />
             </motion.div>
 
             <motion.button
                 variants={itemVariants}
-                whileHover={{ scale: 1.02 }}
+                whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(231,22,42,0.4)" }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading || !date || !time}
-                className="btn-primary w-full mt-4 min-h-[3.5rem] text-base font-bold shadow-lg shadow-primary/20 rounded-2xl"
+                className="w-full mt-4 min-h-[3.5rem] text-base font-bold text-white rounded-2xl bg-gradient-to-r from-[#E7162A] to-[#FF4D5E] shadow-lg shadow-red-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
                 {loading ? "Réservation en cours..." : "Confirmer la réservation"}
             </motion.button>

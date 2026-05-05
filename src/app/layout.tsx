@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Lexend, Manrope } from "next/font/google";
 import "./globals.css";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
@@ -7,6 +8,18 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import { PlatformThemeToggle } from "@/components/platform-theme-toggle";
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+  display: "swap",
+});
+
+const lexend = Lexend({
+  subsets: ["latin"],
+  variable: "--font-lexend",
+  display: "swap",
+});
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
@@ -78,7 +91,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang="fr" className={`${manrope.variable} ${lexend.variable}`} suppressHydrationWarning>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
