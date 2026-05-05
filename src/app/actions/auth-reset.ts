@@ -37,7 +37,7 @@ export async function requestPasswordReset(email: string) {
         });
 
         const { sendPasswordResetEmail } = await import("@/lib/email");
-        await sendPasswordResetEmail(normalizedEmail, user.name || "Etudiant", token);
+        await sendPasswordResetEmail(normalizedEmail, user.name || "Étudiant", token);
 
         return { success: true, message: RESET_PUBLIC_MESSAGE };
     } catch (error) {

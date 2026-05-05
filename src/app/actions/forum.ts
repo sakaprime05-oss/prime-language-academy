@@ -107,7 +107,7 @@ export async function createComment(postId: string, formData: FormData) {
             const { sendForumCommentEmail } = await import("@/lib/email");
             await sendForumCommentEmail(
                 comment.post.author.email,
-                comment.post.author.name || "Etudiant",
+                comment.post.author.name || "Étudiant",
                 access.user.name || "Un autre etudiant",
                 comment.post.title,
                 postId

@@ -67,7 +67,7 @@ export default async function ClubWaitlistPage() {
                     <p className="text-[10px] font-black uppercase tracking-[0.24em] text-white/35">English Club</p>
                     <h2 className="mt-2 text-3xl font-black tracking-tight text-white">Liste d'attente Club</h2>
                     <p className="mt-2 max-w-2xl text-sm font-medium leading-6 text-white/50">
-                        Le Club accepte {PLA_CLUB_CAPACITY} membres maximum. Quand une place est disponible, l'admin invite le premier membre et son paiement en ligne est cree cote serveur.
+                        Le Club accepte {PLA_CLUB_CAPACITY} membres maximum. Quand une place est disponible, l'admin invite le premier membre et son paiement en ligne est créé côté serveur.
                     </p>
                 </div>
                 <div className="grid grid-cols-3 gap-2 rounded-2xl border border-white/10 bg-[#12121e] p-3 text-center">

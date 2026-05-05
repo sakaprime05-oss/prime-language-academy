@@ -32,7 +32,7 @@ export default function LoginForm() {
 
           if (data.canResumePayment) {
             setError(
-              "Votre paiement n'est pas encore confirme. Reprenez votre inscription avec le meme email et le meme mot de passe pour finaliser le paiement."
+              "Votre paiement n'est pas encore confirmé. Reprenez votre inscription avec le même email et le même mot de passe pour finaliser le paiement."
             );
           } else if (data.accountUnavailable) {
             setError("Votre compte est bloqué. Contactez l'administration pour le réactiver.");

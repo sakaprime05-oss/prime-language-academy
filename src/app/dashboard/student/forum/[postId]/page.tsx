@@ -46,9 +46,9 @@ export default async function PostPage(props: { params: Promise<{ postId: string
             </div>
             <div>
               <p className="text-sm font-bold">
-                {post.author.name || "Etudiant"}
+                {post.author.name || "Étudiant"}
                 <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40">
-                  {post.author.role === "TEACHER" ? "Professeur" : "Etudiant"}
+                  {post.author.role === "TEACHER" ? "Professeur" : "Étudiant"}
                 </span>
               </p>
               <p className="text-xs text-[var(--foreground)]/40">{new Date(post.createdAt).toLocaleString("fr-FR")}</p>
@@ -80,7 +80,7 @@ export default async function PostPage(props: { params: Promise<{ postId: string
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="mb-1 text-sm font-bold">
-                    {comment.author.name || "Etudiant"}
+                    {comment.author.name || "Étudiant"}
                     {comment.author.role === "TEACHER" && <span className="ml-2 rounded bg-primary/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-primary">Pro</span>}
                   </p>
                   <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--foreground)]/80">{content.text}</p>

@@ -302,7 +302,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
               </button>
               <button onClick={() => setPricingMode("club")}
                 style={{ position:"relative", zIndex:1, padding:"12px 28px", borderRadius:100, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: pricingMode==="club" ? "#080808" : "var(--muted-foreground)", transition:"color 0.3s" }}>
-                English Club (Mensuel)
+                English Club (2 mois)
               </button>
               {/* Highlight Background */}
               <div style={{
@@ -331,7 +331,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
                 <div style={{ fontSize:13, fontWeight:700, color: activePlan===p.id ? "#E7162A" : "var(--foreground)", marginBottom:6 }}>{p.label}</div>
                 <div style={{ fontSize:11, color:"var(--muted-foreground)", marginBottom:20, letterSpacing:"0.08em" }}>{p.freq}</div>
                 <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:900, color: activePlan===p.id ? "#E7162A" : "var(--foreground)" }}>{p.price}</div>
-                <div style={{ fontSize:11, color:"var(--muted-foreground)", marginTop:2 }}>FCFA {pricingMode === "club" ? "/ mois" : "/ 2 mois"}</div>
+                <div style={{ fontSize:11, color:"var(--muted-foreground)", marginTop:2 }}>FCFA / 2 mois</div>
               </div>
             ))}
           </div>
@@ -566,7 +566,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
                 {[
                   { step:"01", label:"Vous avez déjà le niveau B2+", sub:"Accès direct au Club" },
                   { step:"02", label:"Vous débutez ?", sub:"Formation 2 mois → puis Club" },
-                  { step:"03", label:"Membership mensuel à la carte", sub:"1 à 6 sessions / semaine" },
+                  { step:"03", label:"Adhésion valable 2 mois", sub:"1 à 6 sessions / semaine" },
                   { step:"04", label:"Espace membre privé inclus", sub:"Accès à la plateforme & forums" },
                 ].map(({step,label,sub}) => (
                   <div key={step} style={{ display:"flex", alignItems:"flex-start", gap:16, padding:"14px 0", borderBottom:"1px solid rgba(231,22,42,0.07)" }}>

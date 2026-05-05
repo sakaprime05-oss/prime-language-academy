@@ -40,7 +40,7 @@ export async function POST(request: Request) {
         }
 
         if (session.user.role !== "ADMIN" && session.user.role !== "TEACHER") {
-            return NextResponse.json({ error: "Upload reserve a l'equipe pedagogique." }, { status: 403 });
+            return NextResponse.json({ error: "Upload réservé à l'équipe pédagogique." }, { status: 403 });
         }
 
         const formData = await request.formData();

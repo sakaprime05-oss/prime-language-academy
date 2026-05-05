@@ -36,7 +36,7 @@ async function initializePaystackCheckout(input: PaystackInitInput) {
 
     if (!secretKey) {
         console.error("[Registration] Missing PAYSTACK_SECRET_KEY");
-        return { error: "Le paiement n'a pas pu etre lance pour le moment. Contactez l'administration pour finaliser votre inscription." };
+        return { error: "Le paiement n'a pas pu être lancé pour le moment. Contactez l'administration pour finaliser votre inscription." };
     }
 
     const paystackResponse = await fetch(PAYSTACK_API_URL, {
@@ -65,7 +65,7 @@ async function initializePaystackCheckout(input: PaystackInitInput) {
 
     if (!paystackData.status || !paystackData.data?.authorization_url) {
         console.error("[Registration] Paystack initialization failed:", paystackData.message || paystackData);
-        return { error: "Le paiement n'a pas pu etre lance pour le moment. Verifiez vos informations ou contactez l'administration." };
+        return { error: "Le paiement n'a pas pu être lancé pour le moment. Vérifiez vos informations ou contactez l'administration." };
     }
 
     return { redirectUrl: paystackData.data.authorization_url as string };
@@ -89,7 +89,7 @@ async function createRegistrationCheckout(input: {
         },
         data: {
             status: "FAILED",
-            failureReason: "Nouvelle tentative de paiement creee.",
+            failureReason: "Nouvelle tentative de paiement créée.",
         },
     });
 

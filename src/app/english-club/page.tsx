@@ -311,7 +311,7 @@ export default function EnglishClubPublicPage() {
                 Cercle social privé pour anglophones confirmés. Pas de cours magistraux — de l'immersion, du networking et de la vie en anglais. Pour ceux qui maîtrisent et veulent aller plus loin.
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 36 }}>
-                {["Niveau B2 minimum requis", "Networking & Social Events", "Guest Talks & Masterclasses", "Membership mensuel à la carte"].map(f => (
+                {["Niveau B2 minimum requis", "Networking & Social Events", "Guest Talks & Masterclasses", "Adhésion valable 2 mois"].map(f => (
                   <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(245,240,232,0.8)" }}>
                     <span style={{ color: "#E7162A" }}>✦</span> {f}
                   </div>
@@ -378,7 +378,7 @@ export default function EnglishClubPublicPage() {
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 900, margin: "0 0 12px" }}>
               Choisissez votre <em style={{ color: "#E7162A" }}>niveau d'engagement</em>
             </h2>
-            <p style={{ color: "rgba(245,240,232,0.4)", fontSize: 14 }}>Accès mensuel à la plateforme membre inclus dans tous les plans</p>
+            <p style={{ color: "rgba(245,240,232,0.4)", fontSize: 14 }}>Accès à la plateforme membre inclus pendant les 2 mois d'adhésion</p>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(165px, 1fr))", gap: 16 }}>
@@ -395,7 +395,7 @@ export default function EnglishClubPublicPage() {
                 <div style={{ fontSize: 12, fontWeight: 700, color: p.top ? "#E7162A" : "rgba(245,240,232,0.8)", marginBottom: 6 }}>{p.label}</div>
                 <div style={{ fontSize: 10, color: "rgba(245,240,232,0.35)", marginBottom: 24, letterSpacing: "0.08em" }}>{p.freq}</div>
                 <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 900, color: p.top ? "#E7162A" : "#F5F0E8" }}>{p.price}</div>
-                <div style={{ fontSize: 10, color: "rgba(245,240,232,0.3)", marginTop: 3 }}>FCFA / mois</div>
+                <div style={{ fontSize: 10, color: "rgba(245,240,232,0.3)", marginTop: 3 }}>FCFA / 2 mois</div>
               </div>
             ))}
           </div>

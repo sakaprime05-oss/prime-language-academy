@@ -66,7 +66,7 @@ export async function initiatePayment(formData: FormData) {
 
     if (!secretKey) {
         console.error("Paystack API key is missing");
-        return { error: "Le paiement n'a pas pu etre lance pour le moment. Verifiez vos informations ou contactez l'administration." };
+        return { error: "Le paiement n'a pas pu être lancé pour le moment. Vérifiez vos informations ou contactez l'administration." };
     }
 
     try {
@@ -98,7 +98,7 @@ export async function initiatePayment(formData: FormData) {
             },
             data: {
                 status: "FAILED",
-                failureReason: "Nouvelle tentative de paiement creee.",
+                failureReason: "Nouvelle tentative de paiement créée.",
             },
         });
 
@@ -152,7 +152,7 @@ export async function initiatePayment(formData: FormData) {
                 where: { id: transaction.id },
                 data: { status: "FAILED", failureReason: data.message || "Paystack API Error" }
             });
-            return { error: "Le paiement n'a pas pu etre lance pour le moment. Verifiez vos informations ou contactez l'administration." };
+            return { error: "Le paiement n'a pas pu être lancé pour le moment. Vérifiez vos informations ou contactez l'administration." };
         }
 
         revalidatePath("/dashboard/student/payments");

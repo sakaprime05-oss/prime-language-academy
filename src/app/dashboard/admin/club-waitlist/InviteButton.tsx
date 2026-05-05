@@ -18,7 +18,7 @@ export function InviteButton({ studentId }: { studentId: string }) {
             return;
         }
 
-        setMessage("Invitation envoyee. Le membre peut maintenant finaliser son paiement en ligne.");
+        setMessage("Invitation envoyée. Le membre peut maintenant finaliser son paiement en ligne.");
         setLoading(false);
     }
 

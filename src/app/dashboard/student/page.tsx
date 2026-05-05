@@ -72,10 +72,10 @@ export default async function StudentDashboardPage() {
                 <section className="glass-card border-amber-500/25 bg-amber-500/[0.04] p-6 sm:p-8">
                     <p className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-500">Liste d'attente Club</p>
                     <h1 className="mt-3 text-2xl sm:text-4xl font-black text-[var(--foreground)]">
-                        Votre demande Club est bien enregistree.
+                        Votre demande Club est bien enregistrée.
                     </h1>
                     <p className="mt-4 text-sm leading-7 text-[var(--foreground)]/60">
-                        The English Club est limite a 26 membres pour garder une experience premium. Vous serez contacte des qu'une place se libere ou qu'une nouvelle vague Club est ouverte.
+                        The English Club est limité à 26 membres pour garder une expérience premium. Vous serez contacté dès qu'une place se libère ou qu'une nouvelle vague Club est ouverte.
                     </p>
                     <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <Link href="/english-club" className="rounded-2xl border border-amber-500/30 px-5 py-4 text-center text-xs font-black uppercase tracking-widest text-amber-500">

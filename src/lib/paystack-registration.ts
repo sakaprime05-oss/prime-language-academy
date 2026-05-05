@@ -114,23 +114,23 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
 
   if (student.email) {
     if (isFirstPayment) {
-      await sendAccountActivatedEmail(student.email, student.name || "Etudiant").catch(console.error);
+      await sendAccountActivatedEmail(student.email, student.name || "Étudiant").catch(console.error);
     }
 
-    await sendInvoiceEmail(student.email, student.name || "Etudiant", transaction.amount, transaction.id, providerLabel, stageLabel).catch(console.error);
+    await sendInvoiceEmail(student.email, student.name || "Étudiant", transaction.amount, transaction.id, providerLabel, stageLabel).catch(console.error);
   }
 
-  await sendAdminNotificationEmail(student.name || "Etudiant inconnu", transaction.amount, transaction.id, providerLabel).catch(
+  await sendAdminNotificationEmail(student.name || "Étudiant inconnu", transaction.amount, transaction.id, providerLabel).catch(
     console.error
   );
 
   await notifyTelegram("payment_proof", {
-    name: student.name || "Etudiant inconnu",
+    name: student.name || "Étudiant inconnu",
     email: student.email,
     amount: transaction.amount,
     provider: providerLabel,
-    phone: "Paiement en ligne confirme",
+    phone: "Paiement en ligne confirmé",
   }).catch(console.error);
 
-  return { ok: true, reason: "Paiement confirme." };
+  return { ok: true, reason: "Paiement confirmé." };
 }

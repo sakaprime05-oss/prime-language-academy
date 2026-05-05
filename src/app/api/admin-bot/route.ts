@@ -30,7 +30,7 @@ async function validatePaymentFromBot(params: any) {
         },
     });
 
-    if (!student) return NextResponse.json({ error: "Etudiant non trouve" }, { status: 404 });
+    if (!student) return NextResponse.json({ error: "Étudiant non trouvé" }, { status: 404 });
 
     const plan = student.paymentPlans[0];
     if (!plan) {
@@ -74,13 +74,13 @@ async function validatePaymentFromBot(params: any) {
     });
 
     await Promise.all([
-        sendAccountActivatedEmail(student.email, student.name || "Etudiant"),
-        sendInvoiceEmail(student.email, student.name || "Etudiant", numericAmount, transaction.id, transaction.provider || transaction.method),
+        sendAccountActivatedEmail(student.email, student.name || "Étudiant"),
+        sendInvoiceEmail(student.email, student.name || "Étudiant", numericAmount, transaction.id, transaction.provider || transaction.method),
     ]);
 
     return NextResponse.json({
         success: true,
-        message: `Paiement de ${numericAmount} valide pour ${student.name}. Facture envoyee.`,
+        message: `Paiement de ${numericAmount} validé pour ${student.name}. Reçu envoyé.`,
     });
 }
 

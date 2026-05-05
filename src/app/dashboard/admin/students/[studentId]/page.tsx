@@ -37,7 +37,7 @@ export default async function AdminStudentDetailPage(props: { params: Promise<{ 
           <Link href="/dashboard/admin/students" className="mb-2 flex items-center gap-1 text-xs font-bold text-red-400 hover:underline">
             Retour aux etudiants
           </Link>
-          <h2 className="text-3xl font-black tracking-tight text-white">{student.name || "Etudiant"}</h2>
+          <h2 className="text-3xl font-black tracking-tight text-white">{student.name || "Étudiant"}</h2>
           <p className="mt-2 text-sm font-medium text-white/45">{student.email}</p>
         </div>
         <div className="flex flex-wrap gap-2">
