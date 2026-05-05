@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { format, addMinutes, startOfHour, setHours, setMinutes } from "date-fns";
+import { format, addMinutes } from "date-fns";
 import { fr } from "date-fns/locale";
 import { CalendarIcon, Clock } from "lucide-react";
 
@@ -37,7 +37,7 @@ export function AppointmentForm() {
         if (!date) return [];
         const dayOfWeek = date.getDay();
         const slots = [];
-        
+
         let start = 0;
         let end = 0;
 
@@ -73,7 +73,7 @@ export function AppointmentForm() {
             const [hours, minutes] = time.split(":").map(Number);
             const startTime = new Date(date);
             startTime.setHours(hours, minutes, 0, 0);
-            
+
             const endTime = addMinutes(startTime, 30);
 
             await createAppointment({
@@ -120,10 +120,10 @@ export function AppointmentForm() {
             initial="hidden"
             animate="show"
             onSubmit={onSubmit} 
-            className="flex flex-col gap-6"
+            className="flex flex-col gap-4"
         >
             <motion.div variants={itemVariants} className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-[var(--foreground)]/80 ml-1">
+                <label className="ml-1 text-xs font-black uppercase tracking-[0.08em] text-[var(--foreground)]/65">
                     Date souhaitée
                 </label>
                 <Drawer>
@@ -131,7 +131,7 @@ export function AppointmentForm() {
                         <Button
                             variant={"outline"}
                             className={cn(
-                                "justify-start text-left font-medium min-h-[3.5rem] text-base rounded-2xl border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 dark:border-white/5 dark:bg-black/20 dark:hover:bg-black/40 transition-all",
+                                "min-h-12 justify-start rounded-lg border-[var(--border)]/70 bg-card text-left text-sm font-semibold transition-colors hover:bg-[var(--muted)] dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10",
                                 !date && "text-muted-foreground"
                             )}
                         >
@@ -139,7 +139,7 @@ export function AppointmentForm() {
                             {date ? format(date, "PPP", { locale: fr }) : <span>Choisir une date</span>}
                         </Button>
                     </DrawerTrigger>
-                    <DrawerContent className="px-4 pb-8 pt-4 rounded-t-3xl border-[#21286E]/10 flex flex-col items-center shadow-2xl">
+                    <DrawerContent className="flex flex-col items-center rounded-t-xl border-primary/10 px-4 pb-8 pt-4 shadow-2xl">
                         <div className="w-12 h-1.5 rounded-full bg-muted/60 mb-6 mx-auto"></div>
                         <Calendar
                             mode="single"
@@ -148,7 +148,7 @@ export function AppointmentForm() {
                             disabled={isDateDisabled}
                             initialFocus
                             locale={fr}
-                            className="bg-transparent border-none p-0 scale-105 transform origin-top w-full flex justify-center"
+                            className="flex w-full origin-top justify-center border-none bg-transparent p-0"
                         />
                     </DrawerContent>
                 </Drawer>
@@ -158,20 +158,20 @@ export function AppointmentForm() {
             </motion.div>
 
             <motion.div variants={itemVariants} className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-[var(--foreground)]/80 ml-1">
+                <label className="ml-1 text-xs font-black uppercase tracking-[0.08em] text-[var(--foreground)]/65">
                     Heure (Créneaux de 30 min)
                 </label>
                 <Select disabled={!date} value={time} onValueChange={(value) => setTime(value ?? "")}>
-                    <SelectTrigger className="min-h-[3.5rem] text-base rounded-2xl border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 dark:border-white/5 dark:bg-black/20 dark:hover:bg-black/40 transition-all">
+                    <SelectTrigger className="min-h-12 rounded-lg border-[var(--border)]/70 bg-card text-sm font-semibold transition-colors hover:bg-[var(--muted)] dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10">
                         <div className="flex items-center">
                             <Clock className="mr-3 h-5 w-5 text-[#E7162A]" />
                             <SelectValue placeholder={date ? "Choisir une heure" : "Sélectionnez d'abord une date"} />
                         </div>
                     </SelectTrigger>
-                    <SelectContent className="rounded-2xl border-[#21286E]/10 shadow-xl max-h-[60vh]">
+                    <SelectContent className="max-h-[60vh] rounded-lg border-primary/10 shadow-xl">
                         {timeSlots.length > 0 ? (
                             timeSlots.map((slot) => (
-                                <SelectItem key={slot} value={slot} className="rounded-xl py-3 text-base cursor-pointer">
+                                <SelectItem key={slot} value={slot} className="cursor-pointer rounded-lg py-3 text-sm">
                                     {slot.replace(':', 'h')}
                                 </SelectItem>
                             ))
@@ -192,7 +192,7 @@ export function AppointmentForm() {
             </motion.div>
 
             <motion.div variants={itemVariants} className="flex flex-col gap-2">
-                <label htmlFor="reason" className="text-sm font-semibold text-[var(--foreground)]/80 ml-1">
+                <label htmlFor="reason" className="ml-1 text-xs font-black uppercase tracking-[0.08em] text-[var(--foreground)]/65">
                     Motif du rendez-vous
                 </label>
                 <Textarea
@@ -201,17 +201,17 @@ export function AppointmentForm() {
                     onChange={(e) => setReason(e.target.value)}
                     rows={4}
                     placeholder="De quoi souhaitez-vous discuter ?"
-                    className="resize-none text-base p-4 min-h-[120px] rounded-2xl border-white/10 bg-white/5 backdrop-blur-md focus:bg-white/10 dark:border-white/5 dark:bg-black/20 dark:focus:bg-black/40 transition-all placeholder:text-muted-foreground/60"
+                    className="min-h-[112px] resize-none rounded-lg border-[var(--border)]/70 bg-card p-3 text-sm transition-colors placeholder:text-muted-foreground/60 focus:bg-white dark:border-white/10 dark:bg-white/5 dark:focus:bg-white/10"
                 />
             </motion.div>
 
             <motion.button
                 variants={itemVariants}
-                whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(231,22,42,0.4)" }}
+                whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading || !date || !time}
-                className="w-full mt-4 min-h-[3.5rem] text-base font-bold text-white rounded-2xl bg-gradient-to-r from-[#E7162A] to-[#FF4D5E] shadow-lg shadow-red-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="mt-2 min-h-12 w-full rounded-lg bg-primary text-sm font-black text-white shadow-sm transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
                 {loading ? "Réservation en cours..." : "Confirmer la réservation"}
             </motion.button>

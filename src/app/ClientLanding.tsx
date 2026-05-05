@@ -30,7 +30,22 @@ const WHY = [
   { n:"04", title:"Immersion 100%", desc:"Environnement 100% immersif. Forte pratique orale dès le début pour parler avec confiance, spontanéité et efficacité." },
 ];
 
-export default function ClientLanding({ session, systemSettings }: { session: any, systemSettings?: any, latestArticles?: any[] }) {
+type LandingArticle = {
+  id: string;
+  title: string;
+  slug: string;
+  category?: string | null;
+  content?: string | null;
+  createdAt: string;
+};
+
+const getArticleExcerpt = (content?: string | null) =>
+  (content || "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 130);
+
+const formatArticleDate = (value: string) =>
+  new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value));
+
+export default function ClientLanding({ session, systemSettings, latestArticles = [] }: { session: any, systemSettings?: any, latestArticles?: LandingArticle[] }) {
   const [scrolled, setScrolled] = useState(false);
   const [activePlan, setActivePlan] = useState("immersion");
   const [pricingMode, setPricingMode] = useState<"formation"|"club">("formation");
@@ -51,13 +66,13 @@ export default function ClientLanding({ session, systemSettings }: { session: an
         backdropFilter: scrolled ? "blur(20px)" : "none",
         borderBottom: scrolled ? "1px solid rgba(231,22,42,0.12)" : "1px solid transparent",
         transition:"all 0.4s ease",
-        padding:"0 2rem",
+        padding:"0 clamp(0.75rem, 4vw, 2rem)",
         display:"flex", alignItems:"center", justifyContent:"space-between",
         height:"72px",
       }}>
         <Link href="/" style={{ display:"flex", alignItems:"center", gap:"12px", textDecoration:"none" }}>
           {/* Remplacez '/logo.png' par le nom exact de votre fichier logo s'il est différent (ex: '/logo.svg') */}
-          <LogoMark className="h-20 w-20 sm:h-24 sm:w-24" />
+          <LogoMark className="h-14 w-14 sm:h-20 sm:w-20" />
         </Link>
 
         <div className="hidden lg:flex gap-10 text-[13px] font-medium tracking-widest uppercase text-[var(--foreground)]/55">
@@ -68,15 +83,15 @@ export default function ClientLanding({ session, systemSettings }: { session: an
           ))}
         </div>
 
-        <div style={{ display:"flex", gap:"12px", alignItems:"center" }}>
+        <div style={{ display:"flex", gap:"8px", alignItems:"center", minWidth:0 }}>
           {session ? (
             <Link href="/dashboard" className="btn-primary" style={{ textDecoration:"none", padding:"10px 24px", fontSize:12 }}>
               Mon Espace
             </Link>
           ) : (
             <>
-              <Link href="/login" className="text-[var(--foreground)]/55 hover:text-[var(--primary)]" style={{ fontSize:13, textDecoration:"none", letterSpacing:"0.05em" }}>Connexion</Link>
-              <Link href="/register" className="btn-primary" style={{ textDecoration:"none", padding:"10px 24px", fontSize:12 }}>
+              <Link href="/login" className="hidden sm:inline text-[var(--foreground)]/55 hover:text-[var(--primary)]" style={{ fontSize:13, textDecoration:"none", letterSpacing:"0.05em" }}>Connexion</Link>
+              <Link href="/register" className="btn-primary" style={{ textDecoration:"none", padding:"10px clamp(14px, 3vw, 24px)", fontSize:11, whiteSpace:"nowrap" }}>
                 S'inscrire
               </Link>
             </>
@@ -442,6 +457,45 @@ export default function ClientLanding({ session, systemSettings }: { session: an
           </div>
         </div>
       </section>
+
+      {latestArticles.length > 0 && (
+        <section style={{ padding:"100px 2rem", background:"rgba(231,22,42,0.02)" }}>
+          <div style={{ maxWidth:1100, margin:"0 auto" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", flexWrap:"wrap", gap:24, marginBottom:44 }}>
+              <div>
+                <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", marginBottom:16 }}>Conseils & ressources</div>
+                <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2rem,4vw,3rem)", fontWeight:900, margin:0, lineHeight:1.1 }}>
+                  À lire avant de<br/><em style={{ color:"#E7162A" }}>commencer</em>
+                </h2>
+              </div>
+              <Link href="/blog" style={{ color:"#E7162A", textDecoration:"underline", textUnderlineOffset:4, fontSize:13, fontWeight:800, letterSpacing:"0.08em", textTransform:"uppercase" }}>
+                Voir tous les articles
+              </Link>
+            </div>
+
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(240px, 1fr))", gap:20 }}>
+              {latestArticles.map((article) => {
+                const excerpt = getArticleExcerpt(article.content);
+                return (
+                  <Link
+                    key={article.id}
+                    href={`/blog/${article.slug}`}
+                    style={{ border:"1px solid rgba(231,22,42,0.12)", borderRadius:20, padding:"28px 24px", background:"var(--surface)", color:"inherit", textDecoration:"none", display:"flex", flexDirection:"column", gap:14, minHeight:210 }}
+                  >
+                    <div style={{ display:"flex", justifyContent:"space-between", gap:12, alignItems:"center" }}>
+                      <span style={{ fontSize:10, color:"#E7162A", letterSpacing:"0.14em", textTransform:"uppercase", fontWeight:800 }}>{article.category || "Article"}</span>
+                      <span style={{ fontSize:11, color:"var(--muted-foreground)", whiteSpace:"nowrap" }}>{formatArticleDate(article.createdAt)}</span>
+                    </div>
+                    <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:21, lineHeight:1.2, fontWeight:900, margin:0, color:"var(--foreground)" }}>{article.title}</h3>
+                    {excerpt && <p style={{ margin:0, color:"var(--muted-foreground)", fontSize:13, lineHeight:1.65 }}>{excerpt}...</p>}
+                    <span style={{ marginTop:"auto", color:"#E7162A", fontSize:12, fontWeight:800, letterSpacing:"0.08em", textTransform:"uppercase" }}>Lire l'article →</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ══════════ CTA FINAL ══════════ */}
       <section style={{ padding:"120px 2rem", textAlign:"center", position:"relative", overflow:"hidden" }}>

@@ -1,10 +1,9 @@
-import { PrimeLogo } from "@/components/logo";
 import Link from "next/link";
 import { getArticleBySlug } from "@/app/actions/articles";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, ArrowLeft, Share2, BookOpen } from "lucide-react";
+import { Calendar, User, ArrowLeft, BookOpen } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import Image from "next/image";

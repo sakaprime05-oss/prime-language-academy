@@ -1,4 +1,3 @@
-import { PrimeLogo } from "@/components/logo";
 import Link from "next/link";
 import { getArticles } from "@/app/actions/articles";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
