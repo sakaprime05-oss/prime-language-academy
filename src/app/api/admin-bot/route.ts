@@ -42,8 +42,8 @@ async function lookupStudentSupport(params: any) {
         return NextResponse.json({
             found: false,
             profil_type: "INCONNU",
-            needs_identifier: true,
-            message: "Demander l'email utilisé à l'inscription ou le nom complet.",
+            needs_identifier: false,
+            support_lookup_note: "Aucun identifiant apprenant fourni. Ne pas basculer en support sauf si le message demande clairement une aide de compte, cours, paiement ou SAV.",
         });
     }
 
@@ -97,10 +97,10 @@ async function lookupStudentSupport(params: any) {
         return NextResponse.json({
             found: false,
             profil_type: "INCONNU",
-            needs_identifier: !email,
-            message: email
-                ? "Aucun apprenant trouvé avec cet email. Escalader si la personne insiste."
-                : "Demander l'email utilisé à l'inscription pour retrouver le compte.",
+            needs_identifier: false,
+            support_lookup_note: email
+                ? "Aucun apprenant trouvé avec cet email. Ne pas demander un autre identifiant sauf si le message parle clairement de support apprenant."
+                : "Aucun apprenant trouvé avec ce téléphone. Ne pas demander l'email sauf si le message parle clairement de support apprenant.",
         });
     }
 
