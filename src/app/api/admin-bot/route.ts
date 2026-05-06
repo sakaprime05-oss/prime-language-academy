@@ -14,6 +14,150 @@ function isValidAdminBotKey(apiKey: string | null) {
     return expectedBuffer.length === actualBuffer.length && crypto.timingSafeEqual(expectedBuffer, actualBuffer);
 }
 
+function normalizeDigits(value: unknown) {
+    return String(value || "").replace(/\D/g, "");
+}
+
+function extractEmail(value: unknown) {
+    const match = String(value || "").match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+    return match ? match[0].toLowerCase().trim() : "";
+}
+
+function parseOnboardingData(value?: string | null) {
+    if (!value) return {};
+    try {
+        const parsed = JSON.parse(value);
+        return parsed && typeof parsed === "object" ? parsed as Record<string, unknown> : {};
+    } catch {
+        return {};
+    }
+}
+
+async function lookupStudentSupport(params: any) {
+    const email = extractEmail(params.email || params.message);
+    const phoneDigits = normalizeDigits(params.phone);
+    const phoneTail = phoneDigits.length >= 8 ? phoneDigits.slice(-8) : "";
+
+    if (!email && !phoneTail) {
+        return NextResponse.json({
+            found: false,
+            profil_type: "INCONNU",
+            needs_identifier: true,
+            message: "Demander l'email utilisé à l'inscription ou le nom complet.",
+        });
+    }
+
+    const orFilters: any[] = [];
+    if (email) orFilters.push({ email });
+    if (phoneDigits) orFilters.push({ onboardingData: { contains: phoneDigits } });
+    if (phoneTail && phoneTail !== phoneDigits) orFilters.push({ onboardingData: { contains: phoneTail } });
+
+    const student = await prisma.user.findFirst({
+        where: {
+            role: "STUDENT",
+            OR: orFilters,
+        },
+        include: {
+            level: { select: { name: true } },
+            paymentPlans: {
+                take: 1,
+                orderBy: { createdAt: "desc" },
+                select: {
+                    totalAmount: true,
+                    amountPaid: true,
+                    status: true,
+                    transactions: {
+                        take: 3,
+                        orderBy: { date: "desc" },
+                        select: {
+                            amount: true,
+                            method: true,
+                            provider: true,
+                            status: true,
+                            date: true,
+                        },
+                    },
+                },
+            },
+            appointmentsAsStudent: {
+                take: 3,
+                where: { startTime: { gte: new Date() } },
+                orderBy: { startTime: "asc" },
+                select: {
+                    startTime: true,
+                    endTime: true,
+                    status: true,
+                    reason: true,
+                },
+            },
+        },
+    });
+
+    if (!student) {
+        return NextResponse.json({
+            found: false,
+            profil_type: "INCONNU",
+            needs_identifier: !email,
+            message: email
+                ? "Aucun apprenant trouvé avec cet email. Escalader si la personne insiste."
+                : "Demander l'email utilisé à l'inscription pour retrouver le compte.",
+        });
+    }
+
+    const schedules = student.levelId
+        ? await prisma.teacherSchedule.findMany({
+            where: { levelId: student.levelId },
+            take: 6,
+            orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
+            select: {
+                dayOfWeek: true,
+                startTime: true,
+                endTime: true,
+                type: true,
+                location: true,
+            },
+        })
+        : [];
+
+    const onboarding = parseOnboardingData(student.onboardingData);
+    const latestPlan = student.paymentPlans[0];
+    const remaining = latestPlan ? Math.max(0, latestPlan.totalAmount - latestPlan.amountPaid) : null;
+
+    return NextResponse.json({
+        found: true,
+        profil_type: "APPRENANT_INSCRIT",
+        support_profile: {
+            name: student.name,
+            email: student.email,
+            status: student.status,
+            registration_type: student.registrationType,
+            level: student.level?.name || onboarding.estimatedLevel || null,
+            objective: onboarding.objective || onboarding.learningGoal || null,
+            availability: onboarding.availability || null,
+            time_slot: onboarding.timeSlot || null,
+            course_mode: onboarding.courseMode || null,
+            payment: latestPlan ? {
+                status: latestPlan.status,
+                amount_paid: latestPlan.amountPaid,
+                total_amount: latestPlan.totalAmount,
+                remaining,
+                recent_transactions: latestPlan.transactions,
+            } : null,
+            upcoming_appointments: student.appointmentsAsStudent,
+            schedules,
+            links: {
+                login: "https://primelangageacademy.com/login",
+                forgot_password: "https://primelangageacademy.com/forgot-password",
+                courses: "https://primelangageacademy.com/dashboard/student/courses",
+                payments: "https://primelangageacademy.com/dashboard/student/payments",
+                appointments: "https://primelangageacademy.com/dashboard/student/appointments",
+                messages: "https://primelangageacademy.com/dashboard/student/messages",
+                profile: "https://primelangageacademy.com/dashboard/student/profile",
+            },
+        },
+    });
+}
+
 async function validatePaymentFromBot(params: any) {
     const { email, amount } = params;
     const numericAmount = parseFloat(String(amount || "").replace(/\s/g, ""));
@@ -134,6 +278,10 @@ export async function POST(req: Request) {
                     }
                 });
                 return NextResponse.json({ users });
+            }
+
+            case "lookup_student_support": {
+                return lookupStudentSupport(params);
             }
 
             case "get_lapsed_registrations": {

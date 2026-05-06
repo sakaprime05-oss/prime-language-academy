@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { Download } from "lucide-react";
 import { LogoMark } from "@/components/logo";
 import ThemeToggle from "@/components/ThemeToggle";
 import { PLA_CLUB_CAPACITY, PLA_FAQ, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
@@ -382,10 +383,14 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
             ))}
           </div>
 
-          <div style={{ textAlign:"center", marginTop:36 }}>
+          <div style={{ marginTop:36, display:"flex", flexWrap:"wrap", alignItems:"center", justifyContent:"center", gap:18 }}>
             <Link href="/programme" style={{ color:"#E7162A", textDecoration:"underline", textUnderlineOffset:4, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase" }}>
               Voir le programme complet
             </Link>
+            <a href="/brochure-pla-2026.pdf" download style={{ display:"inline-flex", alignItems:"center", gap:8, color:"var(--muted-foreground)", textDecoration:"underline", textUnderlineOffset:4, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase" }}>
+              <Download size={15} aria-hidden="true" />
+              Brochure PDF
+            </a>
           </div>
         </div>
       </section>

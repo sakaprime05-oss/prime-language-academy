@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Download } from "lucide-react";
 import { PLA_FAQ, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 export const metadata = {
@@ -24,6 +25,19 @@ export default function ProgrammePage() {
                             Une immersion premium à Abidjan pour transformer l'anglais en compétence vivante:
                             méthode ISO+, formateurs experts, suivi personnalisé et environnement de formation confortable.
                         </p>
+                        <div className="flex flex-wrap gap-3 pt-2">
+                            <Link href="/register" className="rounded-full bg-[#E7162A] px-6 py-3 text-sm font-black uppercase tracking-widest text-black">
+                                Réserver ma place
+                            </Link>
+                            <a
+                                href="/brochure-pla-2026.pdf"
+                                download
+                                className="inline-flex items-center gap-2 rounded-full border border-[#E7162A]/40 px-6 py-3 text-sm font-black uppercase tracking-widest text-[#E7162A]"
+                            >
+                                <Download size={16} aria-hidden="true" />
+                                Brochure PDF
+                            </a>
+                        </div>
                     </div>
                 </header>
 
@@ -89,6 +103,14 @@ export default function ProgrammePage() {
                             <Link href="/placement-test" className="rounded-full border border-[#E7162A]/40 px-6 py-3 text-sm font-black uppercase tracking-widest text-[#E7162A]">
                                 Test gratuit
                             </Link>
+                            <a
+                                href="/brochure-pla-2026.pdf"
+                                download
+                                className="inline-flex items-center gap-2 rounded-full border border-[#E7162A]/40 px-6 py-3 text-sm font-black uppercase tracking-widest text-[#E7162A]"
+                            >
+                                <Download size={16} aria-hidden="true" />
+                                Télécharger la brochure
+                            </a>
                             <Link href="/register" className="rounded-full bg-[#E7162A] px-6 py-3 text-sm font-black uppercase tracking-widest text-black">
                                 Réserver ma place
                             </Link>
