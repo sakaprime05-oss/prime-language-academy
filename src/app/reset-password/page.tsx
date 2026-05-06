@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { resetPassword } from "@/app/actions/auth-reset";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { resetPassword } from "@/app/actions/auth-reset";
 import { PrimeLogo } from "@/components/logo";
 
 function ResetPasswordForm() {
@@ -39,8 +39,8 @@ function ResetPasswordForm() {
             return;
         }
 
-        if (password.length < 6) {
-            setError("Le mot de passe doit contenir au moins 6 caractères.");
+        if (password.length < 8) {
+            setError("Le mot de passe doit contenir au moins 8 caractères.");
             setLoading(false);
             return;
         }
@@ -77,7 +77,7 @@ function ResetPasswordForm() {
             <div>
                 <h2 className="text-2xl font-bold text-center text-[var(--foreground)]">Nouveau mot de passe</h2>
                 <p className="mt-2 text-center text-sm text-[var(--foreground)]/60">
-                    Veuillez choisir votre nouveau mot de passe.
+                    Choisissez un nouveau mot de passe de 8 caractères minimum.
                 </p>
             </div>
 
@@ -96,10 +96,11 @@ function ResetPasswordForm() {
                         <input
                             type="password"
                             required
+                            minLength={8}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full px-4 py-3 bg-[var(--background)] border border-[var(--glass-border)] rounded-xl focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all text-[var(--foreground)] placeholder-[var(--foreground)]/30"
-                            placeholder="••••••••"
+                            placeholder="8 caractères minimum"
                         />
                     </div>
                     <div>
@@ -109,10 +110,11 @@ function ResetPasswordForm() {
                         <input
                             type="password"
                             required
+                            minLength={8}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             className="w-full px-4 py-3 bg-[var(--background)] border border-[var(--glass-border)] rounded-xl focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all text-[var(--foreground)] placeholder-[var(--foreground)]/30"
-                            placeholder="••••••••"
+                            placeholder="8 caractères minimum"
                         />
                     </div>
                 </div>
@@ -136,7 +138,7 @@ export default function ResetPasswordPage() {
                 <div className="flex justify-center mb-8">
                     <PrimeLogo className="h-12" />
                 </div>
-                
+
                 <Suspense fallback={<div className="text-center p-4">Chargement...</div>}>
                     <ResetPasswordForm />
                 </Suspense>

@@ -97,6 +97,10 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const selectedPaymentMethod = paymentMethods.find((method) => method.id === formData.paymentMethod) || paymentMethods[0];
     const immediateAmount = formData.paymentOption === "fractionne" ? selectedPlanAmount * 0.5 : selectedPlanAmount;
     const reservationAmount = selectedPlanAmount - immediateAmount;
+    const shouldShowAccountRecovery =
+        error.toLowerCase().includes("email") ||
+        error.toLowerCase().includes("mot de passe") ||
+        error.toLowerCase().includes("paiement");
 
     useEffect(() => {
         formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -255,8 +259,18 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
             </div>
 
             {error && (
-                <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-center text-xs font-bold text-red-500">
-                    {error}
+                <div className="space-y-3 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-center text-xs font-bold text-red-500">
+                    <p>{error}</p>
+                    {shouldShowAccountRecovery && (
+                        <div className="flex flex-wrap justify-center gap-2">
+                            <Link href="/login" className="rounded-lg bg-red-500 px-3 py-2 uppercase tracking-widest text-white">
+                                Se connecter
+                            </Link>
+                            <Link href="/forgot-password" className="rounded-lg border border-red-500/30 px-3 py-2 uppercase tracking-widest">
+                                Mot de passe oublié
+                            </Link>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -326,6 +340,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 {emailStatus === "pending" && (
                                     <p className="text-[11px] text-amber-600 font-bold px-1 mt-1">
                                         Inscription déjà créée. Continuez avec le même mot de passe pour reprendre le paiement.
+                                        <Link href="/forgot-password" className="ml-1 underline">Mot de passe oublié ?</Link>
                                     </p>
                                 )}
                             </div>

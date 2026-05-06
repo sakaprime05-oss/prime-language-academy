@@ -157,12 +157,12 @@ export async function registerUser(formData: FormData) {
                 if (existingUser.status === "WAITLIST" && existingUser.registrationType === "CLUB") {
                     return { success: true, waitlisted: true, redirectUrl: "/register-club/waitlist" };
                 }
-                return { error: "Cet email est déjà utilisé." };
+                return { error: "Cet email est déjà associé à un compte. Connectez-vous ou utilisez Mot de passe oublié pour récupérer l'accès." };
             }
 
             const isPasswordValid = await bcrypt.compare(password, existingUser.passwordHash);
             if (!isPasswordValid) {
-                return { error: "Cette inscription est en attente de paiement. Utilisez le même mot de passe pour reprendre le paiement." };
+                return { error: "Cette inscription est en attente de paiement. Si vous avez oublié le mot de passe, utilisez Mot de passe oublié, puis reprenez le paiement avec ce même email." };
             }
 
             const paymentPlan = existingUser.paymentPlans[0];

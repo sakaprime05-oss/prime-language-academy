@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { registerUser } from "@/app/actions/auth-actions";
 import { PLA_PLANS, formatFcfa } from "@/lib/pla-program";
 
@@ -56,6 +57,10 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
     const immediateAmount = formData.paymentOption === "fractionne" ? selectedMembership.amount * 0.5 : selectedMembership.amount;
     const reservationAmount = selectedMembership.amount - immediateAmount;
     const selectedPaymentMethod = paymentMethods.find((method) => method.id === formData.paymentMethod) || paymentMethods[0];
+    const shouldShowAccountRecovery =
+        error.toLowerCase().includes("email") ||
+        error.toLowerCase().includes("mot de passe") ||
+        error.toLowerCase().includes("paiement");
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const target = e.target as HTMLInputElement | HTMLSelectElement;
@@ -171,8 +176,18 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
             </div>
 
             {error && (
-                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-xs font-bold text-center">
-                    {error}
+                <div className="space-y-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-xs font-bold text-center">
+                    <p>{error}</p>
+                    {shouldShowAccountRecovery && (
+                        <div className="flex flex-wrap justify-center gap-2">
+                            <Link href="/login" className="rounded-lg bg-red-500 px-3 py-2 uppercase tracking-widest text-white">
+                                Se connecter
+                            </Link>
+                            <Link href="/forgot-password" className="rounded-lg border border-red-500/30 px-3 py-2 uppercase tracking-widest">
+                                Mot de passe oublié
+                            </Link>
+                        </div>
+                    )}
                 </div>
             )}
 

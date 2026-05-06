@@ -136,8 +136,10 @@ export async function sendEmail({ to, subject, html, attachments }: SendEmailInp
         if (!user || !pass) {
             if (process.env.NODE_ENV !== "production") {
                 console.info("[email:simulation]", { subject, attachments: attachments?.length || 0 });
+                return true;
             }
-            return true;
+            console.error("Email send failed: no RESEND_API_KEY or Gmail SMTP credentials configured.");
+            return false;
         }
 
         try {
