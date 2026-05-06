@@ -130,7 +130,7 @@ export function PWAInstallPrompt() {
             </h3>
 
             <div className="space-y-3">
-              <Step number={1} text="Ouvrez ce site dans Safari." />
+              <Step number={1} text="Ouvrez ce site dans le navigateur du téléphone." />
               <Step number={2} text='Appuyez sur le bouton "Partager".' />
               <Step number={3} text='Choisissez "Sur l’écran d’accueil".' />
               <Step number={4} text='Appuyez sur "Ajouter".' />

@@ -10,10 +10,14 @@ export default function MentionsLegalesPage() {
     return (
         <main className="min-h-screen bg-[var(--background)] px-6 py-24 text-[var(--foreground)]">
             <article className="mx-auto max-w-3xl space-y-8">
-                <Link href="/" className="text-sm font-bold uppercase tracking-[0.18em] text-[#E7162A] hover:underline">Retour accueil</Link>
+                <Link href="/" className="text-sm font-bold uppercase tracking-[0.18em] text-[#E7162A] hover:underline">
+                    Retour accueil
+                </Link>
                 <header>
                     <h1 className="font-serif text-4xl font-black">Mentions légales</h1>
-                    <p className="mt-4 text-[var(--foreground)]/55">Prime Language Academy présente ici les informations essentielles relatives au site et au programme.</p>
+                    <p className="mt-4 text-[var(--foreground)]/55">
+                        Prime Language Academy présente ici les informations essentielles relatives au site et au programme.
+                    </p>
                 </header>
                 <section className="space-y-4 text-sm leading-7 text-[var(--foreground)]/65">
                     <p><strong className="text-[var(--foreground)]">Nom commercial:</strong> Prime Language Academy.</p>

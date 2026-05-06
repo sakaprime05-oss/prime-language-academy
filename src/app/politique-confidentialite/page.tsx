@@ -18,7 +18,7 @@ export default function ConfidentialitePage() {
                     <p><strong className="text-[var(--foreground)]">Données collectées:</strong> nom, email, téléphone, commune, objectifs, niveau, formule choisie, créneaux, paiement et informations de suivi de formation.</p>
                     <p><strong className="text-[var(--foreground)]">Finalités:</strong> inscription, orientation pédagogique, gestion des paiements, accès au tableau de bord, communication administrative et rappels de cours.</p>
                     <p><strong className="text-[var(--foreground)]">Paiement:</strong> les transactions sont traitées par des prestataires de paiement. Prime Language Academy ne stocke pas les données de carte bancaire.</p>
-                    <p><strong className="text-[var(--foreground)]">Emails:</strong> les emails automatiques peuvent être envoyés via Resend ou Gmail SMTP selon la configuration technique.</p>
+                    <p><strong className="text-[var(--foreground)]">Messages:</strong> les communications automatiques sont envoyées par les canaux techniques configurés par Prime Language Academy.</p>
                     <p><strong className="text-[var(--foreground)]">Droits:</strong> chaque apprenant peut demander la correction ou suppression de ses données en contactant l'administration.</p>
                 </section>
             </article>

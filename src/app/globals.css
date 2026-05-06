@@ -5,6 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  color-scheme: light;
+
   --font-inter: var(--font-lexend), Arial, Helvetica, sans-serif;
   --font-playfair: var(--font-manrope), Arial, Helvetica, sans-serif;
 
@@ -51,6 +53,8 @@
 }
 
 .dark {
+  color-scheme: dark;
+
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --surface: rgba(15, 23, 42, 0.6);

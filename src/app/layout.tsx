@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import { PlatformThemeToggle } from "@/components/platform-theme-toggle";
+import { ThemeColorSync } from "@/components/theme-color-sync";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -125,6 +126,7 @@ export default function RootLayout({
           storageKey="theme"
           disableTransitionOnChange
         >
+          <ThemeColorSync />
           {children}
           <PlatformThemeToggle />
           <ServiceWorkerRegister />

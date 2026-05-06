@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Download } from "lucide-react";
+import { InstallAppButton } from "@/components/install-app-button";
 import { PLA_FAQ, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 export const metadata = {
@@ -29,6 +30,7 @@ export default function ProgrammePage() {
                             <Link href="/register" className="rounded-full bg-[#E7162A] px-6 py-3 text-sm font-black uppercase tracking-widest text-black">
                                 Réserver ma place
                             </Link>
+                            <InstallAppButton />
                             <a
                                 href="/brochure-pla-2026.pdf"
                                 download
@@ -73,6 +75,26 @@ export default function ProgrammePage() {
                                 <p className="mt-6 font-serif text-3xl font-black text-[#E7162A]">{formatFcfa(plan.price)}</p>
                             </div>
                         ))}
+                    </div>
+                </section>
+
+                <section className="rounded-3xl border border-[#E7162A]/15 bg-[#E7162A]/5 p-6 md:p-8">
+                    <div className="grid gap-6 md:grid-cols-[1.1fr_0.9fr] md:items-center">
+                        <div>
+                            <p className="mb-2 text-xs font-black uppercase tracking-[0.22em] text-[#E7162A]">Application gratuite</p>
+                            <h2 className="text-2xl font-black md:text-3xl">Installez la plateforme sans passer par les stores</h2>
+                            <p className="mt-3 text-sm leading-7 text-[var(--foreground)]/60">
+                                Ajoutez Prime Academy sur votre Ã©cran d'accueil comme une application. AccÃ¨s rapide aux cours,
+                                paiements, rendez-vous et ressources, sans frais de store.
+                            </p>
+                        </div>
+                        <div className="rounded-2xl border border-[#E7162A]/15 bg-[var(--background)] p-5">
+                            <div className="mb-4 space-y-2 text-sm text-[var(--foreground)]/60">
+                                <p><strong className="text-[var(--foreground)]">TÃ©lÃ©phone:</strong> ouvrez le menu du navigateur puis choisissez Installer l'application.</p>
+                                <p><strong className="text-[var(--foreground)]">iPhone:</strong> ouvrez le partage puis choisissez Ajouter Ã  l'Ã©cran d'accueil.</p>
+                            </div>
+                            <InstallAppButton className="w-full" />
+                        </div>
                     </div>
                 </section>
 
