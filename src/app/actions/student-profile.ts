@@ -44,7 +44,7 @@ async function saveProfilePhoto(userId: string, file: File) {
 
 export async function updateStudentProfile(formData: FormData) {
   const session = await auth();
-  if (!session?.user || session.user.role !== "STUDENT") return { error: "Non autorise." };
+  if (!session?.user || session.user.role !== "STUDENT") return { error: "Non autorisé." };
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },

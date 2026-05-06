@@ -45,7 +45,7 @@ async function saveForumImage(file: File, userId: string) {
 
 async function requireForumAccess() {
     const session = await auth();
-    if (!session?.user) return { error: "Non autorise" as const };
+    if (!session?.user) return { error: "Non autorisé" as const };
 
     if (session.user.role === "STUDENT" && !(await hasInitialPayment(session.user.id))) {
         return { error: "Finalisez d'abord votre paiement pour participer au forum." as const };
@@ -108,7 +108,7 @@ export async function createComment(postId: string, formData: FormData) {
             await sendForumCommentEmail(
                 comment.post.author.email,
                 comment.post.author.name || "Étudiant",
-                access.user.name || "Un autre etudiant",
+                access.user.name || "Un autre étudiant",
                 comment.post.title,
                 postId
             ).catch((err) => console.error("Could not send forum notification", err));
@@ -123,7 +123,7 @@ export async function createComment(postId: string, formData: FormData) {
 
 async function requireAdmin() {
     const session = await auth();
-    if (!session?.user || session.user.role !== "ADMIN") return { error: "Action reservee a l'administration." as const };
+    if (!session?.user || session.user.role !== "ADMIN") return { error: "Action réservée à l'administration." as const };
     return { user: session.user };
 }
 

@@ -29,7 +29,7 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
   const refCommand = data.reference;
 
   if (!refCommand) {
-    return { ok: false, reason: "Reference Paystack manquante." };
+    return { ok: false, reason: "Référence Paystack manquante." };
   }
 
   const transaction = await prisma.transaction.findFirst({
@@ -40,15 +40,15 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
   });
 
   if (!transaction) {
-    return { ok: true, reason: "Transaction introuvable, evenement ignore." };
+    return { ok: false, reason: "Transaction introuvable. Aucun compte n'a été activé." };
   }
 
   if (transaction.status === "COMPLETED") {
-    return { ok: true, reason: "Transaction deja traitee." };
+    return { ok: true, reason: "Transaction déjà traitée." };
   }
 
   if (transaction.status !== "PENDING") {
-    return { ok: true, reason: "Transaction inactive, evenement ignore." };
+    return { ok: false, reason: "Transaction inactive. Aucun compte n'a été activé." };
   }
 
   const expectedAmount = paystackAmount(transaction.amount);
@@ -88,7 +88,7 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
   });
 
   if (completed.count === 0) {
-    return { ok: true, reason: "Transaction deja traitee." };
+    return { ok: true, reason: "Transaction déjà traitée." };
   }
 
   const plan = transaction.paymentPlan;

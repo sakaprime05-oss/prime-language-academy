@@ -17,7 +17,7 @@ export function LessonCompleteButton({ lessonId, isCompleted }: { lessonId: stri
       setCompleted(true);
       router.refresh();
     } catch {
-      alert("Impossible de mettre a jour votre progression.");
+      alert("Impossible de mettre à jour votre progression.");
     } finally {
       setLoading(false);
     }
@@ -25,7 +25,7 @@ export function LessonCompleteButton({ lessonId, isCompleted }: { lessonId: stri
 
   return (
     <button onClick={handleClick} disabled={loading || completed} className="btn-primary flex w-full items-center justify-center gap-2 sm:w-auto disabled:opacity-60">
-      {completed ? "Deja terminee" : loading ? "Validation..." : "Marquer comme terminee"}
+      {completed ? "Déjà terminée" : loading ? "Validation..." : "Marquer comme terminée"}
     </button>
   );
 }

@@ -47,7 +47,7 @@ export async function GET(req: Request) {
 
     if (!result.ok) {
       console.error("Paystack callback processing failed:", result.reason);
-      return NextResponse.redirect(`${baseUrl}${pendingPath}`);
+      return NextResponse.redirect(`${baseUrl}${errorPath}`);
     }
 
     return NextResponse.redirect(`${baseUrl}${successPath}`);

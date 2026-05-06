@@ -43,7 +43,7 @@ export async function initiatePayment(formData: FormData) {
     const session = await auth();
     if (!session || !session.user) return { error: "Non autorisé" };
 
-    if (session.user?.role !== "STUDENT") return { error: "Non autorise" };
+    if (session.user?.role !== "STUDENT") return { error: "Non autorisé" };
     const limited = rateLimit(rateLimitKey("student-payment", session.user.id), 6, 10 * 60 * 1000);
     if (!limited.ok) {
         return { error: "Trop de tentatives de paiement. Veuillez patienter quelques minutes." };
@@ -188,7 +188,7 @@ export async function getStudentPaymentStatus(userId: string) {
 
 export async function submitManualPayment(formData: FormData) {
     const session = await auth();
-    if (!session || session.user?.role !== "STUDENT") return { error: "Non autorise" };
+    if (!session || session.user?.role !== "STUDENT") return { error: "Non autorisé" };
 
     const transactionId = formData.get("transactionId") as string;
     const provider = formData.get("provider") as string;
@@ -258,7 +258,7 @@ export async function submitManualPayment(formData: FormData) {
 
 export async function confirmWavePayment(formData: FormData) {
     const session = await auth();
-    if (!session || session.user?.role !== "STUDENT") return { error: "Non autorise" };
+    if (!session || session.user?.role !== "STUDENT") return { error: "Non autorisé" };
 
     try {
         const transactionId = formData.get("transactionId") as string;

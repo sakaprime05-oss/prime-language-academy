@@ -18,7 +18,7 @@ async function validatePaymentFromBot(params: any) {
     const { email, amount } = params;
     const numericAmount = parseFloat(String(amount || "").replace(/\s/g, ""));
     if (!email || !Number.isFinite(numericAmount) || numericAmount <= 0) {
-        return NextResponse.json({ error: "Parametres invalides" }, { status: 400 });
+        return NextResponse.json({ error: "Paramètres invalides" }, { status: 400 });
     }
 
     const student = await prisma.user.findUnique({
@@ -34,16 +34,16 @@ async function validatePaymentFromBot(params: any) {
 
     const plan = student.paymentPlans[0];
     if (!plan) {
-        return NextResponse.json({ error: "Aucun plan de paiement actif pour cet etudiant." }, { status: 400 });
+        return NextResponse.json({ error: "Aucun plan de paiement actif pour cet étudiant." }, { status: 400 });
     }
 
     const remaining = Math.max(0, plan.totalAmount - plan.amountPaid);
     if (remaining <= 0) {
-        return NextResponse.json({ error: "Ce plan est deja solde." }, { status: 400 });
+        return NextResponse.json({ error: "Ce plan est déjà soldé." }, { status: 400 });
     }
 
     if (numericAmount > remaining) {
-        return NextResponse.json({ error: "Le montant depasse le solde restant." }, { status: 400 });
+        return NextResponse.json({ error: "Le montant dépasse le solde restant." }, { status: 400 });
     }
 
     const newAmountPaid = plan.amountPaid + numericAmount;

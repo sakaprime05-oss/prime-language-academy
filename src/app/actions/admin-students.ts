@@ -33,7 +33,7 @@ export async function inviteClubWaitlistStudent(studentId: string) {
     });
 
     if (activeClubMembers >= PLA_CLUB_CAPACITY) {
-        return { error: "Le Club est deja plein. Liberez une place avant d'inviter ce membre." };
+        return { error: "Le Club est déjà plein. Libérez une place avant d'inviter ce membre." };
     }
 
     const student = await prisma.user.findUnique({
