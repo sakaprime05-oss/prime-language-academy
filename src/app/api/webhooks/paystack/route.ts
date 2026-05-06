@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const secret = process.env.PAYSTACK_SECRET_KEY;
 
     if (!secret) {
-      console.error("Paystack secret missing");
+      console.error("Payment webhook configuration missing");
       return NextResponse.json({ error: "Configuration Error" }, { status: 500 });
     }
 
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     const expected = Buffer.from(hash);
     const received = Buffer.from(signature || "");
     if (expected.length !== received.length || !crypto.timingSafeEqual(expected, received)) {
-      console.warn(`Invalid Paystack signature from IP: ${clientIp || "unknown"}`);
+      console.warn(`Invalid payment webhook signature from IP: ${clientIp || "unknown"}`);
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 
@@ -30,13 +30,13 @@ export async function POST(req: Request) {
     if (event.event === "charge.success") {
       const result = await completePaystackTransaction(event.data);
       if (!result.ok) {
-        console.error("Paystack processing failed:", result.reason, { clientIp });
+        console.error("Payment webhook processing failed:", result.reason, { clientIp });
       }
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Paystack Webhook error:", error);
+    console.error("Payment webhook error:", error);
     return NextResponse.json({ error: "Webhook Error" }, { status: 500 });
   }
 }

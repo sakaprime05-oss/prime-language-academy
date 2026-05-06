@@ -36,7 +36,7 @@ async function initializePaystackCheckout(input: PaystackInitInput) {
             : "https://primelangageacademy.com";
 
     if (!secretKey) {
-        console.error("[Registration] Missing PAYSTACK_SECRET_KEY");
+        console.error("[Registration] Payment configuration missing");
         return { error: "Le paiement n'a pas pu être lancé pour le moment. Contactez l'administration pour finaliser votre inscription." };
     }
 
@@ -65,7 +65,7 @@ async function initializePaystackCheckout(input: PaystackInitInput) {
     const paystackData = await paystackResponse.json();
 
     if (!paystackData.status || !paystackData.data?.authorization_url) {
-        console.error("[Registration] Paystack initialization failed:", paystackData.message || paystackData);
+        console.error("[Registration] Payment initialization failed:", paystackData.message || paystackData);
         return { error: "Le paiement n'a pas pu être lancé pour le moment. Vérifiez vos informations ou contactez l'administration." };
     }
 
@@ -306,7 +306,7 @@ export async function registerUser(formData: FormData) {
         });
 
         if (checkout.error) {
-            console.error("[Registration] Paystack Init Failed:", checkout.error);
+            console.error("[Registration] Payment initialization failed:", checkout.error);
             return { error: checkout.error };
         }
 

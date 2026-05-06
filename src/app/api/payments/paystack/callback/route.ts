@@ -25,7 +25,7 @@ export async function GET(req: Request) {
 
   const secretKey = process.env.PAYSTACK_SECRET_KEY;
   if (!secretKey) {
-    console.error("Paystack callback: missing server key");
+    console.error("Payment callback: missing server configuration");
     return NextResponse.redirect(`${baseUrl}${errorPath}`);
   }
 
@@ -39,20 +39,20 @@ export async function GET(req: Request) {
     const payload = await response.json();
 
     if (!payload.status || !payload.data) {
-      console.error("Paystack callback verification failed:", payload.message || payload);
+      console.error("Payment callback verification failed:", payload.message || payload);
       return NextResponse.redirect(`${baseUrl}${pendingPath}`);
     }
 
     const result = await completePaystackTransaction(payload.data);
 
     if (!result.ok) {
-      console.error("Paystack callback processing failed:", result.reason);
+      console.error("Payment callback processing failed:", result.reason);
       return NextResponse.redirect(`${baseUrl}${errorPath}`);
     }
 
     return NextResponse.redirect(`${baseUrl}${successPath}`);
   } catch (error) {
-    console.error("Paystack callback error:", error);
+    console.error("Payment callback error:", error);
     return NextResponse.redirect(`${baseUrl}${pendingPath}`);
   }
 }

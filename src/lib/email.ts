@@ -138,7 +138,7 @@ export async function sendEmail({ to, subject, html, attachments }: SendEmailInp
                 console.info("[email:simulation]", { subject, attachments: attachments?.length || 0 });
                 return true;
             }
-            console.error("Email send failed: no RESEND_API_KEY or Gmail SMTP credentials configured.");
+            console.error("Email delivery unavailable: provider credentials are not configured.");
             return false;
         }
 
@@ -158,7 +158,7 @@ export async function sendEmail({ to, subject, html, attachments }: SendEmailInp
 
             return true;
         } catch (error) {
-            console.error("Gmail email send failed:", error);
+            console.error("Email delivery failed:", error);
             return false;
         }
     }
@@ -175,13 +175,13 @@ export async function sendEmail({ to, subject, html, attachments }: SendEmailInp
             });
 
             if (error) {
-                console.error("Resend email failed:", error);
+                console.error("Primary email delivery failed:", error);
                 return sendWithGmail();
             }
 
             return true;
         } catch (error) {
-            console.error("Resend email send failed:", error);
+            console.error("Primary email delivery failed:", error);
             return sendWithGmail();
         }
     }

@@ -36,8 +36,7 @@ function matchesImageMagicBytes(buffer: Buffer, type: string) {
 }
 
 /**
- * Initiate a payment via Paystack and return a redirect URL
- * The student is then redirected to Paystack's checkout page
+ * Initiate an online payment and return a redirect URL.
  */
 export async function initiatePayment(formData: FormData) {
     const session = await auth();
@@ -65,7 +64,7 @@ export async function initiatePayment(formData: FormData) {
             : "https://primelangageacademy.com";
 
     if (!secretKey) {
-        console.error("Paystack API key is missing");
+        console.error("Payment configuration missing");
         return { error: "Le paiement n'a pas pu être lancé pour le moment. Vérifiez vos informations ou contactez l'administration." };
     }
 

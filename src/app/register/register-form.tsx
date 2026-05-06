@@ -47,10 +47,12 @@ const levels = ["Débutant", "Intermédiaire", "Avancé"];
 
 const timeSlots = PLA_TIME_SLOTS.map((slot) => ({ id: slot.id, name: `${slot.label} (${slot.time})` }));
 
-const steps = ["Infos requises", "Objectifs", "Formule & Jours", "Engagement"];
+const steps = ["Profil", "Objectifs", "Formule", "Paiement"];
 const fieldLabelClass = "px-1 text-[10px] font-black uppercase tracking-[0.12em] text-[var(--foreground)]/55";
 const fieldClass = "w-full rounded-lg border border-[var(--foreground)]/15 bg-white/60 px-3 py-2.5 text-sm font-medium text-[var(--foreground)] outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/15 dark:bg-white/5";
 const choiceClass = "flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition-colors";
+const actionBarClass = "sticky bottom-2 z-20 grid grid-cols-[0.82fr_1.18fr] gap-2 rounded-lg border border-[var(--foreground)]/10 bg-[var(--background)]/90 p-2 shadow-lg shadow-black/10 backdrop-blur sm:static sm:grid-cols-[0.8fr_1.2fr] sm:gap-3 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none";
+const backButtonClass = "min-h-12 rounded-lg bg-[var(--foreground)]/6 px-3 py-3 text-sm font-black text-[var(--foreground)] transition-colors hover:bg-[var(--foreground)]/10";
 
 function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const searchParams = useSearchParams();
@@ -378,7 +380,9 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             <input type="password" name="password" required value={formData.password} onChange={handleChange} className={fieldClass} placeholder="••••••••" />
                         </div>
 
-                        <button type="button" onClick={nextStep} className="btn-primary mt-4 min-h-12 w-full">Suivant →</button>
+                        <div className="rounded-lg border border-primary/10 bg-primary/5 p-2 shadow-sm shadow-primary/10">
+                            <button type="button" onClick={nextStep} className="btn-primary min-h-12 w-full">Suivant</button>
+                        </div>
                     </div>
                 )}
 
@@ -443,9 +447,9 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         </div>
 
 
-                        <div className="grid grid-cols-[0.8fr_1.2fr] gap-3 pt-1">
-                            <button type="button" onClick={prevStep} className="min-h-12 rounded-lg bg-[var(--foreground)]/5 px-4 py-3 font-bold text-[var(--foreground)] transition-colors hover:bg-[var(--foreground)]/10">Retour</button>
-                            <button type="button" onClick={nextStep} className="btn-primary min-h-12">Suivant →</button>
+                        <div className={actionBarClass}>
+                            <button type="button" onClick={prevStep} className={backButtonClass}>Retour</button>
+                            <button type="button" onClick={nextStep} className="btn-primary min-h-12 text-sm">Suivant</button>
                         </div>
                     </div>
                 )}
@@ -530,9 +534,9 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-[0.8fr_1.2fr] gap-3 pt-2">
-                            <button type="button" onClick={prevStep} className="min-h-12 rounded-lg bg-[var(--foreground)]/5 px-4 py-3 font-bold text-[var(--foreground)] transition-colors hover:bg-[var(--foreground)]/10">Retour</button>
-                            <button type="button" onClick={nextStep} className="btn-primary min-h-12">Suivant →</button>
+                        <div className={actionBarClass}>
+                            <button type="button" onClick={prevStep} className={backButtonClass}>Retour</button>
+                            <button type="button" onClick={nextStep} className="btn-primary min-h-12 text-sm">Suivant</button>
                         </div>
                     </div>
                 )}
@@ -627,10 +631,10 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-[0.8fr_1.2fr] gap-3 border-t border-[var(--foreground)]/10 pt-5">
-                            <button type="button" onClick={prevStep} className="min-h-12 rounded-lg bg-[var(--foreground)]/5 px-4 py-3 font-bold text-[var(--foreground)] transition-colors hover:bg-[var(--foreground)]/10">Retour</button>
-                            <button type="submit" className="btn-primary min-h-12" disabled={loading}>
-                                {loading ? "Création en cours..." : "Valider l'inscription"}
+                        <div className={actionBarClass}>
+                            <button type="button" onClick={prevStep} className={backButtonClass}>Retour</button>
+                            <button type="submit" className="btn-primary min-h-12 px-3 text-sm" disabled={loading}>
+                                {loading ? "Création..." : "Valider le paiement"}
                             </button>
                         </div>
                     </div>
