@@ -2,13 +2,13 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { PLA_CLUB_CAPACITY, PLA_PLANS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, formatFcfa } from "@/lib/pla-program";
 import { InviteButton } from "./InviteButton";
 
 function getPlanInfo(onboardingData?: string | null) {
     try {
         const data = JSON.parse(onboardingData || "{}");
-        const plan = PLA_PLANS.find((item) => item.id === data.planId);
+        const plan = PLA_CLUB_PLANS.find((item) => item.id === data.planId);
         return {
             planLabel: plan?.label || "Club",
             planPrice: plan?.price ? formatFcfa(plan.price) : "A verifier",

@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { PLA_CLUB_CAPACITY, PLA_PLANS } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS } from "@/lib/pla-program";
 import { sendClubSeatAvailableEmail } from "@/lib/email";
 import { revalidatePath } from "next/cache";
 
@@ -54,7 +54,7 @@ export async function inviteClubWaitlistStudent(studentId: string) {
         onboardingData = JSON.parse(student.onboardingData || "{}");
     } catch {}
 
-    const plan = PLA_PLANS.find((item) => item.id === onboardingData.planId) || PLA_PLANS[0];
+    const plan = PLA_CLUB_PLANS.find((item) => item.id === onboardingData.planId) || PLA_CLUB_PLANS[0];
 
     await prisma.$transaction(async (tx) => {
         const existingPlan = await tx.paymentPlan.findFirst({

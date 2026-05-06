@@ -10,7 +10,7 @@ export const PLA_SESSION = {
 
 export const PLA_CLUB_CAPACITY = 26;
 
-export const PLA_PLANS = [
+const PLA_BASE_PLANS = [
     { id: "loisir", label: "Loisir", freq: "1 séance / semaine", shortFreq: "1x/sem", price: 52000, top: false },
     { id: "essentiel", label: "Essentiel", freq: "2 séances / semaine", shortFreq: "2x/sem", price: 72000, top: false },
     { id: "equilibre", label: "Équilibre", freq: "3 séances / semaine", shortFreq: "3x/sem", price: 92000, top: false },
@@ -18,6 +18,13 @@ export const PLA_PLANS = [
     { id: "intensif", label: "Intensif", freq: "5 séances / semaine", shortFreq: "5x/sem", price: 132000, top: false },
     { id: "immersion", label: "Immersion", freq: "6 séances / semaine", shortFreq: "6x/sem", price: 152000, top: true },
 ] as const;
+
+export const PLA_CLUB_PLANS = PLA_BASE_PLANS;
+
+export const PLA_PLANS = PLA_BASE_PLANS.map((plan) => ({
+    ...plan,
+    price: plan.price + 2000,
+}));
 
 export const PLA_TIME_SLOTS = [
     { id: "v1", label: "Vague 1", time: "16h00 - 18h00", desc: "Idéal pour les étudiants et apprenants disponibles en fin d'après-midi" },

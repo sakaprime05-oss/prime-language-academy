@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { PLA_CLUB_CAPACITY, PLA_PLANS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, formatFcfa } from "@/lib/pla-program";
 
 
 const ACTIVITIES = [
@@ -32,12 +32,12 @@ const ACTIVITIES = [
 ];
 
 const MEMBERSHIPS = [
-  { id: "loisir",      freq: "1 session / semaine", price: formatFcfa(PLA_PLANS[0].price).replace(" FCFA", ""), label: "Social" },
-  { id: "essentiel",   freq: "2 sessions / semaine", price: formatFcfa(PLA_PLANS[1].price).replace(" FCFA", ""), label: "Connect" },
-  { id: "equilibre",   freq: "3 sessions / semaine", price: formatFcfa(PLA_PLANS[2].price).replace(" FCFA", ""), label: "Network" },
-  { id: "performance", freq: "4 sessions / semaine", price: formatFcfa(PLA_PLANS[3].price).replace(" FCFA", ""), label: "Executive" },
-  { id: "intensif",    freq: "5 sessions / semaine", price: formatFcfa(PLA_PLANS[4].price).replace(" FCFA", ""), label: "Elite" },
-  { id: "immersion",   freq: "6 sessions / semaine", price: formatFcfa(PLA_PLANS[5].price).replace(" FCFA", ""), label: "Founder", top: true },
+  { id: "loisir",      freq: "1 session / semaine", price: formatFcfa(PLA_CLUB_PLANS[0].price).replace(" FCFA", ""), label: "Social" },
+  { id: "essentiel",   freq: "2 sessions / semaine", price: formatFcfa(PLA_CLUB_PLANS[1].price).replace(" FCFA", ""), label: "Connect" },
+  { id: "equilibre",   freq: "3 sessions / semaine", price: formatFcfa(PLA_CLUB_PLANS[2].price).replace(" FCFA", ""), label: "Network" },
+  { id: "performance", freq: "4 sessions / semaine", price: formatFcfa(PLA_CLUB_PLANS[3].price).replace(" FCFA", ""), label: "Executive" },
+  { id: "intensif",    freq: "5 sessions / semaine", price: formatFcfa(PLA_CLUB_PLANS[4].price).replace(" FCFA", ""), label: "Elite" },
+  { id: "immersion",   freq: "6 sessions / semaine", price: formatFcfa(PLA_CLUB_PLANS[5].price).replace(" FCFA", ""), label: "Founder", top: true },
 ];
 
 export default function EnglishClubPublicPage() {

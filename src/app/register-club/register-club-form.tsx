@@ -4,15 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { registerUser } from "@/app/actions/auth-actions";
-import { PLA_PLANS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CLUB_PLANS, formatFcfa } from "@/lib/pla-program";
 
 const memberships = [
-    { id: "loisir", name: "Social (1x/sem)", price: formatFcfa(PLA_PLANS[0].price), amount: PLA_PLANS[0].price },
-    { id: "essentiel", name: "Connect (2x/sem)", price: formatFcfa(PLA_PLANS[1].price), amount: PLA_PLANS[1].price },
-    { id: "equilibre", name: "Network (3x/sem)", price: formatFcfa(PLA_PLANS[2].price), amount: PLA_PLANS[2].price },
-    { id: "performance", name: "Executive (4x/sem)", price: formatFcfa(PLA_PLANS[3].price), amount: PLA_PLANS[3].price },
-    { id: "intensif", name: "Elite (5x/sem)", price: formatFcfa(PLA_PLANS[4].price), amount: PLA_PLANS[4].price },
-    { id: "immersion", name: "Founder (6x/sem)", price: formatFcfa(PLA_PLANS[5].price), amount: PLA_PLANS[5].price }
+    { id: "loisir", name: "Social (1x/sem)", price: formatFcfa(PLA_CLUB_PLANS[0].price), amount: PLA_CLUB_PLANS[0].price },
+    { id: "essentiel", name: "Connect (2x/sem)", price: formatFcfa(PLA_CLUB_PLANS[1].price), amount: PLA_CLUB_PLANS[1].price },
+    { id: "equilibre", name: "Network (3x/sem)", price: formatFcfa(PLA_CLUB_PLANS[2].price), amount: PLA_CLUB_PLANS[2].price },
+    { id: "performance", name: "Executive (4x/sem)", price: formatFcfa(PLA_CLUB_PLANS[3].price), amount: PLA_CLUB_PLANS[3].price },
+    { id: "intensif", name: "Elite (5x/sem)", price: formatFcfa(PLA_CLUB_PLANS[4].price), amount: PLA_CLUB_PLANS[4].price },
+    { id: "immersion", name: "Founder (6x/sem)", price: formatFcfa(PLA_CLUB_PLANS[5].price), amount: PLA_CLUB_PLANS[5].price }
 ];
 
 const paymentMethods = [

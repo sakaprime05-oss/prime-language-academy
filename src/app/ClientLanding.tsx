@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Download } from "lucide-react";
 import { LogoMark } from "@/components/logo";
 import ThemeToggle from "@/components/ThemeToggle";
-import { PLA_CLUB_CAPACITY, PLA_FAQ, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_FAQ, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 /* ── tiny helpers ── */
 const PLANS = [
@@ -13,7 +13,7 @@ const PLANS = [
 ];
 
 const CLUB_PLANS = [
-  ...PLA_PLANS.map((plan, index) => ({
+  ...PLA_CLUB_PLANS.map((plan, index) => ({
     ...plan,
     freq: plan.shortFreq,
     price: formatFcfa(plan.price).replace(" FCFA", ""),

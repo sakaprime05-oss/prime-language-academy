@@ -4,12 +4,13 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { sendWelcomeEmail, sendAdminNewRegistrationEmail } from "@/lib/email";
 import { notifyTelegram } from "@/lib/notify";
-import { PLA_CLUB_CAPACITY, PLA_PLANS } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_PLANS } from "@/lib/pla-program";
 import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
 import { paystackChannels } from "@/lib/payment-methods";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
-const planPrices = Object.fromEntries(PLA_PLANS.map((plan) => [plan.id, plan.price])) as Record<string, number>;
+const formationPlanPrices = Object.fromEntries(PLA_PLANS.map((plan) => [plan.id, plan.price])) as Record<string, number>;
+const clubPlanPrices = Object.fromEntries(PLA_CLUB_PLANS.map((plan) => [plan.id, plan.price])) as Record<string, number>;
 
 type PaystackInitInput = {
     email: string;
@@ -170,7 +171,8 @@ export async function registerUser(formData: FormData) {
                 return { error: "Compte en attente incomplet. Contactez le support pour finaliser votre inscription." };
             }
 
-            const submittedTotalAmount = planPrices[planId];
+            const existingPlanPrices = existingUser.registrationType === "CLUB" ? clubPlanPrices : formationPlanPrices;
+            const submittedTotalAmount = existingPlanPrices[planId];
             const updatedTotalAmount = submittedTotalAmount || paymentPlan.totalAmount;
             const remaining = Math.max(0, updatedTotalAmount - paymentPlan.amountPaid);
             if (remaining <= 0) {
@@ -229,7 +231,8 @@ export async function registerUser(formData: FormData) {
             });
         }
 
-        const totalAmount = planPrices[planId];
+        const selectedPlanPrices = isClubRegistration ? clubPlanPrices : formationPlanPrices;
+        const totalAmount = selectedPlanPrices[planId];
         if (!totalAmount) {
             return { error: "Formule invalide. Veuillez choisir une formule de formation." };
         }
