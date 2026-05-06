@@ -9,6 +9,8 @@ export const metadata = {
 
 export default function ContactPage() {
     const whatsappText = encodeURIComponent("Bonjour Prime Language Academy, je souhaite avoir des informations sur la session 2026.");
+    const centreAngreMap = "https://www.google.com/maps/search/?api=1&query=92VJ%2BR6%2C%20Abidjan%2C%20Cocody%20Angr%C3%A9%208e%20Tranche%2C%20Zone%20Bon%20Prix";
+    const centreVallonMap = "https://www.google.com/maps/search/?api=1&query=92F6%2BQH%2C%20Abidjan%2C%20Cocody%202%20Plateaux%20Vallon%2C%20Petit%20Sococ%C3%A9";
 
     return (
         <main className="min-h-screen bg-[#080808] px-6 py-24 text-[#F5F0E8]">
@@ -54,18 +56,28 @@ export default function ContactPage() {
 
                     <article className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-7">
                         <p className="mb-2 text-xs font-black uppercase tracking-[0.2em] text-[#E7162A]">Adresse</p>
-                        <h2 className="text-2xl font-black">Cocody Angre</h2>
+                        <h2 className="text-2xl font-black">Deux lieux</h2>
                         <p className="mt-3 text-sm leading-7 text-[#F5F0E8]/55">
                             {PLA_SESSION.location}. {PLA_SESSION.locationHint}.
                         </p>
-                        <a
-                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(PLA_SESSION.location)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-6 inline-flex rounded-full border border-[#E7162A]/40 px-5 py-3 text-sm font-black uppercase tracking-widest text-[#E7162A]"
-                        >
-                            Voir la carte
-                        </a>
+                        <div className="mt-6 flex flex-wrap gap-3">
+                            <a
+                                href={centreAngreMap}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex rounded-full border border-[#E7162A]/40 px-5 py-3 text-sm font-black uppercase tracking-widest text-[#E7162A]"
+                            >
+                                Angre
+                            </a>
+                            <a
+                                href={centreVallonMap}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex rounded-full border border-[#E7162A]/40 px-5 py-3 text-sm font-black uppercase tracking-widest text-[#E7162A]"
+                            >
+                                Vallon
+                            </a>
+                        </div>
                     </article>
                 </section>
 

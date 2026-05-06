@@ -52,6 +52,7 @@ export async function saveArticle(formData: FormData) {
   const title = formData.get("title") as string;
   const content = sanitizeHtml(formData.get("content") as string);
   const category = (formData.get("category") as string) || "GENERAL";
+  const coverImage = ((formData.get("coverImage") as string) || "").trim() || null;
   const published = formData.get("published") === "true";
   let slug = formData.get("slug") as string;
 
@@ -70,7 +71,7 @@ export async function saveArticle(formData: FormData) {
     if (id) {
       await prisma.article.update({
         where: { id },
-        data: { title, slug, content, category, published },
+        data: { title, slug, content, category, coverImage, published },
       });
     } else {
       await prisma.article.create({
@@ -79,6 +80,7 @@ export async function saveArticle(formData: FormData) {
           slug,
           content,
           category,
+          coverImage,
           published,
           authorId: session.user.id,
         },

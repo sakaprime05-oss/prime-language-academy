@@ -1,23 +1,23 @@
 import Link from "next/link";
-import { getArticles } from "@/app/actions/articles";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Calendar, User, ArrowRight, BookOpen } from "lucide-react";
+import Image from "next/image";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import Image from "next/image";
-import { ParticlesBackground } from "@/components/particles";
+import { ArrowRight, BookOpen, Calendar, Clock, PenLine, User } from "lucide-react";
+import { getArticles } from "@/app/actions/articles";
+import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { siteConfig } from "@/lib/site-config";
+import { articleImage, articleTitle, categoryLabel, editorialSummary, readingTime } from "@/lib/blog-presentation";
 
 export const metadata = {
-  title: "Blog & Articles | Prime Language Academy",
-  description: "Découvrez nos articles, conseils et réflexions sur l'apprentissage de l'anglais et l'importance du bilinguisme.",
-  keywords: "cours d'anglais Abidjan, English Club Côte d'Ivoire, apprendre l'anglais Abidjan, centre linguistique, formation anglais pro",
+  title: "Blog | Prime Language Academy",
+  description:
+    "Analyses, conseils et methodes pour progresser en anglais avec plus de clarte, de discipline et de confiance.",
+  keywords:
+    "cours anglais Abidjan, apprendre anglais Cote d'Ivoire, anglais professionnel, English Club Abidjan, Prime Language Academy",
   openGraph: {
     title: "Blog | Prime Language Academy",
-    description: "Conseils et astuces pour maîtriser l'anglais en Côte d'Ivoire.",
+    description: "Conseils et analyses pour apprendre l'anglais avec methode.",
     url: `${siteConfig.url}/blog`,
     siteName: "Prime Language Academy",
     images: [{ url: siteConfig.ogImage }],
@@ -27,157 +27,208 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Blog | Prime Language Academy",
-    description: "Le meilleur blog pour apprendre l'anglais à Abidjan.",
-  }
+    description: "Le journal editorial de Prime Language Academy.",
+  },
 };
 
 export default async function BlogPage() {
   const articles = await getArticles(true);
+  const [featuredArticle, ...otherArticles] = articles;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans selection:bg-[#E7162A]/30 overflow-x-hidden relative">
-      <ParticlesBackground />
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-xl border-b border-white/10 px-4 py-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 transition-transform group-hover:scale-105">
-              <Image 
-                src="/icon-512x512.png" 
-                alt="PLA Logo" 
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-            <span className="font-extrabold tracking-tight text-xl text-slate-900 dark:text-white hidden sm:block">
-              Prime Academy
+    <main className="min-h-screen bg-[#fff8f7] text-[#291715] dark:bg-[#0f1113] dark:text-[#f5f0e8]">
+      <nav className="sticky top-0 z-50 border-b border-[#291715]/10 bg-[#fff8f7]/90 px-4 py-3 backdrop-blur-xl dark:border-white/10 dark:bg-[#0f1113]/88">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-3">
+            <span className="relative h-10 w-10 overflow-hidden rounded-xl bg-white p-1.5 shadow-sm">
+              <Image src="/icon-512x512.png" alt="Prime Language Academy" fill sizes="40px" className="object-contain p-1.5" priority />
+            </span>
+            <span className="hidden text-sm font-black uppercase leading-4 tracking-[0.16em] sm:block">
+              Prime Language<br />Academy
             </span>
           </Link>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-700 dark:text-slate-300">
-            <Link href="/" className="hover:text-slate-900 dark:text-white transition-colors">Retour à l'Accueil</Link>
-            <Link href="/blog" className="text-[#E7162A] font-bold transition-colors">Le Blog</Link>
+
+          <div className="hidden items-center gap-6 text-xs font-black uppercase tracking-[0.14em] text-[#291715]/55 dark:text-white/55 md:flex">
+            <Link href="/" className="transition hover:text-[#E7162A]">Accueil</Link>
+            <Link href="/programme" className="transition hover:text-[#E7162A]">Programme</Link>
+            <Link href="/blog" className="text-[#E7162A]">Blog</Link>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-white hidden sm:block">
-              Connexion
+
+          <div className="flex items-center gap-2">
+            <Link href="/register" className="inline-flex h-10 items-center justify-center rounded-xl bg-[#E7162A] px-4 text-xs font-black uppercase tracking-[0.12em] text-white transition hover:bg-[#c71123]">
+              S'inscrire
             </Link>
-            <Button asChild className="bg-[#E7162A] hover:bg-[#E7162A]/90 text-slate-900 dark:text-white font-bold shadow-[0_0_15px_rgba(231,22,42,0.3)] hover:shadow-[0_0_25px_rgba(231,22,42,0.5)] transition-shadow">
-              <Link href="/register">S'inscrire</Link>
-            </Button>
             <ThemeToggle />
           </div>
         </div>
       </nav>
 
-      {/* HERO SECTION */}
-      <header className="relative pt-40 pb-20 px-4 bg-slate-50 dark:bg-slate-950 overflow-hidden text-center flex flex-col items-center">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#21286E]/20 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#E7162A]/10 rounded-full blur-[100px] pointer-events-none" />
-        
-        <div className="max-w-3xl mx-auto relative z-10 space-y-6">
-          <Badge variant="outline" className="border-[#E7162A]/50 bg-[#E7162A]/10 text-[#E7162A] px-4 py-1.5 text-xs font-bold tracking-widest uppercase mb-4 shadow-[0_0_15px_rgba(231,22,42,0.2)]">
-            Hub de Connaissances
-          </Badge>
-          <h1 className="text-5xl md:text-7xl font-black text-slate-900 dark:text-white tracking-tighter leading-[1.1]">
-            Notre <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E7162A] to-orange-500">Blog</span>
-          </h1>
-          <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 md:text-lg leading-relaxed max-w-2xl mx-auto">
-            Conseils d'experts, réflexions sur le bilinguisme et actualités de la Prime Language Academy. Lisez, apprenez, et passez à l'action.
-          </p>
-        </div>
-      </header>
+      <section className="border-b border-[#291715]/10 px-4 py-12 dark:border-white/10 sm:py-16">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.84fr_1.16fr] lg:items-end">
+          <div className="space-y-5">
+            <Badge className="rounded-full border border-[#E7162A]/25 bg-[#E7162A]/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-[#E7162A]">
+              Journal PLA
+            </Badge>
+            <h1 className="max-w-3xl font-[var(--font-lexend)] text-4xl font-black leading-[1.02] tracking-normal sm:text-6xl">
+              Des articles utiles, clairs et directement applicables.
+            </h1>
+            <p className="max-w-2xl text-base font-medium leading-8 text-[#291715]/62 dark:text-white/62">
+              Le blog rassemble nos conseils de terrain sur l'anglais, la discipline d'apprentissage, l'oral et les opportunites professionnelles.
+            </p>
+          </div>
 
-      {/* ARTICLES LIST */}
-      <section className="py-16 px-4 min-h-[40vh] relative z-10">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {articles.map((article) => (
-            <Card key={article.id} className="bg-white dark:bg-slate-900 border-slate-800 hover:border-[#E7162A]/50 transition-all group overflow-hidden shadow-lg shadow-black/20 hover:shadow-[0_0_30px_rgba(231,22,42,0.15)] flex flex-col">
-              {article.coverImage && (
-                <div className="relative w-full h-56 overflow-hidden">
-                  <Image 
-                    src={article.coverImage} 
-                    alt={article.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <Badge className="bg-[#21286E]/90 text-white border-none px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-md shadow-lg">
-                      {article.category}
-                    </Badge>
-                  </div>
-                </div>
-              )}
-              <CardHeader className={`p-6 md:p-8 pb-2 ${article.coverImage ? 'pt-6' : ''}`}>
-                {!article.coverImage && (
-                  <div className="flex flex-wrap items-center gap-4 mb-4">
-                    <Badge className="bg-[#21286E]/40 text-blue-300 hover:bg-[#21286E]/50 border-none px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                      {article.category}
-                    </Badge>
-                  </div>
-                )}
-                <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4">
-                    <span className="flex items-center gap-1.5">
-                      <User className="w-3 h-3" />
-                      {article.author.name || "Équipe PLA"}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Calendar className="w-3 h-3" />
-                      {format(new Date(article.createdAt), "dd MMMM yyyy", { locale: fr })}
-                    </span>
-                  </div>
-                <Link href={`/blog/${article.slug}`}>
-                  <CardTitle className="text-xl md:text-2xl font-black text-slate-900 dark:text-white group-hover:text-[#E7162A] transition-colors leading-tight line-clamp-2">
-                    {article.title}
-                  </CardTitle>
-                </Link>
-              </CardHeader>
-              <CardContent className="px-6 md:px-8 py-4 flex-1">
-                <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 text-sm leading-relaxed line-clamp-3">
-                  {article.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
-                </p>
-              </CardContent>
-              <CardFooter className="px-6 md:px-8 py-6 pt-2">
-                <Button asChild variant="ghost" className="p-0 hover:bg-transparent group/btn text-[#E7162A] font-bold flex items-center gap-2 transition-all">
-                  <Link href={`/blog/${article.slug}`}>
-                    Lire la suite
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-
-          {articles.length === 0 && (
-            <div className="text-center py-20 bg-white dark:bg-slate-900 border border-slate-800 rounded-2xl">
-              <BookOpen className="w-16 h-16 text-slate-700 mx-auto mb-4" />
-              <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 font-bold text-lg uppercase tracking-widest">Aucun article publié pour le moment.</p>
-              <Button asChild variant="link" className="mt-4 text-[#E7162A] font-bold">
-                <Link href="/">Retour à l'accueil</Link>
-              </Button>
+          <div className="grid grid-cols-3 gap-2 rounded-2xl border border-[#291715]/10 bg-white/70 p-3 shadow-sm dark:border-white/10 dark:bg-white/5">
+            <div className="p-3">
+              <p className="text-2xl font-black text-[#E7162A]">{articles.length}</p>
+              <p className="mt-1 text-[10px] font-black uppercase leading-4 tracking-[0.12em] text-[#291715]/45 dark:text-white/45">articles</p>
             </div>
-          )}
+            <div className="p-3">
+              <p className="text-2xl font-black text-[#E7162A]">3</p>
+              <p className="mt-1 text-[10px] font-black uppercase leading-4 tracking-[0.12em] text-[#291715]/45 dark:text-white/45">axes</p>
+            </div>
+            <div className="p-3">
+              <p className="text-2xl font-black text-[#E7162A]">5 min</p>
+              <p className="mt-1 text-[10px] font-black uppercase leading-4 tracking-[0.12em] text-[#291715]/45 dark:text-white/45">lecture</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="py-24 px-4 border-t border-slate-800 relative overflow-hidden bg-[#060A14]">
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-[#21286E]/10 blur-[150px] pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto flex flex-col items-center justify-center space-y-8 text-center relative z-10">
-          <div className="relative w-16 h-16 mx-auto opacity-50">
-            <Image src="/icon-512x512.png" alt="Logo PLA" fill className="object-contain" />
+      {featuredArticle ? (
+        <section className="px-4 py-10 sm:py-14">
+          <div className="mx-auto max-w-7xl">
+            <Link
+              href={`/blog/${featuredArticle.slug}`}
+              className="group grid overflow-hidden rounded-2xl border border-[#291715]/10 bg-white shadow-sm transition hover:border-[#E7162A]/35 dark:border-white/10 dark:bg-white/[0.04] lg:grid-cols-[1.08fr_0.92fr]"
+            >
+              <div className="relative min-h-[320px] overflow-hidden lg:min-h-[460px]">
+                <Image
+                  src={articleImage(featuredArticle)}
+                  alt={articleTitle(featuredArticle)}
+                  fill
+                  sizes="(min-width: 1024px) 56vw, 100vw"
+                  className="object-cover transition duration-700 group-hover:scale-[1.03]"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-transparent" />
+                <div className="absolute left-5 top-5">
+                  <Badge className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-[#291715]">
+                    A la une
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="flex flex-col justify-between gap-10 p-6 sm:p-8 lg:p-10">
+                <div className="space-y-5">
+                  <div className="flex flex-wrap items-center gap-3 text-[11px] font-black uppercase tracking-[0.12em] text-[#291715]/45 dark:text-white/45">
+                    <span className="inline-flex items-center gap-1.5">
+                      <PenLine className="h-3.5 w-3.5 text-[#E7162A]" />
+                      {categoryLabel(featuredArticle.category)}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5 text-[#E7162A]" />
+                      {readingTime(featuredArticle)} min
+                    </span>
+                  </div>
+                  <h2 className="font-[var(--font-lexend)] text-3xl font-black leading-tight tracking-normal sm:text-5xl">
+                    {articleTitle(featuredArticle)}
+                  </h2>
+                  <p className="text-sm font-medium leading-7 text-[#291715]/62 dark:text-white/62 sm:text-base">
+                    {editorialSummary(featuredArticle, 230)}
+                  </p>
+                </div>
+                <div className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.12em] text-[#E7162A]">
+                  Lire l'analyse
+                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                </div>
+              </div>
+            </Link>
           </div>
+        </section>
+      ) : (
+        <section className="px-4 py-20">
+          <div className="mx-auto max-w-2xl rounded-2xl border border-[#291715]/10 bg-white p-8 text-center dark:border-white/10 dark:bg-white/[0.04]">
+            <BookOpen className="mx-auto mb-4 h-12 w-12 text-[#E7162A]" />
+            <h2 className="text-2xl font-black">Aucun article publie pour le moment.</h2>
+            <p className="mt-3 text-sm font-medium text-[#291715]/55 dark:text-white/55">
+              Le journal PLA sera bientot alimente avec des conseils et analyses utiles.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {otherArticles.length > 0 && (
+        <section className="px-4 pb-20">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-6 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#E7162A]">Dernieres publications</p>
+                <h2 className="mt-2 text-2xl font-black">A lire ensuite</h2>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {otherArticles.map((article) => (
+                <Link
+                  key={article.id}
+                  href={`/blog/${article.slug}`}
+                  className="group overflow-hidden rounded-2xl border border-[#291715]/10 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-[#E7162A]/35 dark:border-white/10 dark:bg-white/[0.04]"
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <Image
+                      src={articleImage(article)}
+                      alt={articleTitle(article)}
+                      fill
+                      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                      className="object-cover transition duration-700 group-hover:scale-[1.04]"
+                    />
+                    <div className="absolute left-4 top-4">
+                      <Badge className="rounded-full bg-white/92 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#291715]">
+                        {categoryLabel(article.category)}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 p-5">
+                    <div className="flex flex-wrap items-center gap-3 text-[10px] font-black uppercase tracking-[0.12em] text-[#291715]/42 dark:text-white/42">
+                      <span className="inline-flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5 text-[#E7162A]" />
+                        {format(new Date(article.createdAt), "dd MMM yyyy", { locale: fr })}
+                      </span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5 text-[#E7162A]" />
+                        {readingTime(article)} min
+                      </span>
+                    </div>
+                    <h3 className="line-clamp-2 text-xl font-black leading-tight transition group-hover:text-[#E7162A]">
+                      {articleTitle(article)}
+                    </h3>
+                    <p className="line-clamp-3 text-sm font-medium leading-6 text-[#291715]/58 dark:text-white/58">
+                      {editorialSummary(article)}
+                    </p>
+                    <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.12em] text-[#E7162A]">
+                      Lire
+                      <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="border-t border-[#291715]/10 bg-[#24110f] px-4 py-16 text-white dark:border-white/10">
+        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 md:flex-row md:items-center">
           <div>
-            <div className="font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-2">
-              PRIME LANGUAGE ACADEMY
-            </div>
-            <div className="text-slate-500 dark:text-slate-600 text-sm font-medium">
-              © {new Date().getFullYear()} Prime Language Academy. All Rights Reserved.
-            </div>
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#E7162A]">Passer a l'action</p>
+            <h2 className="mt-2 max-w-2xl text-3xl font-black leading-tight">Transformez la lecture en progression concrete.</h2>
           </div>
+          <Link href="/register" className="inline-flex h-12 items-center justify-center rounded-xl bg-[#E7162A] px-6 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:bg-[#c71123]">
+            Rejoindre la formation
+          </Link>
         </div>
-      </footer>
-    </div>
+      </section>
+    </main>
   );
 }

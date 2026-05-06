@@ -1,43 +1,44 @@
 import Link from "next/link";
-import { getArticleBySlug } from "@/app/actions/articles";
+import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Calendar, User, ArrowLeft, BookOpen } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import Image from "next/image";
-import { ParticlesBackground } from "@/components/particles";
+import { ArrowLeft, ArrowRight, BookOpen, Calendar, Clock, Share2, User } from "lucide-react";
+import { getArticleBySlug } from "@/app/actions/articles";
+import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { sanitizeHtml } from "@/lib/sanitize-html";
 import { siteConfig } from "@/lib/site-config";
+import { articleImage, articleTitle, categoryLabel, editorialSummary, readingTime } from "@/lib/blog-presentation";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
-  if (!article) return { title: "Article non trouvé | Prime Language Academy" };
+  if (!article) return { title: "Article non trouve | Prime Language Academy" };
 
+  const title = articleTitle(article);
   const articleUrl = `${siteConfig.url}/blog/${slug}`;
-  const description = article.content.replace(/<[^>]*>/g, '').substring(0, 160) + "...";
+  const description = editorialSummary(article, 160);
 
   return {
-    title: `${article.title} | Prime Language Academy`,
-    description: description,
-    keywords: `anglais, Abidjan, Côte d'Ivoire, ${article.category}, Prime Language Academy`,
+    title: `${title} | Prime Language Academy`,
+    description,
+    keywords: `anglais, Abidjan, Cote d'Ivoire, ${article.category}, Prime Language Academy`,
     openGraph: {
-      title: article.title,
-      description: description,
+      title,
+      description,
       url: articleUrl,
       type: "article",
       publishedTime: new Date(article.createdAt).toISOString(),
       authors: [article.author?.name || "Prime Language Academy"],
-      images: [{ url: siteConfig.ogImage }],
+      images: [{ url: articleImage(article) }],
     },
     twitter: {
       card: "summary_large_image",
-      title: article.title,
-      description: description,
-    }
+      title,
+      description,
+      images: [articleImage(article)],
+    },
   };
 }
 
@@ -45,161 +46,125 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
 
-  if (!article) {
-    notFound();
-  }
+  if (!article) notFound();
 
+  const title = articleTitle(article);
   const safeContent = sanitizeHtml(article.content);
   const articleUrl = `${siteConfig.url}/blog/${slug}`;
+  const image = articleImage(article);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans selection:bg-[#E7162A]/30 overflow-x-hidden relative">
-      <ParticlesBackground />
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-xl border-b border-white/10 px-4 py-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 transition-transform group-hover:scale-105">
-              <Image 
-                src="/icon-512x512.png" 
-                alt="PLA Logo" 
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-            <span className="font-extrabold tracking-tight text-xl text-slate-900 dark:text-white hidden sm:block">
-              Prime Academy
-            </span>
+    <main className="min-h-screen bg-[#fff8f7] text-[#291715] dark:bg-[#0f1113] dark:text-[#f5f0e8]">
+      <nav className="sticky top-0 z-50 border-b border-[#291715]/10 bg-[#fff8f7]/90 px-4 py-3 backdrop-blur-xl dark:border-white/10 dark:bg-[#0f1113]/88">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <Link href="/blog" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#291715]/60 transition hover:text-[#E7162A] dark:text-white/60">
+            <ArrowLeft className="h-4 w-4" />
+            Blog
           </Link>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-700 dark:text-slate-300">
-            <Link href="/blog" className="text-[#E7162A] hover:text-[#E7162A]/80 transition-colors flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Retour au Blog
+          <div className="flex items-center gap-2">
+            <Link href="/register" className="hidden h-10 items-center justify-center rounded-xl bg-[#E7162A] px-4 text-xs font-black uppercase tracking-[0.12em] text-white transition hover:bg-[#c71123] sm:inline-flex">
+              S'inscrire
             </Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button asChild className="bg-[#E7162A] hover:bg-[#E7162A]/90 text-slate-900 dark:text-white font-bold shadow-[0_0_15px_rgba(231,22,42,0.3)] hover:shadow-[0_0_25px_rgba(231,22,42,0.5)] transition-shadow">
-              <Link href="/register">S'inscrire à l'Académie</Link>
-            </Button>
             <ThemeToggle />
           </div>
         </div>
       </nav>
 
-      {/* ARTICLE CONTENT */}
-      <article className="pt-32 pb-24 px-4 relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#21286E]/10 rounded-full blur-[120px] pointer-events-none" />
-        
-        <div className="max-w-3xl mx-auto space-y-12 relative z-10">
-          
-          <header className="space-y-6 text-center">
-            <Badge variant="outline" className="border-[#21286E]/50 bg-[#21286E]/20 text-blue-300 px-4 py-1.5 text-xs font-bold tracking-widest uppercase mb-4">
-              <BookOpen className="w-3 h-3 mr-2 inline" />
-              {article.category}
-            </Badge>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-              {article.title}
-            </h1>
-            <div className="flex flex-wrap items-center justify-center gap-6 text-xs font-medium uppercase tracking-widest text-slate-500 dark:text-slate-600 dark:text-slate-400">
-              <span className="flex items-center gap-2">
-                <User className="w-4 h-4 text-[#E7162A]" />
-                Par {article.author?.name || "Équipe PLA"}
-              </span>
-              <span className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-[#E7162A]" />
-                {format(new Date(article.createdAt), "dd MMMM yyyy", { locale: fr })}
-              </span>
-            </div>
-          </header>
-
-          {article.coverImage && (
-            <div className="relative w-full h-[300px] md:h-[500px] rounded-3xl overflow-hidden shadow-2xl shadow-[#21286E]/10 ring-1 ring-[#21286E]/10">
-              <Image 
-                src={article.coverImage} 
-                alt={article.title} 
-                fill 
-                className="object-cover" 
-                priority
-              />
-            </div>
-          )}
-
-          <div className="bg-white dark:bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-12 shadow-2xl">
-            {/* The dangerouslySetInnerHTML is crucial to parse the HTML tags correctly */}
-            <div 
-              className="prose prose-invert prose-lg max-w-none text-slate-700 dark:text-slate-300 prose-headings:text-slate-900 dark:text-white prose-headings:font-black prose-a:text-[#E7162A] prose-strong:text-slate-900 dark:text-white leading-relaxed prose-p:mb-6"
-              dangerouslySetInnerHTML={{ __html: safeContent }}
-            />
-          </div>
-
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-8">
-            <Button asChild variant="outline" className="rounded-xl border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-100 dark:bg-slate-800 font-bold h-12 px-6">
-              <Link href="/blog" className="flex items-center gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                D'autres articles
-              </Link>
-            </Button>
-            
-            <div className="flex items-center gap-4">
-              <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Partager</span>
-              <div className="flex items-center gap-2">
-                {/* Twitter */}
-                <a 
-                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(articleUrl)}&text=${encodeURIComponent(article.title)}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-950 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
-                </a>
-                {/* LinkedIn */}
-                <a 
-                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(articleUrl)}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                </a>
-                {/* Facebook */}
-                <a 
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                </a>
+      <article>
+        <header className="border-b border-[#291715]/10 px-4 py-10 dark:border-white/10 sm:py-14">
+          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
+            <div className="space-y-6">
+              <Badge className="rounded-full border border-[#E7162A]/25 bg-[#E7162A]/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-[#E7162A]">
+                <BookOpen className="mr-2 inline h-3.5 w-3.5" />
+                {categoryLabel(article.category)}
+              </Badge>
+              <h1 className="font-[var(--font-lexend)] text-4xl font-black leading-[1.03] tracking-normal sm:text-6xl">
+                {title}
+              </h1>
+              <p className="max-w-2xl text-base font-medium leading-8 text-[#291715]/64 dark:text-white/64">
+                {editorialSummary(article, 240)}
+              </p>
+              <div className="flex flex-wrap items-center gap-4 text-[11px] font-black uppercase tracking-[0.12em] text-[#291715]/46 dark:text-white/46">
+                <span className="inline-flex items-center gap-1.5">
+                  <User className="h-3.5 w-3.5 text-[#E7162A]" />
+                  {article.author?.name || "Equipe PLA"}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar className="h-3.5 w-3.5 text-[#E7162A]" />
+                  {format(new Date(article.createdAt), "dd MMMM yyyy", { locale: fr })}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 text-[#E7162A]" />
+                  {readingTime(article)} min de lecture
+                </span>
               </div>
             </div>
+
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#291715]/10 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
+              <Image src={image} alt={title} fill sizes="(min-width: 1024px) 48vw, 100vw" className="object-cover" priority />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+            </div>
           </div>
-        </div>
+        </header>
+
+        <section className="px-4 py-10 sm:py-14">
+          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[240px_minmax(0,760px)_1fr]">
+            <aside className="hidden lg:block">
+              <div className="sticky top-24 space-y-4 rounded-2xl border border-[#291715]/10 bg-white/70 p-5 text-sm font-medium leading-6 text-[#291715]/58 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/58">
+                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#E7162A]">A retenir</p>
+                <p>{editorialSummary(article, 150)}</p>
+              </div>
+            </aside>
+
+            <div className="rounded-2xl border border-[#291715]/10 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.04] sm:p-8 md:p-10">
+              <div
+                className="blog-article-content"
+                dangerouslySetInnerHTML={{ __html: safeContent }}
+              />
+            </div>
+
+            <aside className="space-y-4">
+              <div className="rounded-2xl border border-[#291715]/10 bg-white/70 p-5 dark:border-white/10 dark:bg-white/[0.04]">
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-[#291715]/45 dark:text-white/45">
+                  <Share2 className="h-4 w-4 text-[#E7162A]" />
+                  Partager
+                </div>
+                <div className="mt-4 grid gap-2">
+                  <a
+                    href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(articleUrl)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-xl border border-[#291715]/10 px-4 py-3 text-xs font-black uppercase tracking-[0.12em] transition hover:border-[#E7162A]/40 hover:text-[#E7162A] dark:border-white/10"
+                  >
+                    LinkedIn
+                  </a>
+                  <a
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-xl border border-[#291715]/10 px-4 py-3 text-xs font-black uppercase tracking-[0.12em] transition hover:border-[#E7162A]/40 hover:text-[#E7162A] dark:border-white/10"
+                  >
+                    Facebook
+                  </a>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
       </article>
 
-      {/* CALL TO ACTION */}
-      <section className="py-24 px-4 bg-[#21286E]/10 border-t border-[#21286E]/20 relative overflow-hidden">
-        <div className="max-w-4xl mx-auto text-center relative z-10 space-y-8">
-           <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white leading-tight">
-              Prêt à transformer votre carrière avec <span className="text-[#E7162A]">l'Anglais ?</span>
-           </h2>
-           <p className="text-slate-500 dark:text-slate-600 dark:text-slate-400 text-lg font-medium">
-              Rejoignez notre prochaine session et maîtrisez la méthode ISO+.
-           </p>
-           <Button asChild size="lg" className="h-14 px-10 rounded-xl bg-[#E7162A] hover:bg-[#E7162A]/90 text-slate-900 dark:text-white font-bold uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_20px_rgba(231,22,42,0.4)]">
-              <Link href="/register">Commencer Maintenant</Link>
-           </Button>
+      <section className="border-t border-[#291715]/10 bg-[#24110f] px-4 py-14 text-white dark:border-white/10">
+        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#E7162A]">Prochaine etape</p>
+            <h2 className="mt-2 max-w-2xl text-3xl font-black leading-tight">Passez de la lecture a la pratique guidee.</h2>
+          </div>
+          <Link href="/register" className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#E7162A] px-6 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:bg-[#c71123]">
+            Rejoindre la formation
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </section>
-
-      {/* FOOTER */}
-      <footer className="py-16 px-4 border-t border-slate-800 bg-[#060A14] text-center">
-        <div className="max-w-7xl mx-auto flex flex-col items-center justify-center space-y-6">
-          <div className="relative w-12 h-12 opacity-50 mx-auto">
-             <Image src="/icon-512x512.png" alt="Logo PLA" fill className="object-contain" />
-          </div>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-600">
-            © {new Date().getFullYear()} Prime Language Academy. All rights reserved.
-          </p>
-        </div>
-      </footer>
-    </div>
+    </main>
   );
 }

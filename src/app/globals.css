@@ -792,6 +792,64 @@
     @apply pt-0 border-t-0;
   }
 
+  .blog-article-content {
+    color: color-mix(in oklab, var(--foreground), transparent 18%);
+    font-size: 1.03rem;
+    line-height: 1.9;
+  }
+
+  .blog-article-content > * + * {
+    margin-top: 1.25rem;
+  }
+
+  .blog-article-content p {
+    max-width: none;
+  }
+
+  .blog-article-content h2,
+  .blog-article-content h3,
+  .blog-article-content h4 {
+    color: var(--foreground);
+    font-family: var(--font-lexend), var(--font-manrope), sans-serif;
+    letter-spacing: 0;
+    line-height: 1.18;
+    margin-top: 2.2rem;
+  }
+
+  .blog-article-content h2 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+  }
+
+  .blog-article-content h3 {
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+  }
+
+  .blog-article-content ul,
+  .blog-article-content ol {
+    padding-left: 1.25rem;
+  }
+
+  .blog-article-content li + li {
+    margin-top: 0.65rem;
+  }
+
+  .blog-article-content blockquote {
+    border-left: 4px solid var(--primary);
+    border-radius: 0.75rem;
+    background: color-mix(in oklab, var(--primary), transparent 92%);
+    color: var(--foreground);
+    font-weight: 700;
+    margin: 2rem 0;
+    padding: 1rem 1.2rem;
+  }
+
+  .blog-article-content a {
+    color: var(--primary);
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+  }
+
   /* ── LABEL SMALL ── */
   .label-sm {
     display: block;

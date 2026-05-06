@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ArrowLeft, Save, X, Globe, Tag, Type } from "lucide-react";
+import { ArrowLeft, Globe, ImageIcon, Tag, Type } from "lucide-react";
 
 export default function EditorForm({ article }: { article?: any }) {
   const router = useRouter();
@@ -111,6 +111,22 @@ export default function EditorForm({ article }: { article?: any }) {
                   className="h-12 font-medium border-[#21286E]/10 rounded-xl focus-visible:ring-[#E7162A]"
                 />
               </div>
+            </div>
+
+            <div className="space-y-4">
+              <label className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#21286E]/50 mb-2">
+                <ImageIcon className="w-3 h-3" />
+                Image de couverture
+              </label>
+              <Input
+                name="coverImage"
+                defaultValue={article?.coverImage || ""}
+                className="h-12 font-medium border-[#21286E]/10 rounded-xl focus-visible:ring-[#E7162A]"
+                placeholder="URL d'une image professionnelle, ex: https://images.unsplash.com/..."
+              />
+              <p className="text-xs font-medium leading-5 text-[#21286E]/45">
+                Laissez vide si vous voulez que le site choisisse automatiquement un visuel editorial adapte.
+              </p>
             </div>
 
             <div className="space-y-4">

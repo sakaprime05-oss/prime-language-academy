@@ -45,6 +45,12 @@ const nextConfig: NextConfig = {
   images: {
     localPatterns: [
       {
+        pathname: "/icon-*.png",
+      },
+      {
+        pathname: "/icons/**",
+      },
+      {
         pathname: "/logo.png",
         search: "?v=4",
       },
@@ -53,6 +59,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.public.blob.vercel-storage.com",
       },
     ],
   },
