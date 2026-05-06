@@ -19,12 +19,8 @@ const PLA_BASE_PLANS = [
     { id: "immersion", label: "Immersion", freq: "6 séances / semaine", shortFreq: "6x/sem", price: 152000, top: true },
 ] as const;
 
-export const PLA_CLUB_PLANS = PLA_BASE_PLANS;
-
-export const PLA_PLANS = PLA_BASE_PLANS.map((plan) => ({
-    ...plan,
-    price: plan.price + 2000,
-}));
+export const PLA_PLANS = PLA_BASE_PLANS;
+export const PLA_CLUB_PLANS = PLA_PLANS;
 
 export const PLA_TIME_SLOTS = [
     { id: "v1", label: "Vague 1", time: "16h00 - 18h00", desc: "Idéal pour les étudiants et apprenants disponibles en fin d'après-midi" },
