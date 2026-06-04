@@ -3,7 +3,7 @@
 import ThemeToggle from "@/components/ThemeToggle";
 import { usePathname } from "next/navigation";
 
-const INLINE_THEME_PATHS = ["/", "/blog", "/dashboard"];
+const INLINE_THEME_PATHS = ["/", "/blog", "/dashboard", "/login", "/forgot-password", "/reset-password"];
 
 export function PlatformThemeToggle() {
   const pathname = usePathname() || "/";

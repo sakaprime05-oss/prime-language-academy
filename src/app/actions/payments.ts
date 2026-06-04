@@ -173,6 +173,12 @@ export async function initiatePayment(formData: FormData) {
  * Gets student's payment status and plan
  */
 export async function getStudentPaymentStatus(userId: string) {
+    const session = await auth();
+    if (!session?.user) return null;
+    if (session.user.role !== "ADMIN" && session.user.id !== userId) {
+        throw new Error("Non autorisÃ©");
+    }
+
     const plan = await prisma.paymentPlan.findFirst({
         where: { studentId: userId },
         include: {

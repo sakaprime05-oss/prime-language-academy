@@ -3,119 +3,136 @@ import { redirect } from "next/navigation";
 import { logoutAction } from "@/app/actions/logout";
 import { AdminMobileNav, AdminNav } from "@/components/admin-nav";
 import { LogoMark } from "@/components/logo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-    const session = await auth();
+  const session = await auth();
 
-    if (!session || session.user?.role !== "ADMIN") {
-        redirect("/login");
-    }
+  if (!session || session.user?.role !== "ADMIN") {
+    redirect("/login");
+  }
 
-    const initials = session.user?.name
-        ? session.user.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()
-        : "A";
+  const initials = session.user?.name
+    ? session.user.name
+        .split(" ")
+        .map((name: string) => name[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "A";
 
-    return (
-        <div className="min-h-screen flex" style={{ background: "#07070f", color: "#F0EDE8" }}>
-
-            {/* ── PREMIUM ADMIN SIDEBAR ── */}
-            <aside className="hidden md:flex w-[260px] flex-col sticky top-0 h-screen z-50 shrink-0" style={{
-                background: "linear-gradient(180deg, #0d0d1a 0%, #0a0a14 100%)",
-                borderRight: "1px solid rgba(231,22,42,0.1)",
-                boxShadow: "4px 0 40px rgba(0,0,0,0.5)",
-            }}>
-
-                {/* Logo area */}
-                <div className="px-6 pt-7 pb-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                    <div className="flex items-center gap-3">
-                        <LogoMark className="w-14 h-14 shrink-0" />
-                        <div>
-                            <p className="text-white font-black text-[15px] tracking-tight leading-none">Prime Admin</p>
-                            <p className="text-[9px] uppercase tracking-[0.25em] font-bold mt-1" style={{ color: "#E7162A" }}>Back-Office</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Nav links */}
-                <div className="flex-1 overflow-y-auto px-3 py-5 space-y-0.5">
-                    <AdminNav />
-                </div>
-
-                {/* User card */}
-                <div className="p-4" style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-                    <div className="flex items-center gap-3 p-3 rounded-2xl" style={{ background: "rgba(231,22,42,0.06)", border: "1px solid rgba(231,22,42,0.12)" }}>
-                        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black text-white shrink-0" style={{ background: "linear-gradient(135deg, #E7162A, #B30012)", boxShadow: "0 4px 12px rgba(231,22,42,0.3)" }}>
-                            {initials}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                            <p className="text-xs font-bold text-white truncate">{session.user?.name || "Admin"}</p>
-                            <p className="text-[9px] font-bold uppercase tracking-widest" style={{ color: "rgba(231,22,42,0.6)" }}>Administrateur</p>
-                        </div>
-                        <form action={logoutAction}>
-                            <button
-                                type="submit"
-                                title="Déconnexion"
-                                className="flex h-7 w-7 items-center justify-center rounded-lg text-white/30 transition-all hover:scale-110 hover:text-[#E7162A]"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                </svg>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </aside>
-
-            {/* ── MOBILE LAYOUT ── */}
-            <div className="md:hidden flex flex-col w-full min-h-screen">
-                <header className="sticky top-0 z-40 px-5 py-4 flex items-center justify-between" style={{
-                    background: "rgba(10,10,20,0.95)",
-                    backdropFilter: "blur(20px)",
-                    borderBottom: "1px solid rgba(231,22,42,0.1)",
-                }}>
-                    <div className="flex items-center gap-3">
-                        <LogoMark className="w-10 h-10" />
-                        <h1 className="text-base font-black text-white">Admin</h1>
-                    </div>
-                    <form action={logoutAction}>
-                        <button type="submit" className="text-xs font-bold px-3 py-2 rounded-xl transition-colors" style={{ color: "#E7162A", background: "rgba(231,22,42,0.1)", border: "1px solid rgba(231,22,42,0.2)" }}>
-                            Déconnexion
-                        </button>
-                    </form>
-                </header>
-                <AdminMobileNav />
-                <main className="flex-1 p-4 sm:p-5" style={{ background: "#07070f", color: "#F0EDE8" }}>
-                    {children}
-                </main>
+  return (
+    <div className="flex min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+      <aside className="sticky top-0 z-50 hidden h-screen w-[260px] shrink-0 flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar)] shadow-[var(--glass-shadow)] md:flex">
+        <div className="border-b border-[var(--sidebar-border)] px-6 pb-5 pt-7">
+          <div className="flex items-center gap-3">
+            <LogoMark className="h-14 w-14 shrink-0" />
+            <div>
+              <p className="text-[15px] font-black leading-none tracking-tight text-[var(--sidebar-foreground)]">
+                Prime Admin
+              </p>
+              <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.25em] text-[var(--primary)]">
+                Back-office
+              </p>
             </div>
-
-            {/* ── MAIN CONTENT (Desktop) ── */}
-            <main className="hidden md:flex flex-col flex-1 h-screen overflow-y-auto" style={{ background: "#07070f" }}>
-                {/* Top bar */}
-                <div className="sticky top-0 z-30 px-10 py-4 flex items-center justify-between shrink-0" style={{
-                    background: "rgba(7,7,15,0.85)",
-                    backdropFilter: "blur(20px)",
-                    borderBottom: "1px solid rgba(255,255,255,0.04)",
-                }}>
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#E7162A", boxShadow: "0 0 8px rgba(231,22,42,0.8)" }} />
-                        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "rgba(240,237,232,0.3)" }}>Live · Prime Admin</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest" style={{ color: "rgba(240,237,232,0.25)" }}>
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        {new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
-                    </div>
-                </div>
-
-                {/* Page content */}
-                <div className="flex-1 p-8 lg:p-12">
-                    <div className="max-w-7xl mx-auto">
-                        {children}
-                    </div>
-                </div>
-            </main>
+          </div>
         </div>
-    );
+
+        <div className="flex-1 overflow-y-auto px-3 py-5">
+          <AdminNav />
+        </div>
+
+        <div className="border-t border-[var(--sidebar-border)] p-4">
+          <div className="flex items-center gap-3 rounded-2xl border border-[var(--primary)]/15 bg-[var(--primary)]/10 p-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)] text-sm font-black text-white shadow-sm">
+              {initials}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-bold text-[var(--sidebar-foreground)]">
+                {session.user?.name || "Admin"}
+              </p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--primary)]/70">
+                Administrateur
+              </p>
+            </div>
+            <LogoutButton />
+          </div>
+        </div>
+      </aside>
+
+      <div className="flex min-h-screen w-full flex-col md:hidden">
+        <header className="sticky top-0 z-40 flex items-center justify-between border-b border-[var(--border)] bg-[var(--card)]/95 px-5 py-4 shadow-sm backdrop-blur">
+          <div className="flex items-center gap-3">
+            <LogoMark className="h-10 w-10" />
+            <div>
+              <h1 className="text-base font-black text-[var(--foreground)]">Admin</h1>
+              <p className="text-[9px] font-black uppercase tracking-[0.16em] text-[var(--primary)]">
+                Back-office
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <form action={logoutAction}>
+              <button
+                type="submit"
+                className="rounded-xl border border-[var(--primary)]/20 bg-[var(--primary)]/10 px-3 py-2 text-xs font-bold text-[var(--primary)] transition-colors hover:bg-[var(--primary)]/15"
+              >
+                Sortir
+              </button>
+            </form>
+          </div>
+        </header>
+        <AdminMobileNav />
+        <main className="flex-1 bg-[var(--background)] p-4 text-[var(--foreground)] sm:p-5">
+          {children}
+        </main>
+      </div>
+
+      <main className="hidden h-screen flex-1 flex-col overflow-y-auto bg-[var(--background)] md:flex">
+        <div className="sticky top-0 z-30 flex shrink-0 items-center justify-between border-b border-[var(--border)] bg-[var(--background)]/88 px-10 py-4 backdrop-blur-xl">
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 animate-pulse rounded-full bg-[var(--primary)] shadow-[0_0_8px_rgba(231,22,42,0.8)]" />
+            <span className="text-xs font-bold uppercase tracking-widest text-[var(--muted-foreground)]">
+              Live · Prime Admin
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[var(--muted-foreground)]">
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {new Date().toLocaleDateString("fr-FR", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+              })}
+            </div>
+            <ThemeToggle />
+          </div>
+        </div>
+
+        <div className="flex-1 p-8 lg:p-12">
+          <div className="mx-auto max-w-7xl">{children}</div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function LogoutButton() {
+  return (
+    <form action={logoutAction}>
+      <button
+        type="submit"
+        title="Déconnexion"
+        className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--sidebar-border)] text-[var(--sidebar-foreground)]/45 transition-all hover:border-[var(--primary)]/25 hover:bg-[var(--primary)]/10 hover:text-[var(--primary)]"
+      >
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        <span className="sr-only">Déconnexion</span>
+      </button>
+    </form>
+  );
 }

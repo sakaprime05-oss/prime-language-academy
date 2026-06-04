@@ -6,7 +6,7 @@ import { fr } from "date-fns/locale";
 import { ArrowLeft, ArrowRight, BookOpen, Calendar, Clock, Share2, User } from "lucide-react";
 import { getArticleBySlug } from "@/app/actions/articles";
 import { Badge } from "@/components/ui/badge";
-import { ThemeToggle } from "@/components/theme-toggle";
+import ThemeToggle from "@/components/ThemeToggle";
 import { sanitizeHtml } from "@/lib/sanitize-html";
 import { siteConfig } from "@/lib/site-config";
 import { articleImage, articleTitle, categoryLabel, editorialSummary, readingTime } from "@/lib/blog-presentation";

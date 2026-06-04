@@ -12,7 +12,6 @@ const routes = [
   "/register-club",
   "/rendez-vous",
   "/conditions-generales",
-  "/mentions-legales",
   "/politique-confidentialite",
   "/politique-remboursement",
 ] as const;

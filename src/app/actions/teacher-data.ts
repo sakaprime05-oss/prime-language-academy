@@ -8,16 +8,41 @@ async function checkTeacher() {
     if (!session || (session.user?.role !== "TEACHER" && session.user?.role !== "ADMIN")) {
         throw new Error("Unauthorized");
     }
-    return session.user.id;
+    return session;
+}
+
+async function assertCanAccessLevel(levelId: string, session: Awaited<ReturnType<typeof checkTeacher>>) {
+    if (session.user.role === "ADMIN") return;
+
+    const assignedLevel = await prisma.level.count({
+        where: {
+            id: levelId,
+            teachers: { some: { id: session.user.id } },
+        },
+    });
+
+    if (!assignedLevel) {
+        throw new Error("Unauthorized: Level access denied.");
+    }
 }
 
 export async function getAssignedLevels() {
-    const teacherId = await checkTeacher();
+    const session = await checkTeacher();
+
+    if (session.user.role === "ADMIN") {
+        return await prisma.level.findMany({
+            include: {
+                _count: {
+                    select: { students: true }
+                }
+            }
+        }) as any;
+    }
 
     return await prisma.level.findMany({
         where: {
             teachers: {
-                some: { id: teacherId }
+                some: { id: session.user.id }
             }
         },
         include: {
@@ -29,7 +54,8 @@ export async function getAssignedLevels() {
 }
 
 export async function getLevelStudentsWithProgress(levelId: string) {
-    await checkTeacher();
+    const session = await checkTeacher();
+    await assertCanAccessLevel(levelId, session);
 
     const students = await prisma.user.findMany({
         where: {

@@ -7,8 +7,10 @@
 :root {
   color-scheme: light;
 
-  --font-inter: var(--font-lexend), Arial, Helvetica, sans-serif;
-  --font-playfair: var(--font-manrope), Arial, Helvetica, sans-serif;
+  --font-lexend: "Trebuchet MS", "Segoe UI", Arial, Helvetica, sans-serif;
+  --font-manrope: "Segoe UI", Arial, Helvetica, sans-serif;
+  --font-inter: var(--font-lexend);
+  --font-playfair: var(--font-manrope);
 
   /* Brand Palette - Prime Red, ink, and warm neutrals */
   --surface: rgba(255, 248, 247, 0.94);
@@ -861,5 +863,29 @@
     opacity: 0.55;
     margin-bottom: 0.375rem;
     line-height: 1.4;
+  }
+
+  @media (display-mode: standalone) {
+    .auth-app-shell {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background:
+        radial-gradient(circle at 50% -10%, color-mix(in srgb, var(--primary) 18%, transparent), transparent 42%),
+        var(--background);
+    }
+
+    .auth-login-card {
+      max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 5.25rem);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  @media (max-width: 430px) and (display-mode: standalone) {
+    .auth-login-card {
+      border-radius: 1rem;
+      padding: 1rem;
+    }
   }
 }

@@ -25,10 +25,19 @@ async function checkTeacherOrAdmin() {
 // =============================================
 
 export async function getTeacherSchedules(teacherId?: string) {
-    await checkTeacherOrAdmin();
+    const session = await checkTeacherOrAdmin();
+    const isAdmin = session.user.role === "ADMIN";
+
+    if (!isAdmin && teacherId && teacherId !== session.user.id) {
+        throw new Error("Unauthorized: Teacher schedule access denied.");
+    }
+
+    const scheduleWhere = isAdmin
+        ? (teacherId ? { teacherId } : {})
+        : { teacherId: session.user.id };
     
     return await (prisma as any).teacherSchedule.findMany({
-        where: teacherId ? { teacherId } : {},
+        where: scheduleWhere,
         include: {
             teacher: { select: { name: true, email: true } },
             level: { select: { name: true } }
@@ -87,15 +96,22 @@ export async function deleteSchedule(id: string) {
 
 /** Teachers see: all non-restricted docs + restricted docs they're allowed to see */
 export async function getTrainingDocs(forTeacherId?: string) {
-    await checkTeacherOrAdmin();
+    const session = await checkTeacherOrAdmin();
+    const isAdmin = session.user.role === "ADMIN";
 
-    if (forTeacherId) {
+    if (!isAdmin && forTeacherId && forTeacherId !== session.user.id) {
+        throw new Error("Unauthorized: Training document access denied.");
+    }
+
+    const effectiveTeacherId = isAdmin ? forTeacherId : session.user.id;
+
+    if (effectiveTeacherId) {
         // Teacher view: unrestricted OR explicitly allowed
         return await (prisma as any).trainingDocument.findMany({
             where: {
                 OR: [
                     { isRestricted: false },
-                    { allowedTeachers: { some: { id: forTeacherId } } }
+                    { allowedTeachers: { some: { id: effectiveTeacherId } } }
                 ]
             },
             include: {

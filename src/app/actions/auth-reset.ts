@@ -85,6 +85,7 @@ export async function resetPassword(token: string, newPassword: string) {
         return { error: "Lien expiré." };
     }
     if (newPassword.length < 8) return { error: "Le mot de passe doit contenir au moins 8 caractères." };
+    if (newPassword.length > 128) return { error: "Le mot de passe est trop long." };
 
     const passwordHash = await bcrypt.hash(newPassword, 10);
 

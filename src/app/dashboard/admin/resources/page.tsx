@@ -1,31 +1,34 @@
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
-import { getTrainingDocs, getAllTeachers } from "@/app/actions/teacher-mgmt";
-import { ResourceManagerClient } from "./ResourceManagerClient";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
+import { getAllTeachers, getTrainingDocs } from "@/app/actions/teacher-mgmt";
+import { ResourceManagerClient } from "./ResourceManagerClient";
 
 export default async function AdminResourcesPage() {
-    const session = await auth();
-    if (!session || session.user?.role !== "ADMIN") redirect("/login");
+  const session = await auth();
+  if (!session || session.user?.role !== "ADMIN") redirect("/login");
 
-    const [documents, teachers] = await Promise.all([
-        getTrainingDocs(),
-        getAllTeachers()
-    ]);
+  const [documents, teachers] = await Promise.all([getTrainingDocs(), getAllTeachers()]);
 
-    return (
-        <div className="space-y-6 animate-in fade-in duration-500 pb-12">
-            <header className="mb-8 flex items-center justify-between">
-                <div>
-                    <Link href="/dashboard/admin" className="text-xs font-bold text-red-500 hover:underline flex items-center gap-1 mb-2">
-                        ← Retour à l'admin
-                    </Link>
-                    <h2 className="text-3xl font-extrabold text-white tracking-tight leading-none mb-2">Documents de Formation</h2>
-                    <p className="text-white/40 text-sm font-medium">Partagez des ressources pédagogiques. Par défaut, tous les profs y ont accès. Vous pouvez restreindre l'accès.</p>
-                </div>
-            </header>
-
-            <ResourceManagerClient initialDocuments={documents as any[]} teachers={teachers as any[]} />
+  return (
+    <div className="space-y-6 pb-12 animate-in fade-in duration-500">
+      <header className="mb-8 flex items-center justify-between">
+        <div>
+          <Link
+            href="/dashboard/admin"
+            className="mb-2 flex items-center gap-1 text-xs font-black uppercase tracking-widest text-[var(--primary)] hover:underline"
+          >
+            Retour a l'admin
+          </Link>
+          <p className="platform-eyebrow">Documents</p>
+          <h2 className="platform-title text-[var(--foreground)]">Documents de Formation</h2>
+          <p className="platform-subtitle text-[var(--muted-foreground)]">
+            Partagez des ressources pedagogiques et restreignez l'acces si necessaire.
+          </p>
         </div>
-    );
+      </header>
+
+      <ResourceManagerClient initialDocuments={documents as any[]} teachers={teachers as any[]} />
+    </div>
+  );
 }

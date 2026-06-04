@@ -1,6 +1,5 @@
-"use client";
-
 import Link from "next/link";
+import { LearningPathAdvisor } from "@/components/learning-path-advisor";
 import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, formatFcfa } from "@/lib/pla-program";
 
 
@@ -66,7 +65,7 @@ export default function EnglishClubPublicPage() {
             min-width: 0 !important;
           }
 
-          .english-club-nav > div > a:first-child {
+          .english-club-nav-links {
             display: none !important;
           }
 
@@ -194,6 +193,11 @@ export default function EnglishClubPublicPage() {
             color: #ffffff !important;
           }
         }
+
+        .english-club-activity-card:hover {
+          border-color: rgba(231,22,42,0.4) !important;
+          transform: translateY(-6px);
+        }
       `}</style>
 
       {/* ── NAV ── */}
@@ -208,7 +212,12 @@ export default function EnglishClubPublicPage() {
           <img src="/logo.png" alt="Prime Language Academy" style={{ height: 40, width: "auto", objectFit: "contain" }} />
         </Link>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          <Link href="/" style={{ fontSize: 13, color: "rgba(245,240,232,0.5)", textDecoration: "none", letterSpacing: "0.08em", textTransform: "uppercase" }}>Formation</Link>
+          <div className="english-club-nav-links" style={{ display: "flex", gap: 16, alignItems: "center" }}>
+            <Link href="/" style={{ fontSize: 13, color: "rgba(245,240,232,0.5)", textDecoration: "none", letterSpacing: "0.08em", textTransform: "uppercase" }}>Formation</Link>
+            <a href="#orientation" style={{ fontSize: 13, color: "rgba(245,240,232,0.5)", textDecoration: "none", letterSpacing: "0.08em", textTransform: "uppercase" }}>M'orienter</a>
+            <a href="#activites" style={{ fontSize: 13, color: "rgba(245,240,232,0.5)", textDecoration: "none", letterSpacing: "0.08em", textTransform: "uppercase" }}>Activités</a>
+            <a href="#membership" style={{ fontSize: 13, color: "rgba(245,240,232,0.5)", textDecoration: "none", letterSpacing: "0.08em", textTransform: "uppercase" }}>Tarifs</a>
+          </div>
           <Link href="/register-club" className="english-club-nav-cta" style={{
             fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase",
             background: "linear-gradient(135deg,#E7162A,#FF4D5E,#B30012)", color: "#080808",
@@ -239,7 +248,7 @@ export default function EnglishClubPublicPage() {
           {/* Badge */}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(231,22,42,0.3)", borderRadius: 100, padding: "8px 22px", marginBottom: 40, background: "rgba(231,22,42,0.06)" }}>
             <span style={{ fontSize: 16 }}>🔑</span>
-            <span style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#E7162A", fontWeight: 600 }}>Membership Privé · Abidjan</span>
+            <span style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#E7162A", fontWeight: 600 }}>Membership Privé · Centre Poincaré</span>
           </div>
 
           <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(3rem, 7vw, 6rem)", lineHeight: 1.05, fontWeight: 900, marginBottom: 32, letterSpacing: "-0.02em" }}>
@@ -248,7 +257,7 @@ export default function EnglishClubPublicPage() {
           </h1>
 
           <p style={{ fontSize: "clamp(1rem,2vw,1.2rem)", lineHeight: 1.85, color: "rgba(245,240,232,0.55)", maxWidth: 640, margin: "0 auto 56px" }}>
-            Un cercle anglophone <strong style={{ color: "#F5F0E8" }}>privé et sélect</strong> pour cadres, entrepreneurs et créatifs d'Abidjan. Pratiquez un anglais naturel, réseautez avec des profils ambitieux et vivez la langue au quotidien.
+            Un cercle anglophone <strong style={{ color: "#F5F0E8" }}>privé et sélect</strong> au Centre Poincaré pour cadres, entrepreneurs et créatifs d'Abidjan. Pratiquez un anglais naturel, réseautez avec des profils ambitieux et vivez la langue au quotidien.
           </p>
 
           <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginBottom: 72 }}>
@@ -267,10 +276,16 @@ export default function EnglishClubPublicPage() {
 
           {/* Divider with tags */}
           <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
-            {[`${PLA_CLUB_CAPACITY} membres max`, "Networking", "100% Anglais", "Niveau B2 → C2", "Abidjan", "Global Mindset"].map(t => (
+            {[`${PLA_CLUB_CAPACITY} membres max`, "Networking", "100% Anglais", "Niveau B2 → C2", "Centre Poincaré", "Global Mindset"].map(t => (
               <span key={t} style={{ fontSize: 11, color: "rgba(245,240,232,0.35)", border: "1px solid rgba(231,22,42,0.12)", borderRadius: 100, padding: "5px 14px", letterSpacing: "0.1em", textTransform: "uppercase" }}>{t}</span>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section id="orientation" style={{ padding: "80px 2rem", background: "rgba(231,22,42,0.02)" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <LearningPathAdvisor className="[--background:#080808] [--border:rgba(245,240,232,0.12)] [--card:#101010] [--foreground:#F5F0E8] [--muted-foreground:rgba(245,240,232,0.58)] [--primary:#E7162A]" />
         </div>
       </section>
 
@@ -290,10 +305,10 @@ export default function EnglishClubPublicPage() {
               <div style={{ fontSize: 11, color: "rgba(245,240,232,0.4)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 20 }}>Parcours 01</div>
               <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 900, marginBottom: 16 }}>Formation Régulière</h3>
               <p style={{ color: "rgba(245,240,232,0.5)", lineHeight: 1.8, marginBottom: 28, fontSize: 15 }}>
-                Programme structuré pour apprendre l'anglais de zéro à un niveau opérationnel. Méthode ISO+ (Input, Structure, Output, Automatisation), attestation CECRL.
+                Programme structuré pour apprendre l'anglais de zéro à un niveau opérationnel. Méthode ISO+ (Input, Structure, Output, Automatisation), avec suivi de progression.
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 36 }}>
-                {["Débutants → Avancés", "Grammaire, vocabulaire, expression", "Certification CECRL A1→C2", "Groupes réduits & suivi personnalisé"].map(f => (
+                {["Débutants → Avancés", "Grammaire, vocabulaire, expression", "Progression par niveau", "Groupes réduits & suivi personnalisé"].map(f => (
                   <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(245,240,232,0.7)" }}>
                     <span style={{ color: "#E7162A" }}>✓</span> {f}
                   </div>
@@ -308,7 +323,7 @@ export default function EnglishClubPublicPage() {
               <div style={{ fontSize: 11, color: "#E7162A", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 20 }}>Parcours 02 · Exclusif</div>
               <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 900, color: "#E7162A", marginBottom: 16 }}>English Club</h3>
               <p style={{ color: "rgba(245,240,232,0.6)", lineHeight: 1.8, marginBottom: 28, fontSize: 15 }}>
-                Cercle social privé pour anglophones confirmés. Pas de cours magistraux — de l'immersion, du networking et de la vie en anglais. Pour ceux qui maîtrisent et veulent aller plus loin.
+                Cercle social privé au Centre Poincaré pour anglophones confirmés. Pas de cours magistraux — de l'immersion, du networking et de la vie en anglais. Pour ceux qui maîtrisent et veulent aller plus loin.
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 36 }}>
                 {["Niveau B2 minimum requis", "Networking & Social Events", "Guest Talks & Masterclasses", "Adhésion valable 2 mois"].map(f => (
@@ -335,9 +350,7 @@ export default function EnglishClubPublicPage() {
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
             {ACTIVITIES.map(({ icon, tag, title, desc }) => (
-              <div key={title} style={{ border: "1px solid rgba(231,22,42,0.12)", borderRadius: 20, padding: "36px 28px", background: "rgba(20,20,30,0.6)", backdropFilter: "blur(16px)", transition: "all 0.3s" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(231,22,42,0.4)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-6px)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(231,22,42,0.12)"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}>
+              <div key={title} className="english-club-activity-card" style={{ border: "1px solid rgba(231,22,42,0.12)", borderRadius: 20, padding: "36px 28px", background: "rgba(20,20,30,0.6)", backdropFilter: "blur(16px)", transition: "all 0.3s" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
                   <span style={{ fontSize: 36 }}>{icon}</span>
                   <span style={{ fontSize: 10, color: "#E7162A", border: "1px solid rgba(231,22,42,0.3)", borderRadius: 100, padding: "4px 12px", letterSpacing: "0.15em", textTransform: "uppercase" }}>{tag}</span>
@@ -371,7 +384,7 @@ export default function EnglishClubPublicPage() {
       </section>
 
       {/* ── MEMBERSHIPS ── */}
-      <section style={{ padding: "100px 2rem" }}>
+      <section id="membership" style={{ padding: "100px 2rem" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 64 }}>
             <div style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#E7162A", marginBottom: 16 }}>Membership</div>

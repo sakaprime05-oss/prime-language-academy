@@ -383,7 +383,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
                         <div className="space-y-1 pt-1">
                             <label className={fieldLabelClass}>Mot de passe (Compte) *</label>
-                            <input type="password" name="password" required value={formData.password} onChange={handleChange} className={fieldClass} placeholder="••••••••" />
+                            <input type="password" name="password" required minLength={8} maxLength={128} autoComplete="new-password" value={formData.password} onChange={handleChange} className={fieldClass} placeholder="••••••••" />
                         </div>
 
                         <div className="rounded-lg border border-primary/10 bg-primary/5 p-2 shadow-sm shadow-primary/10">

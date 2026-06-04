@@ -34,7 +34,7 @@ export default async function StudentCoursesPage() {
 
     const progressData = await getStudentProgressData(session.user.id);
     const studentId = session.user.id!;
-    const quizzes = await getQuizzes((session.user as any).levelId);
+    const quizzes = await getQuizzes();
     const modules = progressData.modules || [];
     const pdfLessons = modules.flatMap((module: any) => module.lessons || []).filter((lesson: any) => lesson.type === "PDF");
 

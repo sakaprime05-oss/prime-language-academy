@@ -25,7 +25,7 @@ export function AdminNav() {
 
     return (
         <nav className="flex flex-col gap-1">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-white/20 px-3 mb-3">Navigation</p>
+            <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-widest text-[var(--sidebar-foreground)]/35">Navigation</p>
             {adminLinks.map((link) => {
                 const isActive = link.exact
                     ? pathname === link.href
@@ -34,9 +34,9 @@ export function AdminNav() {
                     <Link
                         key={link.href}
                         href={link.href}
-                        className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-all ${isActive
-                            ? "bg-red-500/15 text-red-400 border border-red-500/20"
-                            : "text-white/40 hover:bg-white/5 hover:text-white/80 border border-transparent"
+                        className={`flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-bold transition-all ${isActive
+                            ? "border-[var(--primary)]/25 bg-[var(--primary)]/10 text-[var(--primary)]"
+                            : "border-transparent text-[var(--sidebar-foreground)]/55 hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-foreground)]"
                             }`}
                     >
                         <link.icon className="w-4 h-4 flex-shrink-0" />
@@ -45,12 +45,12 @@ export function AdminNav() {
                 );
             })}
 
-            <div className="h-px bg-white/5 my-4 mx-2"></div>
+            <div className="mx-2 my-4 h-px bg-[var(--sidebar-border)]"></div>
 
             <form action={logoutAction}>
                 <button
                     type="submit"
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-white/20 hover:bg-red-500/10 hover:text-red-400 transition-all w-full border border-transparent"
+                    className="flex w-full items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-bold text-[var(--sidebar-foreground)]/40 transition-all hover:bg-[var(--primary)]/10 hover:text-[var(--primary)]"
                 >
                     <LogoutIcon className="w-4 h-4 flex-shrink-0" />
                     Déconnexion
@@ -64,7 +64,7 @@ export function AdminMobileNav() {
     const pathname = usePathname();
 
     return (
-        <nav className="sticky top-[73px] z-30 border-b border-red-500/10 bg-[#0a0a14]/95 px-3 py-2 backdrop-blur-xl md:hidden">
+        <nav className="sticky top-[73px] z-30 border-b border-[var(--border)] bg-[var(--card)]/95 px-3 py-2 backdrop-blur-xl md:hidden">
             <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {adminLinks.map((link) => {
                     const isActive = link.exact
@@ -77,8 +77,8 @@ export function AdminMobileNav() {
                             href={link.href}
                             className={`flex min-h-10 shrink-0 items-center gap-2 rounded-lg border px-3 text-xs font-black transition-colors ${
                                 isActive
-                                    ? "border-red-500/30 bg-red-500/15 text-red-300"
-                                    : "border-white/10 bg-white/[0.03] text-white/55 hover:text-white"
+                                    ? "border-[var(--primary)]/30 bg-[var(--primary)]/15 text-[var(--primary)]"
+                                    : "border-[var(--border)] bg-[var(--background)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                             }`}
                         >
                             <link.icon className="h-4 w-4 shrink-0" />

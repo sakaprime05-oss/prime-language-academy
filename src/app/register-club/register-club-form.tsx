@@ -207,7 +207,7 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                     </div>
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Mot de passe</label>
-                        <input type="password" name="password" value={formData.password} onChange={handleChange} className="input-field border-[var(--foreground)]/20" placeholder="••••••••" required />
+                        <input type="password" name="password" value={formData.password} onChange={handleChange} className="input-field border-[var(--foreground)]/20" placeholder="••••••••" required minLength={8} maxLength={128} autoComplete="new-password" />
                     </div>
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Commune de résidence</label>

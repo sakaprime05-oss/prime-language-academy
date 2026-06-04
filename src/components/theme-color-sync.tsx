@@ -22,20 +22,28 @@ export function ThemeColorSync() {
   const { resolvedTheme } = useTheme();
 
   useEffect(() => {
-    if (!resolvedTheme) return;
+    const sync = () => {
+      const isDark = document.documentElement.classList.contains("dark") || resolvedTheme === "dark";
 
-    const isDark = resolvedTheme === "dark";
+      setMetaContent("theme-color", isDark ? DARK_THEME_COLOR : LIGHT_THEME_COLOR);
+      setMetaContent("color-scheme", isDark ? "dark light" : "light dark");
+      document.documentElement.style.colorScheme = isDark ? "dark" : "light";
 
-    setMetaContent("theme-color", isDark ? DARK_THEME_COLOR : LIGHT_THEME_COLOR);
-    setMetaContent("color-scheme", isDark ? "dark light" : "light dark");
-    document.documentElement.style.colorScheme = isDark ? "dark" : "light";
+      const appleStatusBar = document.querySelector<HTMLMetaElement>(
+        'meta[name="apple-mobile-web-app-status-bar-style"]'
+      );
+      if (appleStatusBar) {
+        appleStatusBar.content = isDark ? "black-translucent" : "default";
+      }
+    };
 
-    const appleStatusBar = document.querySelector<HTMLMetaElement>(
-      'meta[name="apple-mobile-web-app-status-bar-style"]'
-    );
-    if (appleStatusBar) {
-      appleStatusBar.content = isDark ? "black-translucent" : "default";
-    }
+    sync();
+    window.addEventListener("pla-theme-change", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("pla-theme-change", sync);
+      window.removeEventListener("storage", sync);
+    };
   }, [resolvedTheme]);
 
   return null;

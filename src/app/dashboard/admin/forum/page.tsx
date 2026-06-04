@@ -1,9 +1,9 @@
-import { auth } from "@/auth";
-import { deleteComment, deletePost } from "@/app/actions/forum";
-import { parseForumContent } from "@/lib/forum-content";
-import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { deleteComment, deletePost } from "@/app/actions/forum";
+import { auth } from "@/auth";
+import { parseForumContent } from "@/lib/forum-content";
+import { prisma } from "@/lib/prisma";
 
 const AUTO_HIDE_REPORTS = 3;
 
@@ -33,17 +33,24 @@ export default async function AdminForumPage() {
   });
 
   const reportedPosts = posts.filter((post) => (parseForumContent(post.content).reportedBy || []).length > 0).length;
-  const reportedComments = posts.flatMap((post) => post.comments).filter((comment) => (parseForumContent(comment.content).reportedBy || []).length > 0).length;
+  const reportedComments = posts
+    .flatMap((post) => post.comments)
+    .filter((comment) => (parseForumContent(comment.content).reportedBy || []).length > 0).length;
 
   return (
     <div className="space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <header className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
-          <Link href="/dashboard/admin" className="mb-2 flex items-center gap-1 text-xs font-bold text-red-400 hover:underline">
+          <Link
+            href="/dashboard/admin"
+            className="mb-2 flex items-center gap-1 text-xs font-black uppercase tracking-widest text-[var(--primary)] hover:underline"
+          >
             Retour admin
           </Link>
-          <h2 className="text-3xl font-black tracking-tight text-white">Moderation forum</h2>
-          <p className="mt-2 text-sm font-medium text-white/45">Surveillez les discussions, les images et les signalements etudiants.</p>
+          <h2 className="platform-title text-[var(--foreground)]">Moderation forum</h2>
+          <p className="platform-subtitle text-[var(--muted-foreground)]">
+            Surveillez les discussions, les images et les signalements etudiants.
+          </p>
         </div>
         <div className="grid grid-cols-3 gap-2 text-center">
           <Stat label="Sujets" value={posts.length} />
@@ -54,39 +61,45 @@ export default async function AdminForumPage() {
 
       <div className="space-y-5">
         {posts.length === 0 ? (
-          <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-10 text-center text-white/45">
-            Aucun sujet pour le moment.
-          </div>
+          <Empty>Aucun sujet pour le moment.</Empty>
         ) : (
           posts.map((post) => {
             const content = parseForumContent(post.content);
             const reports = content.reportedBy?.length || 0;
             return (
-              <article key={post.id} className="rounded-2xl border border-white/5 bg-[#12121e] p-5">
+              <article key={post.id} className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5">
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg font-black text-white">{post.title}</h3>
+                      <h3 className="text-lg font-black text-[var(--foreground)]">{post.title}</h3>
                       {reports > 0 && <Badge>{reports} signalement(s)</Badge>}
                       {reports >= AUTO_HIDE_REPORTS && <Badge>masque aux etudiants</Badge>}
                     </div>
-                    <p className="mt-2 line-clamp-3 text-sm leading-6 text-white/60">{content.text}</p>
-                    <p className="mt-3 text-[10px] font-black uppercase tracking-widest text-white/30">
+                    <p className="mt-2 line-clamp-3 text-sm leading-6 text-[var(--muted-foreground)]">{content.text}</p>
+                    <p className="mt-3 text-[10px] font-black uppercase tracking-widest text-[var(--muted-foreground)]">
                       {post.author.name || post.author.email} - {new Date(post.createdAt).toLocaleString("fr-FR")}
                     </p>
                     {content.imageUrl && (
-                      <a href={content.imageUrl} target="_blank" rel="noreferrer" className="mt-3 block max-w-sm overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
+                      <a
+                        href={content.imageUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-3 block max-w-sm overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--muted)]"
+                      >
                         <img src={content.imageUrl} alt="" className="max-h-48 w-full object-cover" />
                       </a>
                     )}
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <Link href={`/dashboard/student/forum/${post.id}`} className="rounded-xl border border-white/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-white/60 hover:border-white/30">
+                    <Link
+                      href={`/dashboard/student/forum/${post.id}`}
+                      className="rounded-xl border border-[var(--border)] px-4 py-2 text-xs font-black uppercase tracking-widest text-[var(--muted-foreground)] hover:border-[var(--primary)]/30 hover:text-[var(--foreground)]"
+                    >
                       Ouvrir
                     </Link>
                     <form action={removePost}>
                       <input type="hidden" name="postId" value={post.id} />
-                      <button type="submit" className="rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-red-300 hover:bg-red-500/20">
+                      <button type="submit" className="rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-red-600 hover:bg-red-500/20 dark:text-red-300">
                         Supprimer
                       </button>
                     </form>
@@ -94,29 +107,34 @@ export default async function AdminForumPage() {
                 </div>
 
                 {post.comments.length > 0 && (
-                  <div className="mt-5 space-y-2 border-t border-white/5 pt-4">
+                  <div className="mt-5 space-y-2 border-t border-[var(--border)] pt-4">
                     {post.comments.map((comment) => {
                       const commentContent = parseForumContent(comment.content);
                       const commentReports = commentContent.reportedBy?.length || 0;
                       return (
-                        <div key={comment.id} className="rounded-xl bg-white/[0.03] p-3">
+                        <div key={comment.id} className="rounded-xl bg-[var(--muted)] p-3">
                           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                             <div>
                               <div className="flex flex-wrap items-center gap-2">
-                                <p className="text-xs font-black text-white/70">{comment.author.name || comment.author.email}</p>
+                                <p className="text-xs font-black text-[var(--foreground)]">{comment.author.name || comment.author.email}</p>
                                 {commentReports > 0 && <Badge>{commentReports} signalement(s)</Badge>}
                                 {commentReports >= AUTO_HIDE_REPORTS && <Badge>masque aux etudiants</Badge>}
                               </div>
-                              <p className="mt-1 text-sm leading-6 text-white/55">{commentContent.text}</p>
+                              <p className="mt-1 text-sm leading-6 text-[var(--muted-foreground)]">{commentContent.text}</p>
                               {commentContent.imageUrl && (
-                                <a href={commentContent.imageUrl} target="_blank" rel="noreferrer" className="mt-2 block max-w-xs overflow-hidden rounded-lg border border-white/10 bg-white/[0.03]">
+                                <a
+                                  href={commentContent.imageUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="mt-2 block max-w-xs overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)]"
+                                >
                                   <img src={commentContent.imageUrl} alt="" className="max-h-32 w-full object-cover" />
                                 </a>
                               )}
                             </div>
                             <form action={removeComment}>
                               <input type="hidden" name="commentId" value={comment.id} />
-                              <button type="submit" className="rounded-lg border border-red-500/20 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-red-300 hover:bg-red-500/10">
+                              <button type="submit" className="rounded-lg border border-red-500/20 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-red-600 hover:bg-red-500/10 dark:text-red-300">
                                 Supprimer
                               </button>
                             </form>
@@ -137,13 +155,25 @@ export default async function AdminForumPage() {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-xl bg-white/[0.04] px-4 py-3">
-      <p className="text-[9px] font-black uppercase tracking-widest text-white/30">{label}</p>
-      <p className="mt-1 text-2xl font-black text-white">{value}</p>
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-3">
+      <p className="text-[9px] font-black uppercase tracking-widest text-[var(--muted-foreground)]">{label}</p>
+      <p className="mt-1 text-2xl font-black text-[var(--foreground)]">{value}</p>
     </div>
   );
 }
 
 function Badge({ children }: { children: React.ReactNode }) {
-  return <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2 py-1 text-[9px] font-black uppercase tracking-widest text-amber-300">{children}</span>;
+  return (
+    <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2 py-1 text-[9px] font-black uppercase tracking-widest text-amber-700 dark:text-amber-300">
+      {children}
+    </span>
+  );
+}
+
+function Empty({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--card)] p-10 text-center text-[var(--muted-foreground)]">
+      {children}
+    </div>
+  );
 }

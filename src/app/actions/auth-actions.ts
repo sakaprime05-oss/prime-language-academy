@@ -135,6 +135,12 @@ export async function registerUser(formData: FormData) {
     if (!name || !email || !password) {
         return { error: "Tous les champs sont obligatoires." };
     }
+    if (password.length < 8) {
+        return { error: "Le mot de passe doit contenir au moins 8 caracteres." };
+    }
+    if (password.length > 128) {
+        return { error: "Le mot de passe est trop long." };
+    }
 
     const normalizedEmail = email.toLowerCase().trim();
     const limited = rateLimit(rateLimitKey("register", normalizedEmail), 5, 15 * 60 * 1000);

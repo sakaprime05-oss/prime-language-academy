@@ -45,7 +45,7 @@ const levels = [
     sessionsPerWeek: 3,
     description: "3 séances par semaine. Le juste milieu pour progresser sereinement.",
     fullDescription: "Le Parcours Équilibre est le choix des apprenants sérieux qui veulent une transformation réelle sans excès. 3 séances par semaine permettent d'appliquer la méthode ISO+ dans toute sa puissance : Input régulier, Structuration claire, Output pratiqué 3x par semaine, et début de l'automatisation. Vous commencerez à penser en anglais bien avant la fin de la session.",
-    features: ["Pratique orale renforcée", "Accès WiFi inclus", "Attestation certifiée"],
+    features: ["Pratique orale renforcée", "Accès WiFi inclus", "Bilan de progression"],
     for: ["Apprenants ambitieux", "Entrepreneurs", "Candidats TOEIC/IELTS"],
     schedule: "3 séances × 2h / semaine",
     duration: "2 mois (24 séances)",

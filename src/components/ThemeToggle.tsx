@@ -1,32 +1,40 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 export default function ThemeToggle() {
-    const { resolvedTheme, setTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-    const isDark = mounted && resolvedTheme === "dark";
+  useEffect(() => {
+    if (!mounted) return;
+    const sync = () => setIsDark(document.documentElement.classList.contains("dark"));
+    sync();
+    window.addEventListener("storage", sync);
+    window.addEventListener("focus", sync);
+    window.addEventListener("pla-theme-change", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("focus", sync);
+      window.removeEventListener("pla-theme-change", sync);
+    };
+  }, [mounted]);
 
-    return (
-        <button
-            type="button"
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            className="w-10 h-10 rounded-xl bg-[var(--surface)] border border-[var(--glass-border)] text-[var(--foreground)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg"
-            aria-label="Changer le thème"
-            title={isDark ? "Passer en mode clair" : "Passer en mode sombre"}
-        >
-            {isDark ? (
-                <Sun className="w-5 h-5 text-amber-400" />
-            ) : (
-                <Moon className="w-5 h-5 text-indigo-500" />
-            )}
-        </button>
-    );
+  return (
+    <button
+      type="button"
+      data-theme-toggle
+      aria-pressed={isDark}
+      className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] shadow-sm transition-all hover:scale-105 hover:bg-[var(--muted)] active:scale-95"
+      aria-label="Changer le theme"
+      title={isDark ? "Passer en mode clair" : "Passer en mode sombre"}
+    >
+      {isDark ? <Sun className="h-5 w-5 text-amber-400" /> : <Moon className="h-5 w-5 text-indigo-500" />}
+    </button>
+  );
 }

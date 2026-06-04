@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Lexend, Manrope } from "next/font/google";
 import "./globals.css";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
@@ -9,18 +8,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import { PlatformThemeToggle } from "@/components/platform-theme-toggle";
 import { ThemeColorSync } from "@/components/theme-color-sync";
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  variable: "--font-manrope",
-  display: "swap",
-});
-
-const lexend = Lexend({
-  subsets: ["latin"],
-  variable: "--font-lexend",
-  display: "swap",
-});
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
@@ -47,7 +34,8 @@ export const metadata: Metadata = {
   keywords: [
     "formation anglais Abidjan",
     "cours anglais Cocody",
-    "anglais Angré",
+    "anglais Programme 6",
+    "anglais Poincaré",
     "Prime Language Academy",
     "English Club Abidjan",
     "test niveau anglais Côte d'Ivoire",
@@ -92,7 +80,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${manrope.variable} ${lexend.variable}`} suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -111,7 +99,31 @@ export default function RootLayout({
                   const savedTheme = localStorage.getItem("theme");
                   const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
                   const theme = savedTheme || systemTheme;
-                  if (theme === "dark") document.documentElement.classList.add("dark");
+                  const applyTheme = function(nextTheme) {
+                    document.documentElement.classList.remove("light", "dark");
+                    document.documentElement.classList.add(nextTheme);
+                    document.documentElement.style.colorScheme = nextTheme;
+                    localStorage.setItem("theme", nextTheme);
+                    document.querySelectorAll("[data-theme-toggle]").forEach(function(button) {
+                      button.setAttribute("title", nextTheme === "dark" ? "Passer en mode clair" : "Passer en mode sombre");
+                      button.setAttribute("aria-pressed", nextTheme === "dark" ? "true" : "false");
+                    });
+                    window.dispatchEvent(new Event("pla-theme-change"));
+                  };
+                  applyTheme(theme);
+                  window.__plaApplyTheme = applyTheme;
+                  if (!window.__plaThemeListenerReady) {
+                    window.__plaThemeListenerReady = true;
+                    document.addEventListener("click", function(event) {
+                      const button = event.target && event.target.closest ? event.target.closest("[data-theme-toggle]") : null;
+                      if (!button) return;
+                      event.preventDefault();
+                      event.stopPropagation();
+                      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+                      const nextTheme = document.documentElement.classList.contains("dark") ? "light" : "dark";
+                      window.__plaApplyTheme(nextTheme);
+                    }, true);
+                  }
                 } catch (e) {}
               })();
             `,

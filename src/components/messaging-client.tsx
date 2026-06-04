@@ -1,191 +1,344 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, Loader2, MessageCircle, Search, Send, UserRound } from "lucide-react";
 import { sendMessage, getConversations, getMessages, getAvailableContacts } from "@/app/actions/messages";
 
+type Contact = {
+  id: string;
+  name: string | null;
+  role: string | null;
+};
+
+type Message = {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  createdAt: Date | string;
+};
+
+type Conversation = {
+  partner: Contact;
+  lastMessage: Message | null;
+  unreadCount: number;
+};
+
 export function MessagingClient({ currentUserId }: { currentUserId: string }) {
-    const [conversations, setConversations] = useState<any[]>([]);
-    const [contacts, setContacts] = useState<any[]>([]);
-    const [activeContact, setActiveContact] = useState<any | null>(null);
-    const [messages, setMessages] = useState<any[]>([]);
-    const [newMessage, setNewMessage] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
-    const [isSending, setIsSending] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [activeContact, setActiveContact] = useState<Contact | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-    const loadInitialData = useCallback(async () => {
-        setIsLoading(true);
-        const [convs, availableContacts] = await Promise.all([
-            getConversations(),
-            getAvailableContacts()
-        ]);
-        setConversations(convs);
-        setContacts(availableContacts);
-        setIsLoading(false);
-    }, []);
+  const loadInitialData = useCallback(async () => {
+    setIsLoading(true);
+    const [convs, availableContacts] = await Promise.all([
+      getConversations(),
+      getAvailableContacts(),
+    ]);
+    setConversations(convs as Conversation[]);
+    setContacts(availableContacts as Contact[]);
+    setIsLoading(false);
+  }, []);
 
-    const loadMessages = useCallback(async (partnerId: string, background = false) => {
-        if (!background) setIsLoading(true);
-        const msgs = await getMessages(partnerId);
-        setMessages(msgs);
-        if (!background) setIsLoading(false);
-    }, []);
+  const loadMessages = useCallback(async (partnerId: string, background = false) => {
+    if (!background) setIsLoadingMessages(true);
+    const msgs = await getMessages(partnerId);
+    setMessages(msgs as Message[]);
+    if (!background) setIsLoadingMessages(false);
+  }, []);
 
-    useEffect(() => {
-        loadInitialData();
-    }, [loadInitialData]);
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
 
-    useEffect(() => {
-        if (activeContact) {
-            loadMessages(activeContact.id);
-            // Simple polling
-            const interval = setInterval(() => {
-                loadMessages(activeContact.id, true);
-            }, 5000);
-            return () => clearInterval(interval);
-        }
-    }, [activeContact, loadMessages]);
+  useEffect(() => {
+    if (!activeContact) return;
 
-    async function handleSend(e: React.FormEvent) {
-        e.preventDefault();
-        if (!newMessage.trim() || !activeContact) return;
+    loadMessages(activeContact.id);
+    const interval = window.setInterval(() => {
+      loadMessages(activeContact.id, true);
+    }, 5000);
 
-        setIsSending(true);
-        const result = await sendMessage(activeContact.id, newMessage);
-        if (result.success) {
-            setNewMessage("");
-            await loadMessages(activeContact.id);
-            // Refresh conversations list to update last message
-            const convs = await getConversations();
-            setConversations(convs);
-        }
-        setIsSending(false);
+    return () => window.clearInterval(interval);
+  }, [activeContact, loadMessages]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages.length, activeContact?.id]);
+
+  async function handleSend(event: React.FormEvent) {
+    event.preventDefault();
+    if (!newMessage.trim() || !activeContact) return;
+
+    setIsSending(true);
+    const result = await sendMessage(activeContact.id, newMessage.trim());
+    if ("success" in result && result.success) {
+      setNewMessage("");
+      await loadMessages(activeContact.id);
+      const convs = await getConversations();
+      setConversations(convs as Conversation[]);
     }
+    setIsSending(false);
+  }
 
-    // Merge contacts and conversations for the sidebar
-    const sidebarItems = [...conversations];
-    contacts.forEach(contact => {
-        if (!sidebarItems.find(c => c.partner.id === contact.id)) {
-            sidebarItems.push({
-                partner: contact,
-                lastMessage: null,
-                unreadCount: 0
-            });
-        }
+  const sidebarItems = useMemo(() => {
+    const items = [...conversations];
+
+    contacts.forEach((contact) => {
+      if (!items.find((conversation) => conversation.partner.id === contact.id)) {
+        items.push({
+          partner: contact,
+          lastMessage: null,
+          unreadCount: 0,
+        });
+      }
     });
 
-    if (isLoading && !activeContact) {
-        return <div className="p-8 text-center text-[var(--foreground)]/50">Chargement de la messagerie...</div>;
-    }
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return items;
 
-    return (
-        <div className="flex flex-col md:flex-row h-[70vh] min-h-[500px] glass-card overflow-hidden">
-            {/* Sidebar */}
-            <div className={`w-full md:w-1/3 border-r border-[var(--foreground)]/10 flex flex-col ${activeContact ? 'hidden md:flex' : 'flex'}`}>
-                <div className="p-4 border-b border-[var(--foreground)]/10">
-                    <h3 className="font-black text-[var(--foreground)]">Conversations</h3>
-                </div>
-                <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin">
-                    {sidebarItems.length === 0 ? (
-                        <p className="p-4 text-xs text-center text-[var(--foreground)]/40">Aucun contact disponible.</p>
-                    ) : (
-                        sidebarItems.map(item => (
-                            <button
-                                key={item.partner.id}
-                                onClick={() => setActiveContact(item.partner)}
-                                className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left ${activeContact?.id === item.partner.id ? 'bg-primary/10 border border-primary/20' : 'hover:bg-[var(--foreground)]/5 border border-transparent'}`}
-                            >
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center font-bold flex-shrink-0">
-                                    {item.partner.name?.[0] || "?"}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex justify-between items-center mb-1">
-                                        <h4 className="font-bold text-sm text-[var(--foreground)] truncate">{item.partner.name || "Utilisateur"}</h4>
-                                        {item.unreadCount > 0 && (
-                                            <span className="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{item.unreadCount}</span>
-                                        )}
-                                    </div>
-                                    <p className="text-xs text-[var(--foreground)]/50 truncate">
-                                        {item.lastMessage ? item.lastMessage.content : <span className="italic text-[var(--foreground)]/30">Nouvelle conversation</span>}
-                                    </p>
-                                </div>
-                            </button>
-                        ))
-                    )}
-                </div>
-            </div>
-
-            {/* Main Chat Area */}
-            <div className={`w-full md:w-2/3 flex flex-col bg-[var(--background)]/50 ${!activeContact ? 'hidden md:flex' : 'flex'}`}>
-                {activeContact ? (
-                    <>
-                        {/* Chat Header */}
-                        <div className="p-4 border-b border-[var(--foreground)]/10 flex items-center gap-3 bg-[var(--surface)]">
-                            <button className="md:hidden p-2 rounded-lg bg-[var(--foreground)]/5 text-[var(--foreground)]/60" onClick={() => setActiveContact(null)}>
-                                ←
-                            </button>
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center font-bold">
-                                {activeContact.name?.[0] || "?"}
-                            </div>
-                            <div>
-                                <h3 className="font-black text-[var(--foreground)]">{activeContact.name}</h3>
-                                <p className="text-[10px] uppercase tracking-widest text-[var(--foreground)]/40 font-bold">{activeContact.role === "TEACHER" ? "Professeur" : "Étudiant"}</p>
-                            </div>
-                        </div>
-
-                        {/* Messages List */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
-                            {messages.length === 0 ? (
-                                <div className="h-full flex flex-col items-center justify-center text-center opacity-50">
-                                    <div className="text-4xl mb-2">👋</div>
-                                    <p className="text-sm font-bold text-[var(--foreground)]">Dites bonjour à {activeContact.name} !</p>
-                                </div>
-                            ) : (
-                                messages.map(msg => {
-                                    const isMe = msg.senderId === currentUserId;
-                                    return (
-                                        <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                            <div className={`max-w-[75%] rounded-2xl px-4 py-2 ${isMe ? 'bg-primary text-white rounded-br-sm' : 'bg-[var(--foreground)]/10 text-[var(--foreground)] rounded-bl-sm'}`}>
-                                                <p className="text-sm">{msg.content}</p>
-                                                <span className={`text-[9px] mt-1 block ${isMe ? 'text-white/60' : 'text-[var(--foreground)]/40'}`}>
-                                                    {new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    )
-                                })
-                            )}
-                        </div>
-
-                        {/* Input Area */}
-                        <div className="p-4 bg-[var(--surface)] border-t border-[var(--foreground)]/10">
-                            <form onSubmit={handleSend} className="flex gap-2">
-                                <input
-                                    type="text"
-                                    value={newMessage}
-                                    onChange={(e) => setNewMessage(e.target.value)}
-                                    placeholder="Écrivez votre message..."
-                                    className="flex-1 bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none text-[var(--foreground)]"
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={!newMessage.trim() || isSending}
-                                    className="bg-primary hover:bg-primary/90 text-white rounded-xl px-6 font-bold disabled:opacity-50 transition-all active:scale-95"
-                                >
-                                    {isSending ? "..." : "Envoyer"}
-                                </button>
-                            </form>
-                        </div>
-                    </>
-                ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center p-8 opacity-50">
-                        <div className="w-20 h-20 rounded-full bg-[var(--foreground)]/5 flex items-center justify-center mb-4">
-                            <svg className="w-10 h-10 text-[var(--foreground)]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                        </div>
-                        <h3 className="text-xl font-black text-[var(--foreground)]">Messagerie Interne</h3>
-                        <p className="text-sm text-[var(--foreground)]/60 mt-2">Sélectionnez une conversation sur le côté pour commencer à discuter.</p>
-                    </div>
-                )}
-            </div>
-        </div>
+    return items.filter((item) =>
+      `${item.partner.name || "Utilisateur"} ${roleLabel(item.partner.role)}`
+        .toLowerCase()
+        .includes(query)
     );
+  }, [contacts, conversations, searchQuery]);
+
+  if (isLoading && !activeContact) {
+    return (
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-8 text-center text-sm font-semibold text-[var(--muted-foreground)] shadow-sm">
+        Chargement de la messagerie...
+      </div>
+    );
+  }
+
+  return (
+    <section className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] text-[var(--card-foreground)] shadow-[var(--glass-shadow)]">
+      <div className="grid min-h-[calc(100vh-220px)] md:min-h-[620px] lg:grid-cols-[360px_minmax(0,1fr)]">
+        <aside
+          className={`border-[var(--border)] bg-[var(--muted)]/45 lg:border-r ${
+            activeContact ? "hidden lg:flex" : "flex"
+          } flex-col`}
+        >
+          <div className="border-b border-[var(--border)] p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[var(--primary)]">
+                  Boîte interne
+                </p>
+                <h3 className="mt-1 text-lg font-black text-[var(--foreground)]">
+                  Conversations
+                </h3>
+              </div>
+              <span className="rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1 text-xs font-black text-[var(--muted-foreground)]">
+                {sidebarItems.length}
+              </span>
+            </div>
+
+            <label className="mt-4 flex min-h-11 items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 text-[var(--muted-foreground)]">
+              <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Rechercher un contact"
+                className="h-10 w-full bg-transparent text-sm font-semibold text-[var(--foreground)] outline-none placeholder:text-[var(--muted-foreground)]"
+              />
+            </label>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-2 sm:p-3">
+            {sidebarItems.length === 0 ? (
+              <div className="flex h-full min-h-56 flex-col items-center justify-center rounded-xl border border-dashed border-[var(--border)] p-6 text-center">
+                <UserRound className="mb-3 h-8 w-8 text-[var(--muted-foreground)]" aria-hidden="true" />
+                <p className="text-sm font-bold text-[var(--foreground)]">Aucun contact trouvé</p>
+                <p className="mt-1 text-xs text-[var(--muted-foreground)]">
+                  Essayez avec un autre nom ou rôle.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {sidebarItems.map((item) => {
+                  const selected = activeContact?.id === item.partner.id;
+
+                  return (
+                    <button
+                      key={item.partner.id}
+                      type="button"
+                      onClick={() => setActiveContact(item.partner)}
+                      className={`group flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-all ${
+                        selected
+                          ? "border-[var(--primary)]/35 bg-[var(--primary)]/10 shadow-sm"
+                          : "border-transparent hover:border-[var(--border)] hover:bg-[var(--card)]"
+                      }`}
+                    >
+                      <Avatar contact={item.partner} />
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-start justify-between gap-2">
+                          <span className="truncate text-sm font-black text-[var(--foreground)]">
+                            {item.partner.name || "Utilisateur"}
+                          </span>
+                          {item.unreadCount > 0 && (
+                            <span className="rounded-full bg-[var(--primary)] px-2 py-0.5 text-[10px] font-black text-white">
+                              {item.unreadCount}
+                            </span>
+                          )}
+                        </span>
+                        <span className="mt-0.5 block text-[11px] font-black uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
+                          {roleLabel(item.partner.role)}
+                        </span>
+                        <span className="mt-1 block truncate text-xs text-[var(--muted-foreground)]">
+                          {item.lastMessage?.content || "Nouvelle conversation"}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </aside>
+
+        <main className={`${!activeContact ? "hidden lg:flex" : "flex"} min-w-0 flex-col bg-[var(--background)]/55`}>
+          {activeContact ? (
+            <>
+              <div className="flex items-center gap-3 border-b border-[var(--border)] bg-[var(--card)]/95 p-4 backdrop-blur sm:p-5">
+                <button
+                  type="button"
+                  onClick={() => setActiveContact(null)}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] text-[var(--foreground)] lg:hidden"
+                  aria-label="Retour aux conversations"
+                >
+                  <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                </button>
+                <Avatar contact={activeContact} />
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate text-base font-black text-[var(--foreground)]">
+                    {activeContact.name || "Utilisateur"}
+                  </h3>
+                  <p className="text-[11px] font-black uppercase tracking-[0.12em] text-[var(--muted-foreground)]">
+                    {roleLabel(activeContact.role)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+                {isLoadingMessages ? (
+                  <div className="flex h-full min-h-72 items-center justify-center text-[var(--muted-foreground)]">
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                    <span className="text-sm font-semibold">Chargement des messages...</span>
+                  </div>
+                ) : messages.length === 0 ? (
+                  <EmptyChat name={activeContact.name || "ce contact"} />
+                ) : (
+                  <div className="space-y-3">
+                    {messages.map((message) => {
+                      const isMe = message.senderId === currentUserId;
+
+                      return (
+                        <div key={message.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
+                          <div
+                            className={`max-w-[82%] rounded-2xl px-4 py-3 shadow-sm sm:max-w-[68%] ${
+                              isMe
+                                ? "rounded-br-md bg-[var(--primary)] text-white"
+                                : "rounded-bl-md border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)]"
+                            }`}
+                          >
+                            <p className="text-sm leading-6">{message.content}</p>
+                            <time
+                              className={`mt-1 block text-[10px] font-bold ${
+                                isMe ? "text-white/70" : "text-[var(--muted-foreground)]"
+                              }`}
+                            >
+                              {formatMessageTime(message.createdAt)}
+                            </time>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div ref={messagesEndRef} />
+                  </div>
+                )}
+              </div>
+
+              <form
+                onSubmit={handleSend}
+                className="border-t border-[var(--border)] bg-[var(--card)] p-3 sm:p-4"
+              >
+                <div className="flex items-end gap-2 rounded-2xl border border-[var(--border)] bg-[var(--background)] p-2">
+                  <textarea
+                    value={newMessage}
+                    onChange={(event) => setNewMessage(event.target.value)}
+                    placeholder="Écrivez votre message..."
+                    rows={1}
+                    className="max-h-32 min-h-11 flex-1 resize-none bg-transparent px-3 py-2 text-sm font-semibold leading-6 text-[var(--foreground)] outline-none placeholder:text-[var(--muted-foreground)]"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!newMessage.trim() || isSending}
+                    className="flex h-11 min-w-11 items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-black text-white transition-all hover:brightness-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-45"
+                    aria-label="Envoyer le message"
+                  >
+                    {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    <span className="ml-2 hidden sm:inline">Envoyer</span>
+                  </button>
+                </div>
+              </form>
+            </>
+          ) : (
+            <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
+              <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--card)] text-[var(--primary)] shadow-sm">
+                <MessageCircle className="h-9 w-9" aria-hidden="true" />
+              </div>
+              <h3 className="text-2xl font-black text-[var(--foreground)]">Messagerie interne</h3>
+              <p className="mt-2 max-w-md text-sm leading-6 text-[var(--muted-foreground)]">
+                Sélectionnez une conversation pour lire l'historique et répondre rapidement.
+              </p>
+            </div>
+          )}
+        </main>
+      </div>
+    </section>
+  );
+}
+
+function Avatar({ contact }: { contact: Contact }) {
+  return (
+    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--primary)] to-[#7f1d1d] text-sm font-black uppercase text-white shadow-sm shadow-red-950/10">
+      {contact.name?.trim()?.[0] || "?"}
+    </span>
+  );
+}
+
+function EmptyChat({ name }: { name: string }) {
+  return (
+    <div className="flex h-full min-h-72 flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border)] bg-[var(--card)]/55 p-8 text-center">
+      <MessageCircle className="mb-4 h-10 w-10 text-[var(--muted-foreground)]" aria-hidden="true" />
+      <p className="text-base font-black text-[var(--foreground)]">Démarrer la conversation</p>
+      <p className="mt-2 max-w-sm text-sm leading-6 text-[var(--muted-foreground)]">
+        Aucun message avec {name} pour le moment. Envoyez une première réponse claire et concise.
+      </p>
+    </div>
+  );
+}
+
+function roleLabel(role: string | null) {
+  if (role === "TEACHER") return "Professeur";
+  if (role === "STUDENT") return "Étudiant";
+  if (role === "ADMIN") return "Administration";
+  return "Contact";
+}
+
+function formatMessageTime(value: Date | string) {
+  return new Date(value).toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }

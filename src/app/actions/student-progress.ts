@@ -12,8 +12,42 @@ async function checkStudent() {
     return session.user.id;
 }
 
+async function assertTeacherCanAccessStudent(teacherId: string, studentId: string) {
+    const student = await prisma.user.findFirst({
+        where: { id: studentId, role: "STUDENT" },
+        select: { levelId: true },
+    });
+
+    if (!student?.levelId) throw new Error("Unauthorized");
+
+    const assignedLevel = await prisma.level.count({
+        where: {
+            id: student.levelId,
+            teachers: { some: { id: teacherId } },
+        },
+    });
+
+    if (!assignedLevel) throw new Error("Unauthorized");
+}
+
 export async function markLessonComplete(lessonId: string) {
     const userId = await checkStudent();
+    const student = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { levelId: true },
+    });
+
+    if (!student?.levelId) throw new Error("Level not assigned");
+
+    const lesson = await prisma.lesson.findFirst({
+        where: {
+            id: lessonId,
+            module: { levelId: student.levelId },
+        },
+        select: { id: true },
+    });
+
+    if (!lesson) throw new Error("Unauthorized: Lesson access denied.");
 
     await prisma.progress.upsert({
         where: {
@@ -69,6 +103,21 @@ export async function markLessonComplete(lessonId: string) {
 }
 
 export async function getStudentProgressData(userId: string) {
+    const session = await auth();
+    if (!session?.user) throw new Error("Unauthorized");
+
+    if (session.user.role === "STUDENT" && session.user.id !== userId) {
+        throw new Error("Unauthorized");
+    }
+
+    if (session.user.role === "TEACHER") {
+        await assertTeacherCanAccessStudent(session.user.id, userId);
+    }
+
+    if (session.user.role !== "STUDENT" && session.user.role !== "TEACHER" && session.user.role !== "ADMIN") {
+        throw new Error("Unauthorized");
+    }
+
     // This helper fetches necessary data for progress calculation
     const user = await prisma.user.findUnique({
         where: { id: userId },

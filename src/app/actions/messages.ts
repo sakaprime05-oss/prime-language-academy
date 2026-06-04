@@ -16,16 +16,62 @@ async function checkUser() {
     return session.user;
 }
 
+async function canMessageUser(sender: Awaited<ReturnType<typeof checkUser>>, receiverId: string) {
+    if (!receiverId || receiverId === sender.id) return false;
+
+    if (sender.role === "ADMIN") {
+        const receiver = await prisma.user.count({
+            where: { id: receiverId, role: { in: ["TEACHER", "STUDENT"] } },
+        });
+        return receiver > 0;
+    }
+
+    if (sender.role === "STUDENT") {
+        const student = await prisma.user.findUnique({
+            where: { id: sender.id },
+            select: { levelId: true },
+        });
+        if (!student?.levelId) return false;
+
+        const teacher = await prisma.teacherSchedule.count({
+            where: {
+                levelId: student.levelId,
+                teacherId: receiverId,
+                teacher: { role: "TEACHER" },
+            },
+        });
+        return teacher > 0;
+    }
+
+    if (sender.role === "TEACHER") {
+        const student = await prisma.user.count({
+            where: {
+                id: receiverId,
+                role: "STUDENT",
+                OR: [
+                    { level: { teachers: { some: { id: sender.id } } } },
+                    { level: { schedules: { some: { teacherId: sender.id } } } },
+                ],
+            },
+        });
+        return student > 0;
+    }
+
+    return false;
+}
+
 export async function sendMessage(receiverId: string, content: string) {
     const user = await checkUser();
+    const cleanContent = content.trim().slice(0, 5000);
 
-    if (!content.trim()) return { error: "Message cannot be empty" };
+    if (!cleanContent) return { error: "Message cannot be empty" };
+    if (!(await canMessageUser(user, receiverId))) return { error: "Destinataire non autorisÃ©." };
 
     const message = await prisma.message.create({
         data: {
             senderId: user.id!,
             receiverId,
-            content
+            content: cleanContent
         }
     });
 
@@ -136,7 +182,7 @@ export async function getAvailableContacts() {
             where: { teacherId: user.id! }
         });
         
-        const levelIds = schedules.map((s: any) => s.levelId);
+        const levelIds = schedules.map((s: any) => s.levelId).filter(Boolean);
         
         const students = await prisma.user.findMany({
             where: {

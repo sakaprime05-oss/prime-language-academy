@@ -1,4 +1,4 @@
-const CACHE_NAME = "prime-academy-v5";
+const CACHE_NAME = "prime-academy-v6";
 const OFFLINE_URL = "/offline.html";
 
 const PRECACHE_ASSETS = [
@@ -10,6 +10,29 @@ const PRECACHE_ASSETS = [
   "/icons/icon-512x512.png",
   "/icons/maskable-icon-512x512.png",
 ];
+
+const PRIVATE_PATH_PREFIXES = [
+  "/api/",
+  "/auth/",
+  "/dashboard",
+  "/checkout",
+  "/login",
+  "/register",
+  "/register-club",
+  "/forgot-password",
+  "/reset-password",
+];
+
+function shouldBypassCache(requestUrl) {
+  const url = new URL(requestUrl);
+  if (url.origin !== self.location.origin) return true;
+  return PRIVATE_PATH_PREFIXES.some((prefix) => url.pathname.startsWith(prefix));
+}
+
+function canCacheResponse(response) {
+  const cacheControl = response.headers.get("Cache-Control") || "";
+  return response.status === 200 && !/no-store|private/i.test(cacheControl);
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -37,12 +60,12 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
   const url = new URL(event.request.url);
-  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/auth/")) return;
+  if (shouldBypassCache(url.toString())) return;
 
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        if (response.status === 200) {
+        if (canCacheResponse(response)) {
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseClone);
