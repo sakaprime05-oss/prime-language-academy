@@ -130,17 +130,17 @@ export default function ProgrammePage() {
                 <section className="rounded-3xl border border-[#E7162A]/15 bg-[#E7162A]/5 p-6 md:hidden">
                     <div className="grid gap-6 md:grid-cols-[1.1fr_0.9fr] md:items-center">
                         <div>
-                            <p className="mb-2 text-xs font-black uppercase tracking-[0.22em] text-[#E7162A]">Application gratuite</p>
-                            <h2 className="text-2xl font-black md:text-3xl">Installez la plateforme sans passer par les stores</h2>
+                            <p className="mb-2 text-xs font-black uppercase tracking-[0.22em] text-[#E7162A]">Raccourci mobile</p>
+                            <h2 className="text-2xl font-black md:text-3xl">Ajoutez un acces rapide seulement si c'est utile</h2>
                             <p className="mt-3 text-sm leading-7 text-[var(--foreground)]/60">
-                                Ajoutez Prime Academy sur votre Ã©cran d'accueil comme une application. AccÃ¨s rapide aux cours,
-                                paiements, rendez-vous et ressources, sans frais de store.
+                                Sur mobile, vous pouvez garder un raccourci vers vos cours, paiements, rendez-vous
+                                et ressources. C'est optionnel.
                             </p>
                         </div>
                         <div className="rounded-2xl border border-[#E7162A]/15 bg-[var(--background)] p-5">
                             <div className="mb-4 space-y-2 text-sm text-[var(--foreground)]/60">
-                                <p><strong className="text-[var(--foreground)]">TÃ©lÃ©phone:</strong> ouvrez le menu du navigateur puis choisissez Installer l'application.</p>
-                                <p><strong className="text-[var(--foreground)]">iPhone:</strong> ouvrez le partage puis choisissez Ajouter Ã  l'Ã©cran d'accueil.</p>
+                                <p><strong className="text-[var(--foreground)]">Android:</strong> ouvrez le menu du navigateur puis choisissez Ajouter a l'ecran d'accueil si l'option apparait.</p>
+                                <p><strong className="text-[var(--foreground)]">iPhone:</strong> ouvrez le partage puis choisissez Ajouter a l'ecran d'accueil.</p>
                             </div>
                             <InstallAppButton className="w-full" />
                         </div>

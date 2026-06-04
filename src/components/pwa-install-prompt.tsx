@@ -1,12 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Download, Smartphone, X } from "lucide-react";
+import { Smartphone, X } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
+
+const DISMISSAL_DAYS = 30;
+const SOFT_PROMPT_DELAY_MS = 12000;
+const DISMISS_KEY = "pwa-banner-dismissed";
+const SESSION_SEEN_KEY = "pwa-install-soft-seen";
 
 export function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
@@ -16,6 +21,11 @@ export function PWAInstallPrompt() {
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
+    if (!isMobileInstallSurface()) {
+      setShowBanner(false);
+      return;
+    }
+
     const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
@@ -30,29 +40,54 @@ export function PWAInstallPrompt() {
       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     setIsIOS(isIOSDevice);
 
-    const dismissedAt = localStorage.getItem("pwa-banner-dismissed");
+    const dismissedAt = localStorage.getItem(DISMISS_KEY);
     if (dismissedAt) {
       const daysSinceDismissed = (Date.now() - Number(dismissedAt)) / (1000 * 60 * 60 * 24);
-      if (daysSinceDismissed < 7) return;
+      if (daysSinceDismissed < DISMISSAL_DAYS) return;
     }
+    if (sessionStorage.getItem(SESSION_SEEN_KEY) === "1") return;
 
-    const handler = (event: Event) => {
-      event.preventDefault();
-      setDeferredPrompt(event as BeforeInstallPromptEvent);
+    let promptTimer: number | undefined;
+
+    const showSoftBanner = () => {
+      if (!isMobileInstallSurface() || sessionStorage.getItem(SESSION_SEEN_KEY) === "1") return;
+      sessionStorage.setItem(SESSION_SEEN_KEY, "1");
       setShowBanner(true);
     };
 
+    const resizeHandler = () => {
+      if (!isMobileInstallSurface()) {
+        if (promptTimer) window.clearTimeout(promptTimer);
+        setShowBanner(false);
+        setShowIOSGuide(false);
+      }
+    };
+
+    const handler = (event: Event) => {
+      if (!isMobileInstallSurface()) return;
+      event.preventDefault();
+      setDeferredPrompt(event as BeforeInstallPromptEvent);
+      if (promptTimer) window.clearTimeout(promptTimer);
+      promptTimer = window.setTimeout(showSoftBanner, SOFT_PROMPT_DELAY_MS);
+    };
+
     window.addEventListener("beforeinstallprompt", handler);
+    window.addEventListener("resize", resizeHandler);
 
     if (isIOSDevice) {
-      const timer = window.setTimeout(() => setShowBanner(true), 3000);
+      promptTimer = window.setTimeout(showSoftBanner, SOFT_PROMPT_DELAY_MS);
       return () => {
-        window.clearTimeout(timer);
+        if (promptTimer) window.clearTimeout(promptTimer);
         window.removeEventListener("beforeinstallprompt", handler);
+        window.removeEventListener("resize", resizeHandler);
       };
     }
 
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    return () => {
+      if (promptTimer) window.clearTimeout(promptTimer);
+      window.removeEventListener("beforeinstallprompt", handler);
+      window.removeEventListener("resize", resizeHandler);
+    };
   }, []);
 
   const handleInstall = async () => {
@@ -73,43 +108,42 @@ export function PWAInstallPrompt() {
   const handleDismiss = () => {
     setShowBanner(false);
     setShowIOSGuide(false);
-    localStorage.setItem("pwa-banner-dismissed", Date.now().toString());
+    localStorage.setItem(DISMISS_KEY, Date.now().toString());
   };
 
   if (isInstalled || !showBanner) return null;
 
   return (
     <>
-      <div className="fixed bottom-4 left-3 right-3 z-[80] mx-auto max-w-md animate-slide-up sm:bottom-6" role="alert">
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#21286E] to-[#1a1f55] p-4 shadow-2xl backdrop-blur-xl">
-          <div className="absolute -top-12 -right-12 h-24 w-24 rounded-full bg-[#E7162A]/20 blur-2xl" />
+      <div className="fixed bottom-4 left-3 right-3 z-[80] mx-auto max-w-sm animate-slide-up" role="status">
+        <div className="relative rounded-2xl border border-[var(--foreground)]/10 bg-[var(--background)]/95 p-3 shadow-xl backdrop-blur-xl">
 
           <button
             onClick={handleDismiss}
-            className="absolute top-3 right-3 rounded-full p-1 text-white/50 transition-colors hover:bg-white/10 hover:text-white"
+            className="absolute top-3 right-3 rounded-full p-1 text-[var(--foreground)]/45 transition-colors hover:bg-[#E7162A]/10 hover:text-[#E7162A]"
             aria-label="Fermer"
           >
             <X size={18} />
           </button>
 
-          <div className="flex items-center gap-4 pr-8">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#E7162A] shadow-lg shadow-[#E7162A]/30 sm:h-14 sm:w-14">
-              <Smartphone size={26} className="text-white" />
+          <div className="flex items-center gap-3 pr-8">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E7162A]/10 text-[#E7162A]">
+              <Smartphone size={21} />
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-bold text-white">Installer l'application</h3>
-              <p className="mt-0.5 text-xs leading-5 text-white/70">
-                Ouvrez Prime Academy directement depuis l'écran d'accueil.
+              <h3 className="text-sm font-bold text-[var(--foreground)]">Acces rapide sur mobile</h3>
+              <p className="mt-0.5 text-xs leading-5 text-[var(--foreground)]/60">
+                Optionnel : ajoutez un raccourci si vous utilisez souvent la plateforme sur ce telephone.
               </p>
             </div>
           </div>
 
           <button
             onClick={handleInstall}
-            className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#E7162A] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#E7162A]/25 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-[#E7162A]/30 active:scale-[0.98]"
+            className="mt-3 flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#E7162A]/25 bg-[#E7162A]/10 px-4 py-2 text-sm font-semibold text-[#E7162A] transition-all hover:bg-[#E7162A]/15 active:scale-[0.99]"
           >
-            <Download size={16} />
-            {isIOS ? "Comment installer" : "Installer maintenant"}
+            <Smartphone size={16} />
+            {isIOS ? "Voir l'astuce" : "Ajouter si utile"}
           </button>
         </div>
       </div>
@@ -126,13 +160,13 @@ export function PWAInstallPrompt() {
             <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700" />
 
             <h3 className="mb-4 text-center text-lg font-bold text-gray-900 dark:text-white">
-              Installer sur iPhone / iPad
+              Raccourci sur iPhone / iPad
             </h3>
 
             <div className="space-y-3">
-              <Step number={1} text="Ouvrez ce site dans le navigateur du téléphone." />
+              <Step number={1} text="Depuis ce telephone, ouvrez ce site dans Safari." />
               <Step number={2} text='Appuyez sur le bouton "Partager".' />
-              <Step number={3} text='Choisissez "Sur l’écran d’accueil".' />
+              <Step number={3} text='Choisissez "Sur l’écran d’accueil" si vous voulez un raccourci.' />
               <Step number={4} text='Appuyez sur "Ajouter".' />
             </div>
 
@@ -140,7 +174,7 @@ export function PWAInstallPrompt() {
               onClick={handleDismiss}
               className="mt-6 min-h-11 w-full rounded-xl bg-[#E7162A] px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-[#c41222]"
             >
-              J'ai compris
+              Fermer
             </button>
           </div>
         </div>
@@ -163,6 +197,18 @@ export function PWAInstallPrompt() {
       `}</style>
     </>
   );
+}
+
+function isMobileInstallSurface() {
+  if (typeof window === "undefined") return false;
+
+  const mobileUserAgent = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini|Mobile/i.test(
+    window.navigator.userAgent
+  );
+  const narrowMobileViewport = window.matchMedia("(max-width: 820px)").matches;
+  const touchSmallScreen = narrowMobileViewport && window.matchMedia("(pointer: coarse)").matches;
+
+  return narrowMobileViewport && (mobileUserAgent || touchSmallScreen);
 }
 
 function Step({ number, text }: { number: number; text: string }) {

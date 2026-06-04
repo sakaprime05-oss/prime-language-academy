@@ -1,36 +1,52 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Download, MonitorSmartphone, X } from "lucide-react";
+import { MonitorSmartphone, X } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-type InstallMode = "android" | "ios" | "desktop";
+type InstallMode = "android" | "ios" | "mobile";
 
 export function InstallAppButton({ className = "" }: { className?: string }) {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showGuide, setShowGuide] = useState(false);
-  const [mode, setMode] = useState<InstallMode>("desktop");
+  const [mode, setMode] = useState<InstallMode>("mobile");
+  const [isAvailable, setIsAvailable] = useState(false);
 
   useEffect(() => {
+    const mobileSurface = isMobileInstallSurface();
+    setIsAvailable(mobileSurface);
+    if (!mobileSurface) return;
+
     const userAgent = window.navigator.userAgent;
     const isIOS =
       /iPad|iPhone|iPod/.test(userAgent) ||
       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     const isAndroid = /Android/.test(userAgent);
 
-    setMode(isIOS ? "ios" : isAndroid ? "android" : "desktop");
+    setMode(isIOS ? "ios" : isAndroid ? "android" : "mobile");
 
     const handler = (event: Event) => {
+      if (!isMobileInstallSurface()) return;
       event.preventDefault();
       setDeferredPrompt(event as BeforeInstallPromptEvent);
     };
 
+    const resizeHandler = () => {
+      const stillMobile = isMobileInstallSurface();
+      setIsAvailable(stillMobile);
+      if (!stillMobile) setShowGuide(false);
+    };
+
     window.addEventListener("beforeinstallprompt", handler);
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    window.addEventListener("resize", resizeHandler);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handler);
+      window.removeEventListener("resize", resizeHandler);
+    };
   }, []);
 
   const handleInstall = async () => {
@@ -44,15 +60,17 @@ export function InstallAppButton({ className = "" }: { className?: string }) {
     setShowGuide(true);
   };
 
+  if (!isAvailable) return null;
+
   return (
     <>
       <button
         type="button"
         onClick={handleInstall}
-        className={`inline-flex items-center justify-center gap-2 rounded-full border border-[#E7162A]/40 px-6 py-3 text-sm font-black uppercase tracking-widest text-[#E7162A] transition hover:bg-[#E7162A]/10 ${className}`}
+        className={`inline-flex items-center justify-center gap-2 rounded-full border border-[#E7162A]/25 px-5 py-2.5 text-sm font-bold text-[#E7162A] transition hover:bg-[#E7162A]/10 ${className}`}
       >
-        <Download size={16} aria-hidden="true" />
-        Installer l'app gratuite
+        <MonitorSmartphone size={16} aria-hidden="true" />
+        Raccourci mobile
       </button>
 
       {showGuide && (
@@ -70,9 +88,9 @@ export function InstallAppButton({ className = "" }: { className?: string }) {
                   <MonitorSmartphone size={22} />
                 </div>
                 <div>
-                  <h2 className="text-base font-black">Installer sans store</h2>
+                  <h2 className="text-base font-black">Raccourci mobile optionnel</h2>
                   <p className="mt-1 text-xs leading-5 text-[var(--foreground)]/55">
-                    Ajoutez la plateforme PLA directement sur votre écran d'accueil.
+                    Pratique si vous suivez souvent vos cours depuis ce telephone.
                   </p>
                 </div>
               </div>
@@ -102,13 +120,25 @@ export function InstallAppButton({ className = "" }: { className?: string }) {
               onClick={() => setShowGuide(false)}
               className="mt-5 min-h-11 w-full rounded-2xl bg-[#E7162A] px-4 py-3 text-sm font-black uppercase tracking-widest text-white"
             >
-              J'ai compris
+              Fermer
             </button>
           </div>
         </div>
       )}
     </>
   );
+}
+
+function isMobileInstallSurface() {
+  if (typeof window === "undefined") return false;
+
+  const mobileUserAgent = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini|Mobile/i.test(
+    window.navigator.userAgent
+  );
+  const narrowMobileViewport = window.matchMedia("(max-width: 820px)").matches;
+  const touchSmallScreen = narrowMobileViewport && window.matchMedia("(pointer: coarse)").matches;
+
+  return narrowMobileViewport && (mobileUserAgent || touchSmallScreen);
 }
 
 function getInstallSteps(mode: InstallMode) {
@@ -125,14 +155,14 @@ function getInstallSteps(mode: InstallMode) {
     return [
       "Ouvrez ce site dans le navigateur du téléphone.",
       "Touchez le menu du navigateur.",
-      "Choisissez Installer l'application ou Ajouter à l'écran d'accueil.",
-      "Validez l'installation.",
+      "Choisissez Ajouter à l'écran d'accueil si l'option apparait.",
+      "Validez seulement si ce raccourci vous sera utile.",
     ];
   }
 
   return [
-    "Ouvrez ce site dans votre navigateur.",
-    "Cliquez sur l'icône Installer dans la barre d'adresse ou dans le menu.",
-    "Validez pour ouvrir la plateforme comme une application.",
+    "Sur ce telephone, ouvrez le menu du navigateur.",
+    "Choisissez Ajouter à l'écran d'accueil si l'option apparait.",
+    "Gardez ce raccourci uniquement si vous l'utilisez souvent.",
   ];
 }
