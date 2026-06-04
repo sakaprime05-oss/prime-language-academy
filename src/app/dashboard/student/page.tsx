@@ -2,10 +2,9 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getStudentProgressData } from "@/app/actions/student-progress";
-import { getSystemSettings } from "@/app/actions/system-settings";
 import { getDictionary } from "@/lib/i18n";
 import Link from "next/link";
-import { PLA_SESSION, PLA_TIME_SLOTS } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, PLA_SESSION, PLA_TIME_SLOTS } from "@/lib/pla-program";
 import { parseStudentProfileData } from "@/lib/student-profile";
 
 function daysUntil(date: Date) {
@@ -51,11 +50,10 @@ export default async function StudentDashboardPage() {
     });
 
     const progressData = await getStudentProgressData(session.user.id);
-    const systemSettings = await getSystemSettings();
     const fullDict = await getDictionary();
     const dict = fullDict.dashboard;
     const profile = parseStudentProfileData(user?.onboardingData);
-    const sessionEnd = new Date("2026-08-19T23:59:59");
+    const sessionEnd = new Date(`${PLA_SESSION.endDate}T23:59:59`);
     const remainingDays = daysUntil(sessionEnd);
     const remainingSessions = countRemainingSessions(profile.days || [], sessionEnd);
     const selectedSlot = PLA_TIME_SLOTS.find((slot) => slot.id === profile.timeSlot);
@@ -75,7 +73,7 @@ export default async function StudentDashboardPage() {
                         Votre demande Club est bien enregistrée.
                     </h1>
                     <p className="mt-4 text-sm leading-7 text-[var(--foreground)]/60">
-                        The English Club est limité à 26 membres pour garder une expérience premium. Vous serez contacté dès qu'une place se libère ou qu'une nouvelle vague Club est ouverte.
+                        The English Club est limité à {PLA_CLUB_CAPACITY} membres pour garder une expérience premium. Vous serez contacté dès qu'une place se libère ou qu'une nouvelle vague Club est ouverte.
                     </p>
                     <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <Link href="/english-club" className="rounded-2xl border border-amber-500/30 px-5 py-4 text-center text-xs font-black uppercase tracking-widest text-amber-500">
@@ -131,7 +129,7 @@ export default async function StudentDashboardPage() {
                                 </p>
                                 <h3 className="text-2xl font-black text-[var(--foreground)]">{progressData.levelName}</h3>
                                 <p className="text-xs text-[var(--foreground)]/50 mt-2 font-bold uppercase tracking-widest">
-                                    {isClub ? `${dict.member_since} : ${memberSince}` : `${dict.start_date} : ${systemSettings.currentSessionStart}`}
+                                    {isClub ? `${dict.member_since} : ${memberSince}` : `${dict.start_date} : ${PLA_SESSION.dates}`}
                                 </p>
                             </div>
 

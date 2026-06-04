@@ -3,6 +3,27 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { PLA_SESSION } from "@/lib/pla-program";
+
+const DEFAULT_SYSTEM_SETTINGS = {
+    currentSessionName: `SESSION DE LANCEMENT : ${PLA_SESSION.dates.toUpperCase()}`,
+    currentSessionStart: PLA_SESSION.startDate,
+    currentSessionDuration: PLA_SESSION.duration,
+    enableOnlineRegistration: true,
+    enableCorporateRegistration: true,
+};
+
+function hasObsoleteSessionSettings(settings: { currentSessionName: string; currentSessionStart: string; currentSessionDuration: string }) {
+    const value = `${settings.currentSessionName} ${settings.currentSessionStart} ${settings.currentSessionDuration}`.toLowerCase();
+    return value.includes("18 juin")
+        || value.includes("19 aout")
+        || value.includes("19 août")
+        || value.includes("11 avril")
+        || value.includes("avril - juin")
+        || value.includes("2026-04-11")
+        || value.includes("2026-06-18")
+        || value.includes("2026-08-19");
+}
 
 export async function getSystemSettings() {
     try {
@@ -14,12 +35,17 @@ export async function getSystemSettings() {
             settings = await prisma.systemSettings.create({
                 data: {
                     id: "default",
-                    currentSessionName: "SESSION DE LANCEMENT : 18 JUIN – 19 AOUT 2026",
-                    currentSessionStart: "18 Juin 2026",
-                    currentSessionDuration: "02 MOIS",
-                    enableOnlineRegistration: true,
-                    enableCorporateRegistration: true
+                    ...DEFAULT_SYSTEM_SETTINGS,
                 }
+            });
+        } else if (hasObsoleteSessionSettings(settings)) {
+            settings = await prisma.systemSettings.update({
+                where: { id: "default" },
+                data: {
+                    currentSessionName: DEFAULT_SYSTEM_SETTINGS.currentSessionName,
+                    currentSessionStart: DEFAULT_SYSTEM_SETTINGS.currentSessionStart,
+                    currentSessionDuration: DEFAULT_SYSTEM_SETTINGS.currentSessionDuration,
+                },
             });
         }
         return settings;
@@ -28,11 +54,7 @@ export async function getSystemSettings() {
         // Fallback pour éviter que le site ne crashe
         return {
             id: "default",
-            currentSessionName: "SESSION DE LANCEMENT : 18 JUIN – 19 AOUT 2026",
-            currentSessionStart: "18 Juin 2026",
-            currentSessionDuration: "02 MOIS",
-            enableOnlineRegistration: true,
-            enableCorporateRegistration: true,
+            ...DEFAULT_SYSTEM_SETTINGS,
             createdAt: new Date(),
             updatedAt: new Date(),
         };

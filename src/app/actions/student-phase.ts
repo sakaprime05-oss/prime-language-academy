@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { PLA_SESSION } from "@/lib/pla-program";
 
 export async function getStudentPhase() {
     const session = await auth();
@@ -16,10 +17,10 @@ export async function getStudentPhase() {
 
     const settings = await prisma.systemSettings.findUnique({ where: { id: "default" } });
     
-    let sessionStartStr = settings?.currentSessionStart || "2026-06-18"; 
+    let sessionStartStr = settings?.currentSessionStart || PLA_SESSION.startDate;
     
-    if (sessionStartStr.toLowerCase().includes("juin")) {
-        sessionStartStr = "2026-06-18";
+    if (sessionStartStr.toLowerCase().includes("juillet") || sessionStartStr.toLowerCase().includes("juin")) {
+        sessionStartStr = PLA_SESSION.startDate;
     } else if (sessionStartStr.toLowerCase().includes("avril")) {
         sessionStartStr = "2026-04-11";
     }
@@ -31,10 +32,9 @@ export async function getStudentPhase() {
     }
 
     const now = new Date();
-    // 60 jours en millisecondes
-    const sixtyDaysMs = 60 * 24 * 60 * 60 * 1000;
+    const sessionEnd = new Date(`${PLA_SESSION.endDate}T23:59:59`);
 
-    if (now.getTime() - startDate.getTime() >= sixtyDaysMs) {
+    if (now >= sessionEnd) {
         return "CLUB";
     }
 

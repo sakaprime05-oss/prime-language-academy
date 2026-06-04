@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { getSystemSettings } from "@/app/actions/system-settings";
 import { LogoMark } from "@/components/logo";
+import { PLA_SESSION } from "@/lib/pla-program";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import RegisterForm from "./register-form";
@@ -9,6 +10,7 @@ const paymentBadges = ["Wave", "Orange", "MTN", "Moov", "Carte"];
 const trustPoints = [
   "Test de niveau gratuit",
   "Supports numériques inclus",
+  "15 places max par salle",
   "Attestation en fin de session",
 ];
 
@@ -21,7 +23,7 @@ export default async function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[var(--background)] px-3 py-4 text-[var(--foreground)] sm:p-6">
+    <main className="min-h-screen bg-[var(--background)] px-3 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-4 text-[var(--foreground)] sm:p-6">
       <div className="mx-auto grid w-full max-w-6xl gap-4 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
         <section className="hidden overflow-hidden rounded-lg border border-primary/15 bg-[#24110f] text-white shadow-xl shadow-primary/10 dark:bg-[#160b0a] lg:block">
           <div className="relative min-h-[520px] p-5 sm:p-7">
@@ -44,7 +46,7 @@ export default async function RegisterPage() {
 
               <div className="mt-9 max-w-md">
                 <p className="mb-3 inline-flex rounded-full border border-primary/35 bg-primary/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-primary">
-                  Session 21 juin - 19 août
+                  Session {PLA_SESSION.dates}
                 </p>
                 <h1 className="font-[var(--font-lexend)] text-[2.4rem] font-black leading-[0.98] tracking-normal sm:text-5xl">
                   Rejoignez la formation qui vous fait parler anglais.
@@ -56,8 +58,8 @@ export default async function RegisterPage() {
 
               <div className="mt-6 grid grid-cols-3 gap-2">
                 <div className="rounded-lg border border-white/10 bg-white/[0.08] p-3">
-                  <p className="text-2xl font-black text-primary">2</p>
-                  <p className="mt-1 text-[10px] font-black uppercase leading-4 tracking-[0.12em] text-white/55">mois de suivi</p>
+                  <p className="text-2xl font-black text-primary">8</p>
+                  <p className="mt-1 text-[10px] font-black uppercase leading-4 tracking-[0.12em] text-white/55">semaines</p>
                 </div>
                 <div className="rounded-lg border border-white/10 bg-white/[0.08] p-3">
                   <p className="text-2xl font-black text-primary">6</p>
@@ -104,7 +106,7 @@ export default async function RegisterPage() {
                 Prime Language<br />Academy
               </span>
             </Link>
-            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary">Session 21 juin - 19 août</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary">Session {PLA_SESSION.dates}</p>
             <p className="mt-1 text-sm font-bold leading-6 text-[var(--foreground)]/70">
               Inscrivez-vous à la formation et sécurisez votre place en quelques minutes.
             </p>

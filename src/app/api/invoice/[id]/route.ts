@@ -84,7 +84,7 @@ function createInvoiceBuffer(transaction: InvoiceTransaction) {
     const commands = [
         rect(0, 830, 595, 12, "0.906 0.086 0.165"),
         line("Prime Language Academy", 48, 770, 24, "F2"),
-        line("Abidjan, Angre 8e Tranche - Cote d'Ivoire", 48, 742, 10),
+        line("Cocody Angré 8e Tranche et 2 Plateaux Vallon - Côte d'Ivoire", 48, 742, 10),
         line("+225 01 61 33 78 64", 48, 726, 10),
         rect(366, 730, 182, 66, "0.129 0.157 0.431"),
         line("RECU DE PAIEMENT", 386, 772, 15, "F2"),

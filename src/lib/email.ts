@@ -20,7 +20,7 @@ const brand = {
     shortName: "Prime Academy",
     color: "#21286E",
     accent: "#E7162A",
-    address: "Angré 8e Tranche, Abidjan",
+    address: "Cocody Angré 8e Tranche et 2 Plateaux Vallon, Abidjan",
     phone: "+225 01 61 33 78 64",
 };
 
@@ -35,7 +35,7 @@ function senderAddress() {
 }
 
 function adminEmail() {
-    return process.env.ADMIN_EMAIL || process.env.EMAIL_USER || "admin@primelangageacademy.com";
+    return process.env.ADMIN_EMAIL || process.env.EMAIL_USER || "primelanguageacademy9@gmail.com";
 }
 
 function escapeHtml(value: string) {

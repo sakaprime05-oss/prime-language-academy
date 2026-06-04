@@ -1,11 +1,17 @@
 export const PLA_SESSION = {
     label: "Session de lancement",
-    dates: "21 juin - 19 août 2026",
-    duration: "2 mois",
-    location: "Lieu 1: 92VJ+R6, Cocody Angré 8e Tranche, Zone Bon Prix. Lieu 2: 92F6+QH, Cocody / 2 Plateaux Vallon",
-    locationHint: "Angré: près du Programme 6, à 120 m du Pain du Quotidien. Vallon: zone Petit Sococé",
+    dates: "11 juillet - 12 septembre 2026",
+    startDate: "2026-07-11",
+    endDate: "2026-09-12",
+    duration: "2 mois / 8 semaines",
+    registrationFee: 0,
+    classCapacity: 15,
+    location: "Centre Programme 6: Cocody Angré 8e Tranche, à côté du Programme 6, à 120 m du carrefour Pain du Quotidien. Centre Poincaré: 2 Plateaux Vallon, au sein de l'Établissement Henri Poincaré.",
+    locationHint: "Programme 6 accueille la Formation Régulière et la vague hybride du matin. Poincaré est le centre complet: Formation Régulière, Club d'Anglais et Formation Hybride.",
     phone: "+225 01 61 33 78 64",
+    email: "primelanguageacademy9@gmail.com",
     whatsapp: "https://wa.me/2250161337864",
+    appointmentSlots: "Mardi 10h00 - 14h00 et jeudi 09h00 - 14h00, en visioconférence",
 };
 
 export const PLA_CLUB_CAPACITY = 26;
@@ -22,9 +28,73 @@ const PLA_BASE_PLANS = [
 export const PLA_PLANS = PLA_BASE_PLANS;
 export const PLA_CLUB_PLANS = PLA_PLANS;
 
-export const PLA_TIME_SLOTS = [
-    { id: "v1", label: "Vague 1", time: "16h00 - 18h00", desc: "Idéal pour les étudiants et apprenants disponibles en fin d'après-midi" },
-    { id: "v2", label: "Vague 2", time: "18h00 - 20h00", desc: "Idéal pour les professionnels après le travail" },
+export const PLA_REGULAR_TIME_SLOTS = [
+    { id: "v1", label: "Vague 1", time: "16h00 - 18h00", desc: "Disponible pour la Formation Régulière, et pour le Club d'Anglais au Centre Poincaré" },
+    { id: "v2", label: "Vague 2", time: "18h00 - 20h00", desc: "Disponible pour la Formation Régulière, et pour le Club d'Anglais au Centre Poincaré" },
+] as const;
+
+export const PLA_HYBRID_TIME_SLOT = {
+    id: "v3",
+    label: "Vague 3",
+    time: "09h00 - 12h00",
+    desc: "Créneau matin dédié à la Formation Hybride, du lundi au samedi",
+} as const;
+
+export const PLA_TIME_SLOTS = PLA_REGULAR_TIME_SLOTS;
+
+export const PLA_CENTERS = [
+    {
+        id: "programme-6",
+        name: "Centre Programme 6",
+        place: "Cocody Angré 8e Tranche",
+        address: "À côté du Programme 6, à 120 m du carrefour Pain du Quotidien, ruelle longeant la cité Programme 6",
+        mapUrl: "https://maps.app.goo.gl/udHU3RYt2qGDjr8C8?g_st=iwb",
+        positioning: "Centre principal et spécialisé pour les apprenants qui recherchent une formation structurée, avec une offre hybride matinale.",
+        highlight: "Centre principal: Régulière + Hybride matin",
+        programs: [
+            {
+                name: "Formation Régulière",
+                slots: ["Vague 1: 16h00 - 18h00", "Vague 2: 18h00 - 20h00"],
+                schedule: "Du lundi au samedi",
+                summary: "Apprentissage structuré pour construire les bases, progresser régulièrement et parler avec plus de confiance.",
+            },
+            {
+                name: "Formation Hybride",
+                slots: ["Vague 3: 09h00 - 12h00"],
+                schedule: "Du lundi au samedi",
+                summary: "Pratique intensive, ressources numériques et accompagnement guidé dans un environnement favorable à l'immersion.",
+            },
+        ],
+    },
+    {
+        id: "poincare",
+        name: "Centre Poincaré",
+        place: "Établissement Henri Poincaré",
+        address: "Cocody 2 Plateaux Vallon, Abidjan",
+        mapUrl: "https://maps.app.goo.gl/6hsw26QJcq55zyv69?g_st=iwb",
+        positioning: "Centre complet de Prime Language Academy, avec l'ensemble des programmes disponibles.",
+        highlight: "Centre complet: Régulière, Club et Hybride",
+        programs: [
+            {
+                name: "Formation Régulière",
+                slots: ["Vague 1: 16h00 - 18h00", "Vague 2: 18h00 - 20h00"],
+                schedule: "Du lundi au samedi",
+                summary: "Parcours structuré pour développer les bases, la compréhension et l'expression active.",
+            },
+            {
+                name: "Club d'Anglais",
+                slots: ["Vague 1: 16h00 - 18h00", "Vague 2: 18h00 - 20h00"],
+                schedule: "Du lundi au samedi",
+                summary: "Pratique régulière pour maintenir le niveau, développer la fluidité et parler plus naturellement.",
+            },
+            {
+                name: "Formation Hybride",
+                slots: ["Vague 3: 09h00 - 12h00"],
+                schedule: "Du lundi au samedi",
+                summary: "Apprentissage structuré, pratique guidée et ressources numériques pour accélérer la progression.",
+            },
+        ],
+    },
 ] as const;
 
 export const PLA_FAQ = [
@@ -38,7 +108,7 @@ export const PLA_FAQ = [
     },
     {
         question: "Est-ce que je reçois une attestation ?",
-        answer: "Oui. Une attestation de formation est délivrée en fin de session, avec votre niveau selon le cadre européen CECRL, de A1 à C2.",
+        answer: "Oui. Une attestation de formation peut être délivrée en fin de session, selon l'assiduité, la participation et l'évaluation du niveau.",
     },
     {
         question: "Comment se passe le paiement ?",
@@ -54,7 +124,7 @@ export const PLA_FAQ = [
     },
     {
         question: "Puis-je accéder à la plateforme avant le début officiel ?",
-        answer: "Oui ! Dès votre inscription, vous accédez immédiatement à notre plateforme de formation, à la documentation pédagogique complète et à une préformation pour bien démarrer. N'attendez pas le 21 Juin pour progresser.",
+        answer: "Oui ! Dès votre inscription, vous accédez immédiatement à notre plateforme de formation, à la documentation pédagogique complète et à une préformation pour bien démarrer. N'attendez pas le 11 juillet pour progresser.",
     },
 ] as const;
 

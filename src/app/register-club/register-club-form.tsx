@@ -156,7 +156,7 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:pb-0">
             <div className="flex items-center justify-between mb-8 px-2">
                 {steps.map((label, idx) => {
                     const isActive = step === idx + 1;
@@ -308,7 +308,7 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                                     <label className={`p-4 rounded-xl border cursor-pointer transition-all ${formData.paymentOption === 'fractionne' ? 'bg-secondary/10 border-secondary text-secondary' : 'border-[var(--foreground)]/10 text-[var(--foreground)]/70 hover:border-secondary/30'}`}>
                                         <input type="radio" name="paymentOption" value="fractionne" checked={formData.paymentOption === 'fractionne'} onChange={handleChange} className="sr-only" />
                                         <span className="block text-xs font-black">Paiement en 2 fois</span>
-                                        <span className="mt-1 block text-[10px] font-bold opacity-60">Prise en charge maintenant, Réservation ensuite.</span>
+                                        <span className="mt-1 block text-[10px] font-bold opacity-60">Prise en charge maintenant, solde de réservation avant le début officiel.</span>
                                     </label>
                                 </div>
                             </div>
@@ -328,6 +328,9 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                                     <li><span className="opacity-50">À payer maintenant:</span> <strong className="text-secondary">{formatFcfa(immediateAmount)}</strong></li>
                                     {formData.paymentOption === "fractionne" && (
                                         <li><span className="opacity-50">Réservation restante:</span> {formatFcfa(reservationAmount)}</li>
+                                    )}
+                                    {formData.paymentOption === "fractionne" && (
+                                        <li className="leading-5 text-[var(--foreground)]/55">Le solde de réservation doit être réglé avant le début officiel pour confirmer définitivement la place.</li>
                                     )}
                                 </>
                             )}

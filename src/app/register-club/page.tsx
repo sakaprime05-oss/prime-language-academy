@@ -29,7 +29,7 @@ export default async function RegisterClubPage({ searchParams }: { searchParams?
       : "";
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-6 sm:p-6 bg-[var(--background)] relative overflow-hidden">
+    <main className="min-h-screen flex flex-col items-center justify-start bg-[var(--background)] px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-6 sm:p-6 lg:justify-center relative overflow-x-hidden">
       <div className="bg-blob w-[500px] h-[500px] bg-secondary -top-20 -left-20 animate-float opacity-10"></div>
       <div className="bg-blob w-[400px] h-[400px] bg-primary bottom-0 right-0 animate-float opacity-10" style={{ animationDelay: "-3s" }}></div>
 
@@ -37,7 +37,7 @@ export default async function RegisterClubPage({ searchParams }: { searchParams?
         <section className="glass-card border-secondary/20 bg-[#0D0D14] text-[#F5F0E8] shadow-2xl">
           <div className="space-y-5">
             <p className="text-[10px] font-black uppercase tracking-[0.24em] text-secondary/70">Membership privé</p>
-            <h2 className="text-3xl font-black leading-tight">The English Club est limité à 26 membres.</h2>
+            <h2 className="text-3xl font-black leading-tight">The English Club est limité à {PLA_CLUB_CAPACITY} membres.</h2>
             <p className="text-sm leading-7 text-[#F5F0E8]/60">
               Pour garder des échanges utiles, un vrai suivi et une communauté premium, les inscriptions Club sont volontairement limitées.
             </p>
@@ -54,7 +54,7 @@ export default async function RegisterClubPage({ searchParams }: { searchParams?
             <p className="rounded-2xl border border-secondary/15 bg-secondary/10 p-4 text-xs font-bold leading-6 text-[#F5F0E8]/75">
               {isWaitlistMode
                 ? "Le Club est complet. Votre demande sera enregistrée en liste d'attente, sans paiement immédiat."
-                : "Votre paiement réserve votre place. Une fois les 26 places atteintes, les nouvelles demandes passent en liste d'attente."}
+                : `Votre paiement réserve votre place. Une fois les ${PLA_CLUB_CAPACITY} places atteintes, les nouvelles demandes passent en liste d'attente.`}
             </p>
           </div>
         </section>

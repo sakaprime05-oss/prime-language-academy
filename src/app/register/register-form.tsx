@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { registerUser } from "@/app/actions/auth-actions";
-import { PLA_PLANS, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CENTERS, PLA_PLANS, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 const planSessions: Record<string, number> = {
     "loisir": 1,
@@ -30,7 +30,7 @@ const paymentMethods = [
     { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard" },
 ];
 
-const availableDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+const availableDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 
 const objectives = [
     "Travail / carrière", "Voyage", "Études",
@@ -51,7 +51,7 @@ const steps = ["Profil", "Objectifs", "Formule", "Paiement"];
 const fieldLabelClass = "px-1 text-[10px] font-black uppercase tracking-[0.12em] text-[var(--foreground)]/55";
 const fieldClass = "w-full rounded-lg border border-[var(--foreground)]/15 bg-white/60 px-3 py-2.5 text-sm font-medium text-[var(--foreground)] outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/15 dark:bg-white/5";
 const choiceClass = "flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition-colors";
-const actionBarClass = "sticky bottom-2 z-20 grid grid-cols-[0.82fr_1.18fr] gap-2 rounded-lg border border-[var(--foreground)]/10 bg-[var(--background)]/90 p-2 shadow-lg shadow-black/10 backdrop-blur sm:static sm:grid-cols-[0.8fr_1.2fr] sm:gap-3 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none";
+const actionBarClass = "sticky bottom-[calc(0.5rem+env(safe-area-inset-bottom))] z-20 grid grid-cols-[0.82fr_1.18fr] gap-2 rounded-lg border border-[var(--foreground)]/10 bg-[var(--background)]/95 p-2 shadow-lg shadow-black/10 backdrop-blur sm:static sm:grid-cols-[0.8fr_1.2fr] sm:gap-3 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none";
 const backButtonClass = "min-h-12 rounded-lg bg-[var(--foreground)]/6 px-3 py-3 text-sm font-black text-[var(--foreground)] transition-colors hover:bg-[var(--foreground)]/10";
 
 function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
@@ -84,6 +84,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
         planId: searchParams.get("plan") || "essentiel",
         courseMode: "PRESENTIEL", // PRESENTIEL, ONLINE
         studentType: "INDIVIDUEL", // INDIVIDUEL, ENTREPRISE
+        centerId: searchParams.get("center") || "poincare",
         days: [] as string[],
         timeSlot: "",
 
@@ -95,6 +96,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     });
 
     const selectedPlan = plans.find((plan) => plan.id === formData.planId) || plans[1];
+    const selectedCenter = PLA_CENTERS.find((center) => center.id === formData.centerId) || PLA_CENTERS[1];
     const selectedPlanAmount = PLA_PLANS.find((plan) => plan.id === formData.planId)?.price || PLA_PLANS[1].price;
     const selectedPaymentMethod = paymentMethods.find((method) => method.id === formData.paymentMethod) || paymentMethods[0];
     const immediateAmount = formData.paymentOption === "fractionne" ? selectedPlanAmount * 0.5 : selectedPlanAmount;
@@ -276,7 +278,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:space-y-6 sm:pb-0">
                 {/* STEP 1: Informations Personnelles */}
                 {step === 1 && (
                     <div className="space-y-3 animate-in fade-in slide-in-from-right-4 sm:space-y-4">
@@ -509,7 +511,27 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         </div>
 
                         <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
-                            <h3 className="text-lg font-black text-[var(--foreground)]">5. Créneau Horaire</h3>
+                            <h3 className="text-lg font-black text-[var(--foreground)]">Centre de formation</h3>
+                            <p className="text-xs text-[var(--foreground)]/60">Choisissez le centre qui correspond le mieux à votre parcours.</p>
+                            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                                {PLA_CENTERS.map((center) => (
+                                    <label key={center.id} className={`flex cursor-pointer flex-col rounded-lg border p-3 transition-colors ${formData.centerId === center.id ? 'border-primary bg-primary/10' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
+                                        <div className="flex items-center gap-3">
+                                            <input type="radio" name="centerId" value={center.id} checked={formData.centerId === center.id} onChange={handleChange} className="accent-primary" />
+                                            <span className="font-black text-[var(--foreground)] text-sm">{center.name}</span>
+                                        </div>
+                                        <p className="ml-7 mt-1 text-xs font-bold text-primary">{center.highlight}</p>
+                                        <p className="ml-7 mt-1 text-xs leading-5 text-[var(--foreground)]/60">{center.place} · {center.address}</p>
+                                    </label>
+                                ))}
+                            </div>
+                            <div className="rounded-lg border border-primary/15 bg-primary/10 p-3 text-xs leading-6 text-[var(--foreground)]/65">
+                                <strong className="text-[var(--foreground)]">{selectedCenter.name}:</strong> {selectedCenter.programs.map((program) => `${program.name} (${program.slots.join(", ")})`).join(" · ")}
+                            </div>
+                        </div>
+
+                        <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
+                            <h3 className="text-lg font-black text-[var(--foreground)]">Créneau horaire</h3>
                             <p className="text-xs text-[var(--foreground)]/60 mb-2">Choisissez votre vague horaire préférée.</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 {timeSlots.map(slot => (
@@ -522,7 +544,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         </div>
 
                         <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
-                            <h3 className="text-lg font-black text-[var(--foreground)]">6. Jours de base</h3>
+                            <h3 className="text-lg font-black text-[var(--foreground)]">Jours de base</h3>
                             <p className="text-xs text-[var(--foreground)]/60 mb-2">Choisissez vos jours de base ({planSessions[formData.planId]} jour{planSessions[formData.planId] > 1 ? 's' : ''} requis).</p>
                             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                                 {availableDays.map(day => (
@@ -571,7 +593,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                     <input type="radio" name="paymentOption" value="fractionne" checked={formData.paymentOption === 'fractionne'} onChange={handleChange} className="accent-primary mt-0.5" />
                                     <div>
                                         <span className="font-bold block text-sm">Paiement en 2 fois</span>
-                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">1re moitié : la Prise en charge, qui donne accès à la documentation, aux conseils, à la plateforme et au suivi. 2e moitié : la Réservation de votre place.</span>
+                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">1re moitié : la Prise en charge, qui ouvre l'accès à la documentation, aux conseils, à la plateforme et au suivi. 2e moitié : la Réservation, à solder avant le début officiel pour verrouiller définitivement la place.</span>
                                     </div>
                                 </label>
                             </div>
@@ -590,7 +612,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 <div className="mt-1 text-2xl font-black text-[var(--foreground)]">{formatFcfa(immediateAmount)}</div>
                                 {formData.paymentOption === "fractionne" && (
                                     <p className="mt-2 text-xs font-medium text-[var(--foreground)]/60">
-                                        Cette première moitié correspond à la Prise en charge. La Réservation restante sera de {formatFcfa(reservationAmount)}.
+                                        Cette première moitié correspond à la Prise en charge. La Réservation restante sera de {formatFcfa(reservationAmount)} et devra être réglée avant le début officiel pour confirmer définitivement votre place.
                                     </p>
                                 )}
                             </div>
@@ -602,7 +624,8 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             <div className="rounded-lg border border-[var(--foreground)]/10 bg-white/65 p-4 text-xs font-bold leading-relaxed text-[var(--foreground)]/75 dark:bg-white/5">
                                 <ul className="list-disc space-y-2 pl-4">
                                     <li>L'inscription offerte est réservée aux premiers inscrits.</li>
-                                    <li>Le solde total doit obligatoirement être réglé avant le début de la formation.</li>
+                                    <li>Le solde total doit obligatoirement être réglé avant le début officiel de la formation afin de garantir et verrouiller votre place.</li>
+                                    <li>Un simple acompte ne valide pas la réservation définitive face à la forte demande.</li>
                                     <li><strong>Condition de remboursement :</strong> En cas d'annulation notifiée avant le début de la formation, un remboursement est possible. Aucun remboursement ne sera effectué une fois les cours commencés.</li>
                                     <li>Les supports pédagogiques sont offerts au format numérique.</li>
                                     <li>La présence régulière est indispensable pour obtenir l'attestation.</li>

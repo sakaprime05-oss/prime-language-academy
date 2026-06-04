@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Download } from "lucide-react";
 import { LogoMark } from "@/components/logo";
 import ThemeToggle from "@/components/ThemeToggle";
-import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_FAQ, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CENTERS, PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_FAQ, PLA_HYBRID_TIME_SLOT, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 /* ── tiny helpers ── */
 const PLANS = [
@@ -22,6 +22,7 @@ const CLUB_PLANS = [
 ];
 
 const MARQUEE_WORDS = ["Speaking","Confidence","Fluency","Excellence","Bilinguisme","Impact","Immersion","Mastery","Progress","Growth","Networking","Community"];
+const SESSION_START_LABEL = PLA_SESSION.dates.split(" - ")[0];
 
 const WHY = [
   { n:"01", title:"Méthode ISO+", desc:"Input → Structure → Output → Automatisation. Une approche pratique orientée communication — votre cerveau pense directement en anglais." },
@@ -146,7 +147,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
 
             {/* Stats */}
             <div className="landing-hero-stats" style={{ display:"flex", gap:40, marginTop:56, paddingTop:40, borderTop:"1px solid rgba(231,22,42,0.12)", justifyContent:"center", width:"100%" }}>
-              {[["6","Formules adaptées"],["2","Vagues horaires"],["21 juin","Début session"]].map(([v,l])=>(
+              {[["2","Centres"],["3","Vagues horaires"],[SESSION_START_LABEL,"Début session"]].map(([v,l])=>(
                 <div className="landing-stat" key={l}>
                   <div className="landing-stat-value" style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:900, color:"#E7162A", lineHeight:1 }}>{v}</div>
                   <div className="landing-stat-label" style={{ fontSize:11, color:"var(--muted-foreground)", marginTop:6, textTransform:"uppercase", letterSpacing:"0.1em" }}>{l}</div>
@@ -219,7 +220,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
             <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px", background:"var(--surface)", backdropFilter:"blur(16px)" }}>
               <div style={{ width:50, height:50, borderRadius:12, background:"rgba(231,22,42,0.1)", color:"#E7162A", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, marginBottom:24 }}>🏢</div>
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>Présentiel</h3>
-              <p style={{ color:"var(--muted-foreground)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Immersion totale dans nos locaux à Angré 8e Tranche. L'environnement idéal pour rester concentré, interagir en face-à-face et profiter de la dynamique de groupe.</p>
+              <p style={{ color:"var(--muted-foreground)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Immersion totale dans nos centres Programme 6 et Poincaré. L'environnement idéal pour rester concentré, interagir en face-à-face et profiter de la dynamique de groupe.</p>
               <div style={{ fontSize:12, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#E7162A" }}>Disponible</div>
             </div>
 
@@ -248,6 +249,38 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
 
       {/* Divider */}
       <div className="divider-gold" style={{ maxWidth:1200, margin:"0 auto" }}/>
+
+      <section style={{ padding:"100px 2rem", background:"rgba(231,22,42,0.02)" }}>
+        <div style={{ maxWidth:1100, margin:"0 auto" }}>
+          <div style={{ textAlign:"center", marginBottom:48 }}>
+            <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", marginBottom:16 }}>Nos centres</div>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.1rem,4vw,3rem)", fontWeight:900, margin:"0 0 16px" }}>
+              Programme 6 ou <em style={{ color:"#E7162A" }}>Poincaré</em>
+            </h2>
+            <p style={{ color:"var(--muted-foreground)", fontSize:15, lineHeight:1.7, maxWidth:680, margin:"0 auto" }}>
+              Deux lieux à Cocody, avec des offres clairement réparties pour choisir le parcours le plus adapté.
+            </p>
+          </div>
+
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:20 }}>
+            {PLA_CENTERS.map((center) => (
+              <div key={center.id} style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:22, padding:"28px", background:"var(--surface)" }}>
+                <div style={{ fontSize:11, letterSpacing:"0.16em", textTransform:"uppercase", color:"#E7162A", fontWeight:900, marginBottom:10 }}>{center.highlight}</div>
+                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:900, margin:"0 0 8px", color:"var(--foreground)" }}>{center.name}</h3>
+                <p style={{ color:"var(--foreground)", fontSize:14, fontWeight:800, margin:"0 0 10px" }}>{center.place}</p>
+                <p style={{ color:"var(--muted-foreground)", fontSize:14, lineHeight:1.7, margin:"0 0 18px" }}>{center.positioning}</p>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+                  {center.programs.map((program) => (
+                    <span key={program.name} style={{ border:"1px solid rgba(231,22,42,0.16)", borderRadius:999, padding:"8px 12px", fontSize:10, fontWeight:900, letterSpacing:"0.12em", textTransform:"uppercase", color:"#E7162A" }}>
+                      {program.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ══════════ MISSION / VISION ══════════ */}
       <section id="mission" style={{ padding:"120px 2rem" }}>
@@ -361,6 +394,12 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
               <div style={{ fontSize:13, color:"var(--muted-foreground)" }}>{desc}</div>
             </div>
           ))}
+          <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px 32px", background:"var(--surface)", backdropFilter:"blur(16px)", overflow:"hidden", position:"relative" }}>
+            <div style={{ position:"absolute", top:-20, right:-20, width:100, height:100, borderRadius:"50%", background:"rgba(231,22,42,0.05)", filter:"blur(30px)" }}/>
+            <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:12 }}>{PLA_HYBRID_TIME_SLOT.label}</div>
+            <div style={{ fontFamily:"'Playfair Display',serif", fontSize:36, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>{PLA_HYBRID_TIME_SLOT.time}</div>
+            <div style={{ fontSize:13, color:"var(--muted-foreground)" }}>{PLA_HYBRID_TIME_SLOT.desc}</div>
+          </div>
         </div>
       </section>
 
@@ -401,7 +440,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
           <div style={{ textAlign:"center", marginBottom:56 }}>
             <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", marginBottom:16 }}>Dès votre inscription</div>
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2rem,4vw,3rem)", fontWeight:900, margin:"0 0 16px" }}>
-              N'attendez pas le <em style={{ color:"#E7162A" }}>21 Juin</em>
+              N'attendez pas le <em style={{ color:"#E7162A" }}>{SESSION_START_LABEL}</em>
             </h2>
             <p style={{ color:"var(--muted-foreground)", fontSize:15, maxWidth:520, margin:"0 auto" }}>Inscrivez-vous dès maintenant et bénéficiez immédiatement de tout ceci :</p>
           </div>
@@ -510,7 +549,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
             Prêt à débloquer<br/><em style={{ color:"#E7162A" }}>votre potentiel ?</em>
           </h2>
           <p style={{ color:"var(--muted-foreground)", fontSize:16, marginBottom:48, maxWidth:480, marginLeft:"auto", marginRight:"auto", lineHeight:1.7 }}>
-            Angré 8e Tranche · Lun–Dim · 16h – 20h<br/>
+            Programme 6 et Poincaré · Lun–Sam · 09h – 20h<br/>
             <a href="https://wa.me/2250161337864?text=Bonjour%20!%20Je%20souhaite%20avoir%20des%20informations%20sur%20Prime%20Language%20Academy%20%F0%9F%8E%93" target="_blank" rel="noopener noreferrer" style={{ color:"#25D366", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:6, marginTop:8 }}>
               <svg width="18" height="18" viewBox="0 0 32 32" fill="none"><path d="M16 3C9.373 3 4 8.373 4 15c0 2.385.668 4.61 1.83 6.5L4 29l7.7-1.81A12.94 12.94 0 0016 28c6.627 0 12-5.373 12-13S22.627 3 16 3z" fill="#25D366"/><path d="M21.04 18.16c-.28-.14-1.664-.82-1.92-.912-.256-.096-.44-.14-.628.14-.188.28-.72.912-.88 1.1-.164.184-.324.208-.604.07-.28-.14-1.18-.436-2.248-1.388-.832-.74-1.392-1.656-1.556-1.936-.164-.28-.016-.432.124-.572.126-.124.28-.324.42-.488.14-.164.188-.28.28-.468.096-.188.048-.352-.024-.492-.068-.14-.628-1.512-.86-2.072-.228-.548-.456-.472-.628-.48l-.536-.008c-.188 0-.492.068-.748.352-.256.284-.98.956-.98 2.332 0 1.376 1.004 2.704 1.14 2.892.14.188 1.968 3.004 4.768 4.212.668.288 1.188.46 1.596.588.668.212 1.276.184 1.756.112.536-.08 1.664-.68 1.896-1.34.236-.656.236-1.22.168-1.34-.072-.12-.252-.188-.532-.328z" fill="white"/></svg>
               +225 01 61 33 78 64 · WhatsApp
@@ -612,7 +651,6 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
           <Link href="/placement-test" style={{ color:"inherit", textDecoration:"none" }}>Test</Link>
           <Link href="/conditions-generales" style={{ color:"inherit", textDecoration:"none" }}>CGV</Link>
           <Link href="/politique-confidentialite" style={{ color:"inherit", textDecoration:"none" }}>Confidentialite</Link>
-          <Link href="/mentions-legales" style={{ color:"inherit", textDecoration:"none" }}>Mentions legales</Link>
           <Link href="/login" style={{ color:"inherit", textDecoration:"none" }}>Connexion</Link>
         </div>
         <div style={{ fontSize:11, color:"var(--muted-foreground)", letterSpacing:"0.1em" }}>© 2026 Prime Language Academy</div>
