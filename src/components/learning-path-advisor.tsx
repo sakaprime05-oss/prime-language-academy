@@ -38,7 +38,7 @@ const PATHS = [
     center: poincare,
     schedule: `${PLA_HYBRID_TIME_SLOT.label} · ${PLA_HYBRID_TIME_SLOT.time}`,
     text: "Un format plus souple pour avancer le matin avec ressources numeriques, suivi et pratique accompagnee.",
-    href: "/register?center=poincare",
+    href: "/register?path=hybrid&center=poincare",
     cta: "Choisir l'hybride",
     featured: false,
   },

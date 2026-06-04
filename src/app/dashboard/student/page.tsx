@@ -4,8 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { getStudentProgressData } from "@/app/actions/student-progress";
 import { getDictionary } from "@/lib/i18n";
 import Link from "next/link";
-import { PLA_CLUB_CAPACITY, PLA_SESSION, PLA_TIME_SLOTS } from "@/lib/pla-program";
-import { parseStudentProfileData } from "@/lib/student-profile";
+import { PLA_CENTERS, PLA_CLUB_CAPACITY, PLA_HYBRID_TIME_SLOT, PLA_SESSION, PLA_TIME_SLOTS } from "@/lib/pla-program";
+import { getStudentPath, parseStudentProfileData } from "@/lib/student-profile";
 
 function daysUntil(date: Date) {
     const now = new Date();
@@ -56,9 +56,11 @@ export default async function StudentDashboardPage() {
     const sessionEnd = new Date(`${PLA_SESSION.endDate}T23:59:59`);
     const remainingDays = daysUntil(sessionEnd);
     const remainingSessions = countRemainingSessions(profile.days || [], sessionEnd);
-    const selectedSlot = PLA_TIME_SLOTS.find((slot) => slot.id === profile.timeSlot);
-
-    const isClub = user?.registrationType === "CLUB";
+    const studentPath = getStudentPath(user?.registrationType, user?.onboardingData);
+    const isClub = studentPath === "CLUB";
+    const isHybrid = studentPath === "HYBRID";
+    const selectedSlot = isHybrid ? PLA_HYBRID_TIME_SLOT : PLA_TIME_SLOTS.find((slot) => slot.id === profile.timeSlot);
+    const selectedCenter = PLA_CENTERS.find((center) => center.id === profile.centerId) || PLA_CENTERS[0];
     const isWaitlisted = user?.status === "WAITLIST";
     const memberSince = user?.createdAt
         ? new Date(user.createdAt).toLocaleDateString('fr-FR')
@@ -94,10 +96,10 @@ export default async function StudentDashboardPage() {
                 <div className="space-y-0.5 min-w-0">
                     <p className="text-xl md:text-2xl font-black text-[var(--foreground)] tracking-tight leading-snug truncate"
                         style={{fontFamily: 'Inter, sans-serif'}}>
-                        {isClub ? `Welcome back, ${session.user.name?.split(' ')[0]} 🥂` : `${dict.welcome}, ${session.user.name?.split(' ')[0]} 👋`}
+                        {isClub ? `Welcome back, ${session.user.name?.split(' ')[0]} 🥂` : isHybrid ? `Bienvenue en hybride, ${session.user.name?.split(' ')[0]} 👋` : `${dict.welcome}, ${session.user.name?.split(' ')[0]} 👋`}
                     </p>
                     <p className="text-sm text-[var(--foreground)]/50 font-medium leading-tight">
-                        {isClub ? dict.ready_club : dict.ready_course}
+                        {isClub ? dict.ready_club : isHybrid ? "Votre parcours du matin combine supports, pratique guidée et suivi." : dict.ready_course}
                     </p>
                 </div>
                 <div className="w-11 h-11 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-black shadow-lg shadow-primary/20 text-lg border-2 border-white/20 flex-shrink-0">
@@ -125,7 +127,7 @@ export default async function StudentDashboardPage() {
                         <div className="relative z-10 flex flex-col justify-between h-full">
                             <div>
                                 <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2">
-                                    {isClub ? dict.your_club : dict.your_plan}
+                                    {isClub ? dict.your_club : isHybrid ? "Votre parcours hybride" : dict.your_plan}
                                 </p>
                                 <h3 className="text-2xl font-black text-[var(--foreground)]">{progressData.levelName}</h3>
                                 <p className="text-xs text-[var(--foreground)]/50 mt-2 font-bold uppercase tracking-widest">
@@ -150,12 +152,12 @@ export default async function StudentDashboardPage() {
 
                     <div className="glass-card flex flex-col justify-center items-center text-center space-y-2 border-primary/20 bg-primary/5">
                         <div className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center font-black shadow-lg shadow-primary/20 mb-2">
-                            {isClub ? "✨" : (progressData.totalLessons - progressData.completedLessons)}
+                            {isClub ? "✨" : isHybrid ? "H" : (progressData.totalLessons - progressData.completedLessons)}
                         </div>
                         <p className="text-[10px] font-black text-[var(--foreground)]/40 uppercase tracking-widest">
-                            {isClub ? dict.club_status : dict.lessons_left}
+                            {isClub ? dict.club_status : isHybrid ? "Vague 3" : dict.lessons_left}
                         </p>
-                        <p className="text-sm font-black text-[var(--foreground)]">{isClub ? dict.active : dict.get_ready}</p>
+                        <p className="text-sm font-black text-[var(--foreground)]">{isClub ? dict.active : isHybrid ? PLA_HYBRID_TIME_SLOT.time : dict.get_ready}</p>
                     </div>
                 </div>
             )}
@@ -166,7 +168,7 @@ export default async function StudentDashboardPage() {
                         <div className="flex items-start justify-between gap-4">
                             <div>
                                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Programme</p>
-                                <h3 className="mt-1 text-xl font-black text-[var(--foreground)]">{PLA_SESSION.label}</h3>
+                                <h3 className="mt-1 text-xl font-black text-[var(--foreground)]">{isHybrid ? "Formation Hybride" : PLA_SESSION.label}</h3>
                                 <p className="mt-1 text-xs font-bold text-[var(--foreground)]/45">{PLA_SESSION.dates} - {PLA_SESSION.duration}</p>
                             </div>
                             <div className="rounded-2xl bg-primary/10 px-4 py-3 text-center text-primary">
@@ -180,6 +182,12 @@ export default async function StudentDashboardPage() {
                             <MiniStat label="Leçons restantes" value={String(Math.max(0, (progressData.totalLessons || 0) - (progressData.completedLessons || 0)))} />
                             <MiniStat label="Avancement" value={`${progressData.percentage}%`} />
                         </div>
+
+                        {isHybrid && (
+                            <Link href="/dashboard/student/hybrid" className="inline-flex rounded-2xl bg-primary px-5 py-3 text-xs font-black uppercase tracking-widest text-primary-foreground">
+                                Ouvrir l'espace hybride
+                            </Link>
+                        )}
 
                         <div className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4">
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40">Objectif</p>
@@ -206,7 +214,7 @@ export default async function StudentDashboardPage() {
                             )}
                         </div>
                         <p className="text-[11px] font-medium leading-5 text-[var(--foreground)]/45">
-                            Lieu : {PLA_SESSION.location}. {PLA_SESSION.locationHint}
+                            Lieu : {isHybrid ? `${selectedCenter.name} - ${selectedCenter.place}. ${selectedCenter.address}` : `${PLA_SESSION.location}. ${PLA_SESSION.locationHint}`}
                         </p>
                     </div>
                 </section>

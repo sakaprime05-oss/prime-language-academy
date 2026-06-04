@@ -125,11 +125,15 @@ export default async function RegisterPage() {
             </Link>
           </div>
 
-          <div className="mb-4 grid grid-cols-2 gap-2 sm:mb-6 sm:gap-3">
+          <div className="mb-4 grid grid-cols-1 gap-2 sm:mb-6 sm:grid-cols-3 sm:gap-3">
             <div className="rounded-lg border border-primary/25 bg-primary/10 p-3">
               <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary">Formation</p>
               <p className="mt-1 text-xs font-bold leading-5 text-[var(--foreground)]/70">Cours, suivi et plateforme inclus.</p>
             </div>
+            <Link href="/register?path=hybrid" className="rounded-lg border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-3 transition-colors hover:border-primary/30 hover:bg-primary/10">
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[var(--foreground)]/60">Hybride</p>
+              <p className="mt-1 text-xs font-bold leading-5 text-[var(--foreground)]/60">Vague 3 matin, supports et suivi visio.</p>
+            </Link>
             <Link href="/register-club" className="rounded-lg border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-3 transition-colors hover:border-primary/30 hover:bg-primary/10">
               <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[var(--foreground)]/60">English Club</p>
               <p className="mt-1 text-xs font-bold leading-5 text-[var(--foreground)]/60">Pratique orale pour niveau fort.</p>

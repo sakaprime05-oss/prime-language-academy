@@ -6,7 +6,7 @@ import { getDictionary, getLocale } from "@/lib/i18n";
 import { LangToggle } from "@/components/lang-toggle";
 import { prisma } from "@/lib/prisma";
 import ThemeToggle from "@/components/ThemeToggle";
-import { hasRequiredProfilePhoto } from "@/lib/student-profile";
+import { getStudentPath, getStudentPathLabel, hasRequiredProfilePhoto, type StudentPath } from "@/lib/student-profile";
 import { LogoMark } from "@/components/logo";
 import { StudentSidebarNavClient, StudentMobileNavClient } from "@/components/student-nav";
 
@@ -29,7 +29,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
     where: { id: session.user.id },
     select: { registrationType: true, onboardingData: true },
   });
-  const studentMode = student?.registrationType === "CLUB" ? "CLUB" : "FORMATION";
+  const studentMode = getStudentPath(student?.registrationType, student?.onboardingData);
+  const studentModeLabel = getStudentPathLabel(studentMode);
   const currentPath = (await headers()).get("x-url") || "";
   const canCompleteSetupLater =
     currentPath.startsWith("/dashboard/student/profile") ||
@@ -52,7 +53,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             Prime
           </p>
           <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary/60">
-            {studentMode === "CLUB" ? "English Club" : "Formation"}
+            {studentModeLabel}
           </p>
         </div>
 
@@ -67,7 +68,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <div className="min-w-0 flex-1">
             <p className="font-bold text-sm text-[var(--foreground)] truncate">{session.user.name || "Étudiant"}</p>
             <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">
-              {studentMode === "CLUB" ? "Membre Club" : "Apprenant"}
+              {studentMode === "CLUB" ? "Membre Club" : studentMode === "HYBRID" ? "Apprenant hybride" : "Apprenant"}
             </p>
           </div>
           <ThemeToggle />
@@ -82,7 +83,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <div>
               <h1 className="text-lg font-black leading-none text-[var(--foreground)]">Prime</h1>
               <p className="text-[9px] font-black uppercase tracking-widest text-primary/60">
-                {studentMode === "CLUB" ? "Club" : "Formation"}
+                {studentMode === "CLUB" ? "Club" : studentMode === "HYBRID" ? "Hybride" : "Formation"}
               </p>
             </div>
           </div>
@@ -107,10 +108,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
   );
 }
 
-function StudentSidebarNav({ dict, mode }: { dict: any; mode: "FORMATION" | "CLUB" }) {
+function StudentSidebarNav({ dict, mode }: { dict: any; mode: StudentPath }) {
   return <StudentSidebarNavClient dict={dict} mode={mode} />;
 }
 
-function StudentMobileNav({ dict, mode }: { dict: any; mode: "FORMATION" | "CLUB" }) {
+function StudentMobileNav({ dict, mode }: { dict: any; mode: StudentPath }) {
   return <StudentMobileNavClient dict={dict} mode={mode} />;
 }

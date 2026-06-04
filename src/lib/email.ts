@@ -191,11 +191,14 @@ export async function sendEmail({ to, subject, html, attachments }: SendEmailInp
 
 export async function sendWelcomeEmail(to: string, name: string, type: string = "FORMATION") {
     const isClub = type === "CLUB";
-    const title = isClub ? "Bienvenue au English Club" : "Bienvenue chez Prime Language Academy";
+    const isHybrid = type === "HYBRID";
+    const title = isClub ? "Bienvenue au English Club" : isHybrid ? "Bienvenue en Formation Hybride" : "Bienvenue chez Prime Language Academy";
     const body = `
         ${paragraph(`Bonjour ${escapeHtml(name || "cher apprenant")},`)}
         ${paragraph(isClub
             ? "Votre inscription au English Club a bien été enregistrée. Nous sommes heureux de vous compter parmi nos membres."
+            : isHybrid
+                ? "Votre inscription en Formation Hybride a bien été enregistrée. Vous aurez accès aux supports, à la plateforme, au suivi et au créneau hybride du matin."
             : "Votre inscription a bien été enregistrée. Votre parcours avec Prime Language Academy peut maintenant commencer.")}
         ${paragraph("Vous pouvez vous connecter à votre espace avec l'email et le mot de passe utilisés lors de l'inscription.")}
         ${button("Accéder à mon espace", `${appUrl()}/login`)}

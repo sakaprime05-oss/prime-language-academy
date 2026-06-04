@@ -215,6 +215,7 @@ export async function registerUser(formData: FormData) {
 
         const registrationType = onboardingParams.type === "CLUB" ? "CLUB" : "FORMATION";
         const isClubRegistration = registrationType === "CLUB";
+        const isHybridRegistration = onboardingParams.type === "HYBRID";
 
         const pedagogicalLevelName = onboardingParams.level || "Débutant";
         let level = await prisma.level.findFirst({
@@ -310,16 +311,16 @@ export async function registerUser(formData: FormData) {
             return { error: checkout.error };
         }
 
-        sendWelcomeEmail(user.email, user.name || "Étudiant", registrationType)
+        sendWelcomeEmail(user.email, user.name || "Étudiant", isHybridRegistration ? "HYBRID" : registrationType)
             .catch(err => console.error("Could not send welcome email", err));
 
-        sendAdminNewRegistrationEmail(user.name || "Nouveau", user.email, level?.name || planId)
+        sendAdminNewRegistrationEmail(user.name || "Nouveau", user.email, isHybridRegistration ? `Formation hybride - ${level?.name || planId}` : level?.name || planId)
             .catch(err => console.error("Could not send admin reg email", err));
 
         notifyTelegram("new_registration", {
             name: user.name,
             email: user.email,
-            type: registrationType,
+            type: isHybridRegistration ? "HYBRID" : registrationType,
         }).catch(err => console.error("Telegram notify failed", err));
 
         return { success: true, redirectUrl: checkout.redirectUrl };

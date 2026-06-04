@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { registerUser } from "@/app/actions/auth-actions";
-import { PLA_CENTERS, PLA_PLANS, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CENTERS, PLA_HYBRID_TIME_SLOT, PLA_PLANS, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 const planSessions: Record<string, number> = {
     "loisir": 1,
@@ -45,8 +45,6 @@ const communes = [
 
 const levels = ["Débutant", "Intermédiaire", "Avancé"];
 
-const timeSlots = PLA_TIME_SLOTS.map((slot) => ({ id: slot.id, name: `${slot.label} (${slot.time})` }));
-
 const steps = ["Profil", "Objectifs", "Formule", "Paiement"];
 const fieldLabelClass = "px-1 text-[10px] font-black uppercase tracking-[0.12em] text-[var(--foreground)]/55";
 const fieldClass = "w-full rounded-lg border border-[var(--foreground)]/15 bg-white/60 px-3 py-2.5 text-sm font-medium text-[var(--foreground)] outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/15 dark:bg-white/5";
@@ -66,7 +64,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const formTopRef = useRef<HTMLDivElement | null>(null);
 
     const [formData, setFormData] = useState({
-        type: "FORMATION",
+        type: searchParams.get("path") === "hybrid" ? "HYBRID" : "FORMATION",
         name: "",
         dob: "",
         profession: "",
@@ -86,7 +84,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
         studentType: "INDIVIDUEL", // INDIVIDUEL, ENTREPRISE
         centerId: searchParams.get("center") || "poincare",
         days: [] as string[],
-        timeSlot: "",
+        timeSlot: searchParams.get("path") === "hybrid" ? PLA_HYBRID_TIME_SLOT.id : "",
 
         paymentOption: "total",
         paymentMethod: "WAVE",
@@ -95,6 +93,8 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
         signDate: new Date().toISOString().split("T")[0]
     });
 
+    const isHybrid = formData.type === "HYBRID";
+    const availableTimeSlots = (isHybrid ? [PLA_HYBRID_TIME_SLOT] : PLA_TIME_SLOTS).map((slot) => ({ id: slot.id, name: `${slot.label} (${slot.time})` }));
     const selectedPlan = plans.find((plan) => plan.id === formData.planId) || plans[1];
     const selectedCenter = PLA_CENTERS.find((center) => center.id === formData.centerId) || PLA_CENTERS[1];
     const selectedPlanAmount = PLA_PLANS.find((plan) => plan.id === formData.planId)?.price || PLA_PLANS[1].price;
@@ -121,6 +121,10 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
         } else {
             setFormData(prev => {
                 const newData = { ...prev, [name]: value };
+                if (name === "type") {
+                    newData.timeSlot = value === "HYBRID" ? PLA_HYBRID_TIME_SLOT.id : "";
+                    newData.courseMode = value === "HYBRID" ? "PRESENTIEL" : newData.courseMode;
+                }
                 if (name === "planId") {
                     newData.days = []; // Reset days when plan changes to ensure correct count
                 }
@@ -463,7 +467,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         <div className="space-y-3">
                             <div className="space-y-3">
                                 <h3 className="text-lg font-black text-[var(--foreground)]">Type d'étudiant</h3>
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className={`grid gap-2 ${isHybrid ? "grid-cols-1" : "grid-cols-2"}`}>
                                     <label className={`flex cursor-pointer items-center justify-center rounded-lg border p-3 text-sm font-bold transition-colors ${formData.studentType === 'INDIVIDUEL' ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/60 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="studentType" value="INDIVIDUEL" checked={formData.studentType === 'INDIVIDUEL'} onChange={handleChange} className="sr-only" />
                                         Particulier
@@ -478,13 +482,29 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
 
                             <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
+                                <h3 className="text-lg font-black text-[var(--foreground)]">Parcours</h3>
+                                <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                                    <label className={`flex cursor-pointer flex-col rounded-lg border p-3 transition-colors ${formData.type === 'FORMATION' ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/70 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
+                                        <input type="radio" name="type" value="FORMATION" checked={formData.type === 'FORMATION'} onChange={handleChange} className="sr-only" />
+                                        <span className="text-sm font-black">Formation régulière</span>
+                                        <span className="mt-1 text-xs font-medium leading-5 opacity-70">Cours structurés en vagues 1 ou 2, avec supports numériques et suivi.</span>
+                                    </label>
+                                    <label className={`flex cursor-pointer flex-col rounded-lg border p-3 transition-colors ${formData.type === 'HYBRID' ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/70 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
+                                        <input type="radio" name="type" value="HYBRID" checked={formData.type === 'HYBRID'} onChange={handleChange} className="sr-only" />
+                                        <span className="text-sm font-black">Formation hybride</span>
+                                        <span className="mt-1 text-xs font-medium leading-5 opacity-70">Vague 3 du matin : cours, pratique guidée, plateforme et accompagnement visio.</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
                                 <h3 className="text-lg font-black text-[var(--foreground)]">Format des cours</h3>
                                 <div className="grid grid-cols-2 gap-2">
                                     <label className={`flex cursor-pointer items-center justify-center rounded-lg border p-3 text-sm font-bold transition-colors ${formData.courseMode === 'PRESENTIEL' ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/60 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="courseMode" value="PRESENTIEL" checked={formData.courseMode === 'PRESENTIEL'} onChange={handleChange} className="sr-only" />
                                         Présentiel
                                     </label>
-                                    {(systemSettings?.enableOnlineRegistration ?? true) && (
+                                    {(systemSettings?.enableOnlineRegistration ?? true) && !isHybrid && (
                                         <label className={`flex cursor-pointer items-center justify-center rounded-lg border p-3 text-sm font-bold transition-colors ${formData.courseMode === 'ONLINE' ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/60 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                             <input type="radio" name="courseMode" value="ONLINE" checked={formData.courseMode === 'ONLINE'} onChange={handleChange} className="sr-only" />
                                             En Ligne
@@ -532,9 +552,11 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
                         <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
                             <h3 className="text-lg font-black text-[var(--foreground)]">Créneau horaire</h3>
-                            <p className="text-xs text-[var(--foreground)]/60 mb-2">Choisissez votre vague horaire préférée.</p>
+                            <p className="text-xs text-[var(--foreground)]/60 mb-2">
+                                {isHybrid ? "Le parcours hybride utilise la vague 3 du matin." : "Choisissez votre vague horaire préférée."}
+                            </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                {timeSlots.map(slot => (
+                                {availableTimeSlots.map(slot => (
                                     <label key={slot.id} className={`${choiceClass} ${formData.timeSlot === slot.id ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="timeSlot" value={slot.id} checked={formData.timeSlot === slot.id} onChange={handleChange} className="accent-primary" />
                                         <span className="font-bold">{slot.name}</span>
@@ -602,7 +624,9 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         <div className="space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-4 sm:p-5">
                             <h3 className="text-sm font-black text-primary">Récapitulatif avant paiement</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold text-[var(--foreground)]/70">
+                                <div><span className="block opacity-50">Parcours</span>{isHybrid ? "Formation hybride" : "Formation régulière"}</div>
                                 <div><span className="block opacity-50">Formule</span>{selectedPlan.name}</div>
+                                <div><span className="block opacity-50">Centre</span>{selectedCenter.name}</div>
                                 <div><span className="block opacity-50">Moyen</span>{selectedPaymentMethod.name}</div>
                                 <div><span className="block opacity-50">Coût total</span>{formatFcfa(selectedPlanAmount)}</div>
                                 <div><span className="block opacity-50">Option</span>{formData.paymentOption === "fractionne" ? "Paiement en 2 fois" : "Paiement total"}</div>

@@ -1,5 +1,6 @@
 export type StudentProfileData = {
   type?: string;
+  centerId?: string;
   phone?: string;
   whatsapp?: string;
   commune?: string;
@@ -22,6 +23,8 @@ export type StudentProfileData = {
   paymentMethod?: string;
 };
 
+export type StudentPath = "FORMATION" | "HYBRID" | "CLUB";
+
 export function parseStudentProfileData(value?: string | null): StudentProfileData {
   if (!value) return {};
   try {
@@ -34,4 +37,16 @@ export function parseStudentProfileData(value?: string | null): StudentProfileDa
 
 export function hasRequiredProfilePhoto(value?: string | null) {
   return Boolean(parseStudentProfileData(value).profilePhotoUrl);
+}
+
+export function getStudentPath(registrationType?: string | null, onboardingData?: string | null): StudentPath {
+  if (registrationType === "CLUB") return "CLUB";
+  const profile = parseStudentProfileData(onboardingData);
+  return profile.type === "HYBRID" ? "HYBRID" : "FORMATION";
+}
+
+export function getStudentPathLabel(path: StudentPath) {
+  if (path === "CLUB") return "English Club";
+  if (path === "HYBRID") return "Formation Hybride";
+  return "Formation";
 }

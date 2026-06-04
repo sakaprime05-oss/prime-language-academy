@@ -4,10 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logoutAction } from "@/app/actions/logout";
 import { motion } from "framer-motion";
+import type { StudentPath } from "@/lib/student-profile";
 
-type StudentMode = "FORMATION" | "CLUB";
-
-export function StudentSidebarNavClient({ dict, mode = "FORMATION" }: { dict?: any; mode?: StudentMode }) {
+export function StudentSidebarNavClient({ dict, mode = "FORMATION" }: { dict?: any; mode?: StudentPath }) {
     const pathname = usePathname();
 
     const getLabel = (key: string, fallback: string) => dict?.[key] || fallback;
@@ -21,6 +20,17 @@ export function StudentSidebarNavClient({ dict, mode = "FORMATION" }: { dict?: a
             { href: "/dashboard/student/messages", label: getLabel("messages", "Messagerie"), icon: MessageIcon },
             { href: "/dashboard/student/profile", label: getLabel("profile", "Profil"), icon: UserIcon },
         ]
+        : mode === "HYBRID"
+            ? [
+                { href: "/dashboard/student", label: getLabel("dashboard", "Accueil"), icon: HomeIcon, exact: true },
+                { href: "/dashboard/student/hybrid", label: "Espace hybride", icon: HybridIcon },
+                { href: "/dashboard/student/courses", label: getLabel("courses", "Supports"), icon: BookIcon },
+                { href: "/dashboard/student/payments", label: "Paiements", icon: WalletIcon },
+                { href: "/dashboard/student/appointments", label: getLabel("appointments", "Suivi"), icon: ClockIcon },
+                { href: "/dashboard/student/forum", label: getLabel("forum", "Forum"), icon: ChatIcon },
+                { href: "/dashboard/student/messages", label: getLabel("messages", "Messagerie"), icon: MessageIcon },
+                { href: "/dashboard/student/profile", label: getLabel("profile", "Profil"), icon: UserIcon },
+            ]
         : [
             { href: "/dashboard/student", label: getLabel("dashboard", "Accueil"), icon: HomeIcon, exact: true },
             { href: "/dashboard/student/courses", label: getLabel("courses", "Cours"), icon: BookIcon },
@@ -71,7 +81,7 @@ export function StudentSidebarNavClient({ dict, mode = "FORMATION" }: { dict?: a
     );
 }
 
-export function StudentMobileNavClient({ dict, mode = "FORMATION" }: { dict?: any; mode?: StudentMode }) {
+export function StudentMobileNavClient({ dict, mode = "FORMATION" }: { dict?: any; mode?: StudentPath }) {
     const pathname = usePathname();
 
     const getLabel = (key: string, fallback: string) => dict?.[key] || fallback;
@@ -84,6 +94,14 @@ export function StudentMobileNavClient({ dict, mode = "FORMATION" }: { dict?: an
             { href: "/dashboard/student/forum", label: "Forum", icon: ChatIcon },
             { href: "/dashboard/student/profile", label: "Profil", icon: UserIcon },
         ]
+        : mode === "HYBRID"
+            ? [
+                { href: "/dashboard/student", label: "Accueil", icon: HomeIcon, exact: true },
+                { href: "/dashboard/student/hybrid", label: "Hybride", icon: HybridIcon },
+                { href: "/dashboard/student/courses", label: "Supports", icon: BookIcon },
+                { href: "/dashboard/student/payments", label: "Payer", icon: WalletIcon },
+                { href: "/dashboard/student/profile", label: "Profil", icon: UserIcon },
+            ]
         : [
             { href: "/dashboard/student", label: "Accueil", icon: HomeIcon, exact: true },
             { href: "/dashboard/student/courses", label: "Cours", icon: BookIcon },
@@ -156,6 +174,10 @@ function ClockIcon(props: any) {
 
 function ClubIcon(props: any) {
     return <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>;
+}
+
+function HybridIcon(props: any) {
+    return <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6.5A2.5 2.5 0 016.5 4h3A2.5 2.5 0 0112 6.5v11A2.5 2.5 0 019.5 20h-3A2.5 2.5 0 014 17.5v-11zM12 8h2.5A2.5 2.5 0 0117 10.5v7A2.5 2.5 0 0114.5 20H12M17 12h1.5A2.5 2.5 0 0121 14.5v3A2.5 2.5 0 0118.5 20H17" /></svg>;
 }
 
 function MessageIcon(props: any) {
