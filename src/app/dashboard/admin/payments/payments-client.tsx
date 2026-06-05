@@ -258,7 +258,7 @@ function StudentBlock({ tx }: { tx: Transaction }) {
       <p className="truncate text-sm font-black text-[var(--foreground)]">{student?.name || "Etudiant sans nom"}</p>
       <p className="mt-1 truncate text-xs font-semibold text-[var(--muted-foreground)]">{student?.email || "Email non renseigne"}</p>
       <p className="mt-2 inline-flex rounded-full border border-[var(--border)] bg-[var(--muted)] px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-[var(--muted-foreground)]">
-        {student?.registrationType === "CLUB" ? "Club" : "Formation"}
+        {student?.registrationType === "CLUB" ? "Club" : "Formation Hybride"}
       </p>
     </div>
   );

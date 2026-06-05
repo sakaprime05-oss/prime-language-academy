@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { registerUser } from "@/app/actions/auth-actions";
-import { PLA_CENTERS, PLA_HYBRID_TIME_SLOT, PLA_PLANS, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CENTERS, PLA_HYBRID_TIME_SLOT, PLA_ONLINE_TIME_SLOT, PLA_PLANS, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 const planSessions: Record<string, number> = {
     "loisir": 1,
@@ -94,7 +94,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     });
 
     const isHybrid = formData.type === "HYBRID";
-    const availableTimeSlots = (isHybrid ? [PLA_HYBRID_TIME_SLOT] : PLA_TIME_SLOTS).map((slot) => ({ id: slot.id, name: `${slot.label} (${slot.time})` }));
+    const availableTimeSlots = (formData.courseMode === "ONLINE" ? [PLA_ONLINE_TIME_SLOT] : isHybrid ? [PLA_HYBRID_TIME_SLOT] : PLA_TIME_SLOTS).map((slot) => ({ id: slot.id, name: `${slot.label} (${slot.time})` }));
     const selectedPlan = plans.find((plan) => plan.id === formData.planId) || plans[1];
     const selectedCenter = PLA_CENTERS.find((center) => center.id === formData.centerId) || PLA_CENTERS[1];
     const selectedPlanAmount = PLA_PLANS.find((plan) => plan.id === formData.planId)?.price || PLA_PLANS[1].price;
@@ -124,6 +124,13 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                 if (name === "type") {
                     newData.timeSlot = value === "HYBRID" ? PLA_HYBRID_TIME_SLOT.id : "";
                     newData.courseMode = value === "HYBRID" ? "PRESENTIEL" : newData.courseMode;
+                }
+                if (name === "courseMode") {
+                    if (value === "ONLINE") {
+                        newData.timeSlot = PLA_ONLINE_TIME_SLOT.id;
+                    } else {
+                        newData.timeSlot = newData.type === "HYBRID" ? PLA_HYBRID_TIME_SLOT.id : "";
+                    }
                 }
                 if (name === "planId") {
                     newData.days = []; // Reset days when plan changes to ensure correct count
@@ -486,13 +493,13 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                                     <label className={`flex cursor-pointer flex-col rounded-lg border p-3 transition-colors ${formData.type === 'FORMATION' ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/70 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="type" value="FORMATION" checked={formData.type === 'FORMATION'} onChange={handleChange} className="sr-only" />
-                                        <span className="text-sm font-black">Formation régulière</span>
-                                        <span className="mt-1 text-xs font-medium leading-5 opacity-70">Cours structurés en vagues 1 ou 2, avec supports numériques et suivi.</span>
+                                        <span className="text-sm font-black">Formation hybride soir / en ligne</span>
+                                        <span className="mt-1 text-xs font-medium leading-5 opacity-70">Vagues 1 ou 2 en présentiel, ou visioconférence tous les jours de 17h30 à 20h30.</span>
                                     </label>
                                     <label className={`flex cursor-pointer flex-col rounded-lg border p-3 transition-colors ${formData.type === 'HYBRID' ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/70 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="type" value="HYBRID" checked={formData.type === 'HYBRID'} onChange={handleChange} className="sr-only" />
-                                        <span className="text-sm font-black">Formation hybride</span>
-                                        <span className="mt-1 text-xs font-medium leading-5 opacity-70">Vague 3 du matin : cours, pratique guidée, plateforme et accompagnement visio.</span>
+                                        <span className="text-sm font-black">Formation hybride matin</span>
+                                        <span className="mt-1 text-xs font-medium leading-5 opacity-70">Vague 3 du matin : cours, pratique guidée, plateforme et accompagnement.</span>
                                     </label>
                                 </div>
                             </div>
@@ -553,7 +560,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
                             <h3 className="text-lg font-black text-[var(--foreground)]">Créneau horaire</h3>
                             <p className="text-xs text-[var(--foreground)]/60 mb-2">
-                                {isHybrid ? "Le parcours hybride utilise la vague 3 du matin." : "Choisissez votre vague horaire préférée."}
+                                {formData.courseMode === "ONLINE" ? "La visioconférence se déroule tous les jours de 17h30 à 20h30." : isHybrid ? "Le parcours hybride du matin utilise la vague 3." : "Choisissez votre vague de soirée préférée."}
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 {availableTimeSlots.map(slot => (
@@ -624,7 +631,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         <div className="space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-4 sm:p-5">
                             <h3 className="text-sm font-black text-primary">Récapitulatif avant paiement</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold text-[var(--foreground)]/70">
-                                <div><span className="block opacity-50">Parcours</span>{isHybrid ? "Formation hybride" : "Formation régulière"}</div>
+                                <div><span className="block opacity-50">Parcours</span>{isHybrid ? "Formation hybride matin" : formData.courseMode === "ONLINE" ? "Formation hybride en ligne" : "Formation hybride soirée"}</div>
                                 <div><span className="block opacity-50">Formule</span>{selectedPlan.name}</div>
                                 <div><span className="block opacity-50">Centre</span>{selectedCenter.name}</div>
                                 <div><span className="block opacity-50">Moyen</span>{selectedPaymentMethod.name}</div>

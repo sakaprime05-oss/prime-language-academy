@@ -11,7 +11,7 @@ const trustPoints = [
   "Test de niveau gratuit",
   "Supports numériques inclus",
   "15 places max par salle",
-  "Attestation en fin de session",
+  "Formation hybride matin, soir ou visio",
 ];
 
 export default async function RegisterPage() {
@@ -49,7 +49,7 @@ export default async function RegisterPage() {
                   Session {PLA_SESSION.dates}
                 </p>
                 <h1 className="font-[var(--font-lexend)] text-[2.4rem] font-black leading-[0.98] tracking-normal sm:text-5xl">
-                  Rejoignez la formation qui vous fait parler anglais.
+                  Rejoignez la formation hybride qui vous fait parler anglais.
                 </h1>
                 <p className="mt-4 text-sm font-medium leading-7 text-white/68 sm:text-base">
                   Créez votre compte, choisissez votre rythme, puis sécurisez votre place en quelques minutes.
@@ -108,7 +108,7 @@ export default async function RegisterPage() {
             </Link>
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary">Session {PLA_SESSION.dates}</p>
             <p className="mt-1 text-sm font-bold leading-6 text-[var(--foreground)]/70">
-              Inscrivez-vous à la formation et sécurisez votre place en quelques minutes.
+              Inscrivez-vous à la Formation Hybride et sécurisez votre place en quelques minutes.
             </p>
           </div>
 
@@ -127,12 +127,12 @@ export default async function RegisterPage() {
 
           <div className="mb-4 grid grid-cols-1 gap-2 sm:mb-6 sm:grid-cols-3 sm:gap-3">
             <div className="rounded-lg border border-primary/25 bg-primary/10 p-3">
-              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary">Formation</p>
-              <p className="mt-1 text-xs font-bold leading-5 text-[var(--foreground)]/70">Cours, suivi et plateforme inclus.</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary">Formation Hybride</p>
+              <p className="mt-1 text-xs font-bold leading-5 text-[var(--foreground)]/70">Soirée en centre ou visioconférence.</p>
             </div>
             <Link href="/register?path=hybrid" className="rounded-lg border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-3 transition-colors hover:border-primary/30 hover:bg-primary/10">
-              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[var(--foreground)]/60">Hybride</p>
-              <p className="mt-1 text-xs font-bold leading-5 text-[var(--foreground)]/60">Vague 3 matin, supports et suivi visio.</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[var(--foreground)]/60">Matin</p>
+              <p className="mt-1 text-xs font-bold leading-5 text-[var(--foreground)]/60">Vague 3, pratique guidée et suivi.</p>
             </Link>
             <Link href="/register-club" className="rounded-lg border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-3 transition-colors hover:border-primary/30 hover:bg-primary/10">
               <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[var(--foreground)]/60">English Club</p>

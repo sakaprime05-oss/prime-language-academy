@@ -195,7 +195,7 @@ export default function PlacementTest() {
       text: "text-primary",
       badge: "border-primary/20 bg-primary/10 text-primary",
     };
-    const pathLabel = recommendation.path === "CLUB" ? "English Club" : "Formation régulière";
+    const pathLabel = recommendation.path === "CLUB" ? "English Club" : "Formation Hybride";
 
     return (
       <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -248,7 +248,7 @@ export default function PlacementTest() {
             <p className="mt-2 text-sm font-bold leading-6 text-[var(--foreground)]/70">
               {recommendation.path === "CLUB"
                 ? "Ce test sert surtout à identifier les profils déjà trop avancés pour reprendre les bases. Pour vous, le Club est conseillé si vous cherchez surtout à pratiquer, échanger et réseauter en anglais."
-                : "Ce test sert à déterminer le bon point d'entrée. Pour vous, la Formation régulière est conseillée afin d'apprendre ou consolider avant de passer au Club."}
+                : "Ce test sert à déterminer le bon point d'entrée. Pour vous, la Formation Hybride est conseillée afin d'apprendre ou consolider avant de passer au Club."}
             </p>
           </div>
         </div>

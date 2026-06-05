@@ -58,7 +58,7 @@ export default function ContactPage() {
                         <p className="mb-2 text-xs font-black uppercase tracking-[0.2em] text-[#E7162A]">Adresse</p>
                         <h2 className="text-2xl font-black">Deux lieux</h2>
                         <p className="mt-3 text-sm leading-7 text-[#F5F0E8]/55">
-                            Choisissez votre centre selon votre objectif: Programme 6 pour la Formation Régulière, Poincaré pour l'offre complète.
+                            Programme 6 accueille la Formation Hybride en matinée et en soirée. Poincaré ajoute le English Club pour les profils déjà autonomes.
                         </p>
                         <div className="mt-6 flex flex-wrap gap-3">
                             {centers.map((center) => (

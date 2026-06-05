@@ -7,7 +7,7 @@ export const PLA_SESSION = {
     registrationFee: 0,
     classCapacity: 15,
     location: "Centre Programme 6: Cocody Angré 8e Tranche, à côté du Programme 6, à 120 m du carrefour Pain du Quotidien. Centre Poincaré: 2 Plateaux Vallon, au sein de l'Établissement Henri Poincaré.",
-    locationHint: "Programme 6 accueille la Formation Régulière et la vague hybride du matin. Poincaré est le centre complet: Formation Régulière, Club d'Anglais et Formation Hybride.",
+    locationHint: "Les deux centres accueillent la Formation Hybride en présentiel, matin et soirée. Le Club d'Anglais est disponible au Centre Poincaré. La visioconférence est disponible pour la Formation Hybride.",
     phone: "+225 01 61 33 78 64",
     email: "primelanguageacademy9@gmail.com",
     whatsapp: "https://wa.me/2250161337864",
@@ -29,15 +29,22 @@ export const PLA_PLANS = PLA_BASE_PLANS;
 export const PLA_CLUB_PLANS = PLA_PLANS;
 
 export const PLA_REGULAR_TIME_SLOTS = [
-    { id: "v1", label: "Vague 1", time: "16h00 - 18h00", desc: "Disponible pour la Formation Régulière, et pour le Club d'Anglais au Centre Poincaré" },
-    { id: "v2", label: "Vague 2", time: "18h00 - 20h00", desc: "Disponible pour la Formation Régulière, et pour le Club d'Anglais au Centre Poincaré" },
+    { id: "v1", label: "Vague 1", time: "16h00 - 18h00", desc: "Formation Hybride en soirée, disponible dans les deux centres. Club d'Anglais disponible au Centre Poincaré." },
+    { id: "v2", label: "Vague 2", time: "18h00 - 20h00", desc: "Formation Hybride en soirée, disponible dans les deux centres. Club d'Anglais disponible au Centre Poincaré." },
 ] as const;
 
 export const PLA_HYBRID_TIME_SLOT = {
     id: "v3",
     label: "Vague 3",
     time: "09h00 - 12h00",
-    desc: "Créneau matin dédié à la Formation Hybride, du lundi au samedi",
+    desc: "Formation Hybride du matin, disponible en présentiel dans les deux centres, du lundi au samedi",
+} as const;
+
+export const PLA_ONLINE_TIME_SLOT = {
+    id: "online-v1",
+    label: "Visioconférence",
+    time: "17h30 - 20h30",
+    desc: "Formation Hybride en ligne, tous les jours, où que vous soyez",
 } as const;
 
 export const PLA_TIME_SLOTS = PLA_REGULAR_TIME_SLOTS;
@@ -49,20 +56,20 @@ export const PLA_CENTERS = [
         place: "Cocody Angré 8e Tranche",
         address: "À côté du Programme 6, à 120 m du carrefour Pain du Quotidien, ruelle longeant la cité Programme 6",
         mapUrl: "https://maps.app.goo.gl/udHU3RYt2qGDjr8C8?g_st=iwb",
-        positioning: "Centre principal et spécialisé pour les apprenants qui recherchent une formation structurée, avec une offre hybride matinale.",
-        highlight: "Centre principal: Régulière + Hybride matin",
+        positioning: "Centre principal à Angré 8e Tranche, avec la Formation Hybride en matinée et en soirée.",
+        highlight: "Centre principal: Hybride matin + soirée",
         programs: [
             {
-                name: "Formation Régulière",
+                name: "Formation Hybride Soirée",
                 slots: ["Vague 1: 16h00 - 18h00", "Vague 2: 18h00 - 20h00"],
                 schedule: "Du lundi au samedi",
-                summary: "Apprentissage structuré pour construire les bases, progresser régulièrement et parler avec plus de confiance.",
+                summary: "Apprentissage structuré, pratique guidée, supports numériques et suivi pour progresser après la journée.",
             },
             {
-                name: "Formation Hybride",
+                name: "Formation Hybride Matin",
                 slots: ["Vague 3: 09h00 - 12h00"],
                 schedule: "Du lundi au samedi",
-                summary: "Pratique intensive, ressources numériques et accompagnement guidé dans un environnement favorable à l'immersion.",
+                summary: "Format intensif du matin avec cours, pratique guidée, plateforme et accompagnement.",
             },
         ],
     },
@@ -72,14 +79,14 @@ export const PLA_CENTERS = [
         place: "Établissement Henri Poincaré",
         address: "Cocody 2 Plateaux Vallon, Abidjan",
         mapUrl: "https://maps.app.goo.gl/6hsw26QJcq55zyv69?g_st=iwb",
-        positioning: "Centre complet de Prime Language Academy, avec l'ensemble des programmes disponibles.",
-        highlight: "Centre complet: Régulière, Club et Hybride",
+        positioning: "Centre premium complet de Prime Language Academy, avec Formation Hybride et English Club.",
+        highlight: "Centre complet: Hybride + English Club",
         programs: [
             {
-                name: "Formation Régulière",
+                name: "Formation Hybride Soirée",
                 slots: ["Vague 1: 16h00 - 18h00", "Vague 2: 18h00 - 20h00"],
                 schedule: "Du lundi au samedi",
-                summary: "Parcours structuré pour développer les bases, la compréhension et l'expression active.",
+                summary: "Parcours complet pour développer la compréhension, la structure et l'expression active.",
             },
             {
                 name: "Club d'Anglais",
@@ -88,7 +95,7 @@ export const PLA_CENTERS = [
                 summary: "Pratique régulière pour maintenir le niveau, développer la fluidité et parler plus naturellement.",
             },
             {
-                name: "Formation Hybride",
+                name: "Formation Hybride Matin",
                 slots: ["Vague 3: 09h00 - 12h00"],
                 schedule: "Du lundi au samedi",
                 summary: "Apprentissage structuré, pratique guidée et ressources numériques pour accélérer la progression.",
@@ -115,8 +122,8 @@ export const PLA_FAQ = [
         answer: "L'inscription est offerte pour la session de lancement. Le solde de la formation doit être réglé avant le début des cours afin de garantir votre place.",
     },
     {
-        question: "Formation régulière et English Club, est-ce pareil ?",
-        answer: "Non. La formation régulière construit les bases et la structure. Le English Club est dédié à la pratique, la fluidité et l'immersion sociale. Les deux parcours sont distincts.",
+        question: "Formation Hybride et English Club, est-ce pareil ?",
+        answer: "Non. La Formation Hybride sert à apprendre, structurer et débloquer l'expression. Le English Club est réservé aux profils déjà autonomes qui veulent pratiquer, réseauter et maintenir leur niveau en immersion.",
     },
     {
         question: "Y a-t-il des frais d'inscription ?",

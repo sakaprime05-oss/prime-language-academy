@@ -23,7 +23,7 @@ export default async function StudentCoursesPage() {
                 <div className="text-6xl mb-6">🎓</div>
                 <h1 className="text-2xl font-black mb-4">Programme Régulier Terminé !</h1>
                 <p className="text-[var(--foreground)]/70 mb-8 font-medium">
-                    Félicitations, vous avez complété vos 2 mois de structure fondamentale. Votre accès aux leçons régulières est désormais remplacé par l'accès privilégié au Club d'Anglais pour la pratique orale.
+                    Félicitations, vous avez complété vos 2 mois de structure fondamentale. Votre accès aux leçons de formation est désormais remplacé par l'accès privilégié au Club d'Anglais pour la pratique orale.
                 </p>
                 <Link href="/dashboard/student/club" className="inline-block rounded-lg bg-[var(--primary)] px-8 py-4 font-black text-white transition-opacity hover:opacity-90">
                     Rejoindre le Club d'Anglais

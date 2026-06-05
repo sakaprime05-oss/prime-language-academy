@@ -82,7 +82,7 @@ export default function StudentRow({ student, levels }: StudentRowProps) {
       <div className="mt-3 flex flex-wrap items-center gap-2 md:mt-0 md:justify-end">
         <div className={`status-badge ${getStatusColor(status)}`}>{status}</div>
         <div className="status-badge bg-[var(--muted)] text-[var(--muted-foreground)]">
-          {student.registrationType === "CLUB" ? "Club" : "Formation"}
+          {student.registrationType === "CLUB" ? "Club" : "Formation Hybride"}
         </div>
         <div
           className={`status-badge ${

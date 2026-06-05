@@ -68,7 +68,7 @@ export default async function ManualPaymentPage() {
               <span className="text-3xl sm:text-4xl font-black">{pendingTransaction.amount.toLocaleString()}</span>
               <span className="text-sm font-bold opacity-60">FCFA</span>
             </div>
-            <p className="text-xs font-medium opacity-50 mt-4 uppercase tracking-[0.12em]">Frais de scolarité - Prime Academy</p>
+            <p className="text-xs font-medium opacity-50 mt-4 uppercase tracking-[0.12em]">Formation Hybride - Prime Academy</p>
           </div>
 
           <div className="bg-[#1dcaff]/10 p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] border border-[#1dcaff]/20 space-y-5 sm:space-y-6">

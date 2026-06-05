@@ -68,7 +68,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <div className="min-w-0 flex-1">
             <p className="font-bold text-sm text-[var(--foreground)] truncate">{session.user.name || "Étudiant"}</p>
             <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">
-              {studentMode === "CLUB" ? "Membre Club" : studentMode === "HYBRID" ? "Apprenant hybride" : "Apprenant"}
+              {studentMode === "CLUB" ? "Membre Club" : studentMode === "HYBRID" ? "Apprenant hybride" : "Apprenant hybride"}
             </p>
           </div>
           <ThemeToggle />
@@ -83,7 +83,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <div>
               <h1 className="text-lg font-black leading-none text-[var(--foreground)]">Prime</h1>
               <p className="text-[9px] font-black uppercase tracking-widest text-primary/60">
-                {studentMode === "CLUB" ? "Club" : studentMode === "HYBRID" ? "Hybride" : "Formation"}
+                {studentMode === "CLUB" ? "Club" : studentMode === "HYBRID" ? "Hybride" : "Hybride"}
               </p>
             </div>
           </div>

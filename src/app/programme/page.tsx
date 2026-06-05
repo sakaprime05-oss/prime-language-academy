@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Download } from "lucide-react";
 import { InstallAppButton } from "@/components/install-app-button";
 import { LearningPathAdvisor } from "@/components/learning-path-advisor";
-import { PLA_CENTERS, PLA_FAQ, PLA_HYBRID_TIME_SLOT, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CENTERS, PLA_FAQ, PLA_HYBRID_TIME_SLOT, PLA_ONLINE_TIME_SLOT, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 export const metadata = {
     title: "Programme officiel 2026 | Prime Language Academy",
@@ -24,8 +24,8 @@ export default function ProgrammePage() {
                             <span className="text-[#E7162A]">{PLA_SESSION.dates}</span>
                         </h1>
                         <p className="text-lg leading-8 text-[var(--foreground)]/60">
-                            Une immersion premium à Abidjan pour transformer l'anglais en compétence vivante:
-                            méthode ISO+, formateurs experts, suivi personnalisé et environnement de formation confortable.
+                            Une Formation Hybride premium pour transformer l'anglais en compétence vivante:
+                            méthode ISO+, pratique guidée, ressources numériques, suivi personnalisé et option visioconférence.
                         </p>
                         <div className="flex flex-wrap gap-3 pt-2">
                             <Link href="/register" className="rounded-full bg-[#E7162A] px-6 py-3 text-sm font-black uppercase tracking-widest text-black">
@@ -64,7 +64,7 @@ export default function ProgrammePage() {
                         <p className="mb-2 text-xs font-black uppercase tracking-[0.22em] text-[#E7162A]">Centres et formations</p>
                         <h2 className="text-3xl font-black">Choisissez le centre adapté à votre parcours</h2>
                         <p className="mt-3 text-sm leading-7 text-[var(--foreground)]/55">
-                            Programme 6 accueille la Formation Régulière et la vague hybride du matin. Poincaré est le centre complet avec Formation Régulière, Club d'Anglais et Formation Hybride.
+                            Programme 6 accueille la Formation Hybride en matinée et en soirée. Poincaré est le centre complet avec Formation Hybride et Club d'Anglais. L'option visioconférence est disponible où que vous soyez.
                         </p>
                     </div>
                     <div className="grid gap-4 lg:grid-cols-2">
@@ -150,7 +150,7 @@ export default function ProgrammePage() {
                 <section className="grid gap-6 md:grid-cols-2">
                     <div className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-8">
                         <h2 className="mb-5 text-2xl font-black">Organisation des séances</h2>
-                        <p className="mb-6 text-sm leading-7 text-[var(--foreground)]/55">Les cours se déroulent du lundi au samedi. La Formation Régulière utilise les vagues 1 et 2, et la Formation Hybride utilise la vague 3.</p>
+                        <p className="mb-6 text-sm leading-7 text-[var(--foreground)]/55">Les cours en présentiel se déroulent du lundi au samedi. La Formation Hybride utilise les vagues 1 et 2 en soirée, la vague 3 le matin, et la visioconférence tous les jours de 17h30 à 20h30.</p>
                         <div className="space-y-4">
                             {PLA_TIME_SLOTS.map((slot) => (
                                 <div key={slot.id} className="rounded-xl border border-[#E7162A]/10 p-4">
@@ -163,6 +163,11 @@ export default function ProgrammePage() {
                                 <p className="text-xs font-black uppercase tracking-[0.18em] text-[#E7162A]">{PLA_HYBRID_TIME_SLOT.label}</p>
                                 <p className="mt-1 text-2xl font-black">{PLA_HYBRID_TIME_SLOT.time}</p>
                                 <p className="mt-1 text-sm text-[var(--foreground)]/45">{PLA_HYBRID_TIME_SLOT.desc}</p>
+                            </div>
+                            <div className="rounded-xl border border-[#E7162A]/10 p-4">
+                                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#E7162A]">{PLA_ONLINE_TIME_SLOT.label}</p>
+                                <p className="mt-1 text-2xl font-black">{PLA_ONLINE_TIME_SLOT.time}</p>
+                                <p className="mt-1 text-sm text-[var(--foreground)]/45">{PLA_ONLINE_TIME_SLOT.desc}</p>
                             </div>
                         </div>
                     </div>

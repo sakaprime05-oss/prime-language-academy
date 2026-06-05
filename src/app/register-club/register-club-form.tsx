@@ -238,7 +238,7 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Niveau actuel</label>
                         <p className="mb-3 rounded-xl border border-secondary/15 bg-secondary/10 p-3 text-xs font-bold leading-6 text-[var(--foreground)]/65">
-                            Le Club est pensé pour les profils déjà autonomes en anglais. Si vous êtes débutant ou encore hésitant, la Formation régulière reste le meilleur point d'entrée.
+                            Le Club est pensé pour les profils déjà autonomes en anglais. Si vous êtes débutant ou encore hésitant, la Formation Hybride reste le meilleur point d'entrée.
                         </p>
                         <div className="grid grid-cols-1 gap-2">
                             {levels.map(lvl => (

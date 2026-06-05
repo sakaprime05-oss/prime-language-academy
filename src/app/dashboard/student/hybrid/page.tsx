@@ -49,10 +49,10 @@ export default async function StudentHybridPage() {
     return (
       <div className="platform-page animate-in fade-in duration-500">
         <section className="glass-card mx-auto max-w-2xl p-6 text-center sm:p-8">
-          <p className="platform-eyebrow">Espace hybride</p>
-          <h1 className="mt-2 text-2xl font-black text-[var(--foreground)]">Cet espace est réservé au parcours hybride.</h1>
+          <p className="platform-eyebrow">Espace matin</p>
+          <h1 className="mt-2 text-2xl font-black text-[var(--foreground)]">Cet espace est réservé à la vague 3 du matin.</h1>
           <p className="mt-3 text-sm font-bold leading-7 text-[var(--muted-foreground)]">
-            Votre inscription actuelle n'est pas marquée comme Formation Hybride. Vous pouvez continuer avec vos cours ou contacter l'administration pour changer de parcours.
+            Votre inscription actuelle n'est pas marquée comme Formation Hybride Matin. Vous pouvez continuer avec vos supports ou contacter l'administration pour changer de créneau.
           </p>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <Link href="/dashboard/student/courses" className="rounded-xl border border-[var(--primary)]/25 px-5 py-3 text-xs font-black uppercase tracking-widest text-[var(--primary)]">
@@ -70,7 +70,7 @@ export default async function StudentHybridPage() {
   return (
     <div className="platform-page animate-in fade-in duration-500">
       <header className="platform-page-header">
-        <p className="platform-eyebrow">Formation Hybride</p>
+        <p className="platform-eyebrow">Formation Hybride Matin</p>
         <h1 className="platform-title">Votre espace du matin</h1>
         <p className="platform-subtitle">
           Un parcours qui combine supports numériques, pratique guidée, suivi et accompagnement visio pour progresser avec plus de rythme.

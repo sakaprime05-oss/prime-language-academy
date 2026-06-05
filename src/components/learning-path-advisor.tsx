@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Clock, MapPin, MessageCircle, Moon, Sparkles, SunMedium } from "lucide-react";
-import { PLA_CENTERS, PLA_HYBRID_TIME_SLOT, PLA_TIME_SLOTS } from "@/lib/pla-program";
+import { PLA_CENTERS, PLA_HYBRID_TIME_SLOT, PLA_ONLINE_TIME_SLOT, PLA_TIME_SLOTS } from "@/lib/pla-program";
 
 const programme6 = PLA_CENTERS.find((center) => center.id === "programme-6") || PLA_CENTERS[0];
 const poincare = PLA_CENTERS.find((center) => center.id === "poincare") || PLA_CENTERS[1] || programme6;
@@ -10,10 +10,10 @@ const PATHS = [
     id: "regular",
     icon: Moon,
     eyebrow: "Je debute ou je veux progresser",
-    title: "Formation Reguliere",
+    title: "Formation Hybride Soir / En ligne",
     center: programme6,
-    schedule: `${PLA_TIME_SLOTS[0].label} ou ${PLA_TIME_SLOTS[1].label} · 16h00 - 20h00`,
-    text: "Le choix le plus simple pour apprendre avec un cadre clair, des bases solides et un rythme du lundi au samedi.",
+    schedule: `${PLA_TIME_SLOTS[0].label} ou ${PLA_TIME_SLOTS[1].label} · ${PLA_ONLINE_TIME_SLOT.label} ${PLA_ONLINE_TIME_SLOT.time}`,
+    text: "Le choix le plus simple pour apprendre avec un cadre clair, des bases solides, des ressources numériques et un rythme compatible avec la journée.",
     href: "/register?center=programme-6",
     cta: "Reserver ce parcours",
     featured: true,
@@ -37,7 +37,7 @@ const PATHS = [
     title: "Formation Hybride",
     center: poincare,
     schedule: `${PLA_HYBRID_TIME_SLOT.label} · ${PLA_HYBRID_TIME_SLOT.time}`,
-    text: "Un format plus souple pour avancer le matin avec ressources numeriques, suivi et pratique accompagnee.",
+    text: "Un format intensif pour avancer le matin avec ressources numeriques, suivi et pratique accompagnee.",
     href: "/register?path=hybrid&center=poincare",
     cta: "Choisir l'hybride",
     featured: false,
@@ -55,10 +55,10 @@ export function LearningPathAdvisor({ className = "" }: { className?: string }) 
           </p>
           <h2 className="text-2xl font-black leading-tight sm:text-3xl">Choisissez le bon parcours sans vous tromper.</h2>
           <p className="text-sm leading-7 text-[var(--muted-foreground)]">
-            Trois chemins simples: apprendre avec structure, pratiquer au Club, ou suivre le format hybride du matin.
+            Trois chemins simples: Formation Hybride soir/en ligne, English Club pour les profils forts, ou Formation Hybride du matin.
           </p>
           <div className="rounded-2xl border border-[var(--primary)]/15 bg-[var(--primary)]/10 p-4 text-sm leading-7 text-[var(--muted-foreground)]">
-            <strong className="text-[var(--foreground)]">Conseil:</strong> si vous hésitez, commencez par la Formation Régulière. Le test de niveau permet ensuite d'ajuster le groupe.
+            <strong className="text-[var(--foreground)]">Conseil:</strong> si vous hésitez, commencez par la Formation Hybride. Le test de niveau permet ensuite d'ajuster le groupe et de vérifier si le Club est plus adapté.
           </div>
         </div>
 

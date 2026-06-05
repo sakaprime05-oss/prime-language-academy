@@ -30,7 +30,7 @@ export default async function EnglishClubPage() {
             The English Club<br/><em style={{ color:"#E7162A" }}>vous attend</em>
           </h1>
           <p style={{ color:"rgba(245,240,232,0.5)", fontSize:15, lineHeight:1.8, marginBottom:40 }}>
-            Le Club sera débloqué automatiquement après vos <strong style={{ color:"#F5F0E8" }}>2 mois de Formation Régulière</strong>. Concentrez-vous sur vos cours fondamentaux — votre cercle anglophone vous attend de l'autre côté.
+            Le Club sera débloqué automatiquement après vos <strong style={{ color:"#F5F0E8" }}>2 mois de Formation Hybride</strong>. Concentrez-vous sur vos cours fondamentaux — votre cercle anglophone vous attend de l'autre côté.
           </p>
 
           <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:16, padding:"24px", marginBottom:32, background:"rgba(231,22,42,0.03)" }}>

@@ -82,7 +82,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ id: s
                                 <span className="text-lg font-bold opacity-60">FCFA</span>
                             </div>
                             <p className="text-xs font-medium opacity-40 mt-4 uppercase tracking-widest">
-                                {isClub ? "Adhésion English Club" : "Frais de scolarité"} • {student.name}
+                                {isClub ? "Adhésion English Club" : "Formation Hybride"} • {student.name}
                             </p>
                         </div>
 

@@ -482,7 +482,7 @@ export function getRecommendedLevel(totalScore: number): {
     return {
       level: "Débutant",
       description:
-        "Vous êtes au début de votre apprentissage. La Formation régulière est le bon parcours pour construire des bases solides avant de viser la fluidité.",
+        "Vous êtes au début de votre apprentissage. La Formation Hybride est le bon parcours pour construire des bases solides avant de viser la fluidité.",
       color: "emerald",
       path: "FORMATION",
       cta: "Continuer vers la Formation",
@@ -491,7 +491,7 @@ export function getRecommendedLevel(totalScore: number): {
     return {
       level: "Intermédiaire",
       description:
-        "Vous avez déjà des bases et pouvez communiquer dans des situations simples. La Formation régulière vous aidera à gagner en structure, fluidité et confiance.",
+        "Vous avez déjà des bases et pouvez communiquer dans des situations simples. La Formation Hybride vous aidera à gagner en structure, fluidité et confiance.",
       color: "amber",
       path: "FORMATION",
       cta: "Continuer vers la Formation",

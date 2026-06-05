@@ -320,7 +320,13 @@ export async function registerUser(formData: FormData) {
         sendWelcomeEmail(user.email, user.name || "Étudiant", isHybridRegistration ? "HYBRID" : registrationType)
             .catch(err => console.error("Could not send welcome email", err));
 
-        sendAdminNewRegistrationEmail(user.name || "Nouveau", user.email, isHybridRegistration ? `Formation hybride - ${level?.name || planId}` : level?.name || planId)
+        const adminFormationLabel = isHybridRegistration
+            ? `Formation hybride matin - ${level?.name || planId}`
+            : onboardingParams.courseMode === "ONLINE"
+                ? `Formation hybride en ligne - ${level?.name || planId}`
+                : `Formation hybride soirée - ${level?.name || planId}`;
+
+        sendAdminNewRegistrationEmail(user.name || "Nouveau", user.email, isClubRegistration ? "English Club" : adminFormationLabel)
             .catch(err => console.error("Could not send admin reg email", err));
 
         notifyTelegram("new_registration", {

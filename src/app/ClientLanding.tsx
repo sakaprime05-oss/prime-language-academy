@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Download } from "lucide-react";
 import { LogoMark } from "@/components/logo";
 import ThemeToggle from "@/components/ThemeToggle";
-import { PLA_CENTERS, PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_FAQ, PLA_HYBRID_TIME_SLOT, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CENTERS, PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_FAQ, PLA_HYBRID_TIME_SLOT, PLA_ONLINE_TIME_SLOT, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 /* ── tiny helpers ── */
 const PLANS = [
@@ -125,7 +125,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
             </h1>
 
             <p className="landing-hero-copy" style={{ fontSize:17, lineHeight:1.75, color:"var(--muted-foreground)", maxWidth:600, marginBottom:44, marginLeft:"auto", marginRight:"auto" }}>
-              Prime Language Academy accompagne professionnels, étudiants et entrepreneurs francophones vers une maîtrise confiante et efficace de l'anglais.
+              Prime Language Academy accompagne professionnels, étudiants et entrepreneurs francophones vers une maîtrise active de l'anglais grâce à la Formation Hybride, au suivi et à l'immersion.
             </p>
 
             <div className="landing-hero-actions" style={{ display:"flex", gap:16, flexWrap:"wrap", justifyContent:"center" }}>
@@ -229,7 +229,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
               <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px", background:"var(--surface)", backdropFilter:"blur(16px)" }}>
                 <div style={{ width:50, height:50, borderRadius:12, background:"rgba(231,22,42,0.1)", color:"#E7162A", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, marginBottom:24 }}>💻</div>
                 <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>En Ligne (100% Live)</h3>
-                <p style={{ color:"var(--muted-foreground)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Suivez vos cours depuis chez vous ou le bureau via Zoom/Meet. Une interactivité préservée, des corrections en direct, et un gain de temps précieux dans les transports.</p>
+                <p style={{ color:"var(--muted-foreground)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Suivez la Formation Hybride en visioconférence, tous les jours de 17h30 à 20h30. Interactivité préservée, corrections en direct et gain de temps dans les transports.</p>
                 <div style={{ fontSize:12, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#1dcaff" }}>Inscriptions ouvertes</div>
               </div>
             )}
@@ -332,7 +332,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
             <div style={{ display:"inline-flex", background:"var(--surface)", border:"1px solid rgba(231,22,42,0.2)", borderRadius:100, padding:6, position:"relative" }}>
               <button onClick={() => setPricingMode("formation")}
                 style={{ position:"relative", zIndex:1, padding:"12px 28px", borderRadius:100, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: pricingMode==="formation" ? "#080808" : "var(--muted-foreground)", transition:"color 0.3s" }}>
-                Formation (2 Mois)
+                Formation Hybride (2 mois)
               </button>
               <button onClick={() => setPricingMode("club")}
                 style={{ position:"relative", zIndex:1, padding:"12px 28px", borderRadius:100, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: pricingMode==="club" ? "#080808" : "var(--muted-foreground)", transition:"color 0.3s" }}>
@@ -385,7 +385,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
 
       {/* ══════════ HORAIRES ══════════ */}
       <section style={{ padding:"80px 2rem" }}>
-        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           {PLA_TIME_SLOTS.map(({ label, time, desc }) => (
             <div key={label} style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px 32px", background:"var(--surface)", backdropFilter:"blur(16px)", overflow:"hidden", position:"relative" }}>
               <div style={{ position:"absolute", top:-20, right:-20, width:100, height:100, borderRadius:"50%", background:"rgba(231,22,42,0.05)", filter:"blur(30px)" }}/>
@@ -399,6 +399,12 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
             <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:12 }}>{PLA_HYBRID_TIME_SLOT.label}</div>
             <div style={{ fontFamily:"'Playfair Display',serif", fontSize:36, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>{PLA_HYBRID_TIME_SLOT.time}</div>
             <div style={{ fontSize:13, color:"var(--muted-foreground)" }}>{PLA_HYBRID_TIME_SLOT.desc}</div>
+          </div>
+          <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px 32px", background:"var(--surface)", backdropFilter:"blur(16px)", overflow:"hidden", position:"relative" }}>
+            <div style={{ position:"absolute", top:-20, right:-20, width:100, height:100, borderRadius:"50%", background:"rgba(231,22,42,0.05)", filter:"blur(30px)" }}/>
+            <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:12 }}>{PLA_ONLINE_TIME_SLOT.label}</div>
+            <div style={{ fontFamily:"'Playfair Display',serif", fontSize:36, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>{PLA_ONLINE_TIME_SLOT.time}</div>
+            <div style={{ fontSize:13, color:"var(--muted-foreground)" }}>{PLA_ONLINE_TIME_SLOT.desc}</div>
           </div>
         </div>
       </section>
@@ -449,7 +455,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
               { icon:"📱", title:"Accès plateforme", desc:"Accès immédiat à notre plateforme de formation en ligne" },
               { icon:"📚", title:"Documentation", desc:"Documentation pédagogique complète disponible dès le 1er jour" },
               { icon:"🚀", title:"Préformation", desc:"Une séquence de préformation pour bien démarrer avant le début officiel" },
-              { icon:"💻", title:"Séances Visio", desc:"Séances en visioconférence disponibles dès votre inscription" },
+              { icon:"💻", title:"Séances Visio", desc:"Accompagnement en visioconférence dès votre inscription et formation en ligne de 17h30 à 20h30" },
               { icon:"🤝", title:"Accompagnement", desc:"Nos consultants et formateurs vous accompagnent immédiatement" },
             ].map(({icon,title,desc}) => (
               <div key={title} style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"32px 24px", background:"var(--surface)", backdropFilter:"blur(16px)", textAlign:"center" }}>
@@ -477,7 +483,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))", gap:20 }}>
             {[
-              { icon:"🎯", title:"Formations Professionnels", desc:"Programmes adaptés pour les cadres et professionnels souhaitant renforcer leur anglais métier." },
+              { icon:"🎯", title:"Formations professionnelles", desc:"Programmes adaptés pour les cadres et professionnels souhaitant renforcer leur anglais métier." },
               { icon:"🎓", title:"Formations Étudiants", desc:"Parcours spécifiques pour les étudiants avec des objectifs académiques et d'insertion professionnelle." },
               { icon:"👥", title:"Formations Groupes & Asso.", desc:"Formation des groupes, collectifs et associations avec des formats flexibles et adaptables." },
               { icon:"🏠", title:"Formation Privée", desc:"Cours individuels 100% personnalisés selon votre rythme, vos objectifs et votre emploi du temps." },
@@ -549,7 +555,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
             Prêt à débloquer<br/><em style={{ color:"#E7162A" }}>votre potentiel ?</em>
           </h2>
           <p style={{ color:"var(--muted-foreground)", fontSize:16, marginBottom:48, maxWidth:480, marginLeft:"auto", marginRight:"auto", lineHeight:1.7 }}>
-            Programme 6 et Poincaré · Lun–Sam · 09h – 20h<br/>
+            Présentiel à Programme 6 et Poincaré · En ligne 17h30 - 20h30<br/>
             <a href="https://wa.me/2250161337864?text=Bonjour%20!%20Je%20souhaite%20avoir%20des%20informations%20sur%20Prime%20Language%20Academy%20%F0%9F%8E%93" target="_blank" rel="noopener noreferrer" style={{ color:"#25D366", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:6, marginTop:8 }}>
               <svg width="18" height="18" viewBox="0 0 32 32" fill="none"><path d="M16 3C9.373 3 4 8.373 4 15c0 2.385.668 4.61 1.83 6.5L4 29l7.7-1.81A12.94 12.94 0 0016 28c6.627 0 12-5.373 12-13S22.627 3 16 3z" fill="#25D366"/><path d="M21.04 18.16c-.28-.14-1.664-.82-1.92-.912-.256-.096-.44-.14-.628.14-.188.28-.72.912-.88 1.1-.164.184-.324.208-.604.07-.28-.14-1.18-.436-2.248-1.388-.832-.74-1.392-1.656-1.556-1.936-.164-.28-.016-.432.124-.572.126-.124.28-.324.42-.488.14-.164.188-.28.28-.468.096-.188.048-.352-.024-.492-.068-.14-.628-1.512-.86-2.072-.228-.548-.456-.472-.628-.48l-.536-.008c-.188 0-.492.068-.748.352-.256.284-.98.956-.98 2.332 0 1.376 1.004 2.704 1.14 2.892.14.188 1.968 3.004 4.768 4.212.668.288 1.188.46 1.596.588.668.212 1.276.184 1.756.112.536-.08 1.664-.68 1.896-1.34.236-.656.236-1.22.168-1.34-.072-.12-.252-.188-.532-.328z" fill="white"/></svg>
               +225 01 61 33 78 64 · WhatsApp
@@ -609,7 +615,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                 {[
                   { step:"01", label:"Vous avez déjà le niveau B2+", sub:"Accès direct au Club" },
-                  { step:"02", label:"Vous débutez ?", sub:"Formation 2 mois → puis Club" },
+                  { step:"02", label:"Vous débutez ?", sub:"Formation Hybride 2 mois → puis Club" },
                   { step:"03", label:"Adhésion valable 2 mois", sub:"1 à 6 sessions / semaine" },
                   { step:"04", label:"Espace membre privé inclus", sub:"Accès à la plateforme & forums" },
                 ].map(({step,label,sub}) => (

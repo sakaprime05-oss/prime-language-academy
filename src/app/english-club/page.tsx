@@ -303,9 +303,9 @@ export default function EnglishClubPublicPage() {
             {/* Formation */}
             <div style={{ border: "1px solid rgba(245,240,232,0.1)", borderRadius: 24, padding: "48px 40px", background: "rgba(20,20,30,0.5)", backdropFilter: "blur(16px)" }}>
               <div style={{ fontSize: 11, color: "rgba(245,240,232,0.4)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 20 }}>Parcours 01</div>
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 900, marginBottom: 16 }}>Formation Régulière</h3>
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 900, marginBottom: 16 }}>Formation Hybride</h3>
               <p style={{ color: "rgba(245,240,232,0.5)", lineHeight: 1.8, marginBottom: 28, fontSize: 15 }}>
-                Programme structuré pour apprendre l'anglais de zéro à un niveau opérationnel. Méthode ISO+ (Input, Structure, Output, Automatisation), avec suivi de progression.
+                Programme structuré pour apprendre l'anglais de zéro à un niveau opérationnel. Méthode ISO+ (Input, Structure, Output, Automatisation), pratique guidée, ressources numériques et suivi de progression.
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 36 }}>
                 {["Débutants → Avancés", "Grammaire, vocabulaire, expression", "Progression par niveau", "Groupes réduits & suivi personnalisé"].map(f => (

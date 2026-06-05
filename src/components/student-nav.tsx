@@ -23,7 +23,7 @@ export function StudentSidebarNavClient({ dict, mode = "FORMATION" }: { dict?: a
         : mode === "HYBRID"
             ? [
                 { href: "/dashboard/student", label: getLabel("dashboard", "Accueil"), icon: HomeIcon, exact: true },
-                { href: "/dashboard/student/hybrid", label: "Espace hybride", icon: HybridIcon },
+                { href: "/dashboard/student/hybrid", label: "Espace matin", icon: HybridIcon },
                 { href: "/dashboard/student/courses", label: getLabel("courses", "Supports"), icon: BookIcon },
                 { href: "/dashboard/student/payments", label: "Paiements", icon: WalletIcon },
                 { href: "/dashboard/student/appointments", label: getLabel("appointments", "Suivi"), icon: ClockIcon },
@@ -97,7 +97,7 @@ export function StudentMobileNavClient({ dict, mode = "FORMATION" }: { dict?: an
         : mode === "HYBRID"
             ? [
                 { href: "/dashboard/student", label: "Accueil", icon: HomeIcon, exact: true },
-                { href: "/dashboard/student/hybrid", label: "Hybride", icon: HybridIcon },
+                { href: "/dashboard/student/hybrid", label: "Matin", icon: HybridIcon },
                 { href: "/dashboard/student/courses", label: "Supports", icon: BookIcon },
                 { href: "/dashboard/student/payments", label: "Payer", icon: WalletIcon },
                 { href: "/dashboard/student/profile", label: "Profil", icon: UserIcon },
