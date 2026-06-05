@@ -1,7 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendWelcomeEmail, sendInvoiceEmail, sendAccountActivatedEmail, sendEmail } from "@/lib/email";
+import {
+    formatFcfa,
+    PLA_CENTERS,
+    PLA_CLUB_CAPACITY,
+    PLA_CLUB_PLANS,
+    PLA_HYBRID_TIME_SLOT,
+    PLA_ONLINE_TIME_SLOT,
+    PLA_PLANS,
+    PLA_REGULAR_TIME_SLOTS,
+    PLA_SESSION,
+} from "@/lib/pla-program";
 import { sanitizeHtml } from "@/lib/sanitize-html";
+import { siteConfig } from "@/lib/site-config";
 import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
 import crypto from "crypto";
 
@@ -31,6 +43,128 @@ function parseOnboardingData(value?: string | null) {
     } catch {
         return {};
     }
+}
+
+function appLink(path: string) {
+    return `${siteConfig.url.replace(/\/$/, "")}${path}`;
+}
+
+function publicLinks() {
+    return {
+        home: siteConfig.url,
+        programme: appLink("/programme"),
+        formation_registration: appLink("/register"),
+        club_registration: appLink("/register-club"),
+        placement_test: appLink("/placement-test"),
+        appointment: appLink("/rendez-vous"),
+        brochure: appLink("/brochure-pla-2026.pdf"),
+        whatsapp: PLA_SESSION.whatsapp,
+    };
+}
+
+function planSummary() {
+    return PLA_PLANS.map((plan) => ({
+        id: plan.id,
+        label: plan.label,
+        frequency: plan.freq,
+        price: plan.price,
+        price_label: formatFcfa(plan.price),
+    }));
+}
+
+async function getClubSeatStats() {
+    const [activeClubMembers, pendingClubMembers, waitlistedClubMembers] = await Promise.all([
+        prisma.user.count({ where: { role: "STUDENT", registrationType: "CLUB", status: "ACTIVE" } }),
+        prisma.user.count({ where: { role: "STUDENT", registrationType: "CLUB", status: "PENDING" } }),
+        prisma.user.count({ where: { role: "STUDENT", registrationType: "CLUB", status: "WAITLIST" } }),
+    ]);
+
+    const reservedSeats = activeClubMembers + pendingClubMembers;
+    return {
+        capacity: PLA_CLUB_CAPACITY,
+        active_members: activeClubMembers,
+        pending_members: pendingClubMembers,
+        waitlist_members: waitlistedClubMembers,
+        reserved_seats: reservedSeats,
+        available_seats: Math.max(0, PLA_CLUB_CAPACITY - reservedSeats),
+    };
+}
+
+async function buildProgramInfo() {
+    const clubSeats = await getClubSeatStats();
+    const plans = planSummary();
+    const priceRange = `${formatFcfa(PLA_PLANS[0].price)} - ${formatFcfa(PLA_PLANS[PLA_PLANS.length - 1].price)}`;
+    const centers = PLA_CENTERS.map((center) => ({
+        name: center.name,
+        place: center.place,
+        address: center.address,
+        highlight: center.highlight,
+        map_url: center.mapUrl,
+        programs: center.programs.map((program) => ({
+            name: program.name,
+            slots: program.slots,
+            schedule: program.schedule,
+        })),
+    }));
+
+    return {
+        brand: siteConfig.name,
+        session: {
+            label: PLA_SESSION.label,
+            dates: PLA_SESSION.dates,
+            start_date: PLA_SESSION.startDate,
+            end_date: PLA_SESSION.endDate,
+            duration: PLA_SESSION.duration,
+        },
+        offers: {
+            formation_hybride: {
+                label: "Formation Hybride",
+                description: "Parcours principal pour apprendre, structurer l'anglais et progresser avec supports, plateforme, suivi et pratique guidée.",
+                price_range: priceRange,
+                plans,
+                schedules: {
+                    evening: PLA_REGULAR_TIME_SLOTS.map((slot) => `${slot.label}: ${slot.time}`),
+                    morning: `${PLA_HYBRID_TIME_SLOT.label}: ${PLA_HYBRID_TIME_SLOT.time}`,
+                    online: `${PLA_ONLINE_TIME_SLOT.label}: ${PLA_ONLINE_TIME_SLOT.time}`,
+                },
+            },
+            english_club: {
+                label: "English Club",
+                description: "Espace de pratique pour les profils déjà autonomes. Les débutants doivent d'abord passer par la Formation Hybride.",
+                capacity: PLA_CLUB_CAPACITY,
+                seats: clubSeats,
+                price_range: priceRange,
+                plans: PLA_CLUB_PLANS.map((plan) => ({
+                    id: plan.id,
+                    label: plan.label,
+                    frequency: plan.freq,
+                    price: plan.price,
+                    price_label: formatFcfa(plan.price),
+                })),
+                center: "Centre Poincaré",
+            },
+        },
+        centers,
+        contact: {
+            phone: PLA_SESSION.phone,
+            email: PLA_SESSION.email,
+            address: siteConfig.contact.address,
+        },
+        links: publicLinks(),
+        bot_reply: [
+            `Prime Language Academy - ${PLA_SESSION.dates}`,
+            "",
+            `Formation Hybride: ${priceRange}`,
+            `Horaires: 16h00-18h00, 18h00-20h00, matin 09h00-12h00, en ligne 17h30-20h30.`,
+            "Centres: Programme 6 et Poincaré. Le English Club est disponible à Poincaré.",
+            `English Club: ${PLA_CLUB_CAPACITY} places maximum, ${clubSeats.available_seats} place(s) disponible(s) selon les paiements et activations.`,
+            "",
+            `Programme: ${appLink("/programme")}`,
+            `Inscription Formation: ${appLink("/register")}`,
+            `Inscription Club: ${appLink("/register-club")}`,
+            `Brochure: ${appLink("/brochure-pla-2026.pdf")}`,
+        ].join("\n"),
+    };
 }
 
 async function lookupStudentSupport(params: any) {
@@ -146,13 +280,13 @@ async function lookupStudentSupport(params: any) {
             upcoming_appointments: student.appointmentsAsStudent,
             schedules,
             links: {
-                login: "https://primelangageacademy.com/login",
-                forgot_password: "https://primelangageacademy.com/forgot-password",
-                courses: "https://primelangageacademy.com/dashboard/student/courses",
-                payments: "https://primelangageacademy.com/dashboard/student/payments",
-                appointments: "https://primelangageacademy.com/dashboard/student/appointments",
-                messages: "https://primelangageacademy.com/dashboard/student/messages",
-                profile: "https://primelangageacademy.com/dashboard/student/profile",
+                login: appLink("/login"),
+                forgot_password: appLink("/forgot-password"),
+                courses: appLink("/dashboard/student/courses"),
+                payments: appLink("/dashboard/student/payments"),
+                appointments: appLink("/dashboard/student/appointments"),
+                messages: appLink("/dashboard/student/messages"),
+                profile: appLink("/dashboard/student/profile"),
             },
         },
     });
@@ -247,11 +381,12 @@ export async function POST(req: Request) {
 
         switch (action) {
             case "get_stats": {
-                const [totalStudents, totalClub, pendingPayments, totalArticles] = await Promise.all([
+                const [totalStudents, totalClub, pendingPayments, totalArticles, clubSeats] = await Promise.all([
                     prisma.user.count({ where: { role: "STUDENT" } }),
                     prisma.user.count({ where: { registrationType: "CLUB" } }),
-                    prisma.transaction.count({ where: { status: "PENDING" } }),
+                    prisma.transaction.count({ where: { status: { in: ["PENDING", "VERIFYING"] } } }),
                     prisma.article.count(),
+                    getClubSeatStats(),
                 ]);
 
                 return NextResponse.json({
@@ -259,9 +394,15 @@ export async function POST(req: Request) {
                         students: totalStudents,
                         club_members: totalClub,
                         pending_payments: pendingPayments,
-                        articles: totalArticles
+                        articles: totalArticles,
+                        club_capacity: PLA_CLUB_CAPACITY,
+                        club_available_seats: clubSeats.available_seats,
                     }
                 });
+            }
+
+            case "get_program_info": {
+                return NextResponse.json({ program: await buildProgramInfo() });
             }
 
             case "get_recent_registrations": {
@@ -415,18 +556,19 @@ export async function POST(req: Request) {
                 const endOfToday = new Date();
                 endOfToday.setHours(23, 59, 59, 999);
 
-                const [newInscrits, pendingPayments, todayAppointments] = await Promise.all([
+                const [newInscrits, pendingPayments, todayAppointments, program] = await Promise.all([
                     prisma.user.count({
                         where: { role: "STUDENT", createdAt: { gte: last24h } }
                     }),
                     prisma.transaction.count({
-                        where: { status: "VERIFYING" }
+                        where: { status: { in: ["PENDING", "VERIFYING"] } }
                     }),
                     prisma.appointment.findMany({
                         where: { date: { gte: startOfToday, lte: endOfToday } },
                         include: { student: { select: { name: true } } },
                         orderBy: { startTime: "asc" }
-                    })
+                    }),
+                    buildProgramInfo(),
                 ]);
 
                 return NextResponse.json({
@@ -434,11 +576,17 @@ export async function POST(req: Request) {
                         new_students: newInscrits,
                         pending_validations: pendingPayments,
                         appointments_count: todayAppointments.length,
+                        club_available_seats: program.offers.english_club.seats.available_seats,
+                        session: program.session.dates,
+                        price_range: program.offers.formation_hybride.price_range,
+                        programme_link: program.links.programme,
+                        brochure_link: program.links.brochure,
                         appointments_details: todayAppointments.map(a => ({
                             time: a.startTime,
                             student: a.student.name,
                             reason: a.reason
-                        }))
+                        })),
+                        program,
                     }
                 });
             }

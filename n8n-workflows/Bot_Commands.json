@@ -3,14 +3,19 @@
   "nodes": [
     {
       "parameters": {
-        "updates": ["message"],
+        "updates": [
+          "message"
+        ],
         "additionalFields": {}
       },
       "id": "e2a84e9c-bd18-4a52-b8ec-f236965158a1",
       "name": "Telegram Trigger",
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.1,
-      "position": [200, 400],
+      "position": [
+        200,
+        400
+      ],
       "webhookId": "prime-academy-bot-pro",
       "credentials": {
         "telegramApi": {
@@ -22,13 +27,20 @@
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": false, "leftValue": "", "typeValidation": "strict" },
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
           "conditions": [
             {
               "id": "cond-validate",
               "leftValue": "={{ $json.message.text }}",
               "rightValue": "Valide le paiement de",
-              "operator": { "type": "string", "operation": "contains" }
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
             }
           ],
           "combinator": "and"
@@ -38,18 +50,26 @@
       "name": "Est: Valider Paiement?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [420, 200]
+      "position": [
+        420,
+        200
+      ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": false },
+          "options": {
+            "caseSensitive": false
+          },
           "conditions": [
             {
               "id": "cond-welcome",
               "leftValue": "={{ $json.message.text }}",
               "rightValue": "bienvenue",
-              "operator": { "type": "string", "operation": "contains" }
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
             }
           ],
           "combinator": "and"
@@ -59,28 +79,48 @@
       "name": "Est: Message Bienvenue?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [420, 420]
+      "position": [
+        420,
+        420
+      ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": false },
+          "options": {
+            "caseSensitive": false
+          },
           "conditions": [
             {
               "id": "cond-rdv",
               "leftValue": "={{ $json.message.text }}",
               "rightValue": "rendez-vous",
-              "operator": { "type": "string", "operation": "contains" }
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "cond-rdv-short",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "rdv",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
             }
           ],
-          "combinator": "and"
+          "combinator": "or"
         }
       },
       "id": "18f0a0c6-df27-4a11-8ec7-c0e8eb87c3cd",
       "name": "Est: Rendez-vous?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [420, 640]
+      "position": [
+        420,
+        640
+      ]
     },
     {
       "parameters": {
@@ -90,15 +130,23 @@
       "name": "Extraire Montant & Email",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [660, 100]
+      "position": [
+        660,
+        100
+      ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://primelanguageacademy.com/api/admin-bot",
+        "url": "https://primelangageacademy.com/api/admin-bot",
         "sendHeaders": true,
         "headerParameters": {
-          "parameters": [{ "name": "x-api-key", "value": "pla_bot_secret_2026_admin" }]
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $env.ADMIN_BOT_KEY }}"
+            }
+          ]
         },
         "sendBody": true,
         "specifyBody": "json",
@@ -109,15 +157,23 @@
       "name": "API: Valider Paiement",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [880, 100]
+      "position": [
+        880,
+        100
+      ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://primelanguageacademy.com/api/admin-bot",
+        "url": "https://primelangageacademy.com/api/admin-bot",
         "sendHeaders": true,
         "headerParameters": {
-          "parameters": [{ "name": "x-api-key", "value": "pla_bot_secret_2026_admin" }]
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $env.ADMIN_BOT_KEY }}"
+            }
+          ]
         },
         "sendBody": true,
         "specifyBody": "json",
@@ -128,15 +184,23 @@
       "name": "API: Envoyer Bienvenus",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [680, 420]
+      "position": [
+        680,
+        420
+      ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://primelanguageacademy.com/api/admin-bot",
+        "url": "https://primelangageacademy.com/api/admin-bot",
         "sendHeaders": true,
         "headerParameters": {
-          "parameters": [{ "name": "x-api-key", "value": "pla_bot_secret_2026_admin" }]
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $env.ADMIN_BOT_KEY }}"
+            }
+          ]
         },
         "sendBody": true,
         "specifyBody": "json",
@@ -147,92 +211,435 @@
       "name": "API: Rendez-vous du jour",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [680, 640]
+      "position": [
+        680,
+        640
+      ]
     },
     {
       "parameters": {
         "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
         "text": "=✅ *Paiement validé !*\n\n{{ $json.message }}",
-        "additionalFields": { "parse_mode": "Markdown" }
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
       },
       "id": "a92c3008-0112-4c28-bb71-8bc4e8e1a62d",
       "name": "Réponse: Paiement OK",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1100, 100],
+      "position": [
+        1100,
+        100
+      ],
       "credentials": {
-        "telegramApi": { "id": "HkSBgFG3AltWbaTn", "name": "compte Telegram" }
+        "telegramApi": {
+          "id": "HkSBgFG3AltWbaTn",
+          "name": "compte Telegram"
+        }
       }
     },
     {
       "parameters": {
         "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
         "text": "=📧 *Emails de bienvenue envoyés !*\n\n{{ $json.message }}",
-        "additionalFields": { "parse_mode": "Markdown" }
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
       },
       "id": "6d9b9222-0d12-4752-9b24-b38afdb1ebbc",
       "name": "Réponse: Bienvenus OK",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [900, 420],
+      "position": [
+        900,
+        420
+      ],
       "credentials": {
-        "telegramApi": { "id": "HkSBgFG3AltWbaTn", "name": "compte Telegram" }
+        "telegramApi": {
+          "id": "HkSBgFG3AltWbaTn",
+          "name": "compte Telegram"
+        }
       }
     },
     {
       "parameters": {
         "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
         "text": "=📅 *Rendez-vous d'aujourd'hui* :\n\n{{ $json.appointments && $json.appointments.length > 0 ? $json.appointments.map(a => '• ' + new Date(a.startTime).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) + ' — ' + a.student.name + (a.reason ? ' (' + a.reason + ')' : '')).join('\\n') : 'Aucun rendez-vous aujourd\\'hui. ✅' }}",
-        "additionalFields": { "parse_mode": "Markdown" }
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
       },
       "id": "2d8f9b90-1db2-48f8-b391-76673d32570d",
       "name": "Réponse: RDV",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [900, 640],
+      "position": [
+        900,
+        640
+      ],
       "credentials": {
-        "telegramApi": { "id": "HkSBgFG3AltWbaTn", "name": "compte Telegram" }
+        "telegramApi": {
+          "id": "HkSBgFG3AltWbaTn",
+          "name": "compte Telegram"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-program-info-cond-1",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "programme",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "cond-program-info-cond-2",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "offres",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "cond-program-info-cond-3",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "tarifs",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "cond-program-info-cond-4",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/programme",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "cond-program-info-cond-5",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/offres",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        }
+      },
+      "id": "cond-program-info",
+      "name": "Est: Infos Programme?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        420,
+        860
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://primelangageacademy.com/api/admin-bot",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $env.ADMIN_BOT_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"action\": \"get_program_info\"\n}",
+        "options": {}
+      },
+      "id": "api-program-info",
+      "name": "API: Infos Programme",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        680,
+        860
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=?? *Programme PLA ? jour*\n\n{{ $json.program.bot_reply }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "reply-program-info",
+      "name": "R?ponse: Programme",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        900,
+        860
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "HkSBgFG3AltWbaTn",
+          "name": "compte Telegram"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-help-cond-1",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "aide",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "cond-help-cond-2",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "help",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "cond-help-cond-3",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "cond-help-cond-4",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/aide",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        }
+      },
+      "id": "cond-help",
+      "name": "Est: Aide?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        420,
+        1080
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=?? *Commandes Prime Academy*\n\n? Programme, offres ou tarifs\n? Rendez-vous\n? Bienvenue\n? Valide le paiement de 52000 pour eleve@email.com\n\nLe bot utilise maintenant le domaine officiel primelangageacademy.com.",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "reply-help",
+      "name": "R?ponse: Aide",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        680,
+        1080
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "HkSBgFG3AltWbaTn",
+          "name": "compte Telegram"
+        }
       }
     }
   ],
   "pinData": {},
   "connections": {
     "Telegram Trigger": {
-      "main": [[
-        { "node": "Est: Valider Paiement?", "type": "main", "index": 0 }
-      ]]
+      "main": [
+        [
+          {
+            "node": "Est: Valider Paiement?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Est: Valider Paiement?": {
       "main": [
-        [{ "node": "Extraire Montant & Email", "type": "main", "index": 0 }],
-        [{ "node": "Est: Message Bienvenue?", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Extraire Montant & Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Est: Message Bienvenue?",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Est: Message Bienvenue?": {
       "main": [
-        [{ "node": "API: Envoyer Bienvenus", "type": "main", "index": 0 }],
-        [{ "node": "Est: Rendez-vous?", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "API: Envoyer Bienvenus",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Est: Rendez-vous?",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Est: Rendez-vous?": {
       "main": [
-        [{ "node": "API: Rendez-vous du jour", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "API: Rendez-vous du jour",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Est: Infos Programme?",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Extraire Montant & Email": {
-      "main": [[{ "node": "API: Valider Paiement", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "API: Valider Paiement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "API: Valider Paiement": {
-      "main": [[{ "node": "Réponse: Paiement OK", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Réponse: Paiement OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "API: Envoyer Bienvenus": {
-      "main": [[{ "node": "Réponse: Bienvenus OK", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Réponse: Bienvenus OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "API: Rendez-vous du jour": {
-      "main": [[{ "node": "Réponse: RDV", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Réponse: RDV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Est: Infos Programme?": {
+      "main": [
+        [
+          {
+            "node": "API: Infos Programme",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Est: Aide?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API: Infos Programme": {
+      "main": [
+        [
+          {
+            "node": "R?ponse: Programme",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Est: Aide?": {
+      "main": [
+        [
+          {
+            "node": "R?ponse: Aide",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
     }
   },
   "active": true,
-  "settings": { "executionOrder": "v1" },
+  "settings": {
+    "executionOrder": "v1"
+  },
   "versionId": "e1f1c2b5-e6a8-4c3d-b4b6-3a7891cf1567"
 }

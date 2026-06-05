@@ -16,18 +16,21 @@
       "name": "Déclencheur 8h00",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.1,
-      "position": [240, 300]
+      "position": [
+        240,
+        300
+      ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://primelanguageacademy.com/api/admin-bot",
+        "url": "https://primelangageacademy.com/api/admin-bot",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "x-api-key",
-              "value": "pla_bot_secret_2026_admin"
+              "value": "={{ $env.ADMIN_BOT_KEY }}"
             }
           ]
         },
@@ -40,12 +43,15 @@
       "name": "API Morning Report",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [460, 300]
+      "position": [
+        460,
+        300
+      ]
     },
     {
       "parameters": {
         "chatId": "6645894689",
-        "text": "=🌅 *Morning Report - Prime Academy*\n\nBonjour Directeur ! Voici le point du {{ new Date().toLocaleDateString('fr-FR') }} :\n\n📊 *Nouveaux inscrits (24h)* : {{ $json.report.new_students }}\n💰 *Paiements à valider* : {{ $json.report.pending_validations }}\n📅 *Rendez-vous aujourd'hui* : {{ $json.report.appointments_count }}\n\n{{ $json.report.appointments_count > 0 ? '📋 *Détails RDV :*\\n' + $json.report.appointments_details.map(a => '• ' + new Date(a.time).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) + ' — ' + a.student + (a.reason ? ' (' + a.reason + ')' : '')).join('\\n') : '' }}\n\nBonne journée ! 💪",
+        "text": "=?? *Morning Report - Prime Academy*\n\nBonjour Directeur. Point du {{ new Date().toLocaleDateString('fr-FR') }} :\n\n?? Nouveaux inscrits 24h : {{ $json.report.new_students }}\n?? Paiements ? v?rifier : {{ $json.report.pending_validations }}\n?? Rendez-vous aujourd'hui : {{ $json.report.appointments_count }}\n?? Session : {{ $json.report.session }}\n?? Tarifs : {{ $json.report.price_range }}\n??? Places Club disponibles : {{ $json.report.club_available_seats }}\n\n{{ $json.report.appointments_count > 0 ? 'D?tails RDV :\\n' + $json.report.appointments_details.map(a => '? ' + new Date(a.time).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) + ' - ' + a.student + (a.reason ? ' (' + a.reason + ')' : '')).join('\\n') : 'Aucun rendez-vous aujourd?hui.' }}\n\nProgramme : {{ $json.report.programme_link }}\nBrochure : {{ $json.report.brochure_link }}",
         "additionalFields": {
           "parse_mode": "Markdown"
         }
@@ -54,7 +60,10 @@
       "name": "Envoyer Morning Report",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [680, 300],
+      "position": [
+        680,
+        300
+      ],
       "credentials": {
         "telegramApi": {
           "id": "HkSBgFG3AltWbaTn",
@@ -66,13 +75,31 @@
   "pinData": {},
   "connections": {
     "Déclencheur 8h00": {
-      "main": [[{ "node": "API Morning Report", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "API Morning Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "API Morning Report": {
-      "main": [[{ "node": "Envoyer Morning Report", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Envoyer Morning Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
-  "settings": { "executionOrder": "v1" },
+  "settings": {
+    "executionOrder": "v1"
+  },
   "versionId": "f7d4e5a9-c3b2-4d1e-8a0f-1a2b3c4d5e6f"
 }

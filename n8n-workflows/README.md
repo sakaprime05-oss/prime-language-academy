@@ -1,32 +1,45 @@
-# 🚀 Guide d'intégration n8n - Prime Academy Bot
+# Guide d'integration n8n - Prime Academy Bot
 
-Pour vous faciliter la vie, j'ai pré-configuré les workflows n8n pour les 4 fonctionnalités "Pro" que nous venons d'implémenter.
+Ces exports permettent de connecter le bot Telegram d'administration au site Prime Language Academy.
 
 ## Fichiers disponibles
-Dans votre projet, vous trouverez un nouveau dossier `n8n-workflows` contenant deux fichiers :
-1. `Morning_Report.json` : S'exécute automatiquement tous les jours à 8h00.
-2. `Bot_Commands.json` : Écoute les messages de votre bot Telegram pour exécuter vos commandes.
 
-## 🛠️ Comment les importer dans n8n
+Le dossier `n8n-workflows` contient deux fichiers :
+1. `Morning_Report.json` : s'execute automatiquement tous les jours a 8h00.
+2. `Bot_Commands.json` : ecoute les messages Telegram pour executer les commandes admin.
 
-1. Ouvrez votre interface **n8n**.
-2. Créez un nouveau workflow (cliquez sur "+ Add Workflow").
-3. Ouvrez l'un des fichiers `.json` (ex: `Morning_Report.json`) avec un éditeur de texte (VS Code, Notepad, etc.) et copiez tout son contenu.
-4. Retournez dans n8n, cliquez n'importe où sur l'espace vide (canvas) et faites `Ctrl+V` (ou `Cmd+V` sur Mac) pour coller le workflow.
-5. Les nœuds apparaîtront automatiquement !
+## Comment les importer dans n8n
 
-## ⚙️ Configuration requise (À remplir dans n8n)
+1. Ouvrez votre interface n8n.
+2. Creez un nouveau workflow.
+3. Ouvrez l'un des fichiers `.json` avec un editeur de texte et copiez tout son contenu.
+4. Retournez dans n8n, cliquez sur l'espace vide du canvas et faites `Ctrl+V`.
+5. Les noeuds apparaissent automatiquement.
 
-Dans les nœuds HTTP Request (nommés **API: ...**), vous devez :
-- Mettre à jour l'URL avec votre domaine de production si ce n'est pas `www.primelanguageacademy.com`.
-- Dans l'onglet **Headers**, remplacer `VOTRE_CLE_API_SECRETE_ICI` par la vraie valeur de votre variable d'environnement `ADMIN_BOT_KEY`.
+## Configuration requise
 
-Dans les nœuds Telegram :
-- Sélectionnez vos "Credentials" Telegram (Connectez votre Bot via le BotFather si ce n'est pas déjà fait).
-- Pour le Morning Report, remplacez `VOTRE_CHAT_ID_TELEGRAM` par votre identifiant de discussion (Chat ID) pour que le bot sache à qui envoyer le rapport à 8h.
+Les noeuds HTTP Request pointent maintenant vers :
+`https://primelangageacademy.com/api/admin-bot`
 
-## 💬 Commandes reconnues par le bot :
-Une fois le workflow `Bot_Commands` activé, envoyez exactement ceci à votre bot :
-- `"Valide le paiement de 50000 pour eleve@email.com"`
-- `"Envoie un message de bienvenue"`
-- `"Quels sont mes rendez-vous d'aujourd'hui"`
+Dans n8n, configurez la variable d'environnement :
+`ADMIN_BOT_KEY`
+
+Les exports utilisent cette valeur dans les headers avec :
+`={{ $env.ADMIN_BOT_KEY }}`
+
+Dans les noeuds Telegram :
+- Selectionnez vos credentials Telegram.
+- Pour le Morning Report, remplacez le `chatId` par votre identifiant de discussion Telegram.
+
+## Commandes reconnues par le bot
+
+Une fois le workflow `Bot_Commands` active, vous pouvez envoyer :
+- `Valide le paiement de 50000 pour eleve@email.com`
+- `Envoie un message de bienvenue`
+- `Quels sont mes rendez-vous d'aujourd'hui`
+- `Programme`
+- `Offres`
+- `Tarifs`
+- `Aide`
+
+Les commandes `Programme`, `Offres` et `Tarifs` appellent l'action `get_program_info`, qui utilise les memes donnees que le site : Formation Hybride, English Club, session du 11 juillet au 12 septembre 2026, tarifs de 52 000 a 152 000 FCFA, centres Programme 6 et Poincare.
