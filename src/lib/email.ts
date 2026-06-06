@@ -52,7 +52,16 @@ function money(amount: number) {
 }
 
 function receiptNumber(transactionId: string) {
-    const clean = String(transactionId || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    const readable = String(transactionId || "")
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9-]/g, "");
+
+    if (/^PLA-[A-Z0-9]{3}-\d{6}-[A-F0-9]{8}$/.test(readable)) {
+        return readable;
+    }
+
+    const clean = readable.replace(/[^A-Z0-9]/g, "");
     return clean ? `PLA-${clean.slice(0, 8)}` : `PLA-${Date.now().toString().slice(-8)}`;
 }
 
@@ -268,7 +277,6 @@ export async function sendAdminNotificationEmail(studentName: string, amount: nu
             ["Montant", money(amount)],
             ["Reçu", receipt],
             ["Moyen", paymentMethodLabel(method)],
-            ["Reference interne", escapeHtml(transactionId)],
             ["Date", new Date().toLocaleDateString("fr-FR")],
         ])}
         ${button("Ouvrir le dashboard", `${appUrl()}/dashboard/admin`, brand.color)}

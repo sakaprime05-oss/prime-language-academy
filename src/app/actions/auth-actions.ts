@@ -7,6 +7,7 @@ import { notifyTelegram } from "@/lib/notify";
 import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_PLANS } from "@/lib/pla-program";
 import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
 import { paystackChannels } from "@/lib/payment-methods";
+import { createPaymentReference } from "@/lib/payment-reference";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 const formationPlanPrices = Object.fromEntries(PLA_PLANS.map((plan) => [plan.id, plan.price])) as Record<string, number>;
@@ -58,6 +59,23 @@ async function initializePaystackCheckout(input: PaystackInitInput) {
                 planId: input.planId,
                 studentId: input.studentId,
                 preferredPaymentMethod: input.preferredPaymentMethod || "PAYSTACK",
+                custom_fields: [
+                    {
+                        display_name: "Reference PLA",
+                        variable_name: "reference_pla",
+                        value: input.reference,
+                    },
+                    {
+                        display_name: "Paiement concerne",
+                        variable_name: "paiement_concerne",
+                        value: "Inscription Prime Language Academy",
+                    },
+                    {
+                        display_name: "Moyen choisi",
+                        variable_name: "moyen_choisi",
+                        value: input.preferredPaymentMethod || "Paiement en ligne",
+                    },
+                ],
             },
         }),
     });
@@ -80,8 +98,7 @@ async function createRegistrationCheckout(input: {
     preferredPaymentMethod?: string;
     retry?: boolean;
 }) {
-    const refPrefix = input.retry ? "REG-RETRY" : "REG";
-    const refCommand = `${refPrefix}-${input.paymentPlanId}-${Date.now()}`;
+    const refCommand = createPaymentReference(input.retry ? "RPY" : "REG");
 
     await prisma.transaction.updateMany({
         where: {

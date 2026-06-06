@@ -97,6 +97,7 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
   const stageLabel = paymentStageLabel(plan.amountPaid, transaction.amount, plan.totalAmount);
   const newAmountPaid = plan.amountPaid + transaction.amount;
   const newPlanStatus = newAmountPaid >= plan.totalAmount ? "PAID" : "PARTIAL";
+  const publicReference = transaction.referenceId || transaction.id;
 
   await prisma.$transaction([
     prisma.paymentPlan.update({
@@ -117,10 +118,10 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
       await sendAccountActivatedEmail(student.email, student.name || "Étudiant").catch(console.error);
     }
 
-    await sendInvoiceEmail(student.email, student.name || "Étudiant", transaction.amount, transaction.id, providerLabel, stageLabel).catch(console.error);
+    await sendInvoiceEmail(student.email, student.name || "Étudiant", transaction.amount, publicReference, providerLabel, stageLabel).catch(console.error);
   }
 
-  await sendAdminNotificationEmail(student.name || "Étudiant inconnu", transaction.amount, transaction.id, providerLabel).catch(
+  await sendAdminNotificationEmail(student.name || "Étudiant inconnu", transaction.amount, publicReference, providerLabel).catch(
     console.error
   );
 
@@ -134,3 +135,4 @@ export async function completePaystackTransaction(data: PaystackTransactionData)
 
   return { ok: true, reason: "Paiement confirmé." };
 }
+

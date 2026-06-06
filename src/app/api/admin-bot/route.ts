@@ -15,6 +15,7 @@ import {
 import { sanitizeHtml } from "@/lib/sanitize-html";
 import { siteConfig } from "@/lib/site-config";
 import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
+import { createPaymentReference } from "@/lib/payment-reference";
 import crypto from "crypto";
 
 function isValidAdminBotKey(apiKey: string | null) {
@@ -334,7 +335,7 @@ async function validatePaymentFromBot(params: any) {
                 amount: numericAmount,
                 method: "MANUAL",
                 status: "COMPLETED",
-                referenceId: `BOT-VAL-${Date.now()}`,
+                referenceId: createPaymentReference("ADM"),
             },
         });
 

@@ -8,6 +8,7 @@ import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 import { put } from "@vercel/blob";
 import { paystackChannels } from "@/lib/payment-methods";
+import { createPaymentReference } from "@/lib/payment-reference";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 
@@ -87,8 +88,7 @@ export async function initiatePayment(formData: FormData) {
 
         const amount = remaining;
 
-        // Generate a unique reference for this command
-        const refCommand = `PRIME-${planId}-${Date.now()}`;
+        const refCommand = createPaymentReference("PAY");
 
         await prisma.transaction.updateMany({
             where: {
@@ -126,10 +126,20 @@ export async function initiatePayment(formData: FormData) {
                 preferredPaymentMethod: paymentMethod || "PAYSTACK",
                 custom_fields: [
                     {
-                        display_name: "Plan ID",
-                        variable_name: "plan_id",
-                        value: planId
-                    }
+                        display_name: "Reference PLA",
+                        variable_name: "reference_pla",
+                        value: refCommand,
+                    },
+                    {
+                        display_name: "Paiement concerne",
+                        variable_name: "paiement_concerne",
+                        value: "Solde Prime Language Academy",
+                    },
+                    {
+                        display_name: "Moyen choisi",
+                        variable_name: "moyen_choisi",
+                        value: paymentMethod || "Paiement en ligne",
+                    },
                 ]
             }
         };
@@ -413,7 +423,7 @@ export async function approveTransaction(transactionId: string) {
                 student.email,
                 student.name || "Étudiant",
                 transaction.amount,
-                transaction.id,
+                transaction.referenceId || transaction.id,
                 transaction.provider || transaction.method,
                 stageLabel
             ).catch(console.error);
