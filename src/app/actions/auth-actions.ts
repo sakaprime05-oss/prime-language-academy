@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { sendWelcomeEmail, sendAdminNewRegistrationEmail } from "@/lib/email";
 import { notifyTelegram } from "@/lib/notify";
-import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_PLANS } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_PAYSTACK_TEST_PLAN, PLA_PLANS } from "@/lib/pla-program";
 import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
 import { paystackChannels } from "@/lib/payment-methods";
 import { createPaymentReference } from "@/lib/payment-reference";
@@ -12,6 +12,24 @@ import { createPaymentReference } from "@/lib/payment-reference";
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 const formationPlanPrices = Object.fromEntries(PLA_PLANS.map((plan) => [plan.id, plan.price])) as Record<string, number>;
 const clubPlanPrices = Object.fromEntries(PLA_CLUB_PLANS.map((plan) => [plan.id, plan.price])) as Record<string, number>;
+
+function canUsePaystackTestPlan(planId: string, onboardingParams: any) {
+    const configuredToken = process.env.PAYSTACK_TEST_PLAN_TOKEN;
+    return (
+        planId === PLA_PAYSTACK_TEST_PLAN.id &&
+        Boolean(configuredToken) &&
+        onboardingParams?.paymentTestMode === true &&
+        onboardingParams?.paymentTestToken === configuredToken
+    );
+}
+
+function planPricesForRegistration(registrationType: string, planId: string, onboardingParams: any) {
+    if (registrationType !== "CLUB" && canUsePaystackTestPlan(planId, onboardingParams)) {
+        return { ...formationPlanPrices, [PLA_PAYSTACK_TEST_PLAN.id]: PLA_PAYSTACK_TEST_PLAN.price };
+    }
+
+    return registrationType === "CLUB" ? clubPlanPrices : formationPlanPrices;
+}
 
 type PaystackInitInput = {
     email: string;
@@ -194,7 +212,7 @@ export async function registerUser(formData: FormData) {
                 return { error: "Compte en attente incomplet. Contactez le support pour finaliser votre inscription." };
             }
 
-            const existingPlanPrices = existingUser.registrationType === "CLUB" ? clubPlanPrices : formationPlanPrices;
+            const existingPlanPrices = planPricesForRegistration(existingUser.registrationType, planId, onboardingParams);
             const submittedTotalAmount = existingPlanPrices[planId];
             const updatedTotalAmount = submittedTotalAmount || paymentPlan.totalAmount;
             const remaining = Math.max(0, updatedTotalAmount - paymentPlan.amountPaid);
@@ -215,8 +233,9 @@ export async function registerUser(formData: FormData) {
                 ]);
             }
 
+            const isTestPlanRetry = planId === PLA_PAYSTACK_TEST_PLAN.id;
             const amountToPay =
-                onboardingParams.paymentOption === "fractionne" && paymentPlan.amountPaid <= 0
+                onboardingParams.paymentOption === "fractionne" && paymentPlan.amountPaid <= 0 && !isTestPlanRetry
                     ? updatedTotalAmount * 0.5
                     : remaining;
 
@@ -255,7 +274,7 @@ export async function registerUser(formData: FormData) {
             });
         }
 
-        const selectedPlanPrices = isClubRegistration ? clubPlanPrices : formationPlanPrices;
+        const selectedPlanPrices = planPricesForRegistration(registrationType, planId, onboardingParams);
         const totalAmount = selectedPlanPrices[planId];
         if (!totalAmount) {
             return { error: "Formule invalide. Veuillez choisir une formule de formation." };
@@ -296,7 +315,7 @@ export async function registerUser(formData: FormData) {
             }
         }
 
-        const amountToPay = onboardingParams.paymentOption === "fractionne" ? totalAmount * 0.5 : totalAmount;
+        const amountToPay = onboardingParams.paymentOption === "fractionne" && planId !== PLA_PAYSTACK_TEST_PLAN.id ? totalAmount * 0.5 : totalAmount;
 
         const user = await prisma.user.create({
             data: {

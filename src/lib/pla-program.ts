@@ -28,6 +28,15 @@ const PLA_BASE_PLANS = [
 export const PLA_PLANS = PLA_BASE_PLANS;
 export const PLA_CLUB_PLANS = PLA_PLANS;
 
+export const PLA_PAYSTACK_TEST_PLAN = {
+    id: "paystack-live-test-1000",
+    label: "Test Paystack Live",
+    freq: "Test unique",
+    shortFreq: "test",
+    price: 1000,
+    top: false,
+} as const;
+
 export const PLA_REGULAR_TIME_SLOTS = [
     { id: "v1", label: "Vague 1", time: "16h00 - 18h00", desc: "Formation Hybride en soirée, disponible dans les deux centres. Club d'Anglais disponible au Centre Poincaré." },
     { id: "v2", label: "Vague 2", time: "18h00 - 20h00", desc: "Formation Hybride en soirée, disponible dans les deux centres. Club d'Anglais disponible au Centre Poincaré." },

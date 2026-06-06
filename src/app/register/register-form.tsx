@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { registerUser } from "@/app/actions/auth-actions";
-import { PLA_CENTERS, PLA_HYBRID_TIME_SLOT, PLA_ONLINE_TIME_SLOT, PLA_PLANS, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CENTERS, PLA_HYBRID_TIME_SLOT, PLA_ONLINE_TIME_SLOT, PLA_PAYSTACK_TEST_PLAN, PLA_PLANS, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 const planSessions: Record<string, number> = {
     "loisir": 1,
@@ -12,17 +12,26 @@ const planSessions: Record<string, number> = {
     "equilibre": 3,
     "performance": 4,
     "intensif": 5,
-    "immersion": 6
+    "immersion": 6,
+    [PLA_PAYSTACK_TEST_PLAN.id]: 1,
 };
 
 const plans = [
-    { id: "loisir", name: "Loisir (1 séance/sem)", price: formatFcfa(PLA_PLANS[0].price), desc: "Initiation ou contact léger" },
-    { id: "essentiel", name: "Essentiel (2 séances/sem)", price: formatFcfa(PLA_PLANS[1].price), desc: "Construction des bases" },
-    { id: "equilibre", name: "Équilibre (3 séances/sem)", price: formatFcfa(PLA_PLANS[2].price), desc: "Pratique régulière" },
-    { id: "performance", name: "Performance (4 séances/sem)", price: formatFcfa(PLA_PLANS[3].price), desc: "Résultats tangibles" },
-    { id: "intensif", name: "Intensif (5 séances/sem)", price: formatFcfa(PLA_PLANS[4].price), desc: "Transformation radicale" },
-    { id: "immersion", name: "Immersion (6 séances/sem)", price: formatFcfa(PLA_PLANS[5].price), desc: "Maîtrise totale" }
+    { id: "loisir", name: "Loisir (1 séance/sem)", price: formatFcfa(PLA_PLANS[0].price), amount: PLA_PLANS[0].price, desc: "Initiation ou contact léger" },
+    { id: "essentiel", name: "Essentiel (2 séances/sem)", price: formatFcfa(PLA_PLANS[1].price), amount: PLA_PLANS[1].price, desc: "Construction des bases" },
+    { id: "equilibre", name: "Équilibre (3 séances/sem)", price: formatFcfa(PLA_PLANS[2].price), amount: PLA_PLANS[2].price, desc: "Pratique régulière" },
+    { id: "performance", name: "Performance (4 séances/sem)", price: formatFcfa(PLA_PLANS[3].price), amount: PLA_PLANS[3].price, desc: "Résultats tangibles" },
+    { id: "intensif", name: "Intensif (5 séances/sem)", price: formatFcfa(PLA_PLANS[4].price), amount: PLA_PLANS[4].price, desc: "Transformation radicale" },
+    { id: "immersion", name: "Immersion (6 séances/sem)", price: formatFcfa(PLA_PLANS[5].price), amount: PLA_PLANS[5].price, desc: "Maîtrise totale" }
 ];
+
+const testPlan = {
+    id: PLA_PAYSTACK_TEST_PLAN.id,
+    name: "Test paiement live (temporaire)",
+    price: formatFcfa(PLA_PAYSTACK_TEST_PLAN.price),
+    amount: PLA_PAYSTACK_TEST_PLAN.price,
+    desc: "Option temporaire pour tester Paystack live",
+};
 
 const paymentMethods = [
     { id: "WAVE", name: "Wave", detail: "Prioritaire à Abidjan" },
@@ -55,6 +64,9 @@ const backButtonClass = "min-h-12 rounded-lg bg-[var(--foreground)]/6 px-3 py-3 
 function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const paymentTestToken = searchParams.get("paystackTest") || "";
+    const isPaymentTestMode = Boolean(paymentTestToken);
+    const availablePlans = isPaymentTestMode ? [testPlan, ...plans] : plans;
 
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -79,7 +91,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
         objectiveOther: "",
         level: searchParams.get("level") || "",
 
-        planId: searchParams.get("plan") || "essentiel",
+        planId: searchParams.get("plan") || (isPaymentTestMode ? PLA_PAYSTACK_TEST_PLAN.id : "essentiel"),
         courseMode: "PRESENTIEL", // PRESENTIEL, ONLINE
         studentType: "INDIVIDUEL", // INDIVIDUEL, ENTREPRISE
         centerId: searchParams.get("center") || "poincare",
@@ -95,11 +107,12 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
     const isHybrid = formData.type === "HYBRID";
     const availableTimeSlots = (formData.courseMode === "ONLINE" ? [PLA_ONLINE_TIME_SLOT] : isHybrid ? [PLA_HYBRID_TIME_SLOT] : PLA_TIME_SLOTS).map((slot) => ({ id: slot.id, name: `${slot.label} (${slot.time})` }));
-    const selectedPlan = plans.find((plan) => plan.id === formData.planId) || plans[1];
+    const selectedPlan = availablePlans.find((plan) => plan.id === formData.planId) || availablePlans[1] || plans[1];
     const selectedCenter = PLA_CENTERS.find((center) => center.id === formData.centerId) || PLA_CENTERS[1];
-    const selectedPlanAmount = PLA_PLANS.find((plan) => plan.id === formData.planId)?.price || PLA_PLANS[1].price;
+    const selectedPlanAmount = availablePlans.find((plan) => plan.id === formData.planId)?.amount || PLA_PLANS[1].price;
     const selectedPaymentMethod = paymentMethods.find((method) => method.id === formData.paymentMethod) || paymentMethods[0];
-    const immediateAmount = formData.paymentOption === "fractionne" ? selectedPlanAmount * 0.5 : selectedPlanAmount;
+    const isSelectedTestPlan = formData.planId === PLA_PAYSTACK_TEST_PLAN.id;
+    const immediateAmount = formData.paymentOption === "fractionne" && !isSelectedTestPlan ? selectedPlanAmount * 0.5 : selectedPlanAmount;
     const reservationAmount = selectedPlanAmount - immediateAmount;
     const shouldShowAccountRecovery =
         error.toLowerCase().includes("email") ||
@@ -134,6 +147,9 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                 }
                 if (name === "planId") {
                     newData.days = []; // Reset days when plan changes to ensure correct count
+                    if (value === PLA_PAYSTACK_TEST_PLAN.id) {
+                        newData.paymentOption = "total";
+                    }
                 }
                 return newData;
             });
@@ -218,6 +234,9 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
         const finalData = {
             ...formData,
+            paymentOption: isSelectedTestPlan ? "total" : formData.paymentOption,
+            paymentTestMode: isSelectedTestPlan,
+            paymentTestToken: isPaymentTestMode ? paymentTestToken : undefined,
             objective: formData.objective === "Autre" ? formData.objectiveOther : formData.objective,
             commune: formData.commune === "Autre" ? formData.communeOther : formData.commune
         };
@@ -286,6 +305,12 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </Link>
                         </div>
                     )}
+                </div>
+            )}
+
+            {isPaymentTestMode && (
+                <div className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-3 text-xs font-bold leading-5 text-amber-700 dark:text-amber-200">
+                    Mode test Paystack live actif. La formule temporaire à {formatFcfa(PLA_PAYSTACK_TEST_PLAN.price)} est visible uniquement avec ce lien.
                 </div>
             )}
 
@@ -524,7 +549,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
                             <h3 className="text-lg font-black text-[var(--foreground)]">Formule choisie</h3>
                             <div className="space-y-2">
-                                {plans.map(plan => (
+                                {availablePlans.map(plan => (
                                     <label key={plan.id} className={`flex cursor-pointer flex-col rounded-lg border p-3 transition-colors ${formData.planId === plan.id ? 'border-primary bg-primary/10' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <div className="flex items-center gap-3">
                                             <input type="radio" name="planId" value={plan.id} checked={formData.planId === plan.id} onChange={handleChange} className="accent-primary" />
@@ -618,13 +643,15 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                         <span className="text-xs text-[var(--foreground)]/60 mt-1 block">Réglez la Prise en charge et la Réservation en une seule fois.</span>
                                     </div>
                                 </label>
-                                <label className={`flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors ${formData.paymentOption === 'fractionne' ? 'border-primary bg-primary/10' : 'border-[var(--foreground)]/10 bg-white/55 dark:bg-white/5'}`}>
-                                    <input type="radio" name="paymentOption" value="fractionne" checked={formData.paymentOption === 'fractionne'} onChange={handleChange} className="accent-primary mt-0.5" />
-                                    <div>
-                                        <span className="font-bold block text-sm">Paiement en 2 fois</span>
-                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">1re moitié : la Prise en charge, qui ouvre l'accès à la documentation, aux conseils, à la plateforme et au suivi. 2e moitié : la Réservation, à solder avant le début officiel pour verrouiller définitivement la place.</span>
-                                    </div>
-                                </label>
+                                {!isSelectedTestPlan && (
+                                    <label className={`flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors ${formData.paymentOption === 'fractionne' ? 'border-primary bg-primary/10' : 'border-[var(--foreground)]/10 bg-white/55 dark:bg-white/5'}`}>
+                                        <input type="radio" name="paymentOption" value="fractionne" checked={formData.paymentOption === 'fractionne'} onChange={handleChange} className="accent-primary mt-0.5" />
+                                        <div>
+                                            <span className="font-bold block text-sm">Paiement en 2 fois</span>
+                                            <span className="text-xs text-[var(--foreground)]/60 mt-1 block">1re moitié : la Prise en charge, qui ouvre l'accès à la documentation, aux conseils, à la plateforme et au suivi. 2e moitié : la Réservation, à solder avant le début officiel pour verrouiller définitivement la place.</span>
+                                        </div>
+                                    </label>
+                                )}
                             </div>
                         </div>
 
