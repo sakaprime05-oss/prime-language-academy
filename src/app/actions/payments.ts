@@ -380,7 +380,7 @@ export async function approveTransaction(transactionId: string) {
 
         if (!transaction) return { error: "Transaction introuvable" };
         if (transaction.status === "COMPLETED") return { success: true };
-        if (transaction.status !== "VERIFYING" && transaction.status !== "PENDING") {
+        if (transaction.status !== "VERIFYING") {
             return { error: "Transaction déjà traitée ou invalide" };
         }
 

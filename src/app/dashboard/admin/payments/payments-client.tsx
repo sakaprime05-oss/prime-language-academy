@@ -77,6 +77,12 @@ function providerDot(provider: string | null) {
   return "bg-[var(--muted-foreground)]";
 }
 
+function displayReceipt(tx: Transaction) {
+  const reference = tx.referenceId || "";
+  if (/^PLA-[A-Z0-9]{3}-\d{6}-[A-F0-9]{8}$/.test(reference)) return reference;
+  return tx.id ? `PLA-${tx.id.slice(0, 8).toUpperCase()}` : "-";
+}
+
 export default function AdminPaymentsClient({ initialTransactions }: { initialTransactions: Transaction[] }) {
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState("ALL");
@@ -281,7 +287,7 @@ function PaymentDetails({ tx }: { tx: Transaction }) {
         </a>
       ) : (
         <p className="truncate text-xs font-semibold text-[var(--muted-foreground)]">
-          Recu : {tx.id ? `PLA-${tx.id.slice(0, 8).toUpperCase()}` : "-"}
+          Recu : {displayReceipt(tx)}
         </p>
       )}
       {tx.failureReason && <p className="text-xs font-semibold text-red-600 dark:text-red-300">{tx.failureReason}</p>}
