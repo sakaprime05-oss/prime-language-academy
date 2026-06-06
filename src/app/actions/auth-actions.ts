@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { sendWelcomeEmail, sendAdminNewRegistrationEmail } from "@/lib/email";
 import { notifyTelegram } from "@/lib/notify";
-import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_PAYSTACK_TEST_PLAN, PLA_PLANS } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_PAYSTACK_SPLIT_TEST_PLAN, PLA_PAYSTACK_TEST_PLAN, PLA_PLANS } from "@/lib/pla-program";
 import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
 import { paystackChannels } from "@/lib/payment-methods";
 import { createPaymentReference } from "@/lib/payment-reference";
@@ -12,11 +12,16 @@ import { createPaymentReference } from "@/lib/payment-reference";
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 const formationPlanPrices = Object.fromEntries(PLA_PLANS.map((plan) => [plan.id, plan.price])) as Record<string, number>;
 const clubPlanPrices = Object.fromEntries(PLA_CLUB_PLANS.map((plan) => [plan.id, plan.price])) as Record<string, number>;
+const paystackTestPlanPrices: Record<string, number> = {
+    [PLA_PAYSTACK_TEST_PLAN.id]: PLA_PAYSTACK_TEST_PLAN.price,
+    [PLA_PAYSTACK_SPLIT_TEST_PLAN.id]: PLA_PAYSTACK_SPLIT_TEST_PLAN.price,
+};
 
 function canUsePaystackTestPlan(planId: string, onboardingParams: any) {
     const configuredToken = process.env.PAYSTACK_TEST_PLAN_TOKEN;
+    const isKnownTestPlan = Object.prototype.hasOwnProperty.call(paystackTestPlanPrices, planId);
     return (
-        planId === PLA_PAYSTACK_TEST_PLAN.id &&
+        isKnownTestPlan &&
         Boolean(configuredToken) &&
         onboardingParams?.paymentTestMode === true &&
         onboardingParams?.paymentTestToken === configuredToken
@@ -25,7 +30,7 @@ function canUsePaystackTestPlan(planId: string, onboardingParams: any) {
 
 function planPricesForRegistration(registrationType: string, planId: string, onboardingParams: any) {
     if (registrationType !== "CLUB" && canUsePaystackTestPlan(planId, onboardingParams)) {
-        return { ...formationPlanPrices, [PLA_PAYSTACK_TEST_PLAN.id]: PLA_PAYSTACK_TEST_PLAN.price };
+        return { ...formationPlanPrices, ...paystackTestPlanPrices };
     }
 
     return registrationType === "CLUB" ? clubPlanPrices : formationPlanPrices;
@@ -233,9 +238,9 @@ export async function registerUser(formData: FormData) {
                 ]);
             }
 
-            const isTestPlanRetry = planId === PLA_PAYSTACK_TEST_PLAN.id;
+            const isTotalTestPlanRetry = planId === PLA_PAYSTACK_TEST_PLAN.id;
             const amountToPay =
-                onboardingParams.paymentOption === "fractionne" && paymentPlan.amountPaid <= 0 && !isTestPlanRetry
+                onboardingParams.paymentOption === "fractionne" && paymentPlan.amountPaid <= 0 && !isTotalTestPlanRetry
                     ? updatedTotalAmount * 0.5
                     : remaining;
 

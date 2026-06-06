@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { registerUser } from "@/app/actions/auth-actions";
-import { PLA_CENTERS, PLA_HYBRID_TIME_SLOT, PLA_ONLINE_TIME_SLOT, PLA_PAYSTACK_TEST_PLAN, PLA_PLANS, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CENTERS, PLA_HYBRID_TIME_SLOT, PLA_ONLINE_TIME_SLOT, PLA_PAYSTACK_SPLIT_TEST_PLAN, PLA_PAYSTACK_TEST_PLAN, PLA_PLANS, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
 
 const planSessions: Record<string, number> = {
     "loisir": 1,
@@ -14,6 +14,7 @@ const planSessions: Record<string, number> = {
     "intensif": 5,
     "immersion": 6,
     [PLA_PAYSTACK_TEST_PLAN.id]: 1,
+    [PLA_PAYSTACK_SPLIT_TEST_PLAN.id]: 1,
 };
 
 const plans = [
@@ -31,6 +32,14 @@ const testPlan = {
     price: formatFcfa(PLA_PAYSTACK_TEST_PLAN.price),
     amount: PLA_PAYSTACK_TEST_PLAN.price,
     desc: "Option temporaire pour tester Paystack live",
+};
+
+const splitTestPlan = {
+    id: PLA_PAYSTACK_SPLIT_TEST_PLAN.id,
+    name: "Test paiement en 2 fois (temporaire)",
+    price: formatFcfa(PLA_PAYSTACK_SPLIT_TEST_PLAN.price),
+    amount: PLA_PAYSTACK_SPLIT_TEST_PLAN.price,
+    desc: "Option temporaire pour tester la prise en charge puis la reservation",
 };
 
 const paymentMethods = [
@@ -66,7 +75,12 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const router = useRouter();
     const paymentTestToken = searchParams.get("paystackTest") || "";
     const isPaymentTestMode = Boolean(paymentTestToken);
-    const availablePlans = isPaymentTestMode ? [testPlan, ...plans] : plans;
+    const availablePlans = isPaymentTestMode ? [testPlan, splitTestPlan, ...plans] : plans;
+    const requestedPlanId = searchParams.get("plan") || "";
+    const requestedTestPlanIds: string[] = [PLA_PAYSTACK_TEST_PLAN.id, PLA_PAYSTACK_SPLIT_TEST_PLAN.id];
+    const canUseRequestedPlan = Boolean(requestedPlanId) && (!requestedTestPlanIds.includes(requestedPlanId) || isPaymentTestMode);
+    const initialPlanId = canUseRequestedPlan ? requestedPlanId : isPaymentTestMode ? PLA_PAYSTACK_TEST_PLAN.id : "essentiel";
+    const initialPaymentOption = initialPlanId === PLA_PAYSTACK_SPLIT_TEST_PLAN.id ? "fractionne" : "total";
 
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -91,14 +105,14 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
         objectiveOther: "",
         level: searchParams.get("level") || "",
 
-        planId: searchParams.get("plan") || (isPaymentTestMode ? PLA_PAYSTACK_TEST_PLAN.id : "essentiel"),
+        planId: initialPlanId,
         courseMode: "PRESENTIEL", // PRESENTIEL, ONLINE
         studentType: "INDIVIDUEL", // INDIVIDUEL, ENTREPRISE
         centerId: searchParams.get("center") || "poincare",
         days: [] as string[],
         timeSlot: searchParams.get("path") === "hybrid" ? PLA_HYBRID_TIME_SLOT.id : "",
 
-        paymentOption: "total",
+        paymentOption: initialPaymentOption,
         paymentMethod: "WAVE",
         agreement: false,
         signature: "",
@@ -111,8 +125,10 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const selectedCenter = PLA_CENTERS.find((center) => center.id === formData.centerId) || PLA_CENTERS[1];
     const selectedPlanAmount = availablePlans.find((plan) => plan.id === formData.planId)?.amount || PLA_PLANS[1].price;
     const selectedPaymentMethod = paymentMethods.find((method) => method.id === formData.paymentMethod) || paymentMethods[0];
-    const isSelectedTestPlan = formData.planId === PLA_PAYSTACK_TEST_PLAN.id;
-    const immediateAmount = formData.paymentOption === "fractionne" && !isSelectedTestPlan ? selectedPlanAmount * 0.5 : selectedPlanAmount;
+    const isSelectedTotalTestPlan = formData.planId === PLA_PAYSTACK_TEST_PLAN.id;
+    const isSelectedSplitTestPlan = formData.planId === PLA_PAYSTACK_SPLIT_TEST_PLAN.id;
+    const isSelectedPaystackTestPlan = isSelectedTotalTestPlan || isSelectedSplitTestPlan;
+    const immediateAmount = formData.paymentOption === "fractionne" && !isSelectedTotalTestPlan ? selectedPlanAmount * 0.5 : selectedPlanAmount;
     const reservationAmount = selectedPlanAmount - immediateAmount;
     const shouldShowAccountRecovery =
         error.toLowerCase().includes("email") ||
@@ -149,6 +165,17 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                     newData.days = []; // Reset days when plan changes to ensure correct count
                     if (value === PLA_PAYSTACK_TEST_PLAN.id) {
                         newData.paymentOption = "total";
+                    }
+                    if (value === PLA_PAYSTACK_SPLIT_TEST_PLAN.id) {
+                        newData.paymentOption = "fractionne";
+                    }
+                }
+                if (name === "paymentOption") {
+                    if (prev.planId === PLA_PAYSTACK_TEST_PLAN.id) {
+                        newData.paymentOption = "total";
+                    }
+                    if (prev.planId === PLA_PAYSTACK_SPLIT_TEST_PLAN.id) {
+                        newData.paymentOption = "fractionne";
                     }
                 }
                 return newData;
@@ -234,9 +261,9 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
         const finalData = {
             ...formData,
-            paymentOption: isSelectedTestPlan ? "total" : formData.paymentOption,
-            paymentTestMode: isSelectedTestPlan,
-            paymentTestToken: isPaymentTestMode ? paymentTestToken : undefined,
+            paymentOption: isSelectedSplitTestPlan ? "fractionne" : isSelectedTotalTestPlan ? "total" : formData.paymentOption,
+            paymentTestMode: isSelectedPaystackTestPlan,
+            paymentTestToken: isSelectedPaystackTestPlan && isPaymentTestMode ? paymentTestToken : undefined,
             objective: formData.objective === "Autre" ? formData.objectiveOther : formData.objective,
             commune: formData.commune === "Autre" ? formData.communeOther : formData.commune
         };
@@ -310,7 +337,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
             {isPaymentTestMode && (
                 <div className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-3 text-xs font-bold leading-5 text-amber-700 dark:text-amber-200">
-                    Mode test Paystack live actif. La formule temporaire à {formatFcfa(PLA_PAYSTACK_TEST_PLAN.price)} est visible uniquement avec ce lien.
+                    Mode test Paystack live actif. Les formules temporaires de {formatFcfa(PLA_PAYSTACK_TEST_PLAN.price)} et {formatFcfa(PLA_PAYSTACK_SPLIT_TEST_PLAN.price)} sont visibles uniquement avec ce lien.
                 </div>
             )}
 
@@ -636,14 +663,16 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         <div className="space-y-3">
                             <h3 className="text-lg font-black text-[var(--foreground)]">6. Modalités de paiement</h3>
                             <div className="flex flex-col gap-2">
-                                <label className={`flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors ${formData.paymentOption === 'total' ? 'border-primary bg-primary/10' : 'border-[var(--foreground)]/10 bg-white/55 dark:bg-white/5'}`}>
-                                    <input type="radio" name="paymentOption" value="total" checked={formData.paymentOption === 'total'} onChange={handleChange} className="accent-primary mt-0.5" />
-                                    <div>
-                                        <span className="font-bold block text-sm">Paiement total</span>
-                                        <span className="text-xs text-[var(--foreground)]/60 mt-1 block">Réglez la Prise en charge et la Réservation en une seule fois.</span>
-                                    </div>
-                                </label>
-                                {!isSelectedTestPlan && (
+                                {!isSelectedSplitTestPlan && (
+                                    <label className={`flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors ${formData.paymentOption === 'total' ? 'border-primary bg-primary/10' : 'border-[var(--foreground)]/10 bg-white/55 dark:bg-white/5'}`}>
+                                        <input type="radio" name="paymentOption" value="total" checked={formData.paymentOption === 'total'} onChange={handleChange} className="accent-primary mt-0.5" />
+                                        <div>
+                                            <span className="font-bold block text-sm">Paiement total</span>
+                                            <span className="text-xs text-[var(--foreground)]/60 mt-1 block">Réglez la Prise en charge et la Réservation en une seule fois.</span>
+                                        </div>
+                                    </label>
+                                )}
+                                {!isSelectedTotalTestPlan && (
                                     <label className={`flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors ${formData.paymentOption === 'fractionne' ? 'border-primary bg-primary/10' : 'border-[var(--foreground)]/10 bg-white/55 dark:bg-white/5'}`}>
                                         <input type="radio" name="paymentOption" value="fractionne" checked={formData.paymentOption === 'fractionne'} onChange={handleChange} className="accent-primary mt-0.5" />
                                         <div>
