@@ -47,7 +47,7 @@ export default function ContactPage() {
                         <p className="mb-2 text-xs font-black uppercase tracking-[0.2em] text-[#E7162A]">Rendez-vous</p>
                         <h2 className="text-2xl font-black">Mardi et jeudi</h2>
                         <p className="mt-3 text-sm leading-7 text-[#F5F0E8]/55">
-                            Mardi 10h-14h et jeudi 9h-14h, en visio ou vocal, avec un consultant et le responsable du programme.
+                            Mardi 10h-14h et jeudi 9h-14h, en visio ou vocal. Chaque session d'appel dure 30 minutes maximum.
                         </p>
                         <Link href="/rendez-vous" className="mt-6 inline-flex rounded-full border border-[#E7162A]/40 px-5 py-3 text-sm font-black uppercase tracking-widest text-[#E7162A]">
                             Prendre rendez-vous

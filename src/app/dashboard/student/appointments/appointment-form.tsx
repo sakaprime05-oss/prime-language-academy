@@ -159,7 +159,7 @@ export function AppointmentForm() {
 
             <motion.div variants={itemVariants} className="flex flex-col gap-2">
                 <label className="ml-1 text-xs font-black uppercase tracking-[0.08em] text-[var(--foreground)]/65">
-                    Heure (Créneaux de 30 min)
+                    Heure (30 min max par appel)
                 </label>
                 <Select disabled={!date} value={time} onValueChange={(value) => setTime(value ?? "")}>
                     <SelectTrigger className="min-h-12 rounded-lg border-[var(--border)]/70 bg-card text-sm font-semibold transition-colors hover:bg-[var(--muted)] dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10">
@@ -186,7 +186,7 @@ export function AppointmentForm() {
                         animate={{ opacity: 1, height: "auto" }}
                         className="text-xs text-muted-foreground font-medium px-1"
                     >
-                        {date.getDay() === 2 ? "Horaires du Mardi : 10h - 14h" : "Horaires du Jeudi : 09h - 14h"}
+                        {date.getDay() === 2 ? "Horaires du Mardi : 10h - 14h" : "Horaires du Jeudi : 09h - 14h"} · session d'appel de 30 minutes maximum
                     </motion.p>
                 )}
             </motion.div>

@@ -191,7 +191,7 @@ export default function RendezVousPage() {
                                 {
                                     icon: <Phone className="w-5 h-5 text-[#E7162A]" />,
                                     title: "Durée",
-                                    desc: "30 minutes par session",
+                                    desc: "30 minutes maximum par session d'appel",
                                 },
                             ].map((item) => (
                                 <div key={item.title} className="flex items-start gap-4 p-4 bg-[#21286E]/5 rounded-2xl border border-[#21286E]/10">
@@ -329,7 +329,7 @@ export default function RendezVousPage() {
                                                 </SelectContent>
                                             </Select>
                                             <p className="text-[10px] text-[var(--foreground)]/50 font-medium">
-                                                {date && date.getDay() === 2 ? "Mar 10h-14h" : date && date.getDay() === 4 ? "Jeu 9h-14h" : "Selon disponibilité"}
+                                                {date && date.getDay() === 2 ? "Mar 10h-14h" : date && date.getDay() === 4 ? "Jeu 9h-14h" : "Selon disponibilité"} · 30 min max par appel
                                             </p>
                                         </div>
                                     </div>

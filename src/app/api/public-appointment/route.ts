@@ -132,6 +132,7 @@ export async function POST(req: NextRequest) {
               <tr><td style="padding: 12px; color: #666; font-size: 14px; border-bottom: 1px solid #eee;">Telephone</td><td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #eee;">${safePhone}</td></tr>
               <tr><td style="padding: 12px; color: #666; font-size: 14px; border-bottom: 1px solid #eee;">Date</td><td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #eee;">${dateLabel}</td></tr>
               <tr><td style="padding: 12px; color: #666; font-size: 14px; border-bottom: 1px solid #eee;">Heure</td><td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #eee;">${safeTime}</td></tr>
+              <tr><td style="padding: 12px; color: #666; font-size: 14px; border-bottom: 1px solid #eee;">Durée</td><td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #eee;">30 minutes maximum par session d'appel</td></tr>
               <tr><td style="padding: 12px; color: #666; font-size: 14px;">Motif</td><td style="padding: 12px; font-weight: bold;">${safeReason}</td></tr>
             </table>
           </div>
@@ -151,7 +152,7 @@ export async function POST(req: NextRequest) {
             await sendMail(
                 email,
                 "Votre demande de rendez-vous - Prime Language Academy",
-                `Bonjour ${name},\n\nVotre demande de rendez-vous a bien été reçue.\nDate : ${dateLabel} à ${time}\nMotif : ${reason || "Non précisé"}\n\nNous vous contacterons très prochainement pour confirmer.\n\nCordialement,\nL'équipe Prime Language Academy`,
+                `Bonjour ${name},\n\nVotre demande de rendez-vous a bien été reçue.\nDate : ${dateLabel} à ${time}\nDurée : 30 minutes maximum par session d'appel\nMotif : ${reason || "Non précisé"}\n\nNous vous contacterons très prochainement pour confirmer.\n\nCordialement,\nL'équipe Prime Language Academy`,
                 `<div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto;">
                   <div style="background: #21286E; padding: 28px; text-align: center; border-radius: 12px 12px 0 0;">
                     <h2 style="color: white; margin: 0;">Demande reçue</h2>
@@ -162,6 +163,7 @@ export async function POST(req: NextRequest) {
                     <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
                       <p style="margin: 4px 0;"><strong>Date :</strong> ${dateLabel}</p>
                       <p style="margin: 4px 0;"><strong>Heure :</strong> ${safeTime}</p>
+                      <p style="margin: 4px 0;"><strong>Durée :</strong> 30 minutes maximum par session d'appel</p>
                       <p style="margin: 4px 0;"><strong>Motif :</strong> ${safeReason}</p>
                     </div>
                     <p>Nous vous contacterons très prochainement pour confirmer votre créneau.</p>
