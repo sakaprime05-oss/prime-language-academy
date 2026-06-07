@@ -53,6 +53,9 @@ export default async function StudentAppointmentsPage() {
                                         <span className="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
                                         {new Date(apt.startTime).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })} - {new Date(apt.endTime).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
                                     </p>
+                                    <p className="text-xs font-black uppercase tracking-[0.12em] text-[#E7162A]">
+                                        {apt.title || "Rendez-vous"} · 30 min max
+                                    </p>
                                     <p className="mt-2 rounded-lg border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-3 text-sm text-[var(--foreground)]/55">
                                         Motif : {apt.reason || "Non spécifié"}
                                     </p>

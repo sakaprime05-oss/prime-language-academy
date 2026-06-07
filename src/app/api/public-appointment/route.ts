@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendMail } from "@/lib/mail";
 import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
+import { DEFAULT_APPOINTMENT_CHANNEL, getAppointmentChannel, validateAppointmentSlot } from "@/lib/appointment-schedule";
 
 const MAX_FIELD_LENGTH = 500;
 
@@ -34,6 +35,7 @@ export async function POST(req: NextRequest) {
         const name = cleanText(body.name, 120);
         const email = cleanText(body.email, 180).toLowerCase();
         const phone = cleanText(body.phone, 80);
+        const exchangeType = cleanText(body.exchangeType, 20) || DEFAULT_APPOINTMENT_CHANNEL;
         const date = cleanText(body.date, 20);
         const time = cleanText(body.time, 20);
         const reason = cleanText(body.reason);
@@ -84,26 +86,10 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Choisissez un creneau a l'heure pile ou a la demi-heure." }, { status: 400 });
         }
 
-        const dayOfWeek = selectedDate.getDay();
-        if (dayOfWeek !== 2 && dayOfWeek !== 4) {
-            return NextResponse.json(
-                { error: "Les rendez-vous sont uniquement disponibles les mardis et jeudis." },
-                { status: 400 }
-            );
-        }
-
-        if (dayOfWeek === 2 && (hours < 10 || hours >= 14)) {
-            return NextResponse.json(
-                { error: "Le mardi, les consultations sont entre 10h00 et 14h00." },
-                { status: 400 }
-            );
-        }
-
-        if (dayOfWeek === 4 && (hours < 9 || hours >= 14)) {
-            return NextResponse.json(
-                { error: "Le jeudi, les consultations sont entre 09h00 et 14h00." },
-                { status: 400 }
-            );
+        const channel = getAppointmentChannel(exchangeType);
+        const slotValidation = validateAppointmentSlot(channel.id, selectedDate, time);
+        if (!slotValidation.ok) {
+            return NextResponse.json({ error: slotValidation.error }, { status: 400 });
         }
 
         const dateLabel = selectedDate.toLocaleDateString("fr-FR", {
@@ -116,6 +102,7 @@ export async function POST(req: NextRequest) {
         const safeName = escapeHtml(name);
         const safeEmail = escapeHtml(email);
         const safePhone = escapeHtml(phone || "Non renseigne");
+        const safeExchangeType = escapeHtml(channel.publicLabel);
         const safeTime = escapeHtml(time);
         const safeReason = escapeHtml(reason || "Non precise");
 
@@ -130,6 +117,7 @@ export async function POST(req: NextRequest) {
               <tr><td style="padding: 12px; color: #666; font-size: 14px; border-bottom: 1px solid #eee;">Nom</td><td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #eee;">${safeName}</td></tr>
               <tr><td style="padding: 12px; color: #666; font-size: 14px; border-bottom: 1px solid #eee;">Email</td><td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #eee;"><a href="mailto:${safeEmail}">${safeEmail}</a></td></tr>
               <tr><td style="padding: 12px; color: #666; font-size: 14px; border-bottom: 1px solid #eee;">Telephone</td><td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #eee;">${safePhone}</td></tr>
+              <tr><td style="padding: 12px; color: #666; font-size: 14px; border-bottom: 1px solid #eee;">Type d'échange</td><td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #eee;">${safeExchangeType}</td></tr>
               <tr><td style="padding: 12px; color: #666; font-size: 14px; border-bottom: 1px solid #eee;">Date</td><td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #eee;">${dateLabel}</td></tr>
               <tr><td style="padding: 12px; color: #666; font-size: 14px; border-bottom: 1px solid #eee;">Heure</td><td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #eee;">${safeTime}</td></tr>
               <tr><td style="padding: 12px; color: #666; font-size: 14px; border-bottom: 1px solid #eee;">Durée</td><td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #eee;">30 minutes maximum par session d'appel</td></tr>
@@ -145,14 +133,14 @@ export async function POST(req: NextRequest) {
             await sendMail(
                 process.env.EMAIL_USER,
                 `[RDV Public] ${name} - ${dateLabel} à ${time}`,
-                `Nouvelle demande de RDV de ${name} (${email}) pour le ${dateLabel} à ${time}. Motif : ${reason || "Non précisé"}`,
+                `Nouvelle demande de RDV de ${name} (${email}) pour le ${dateLabel} à ${time}.\nType d'échange : ${channel.publicLabel}\nDurée : 30 minutes maximum par session d'appel\nMotif : ${reason || "Non précisé"}`,
                 html
             );
 
             await sendMail(
                 email,
                 "Votre demande de rendez-vous - Prime Language Academy",
-                `Bonjour ${name},\n\nVotre demande de rendez-vous a bien été reçue.\nDate : ${dateLabel} à ${time}\nDurée : 30 minutes maximum par session d'appel\nMotif : ${reason || "Non précisé"}\n\nNous vous contacterons très prochainement pour confirmer.\n\nCordialement,\nL'équipe Prime Language Academy`,
+                `Bonjour ${name},\n\nVotre demande de rendez-vous a bien été reçue.\nType d'échange : ${channel.publicLabel}\nDate : ${dateLabel} à ${time}\nDurée : 30 minutes maximum par session d'appel\nMotif : ${reason || "Non précisé"}\n\nNous vous contacterons très prochainement pour confirmer.\n\nCordialement,\nL'équipe Prime Language Academy`,
                 `<div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto;">
                   <div style="background: #21286E; padding: 28px; text-align: center; border-radius: 12px 12px 0 0;">
                     <h2 style="color: white; margin: 0;">Demande reçue</h2>
@@ -161,6 +149,7 @@ export async function POST(req: NextRequest) {
                     <p>Bonjour <strong>${safeName}</strong>,</p>
                     <p>Votre demande de rendez-vous a bien été enregistrée :</p>
                     <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
+                      <p style="margin: 4px 0;"><strong>Type d'échange :</strong> ${safeExchangeType}</p>
                       <p style="margin: 4px 0;"><strong>Date :</strong> ${dateLabel}</p>
                       <p style="margin: 4px 0;"><strong>Heure :</strong> ${safeTime}</p>
                       <p style="margin: 4px 0;"><strong>Durée :</strong> 30 minutes maximum par session d'appel</p>

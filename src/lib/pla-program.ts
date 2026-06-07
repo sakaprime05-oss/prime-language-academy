@@ -11,7 +11,7 @@ export const PLA_SESSION = {
     phone: "+225 01 61 33 78 64",
     email: "primelanguageacademy9@gmail.com",
     whatsapp: "https://wa.me/2250161337864",
-    appointmentSlots: "Mardi 10h00 - 14h00 et jeudi 09h00 - 14h00, en visioconférence. Sessions d'appel de 30 minutes maximum",
+    appointmentSlots: "Zoom: mardi 10h00 - 14h00 / 17h00 - 20h00 et jeudi 09h00 - 14h00 / 17h00 - 20h00. Appel: mercredi 11h00 - 14h00 / 17h00 - 20h00 et samedi 10h00 - 14h00 / 17h00 - 20h00. Sessions de 30 minutes maximum",
 };
 
 export const PLA_CLUB_CAPACITY = 26;

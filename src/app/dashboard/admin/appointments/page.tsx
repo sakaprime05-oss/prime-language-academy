@@ -25,7 +25,7 @@ export default async function AdminAppointmentsPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-[var(--border)] bg-[var(--muted)]/45">
-                {["Date & heure", "Étudiant", "Motif", "Statut", "Actions"].map((heading) => (
+                {["Date & heure", "Type", "Étudiant", "Motif", "Statut", "Actions"].map((heading) => (
                   <th key={heading} className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[var(--muted-foreground)]">
                     {heading}
                   </th>
@@ -35,7 +35,7 @@ export default async function AdminAppointmentsPage() {
             <tbody className="divide-y divide-[var(--border)]">
               {appointments.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center font-bold text-[var(--muted-foreground)]">
+                  <td colSpan={6} className="px-6 py-12 text-center font-bold text-[var(--muted-foreground)]">
                     Aucun rendez-vous.
                   </td>
                 </tr>
@@ -49,6 +49,10 @@ export default async function AdminAppointmentsPage() {
                       <p className="text-xs text-[var(--muted-foreground)]">
                         {new Date(apt.startTime).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
                       </p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="text-sm font-black text-[var(--foreground)]">{apt.title || "Rendez-vous"}</p>
+                      <p className="text-xs text-[var(--muted-foreground)]">30 min max</p>
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-sm font-bold text-[var(--foreground)]">{apt.student.name || "Étudiant"}</p>

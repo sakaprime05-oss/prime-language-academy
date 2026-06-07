@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MapPin, Navigation, Route } from "lucide-react";
+import { formatAppointmentChannelDays } from "@/lib/appointment-schedule";
 import { PLA_CENTERS, PLA_SESSION } from "@/lib/pla-program";
 import { siteConfig } from "@/lib/site-config";
 
@@ -45,9 +46,9 @@ export default function ContactPage() {
 
                     <article className="rounded-2xl border border-[#E7162A]/15 bg-white/[0.04] p-7">
                         <p className="mb-2 text-xs font-black uppercase tracking-[0.2em] text-[#E7162A]">Rendez-vous</p>
-                        <h2 className="text-2xl font-black">Mardi et jeudi</h2>
+                        <h2 className="text-2xl font-black">Zoom ou appel</h2>
                         <p className="mt-3 text-sm leading-7 text-[#F5F0E8]/55">
-                            Mardi 10h-14h et jeudi 9h-14h, en visio ou vocal. Chaque session d'appel dure 30 minutes maximum.
+                            Zoom : {formatAppointmentChannelDays("ZOOM")}. Appel : {formatAppointmentChannelDays("CALL")}. Chaque session dure 30 minutes maximum.
                         </p>
                         <Link href="/rendez-vous" className="mt-6 inline-flex rounded-full border border-[#E7162A]/40 px-5 py-3 text-sm font-black uppercase tracking-widest text-[#E7162A]">
                             Prendre rendez-vous

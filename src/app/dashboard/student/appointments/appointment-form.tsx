@@ -23,42 +23,26 @@ import { cn } from "@/lib/utils";
 import { format, addMinutes } from "date-fns";
 import { fr } from "date-fns/locale";
 import { CalendarIcon, Clock } from "lucide-react";
+import {
+    APPOINTMENT_CHANNELS,
+    DEFAULT_APPOINTMENT_CHANNEL,
+    formatAppointmentChannelDays,
+    generateAppointmentTimeSlots,
+    getAppointmentDayConfig,
+} from "@/lib/appointment-schedule";
 
 import { motion, type Variants } from "framer-motion";
 
 export function AppointmentForm() {
     const [loading, setLoading] = useState(false);
+    const [exchangeType, setExchangeType] = useState(DEFAULT_APPOINTMENT_CHANNEL);
     const [date, setDate] = useState<Date | undefined>(undefined);
     const [time, setTime] = useState<string>("");
     const [reason, setReason] = useState("");
 
-    // Générer les créneaux horaires selon le jour
-    const getTimeSlots = () => {
-        if (!date) return [];
-        const dayOfWeek = date.getDay();
-        const slots = [];
-
-        let start = 0;
-        let end = 0;
-
-        if (dayOfWeek === 2) { // Mardi: 10h-14h
-            start = 10;
-            end = 14;
-        } else if (dayOfWeek === 4) { // Jeudi: 9h-14h
-            start = 9;
-            end = 14;
-        } else {
-            return [];
-        }
-
-        for (let h = start; h < end; h++) {
-            slots.push(`${h.toString().padStart(2, '0')}:00`);
-            slots.push(`${h.toString().padStart(2, '0')}:30`);
-        }
-        return slots;
-    };
-
-    const timeSlots = getTimeSlots();
+    const selectedChannel = APPOINTMENT_CHANNELS.find((channel) => channel.id === exchangeType) || APPOINTMENT_CHANNELS[0];
+    const selectedDayConfig = getAppointmentDayConfig(exchangeType, date);
+    const timeSlots = generateAppointmentTimeSlots(exchangeType, date);
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -80,10 +64,12 @@ export function AppointmentForm() {
                 date: date,
                 startTime,
                 endTime,
-                reason
+                reason,
+                exchangeType
             });
 
             toast.success("Votre demande de rendez-vous a été envoyée !");
+            setExchangeType(DEFAULT_APPOINTMENT_CHANNEL);
             setDate(undefined);
             setTime("");
             setReason("");
@@ -95,10 +81,8 @@ export function AppointmentForm() {
     }
 
     const isDateDisabled = (date: Date) => {
-        const day = date.getDay();
-        // Désactiver si pas mardi (2) ou jeudi (4), ou si c'est dans le passé
         const isPast = date < new Date(new Date().setHours(0, 0, 0, 0));
-        return isPast || (day !== 2 && day !== 4);
+        return isPast || !getAppointmentDayConfig(exchangeType, date);
     };
 
     const containerVariants: Variants = {
@@ -122,6 +106,35 @@ export function AppointmentForm() {
             onSubmit={onSubmit} 
             className="flex flex-col gap-4"
         >
+            <motion.div variants={itemVariants} className="flex flex-col gap-2">
+                <label className="ml-1 text-xs font-black uppercase tracking-[0.08em] text-[var(--foreground)]/65">
+                    Type d'échange
+                </label>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {APPOINTMENT_CHANNELS.map((channel) => (
+                        <button
+                            key={channel.id}
+                            type="button"
+                            onClick={() => {
+                                setExchangeType(channel.id);
+                                setDate(undefined);
+                                setTime("");
+                            }}
+                            className={`rounded-lg border p-3 text-left transition-colors ${exchangeType === channel.id
+                                ? "border-primary bg-primary/10 text-[var(--foreground)]"
+                                : "border-[var(--border)] bg-card hover:border-primary/30"
+                            }`}
+                        >
+                            <span className="block text-sm font-black">{channel.publicLabel}</span>
+                            <span className="mt-1 block text-xs font-medium leading-5 text-[var(--foreground)]/60">{channel.description}</span>
+                            <span className="mt-2 block text-[10px] font-black uppercase tracking-[0.12em] text-primary">
+                                {formatAppointmentChannelDays(channel.id)}
+                            </span>
+                        </button>
+                    ))}
+                </div>
+            </motion.div>
+
             <motion.div variants={itemVariants} className="flex flex-col gap-2">
                 <label className="ml-1 text-xs font-black uppercase tracking-[0.08em] text-[var(--foreground)]/65">
                     Date souhaitée
@@ -153,7 +166,7 @@ export function AppointmentForm() {
                     </DrawerContent>
                 </Drawer>
                 <p className="text-xs text-muted-foreground font-medium px-1">
-                    Les rendez-vous sont disponibles les Mardis et Jeudis.
+                    {selectedChannel.publicLabel} : {formatAppointmentChannelDays(exchangeType)}
                 </p>
             </motion.div>
 
@@ -186,7 +199,7 @@ export function AppointmentForm() {
                         animate={{ opacity: 1, height: "auto" }}
                         className="text-xs text-muted-foreground font-medium px-1"
                     >
-                        {date.getDay() === 2 ? "Horaires du Mardi : 10h - 14h" : "Horaires du Jeudi : 09h - 14h"} · session d'appel de 30 minutes maximum
+                        {selectedDayConfig ? `${selectedDayConfig.label} : ${selectedDayConfig.ranges.map((range) => `${range.start.replace(":00", "h")}-${range.end.replace(":00", "h")}`).join(" et ")}` : "Selon disponibilité"} · session d'appel de 30 minutes maximum
                     </motion.p>
                 )}
             </motion.div>

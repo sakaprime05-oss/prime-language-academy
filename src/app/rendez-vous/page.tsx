@@ -26,6 +26,13 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import {
+    APPOINTMENT_CHANNELS,
+    DEFAULT_APPOINTMENT_CHANNEL,
+    formatAppointmentChannelDays,
+    generateAppointmentTimeSlots,
+    getAppointmentDayConfig,
+} from "@/lib/appointment-schedule";
 
 export default function RendezVousPage() {
     const [loading, setLoading] = useState(false);
@@ -35,26 +42,14 @@ export default function RendezVousPage() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
+    const [exchangeType, setExchangeType] = useState(DEFAULT_APPOINTMENT_CHANNEL);
     const [date, setDate] = useState<Date | undefined>(undefined);
     const [time, setTime] = useState<string>("");
     const [reason, setReason] = useState("");
 
-    const getTimeSlots = () => {
-        if (!date) return [];
-        const dayOfWeek = date.getDay();
-        const slots = [];
-        let start = 0; let end = 0;
-        if (dayOfWeek === 2) { start = 10; end = 14; }
-        else if (dayOfWeek === 4) { start = 9; end = 14; }
-        else return [];
-        for (let h = start; h < end; h++) {
-            slots.push(`${h.toString().padStart(2, '0')}:00`);
-            slots.push(`${h.toString().padStart(2, '0')}:30`);
-        }
-        return slots;
-    };
-
-    const timeSlots = getTimeSlots();
+    const selectedChannel = APPOINTMENT_CHANNELS.find((channel) => channel.id === exchangeType) || APPOINTMENT_CHANNELS[0];
+    const selectedDayConfig = getAppointmentDayConfig(exchangeType, date);
+    const timeSlots = generateAppointmentTimeSlots(exchangeType, date);
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -69,6 +64,7 @@ export default function RendezVousPage() {
             name,
             email,
             phone,
+            exchangeType,
             date: format(date, "yyyy-MM-dd"),
             time,
             reason,
@@ -97,9 +93,8 @@ export default function RendezVousPage() {
     }
 
     const isDateDisabled = (date: Date) => {
-        const day = date.getDay();
         const isPast = date < new Date(new Date().setHours(0, 0, 0, 0));
-        return isPast || (day !== 2 && day !== 4);
+        return isPast || !getAppointmentDayConfig(exchangeType, date);
     };
 
     return (
@@ -175,18 +170,18 @@ export default function RendezVousPage() {
                             {[
                                 {
                                     icon: <CalendarIcon className="w-5 h-5 text-[#E7162A]" />,
-                                    title: "Jours disponibles",
-                                    desc: "Mardi et Jeudi uniquement",
+                                    title: "Visio Zoom",
+                                    desc: formatAppointmentChannelDays("ZOOM"),
                                 },
                                 {
                                     icon: <Clock className="w-5 h-5 text-[#E7162A]" />,
-                                    title: "Horaires",
-                                    desc: "Mardi : 10h–14h | Jeudi : 09h–14h",
+                                    title: "Appel téléphonique",
+                                    desc: formatAppointmentChannelDays("CALL"),
                                 },
                                 {
                                     icon: <MapPin className="w-5 h-5 text-[#E7162A]" />,
-                                    title: "Lieu",
-                                    desc: "En présentiel ou en ligne selon votre préférence",
+                                    title: "Type d'échange",
+                                    desc: "Choisissez Zoom ou Appel avant de sélectionner la date.",
                                 },
                                 {
                                     icon: <Phone className="w-5 h-5 text-[#E7162A]" />,
@@ -247,7 +242,7 @@ export default function RendezVousPage() {
                                         variant="outline"
                                         onClick={() => {
                                             setSuccess(false);
-                                            setName(""); setEmail(""); setPhone(""); setDate(undefined); setTime(""); setReason("");
+                                            setName(""); setEmail(""); setPhone(""); setExchangeType(DEFAULT_APPOINTMENT_CHANNEL); setDate(undefined); setTime(""); setReason("");
                                         }}
                                         className="mt-4 rounded-xl border-[#21286E]/20 text-[#21286E] font-bold"
                                     >
@@ -276,6 +271,35 @@ export default function RendezVousPage() {
                                             Adresse email <span className="text-[#E7162A]">*</span>
                                         </label>
                                         <Input id="email" value={email} onChange={e => setEmail(e.target.value)} type="email" required placeholder="jean@exemple.com" className="h-12 rounded-xl" />
+                                    </div>
+
+                                    <div className="flex flex-col gap-3">
+                                        <label className="text-sm font-bold text-[#21286E]">
+                                            Type d'échange <span className="text-[#E7162A]">*</span>
+                                        </label>
+                                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                            {APPOINTMENT_CHANNELS.map((channel) => (
+                                                <button
+                                                    key={channel.id}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setExchangeType(channel.id);
+                                                        setDate(undefined);
+                                                        setTime("");
+                                                    }}
+                                                    className={`rounded-2xl border p-4 text-left transition-all ${exchangeType === channel.id
+                                                        ? "border-[#E7162A] bg-[#E7162A]/10 shadow-sm shadow-[#E7162A]/10"
+                                                        : "border-[#21286E]/10 bg-slate-50/50 hover:border-[#E7162A]/30"
+                                                    }`}
+                                                >
+                                                    <span className="block text-sm font-black text-[#21286E]">{channel.publicLabel}</span>
+                                                    <span className="mt-1 block text-xs font-medium leading-5 text-[var(--foreground)]/60">{channel.description}</span>
+                                                    <span className="mt-2 block text-[10px] font-black uppercase tracking-[0.12em] text-[#E7162A]">
+                                                        {formatAppointmentChannelDays(channel.id)}
+                                                    </span>
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -307,7 +331,9 @@ export default function RendezVousPage() {
                                                     />
                                                 </PopoverContent>
                                             </Popover>
-                                            <p className="text-[10px] text-[var(--foreground)]/50 font-medium">Mardis et Jeudis uniquement</p>
+                                            <p className="text-[10px] text-[var(--foreground)]/50 font-medium">
+                                                {selectedChannel.publicLabel} : {formatAppointmentChannelDays(exchangeType)}
+                                            </p>
                                         </div>
                                         <div className="flex flex-col gap-2">
                                             <label className="text-sm font-bold text-[#21286E]">
@@ -329,7 +355,7 @@ export default function RendezVousPage() {
                                                 </SelectContent>
                                             </Select>
                                             <p className="text-[10px] text-[var(--foreground)]/50 font-medium">
-                                                {date && date.getDay() === 2 ? "Mar 10h-14h" : date && date.getDay() === 4 ? "Jeu 9h-14h" : "Selon disponibilité"} · 30 min max par appel
+                                                {selectedDayConfig ? `${selectedDayConfig.label} : ${selectedDayConfig.ranges.map((range) => `${range.start.replace(":00", "h")}-${range.end.replace(":00", "h")}`).join(" et ")}` : "Selon disponibilité"} · 30 min max par appel
                                             </p>
                                         </div>
                                     </div>
