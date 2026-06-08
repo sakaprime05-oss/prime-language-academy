@@ -37,7 +37,7 @@ function safeUploadName(name: string, type: string) {
 function resolveQrTarget(request: Request, rawValue: FormDataEntryValue | null) {
   const requestOrigin = new URL(request.url).origin;
   const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || requestOrigin;
-  const defaultTarget = process.env.PLA_PDF_QR_URL || `${appBaseUrl.replace(/\/$/, "")}/dashboard/student/courses`;
+  const defaultTarget = process.env.PLA_PDF_QR_URL || process.env.PLA_PUBLIC_SITE_URL || appBaseUrl.replace(/\/$/, "") || "https://primelangageacademy.com";
   const candidate = typeof rawValue === "string" && rawValue.trim() ? rawValue.trim() : defaultTarget;
 
   try {
@@ -95,7 +95,7 @@ async function addQrToLastPdfPage(buffer: Buffer, qrTarget: string) {
     color: rgb(0.08, 0.08, 0.08),
   });
 
-  lastPage.drawText("Scannez pour acceder", {
+  lastPage.drawText("Scannez pour visiter", {
     x: x + padding,
     y: y + boxHeight - 46,
     size: 8.5,
@@ -103,7 +103,7 @@ async function addQrToLastPdfPage(buffer: Buffer, qrTarget: string) {
     color: rgb(0.22, 0.22, 0.22),
   });
 
-  lastPage.drawText("a votre espace cours.", {
+  lastPage.drawText("le site officiel PLA.", {
     x: x + padding,
     y: y + boxHeight - 60,
     size: 8.5,

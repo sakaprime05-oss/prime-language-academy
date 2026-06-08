@@ -10,8 +10,11 @@ export default async function AdminCoursesPage() {
     const levels = await prisma.level.findMany({
         include: {
             modules: {
+                orderBy: { order: 'asc' },
                 include: {
-                    lessons: true
+                    lessons: {
+                        orderBy: { order: 'asc' }
+                    }
                 }
             },
             _count: {

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "import:courses": "node scripts/import-course-documents.mjs",
     "start": "next start",
     "lint": "eslint"
   },

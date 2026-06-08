@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { markLessonComplete } from "@/app/actions/student-progress";
 import Link from "next/link";
+import { Check, ClipboardList, Download, FileText, PlayCircle } from "lucide-react";
+import { markLessonComplete } from "@/app/actions/student-progress";
 
 interface LessonItemProps {
     lesson: any;
@@ -13,52 +14,76 @@ export default function LessonItem({ lesson, isCompleted: initialCompleted }: Le
     const [completed, setCompleted] = useState(initialCompleted);
     const [loading, setLoading] = useState(false);
     const isPdf = lesson.type === "PDF";
+    const hasContent = Boolean(lesson.contentUrl) || lesson.type === "QUIZ";
 
     const handleToggle = async (e: React.MouseEvent) => {
         e.preventDefault();
-        e.stopPropagation(); // Prévenir la navigation si on clique sur le bouton
+        e.stopPropagation();
         if (completed) return;
 
         setLoading(true);
         try {
             await markLessonComplete(lesson.id);
             setCompleted(true);
-        } catch (error) {
-            alert("Erreur lors de la mise à jour");
+        } catch {
+            alert("Erreur lors de la mise a jour");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <Link href={`/dashboard/student/courses/${lesson.id}`} className={`glass-card !p-4 flex items-center justify-between group hover:border-[var(--primary)]/30 transition-all ${completed ? 'opacity-80' : ''}`}>
-            <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1 mr-2">
-                <div className={`w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 rounded-full flex items-center justify-center transition-colors ${completed ? 'bg-green-500/20 text-green-500' : 'bg-[var(--surface-hover)] text-[var(--foreground)]/40'}`}>
+        <div className={`glass-card group flex items-center justify-between gap-3 !p-4 transition-all hover:border-[var(--primary)]/30 ${completed ? "opacity-80" : ""}`}>
+            <Link href={`/dashboard/student/courses/${lesson.id}`} className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+                <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl transition-colors sm:h-11 sm:w-11 ${completed ? "bg-green-500/15 text-green-500" : isPdf ? "bg-red-500/10 text-red-500" : "bg-[var(--surface-hover)] text-[var(--foreground)]/45"}`}>
                     {completed ? (
-                        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                        <Check className="h-5 w-5" aria-hidden="true" />
+                    ) : isPdf ? (
+                        <FileText className="h-5 w-5" aria-hidden="true" />
+                    ) : lesson.type === "QUIZ" ? (
+                        <ClipboardList className="h-5 w-5" aria-hidden="true" />
                     ) : (
-                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <PlayCircle className="h-5 w-5" aria-hidden="true" />
                     )}
                 </div>
+
                 <div className="min-w-0 flex-1">
-                    <h4 className={`font-bold text-sm truncate ${completed ? 'line-through text-[var(--foreground)]/40' : 'text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors'}`}>
+                    <h4 className={`truncate text-sm font-bold ${completed ? "text-[var(--foreground)]/40 line-through" : "text-[var(--foreground)] transition-colors group-hover:text-[var(--primary)]"}`}>
                         {lesson.title}
                     </h4>
-                    <p className="text-[9px] sm:text-[10px] uppercase font-black tracking-widest truncate text-[var(--foreground)]/30 group-hover:text-[var(--primary)]/70 transition-colors">
-                        {isPdf ? "PDF - ouvrir / télécharger" : `${lesson.type} - voir le contenu`}
-                    </p>
+                    <div className="mt-1 flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-[var(--foreground)]/5 px-2 py-1 text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40">
+                            {isPdf ? "PDF" : lesson.type}
+                        </span>
+                        <span className={`text-[10px] font-bold ${hasContent ? "text-[var(--foreground)]/45" : "text-amber-500"}`}>
+                            {isPdf ? "ouvrir ou telecharger" : hasContent ? "voir le contenu" : "contenu a completer"}
+                        </span>
+                    </div>
                 </div>
-            </div>
+            </Link>
 
-            {!completed && (
-                <button
-                    disabled={loading}
-                    onClick={handleToggle}
-                    className="text-[10px] font-bold bg-[var(--primary)]/10 z-10 text-[var(--primary)] px-4 py-2 rounded-xl hover:bg-[var(--primary)] hover:text-white transition-all active:scale-95"
-                >
-                    {loading ? "Chargement..." : "Terminer"}
-                </button>
-            )}
-        </Link>
+            <div className="flex shrink-0 items-center gap-2">
+                {isPdf && lesson.contentUrl && (
+                    <a
+                        href={lesson.contentUrl}
+                        download
+                        onClick={(event) => event.stopPropagation()}
+                        className="hidden rounded-xl border border-[var(--foreground)]/10 p-2 text-[var(--foreground)]/45 transition-colors hover:border-[var(--primary)]/30 hover:text-[var(--primary)] sm:inline-flex"
+                        aria-label={`Telecharger ${lesson.title}`}
+                    >
+                        <Download className="h-4 w-4" aria-hidden="true" />
+                    </a>
+                )}
+                {!completed && (
+                    <button
+                        disabled={loading}
+                        onClick={handleToggle}
+                        className="z-10 rounded-xl bg-[var(--primary)]/10 px-4 py-2 text-[10px] font-bold text-[var(--primary)] transition-all hover:bg-[var(--primary)] hover:text-white active:scale-95 disabled:opacity-50"
+                    >
+                        {loading ? "..." : "Terminer"}
+                    </button>
+                )}
+            </div>
+        </div>
     );
 }
