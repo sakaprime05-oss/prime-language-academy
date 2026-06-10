@@ -4,9 +4,9 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { sendWelcomeEmail, sendAdminNewRegistrationEmail } from "@/lib/email";
 import { notifyTelegram } from "@/lib/notify";
-import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_PAYSTACK_SPLIT_TEST_PLAN, PLA_PAYSTACK_TEST_PLAN, PLA_PLANS } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_PAYSTACK_SPLIT_TEST_PLAN, PLA_PAYSTACK_TEST_PLAN, PLA_PLANS, formatFcfa } from "@/lib/pla-program";
 import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
-import { paystackChannels } from "@/lib/payment-methods";
+import { paymentMethodLabel, paystackChannels } from "@/lib/payment-methods";
 import { createPaymentReference } from "@/lib/payment-reference";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
@@ -45,10 +45,19 @@ type PaystackInitInput = {
     studentId: string;
     preferredPaymentMethod?: string;
     callbackPath?: string;
+    paymentPurpose?: string;
+    totalAmount?: number;
 };
 
 function paystackAmount(amount: number) {
     return Math.round(amount * 100);
+}
+
+function paymentStageLabel(amountPaidBefore: number, amount: number, totalAmount: number) {
+    if (amountPaidBefore <= 0 && amount >= totalAmount) return "Paiement total";
+    if (amountPaidBefore <= 0) return "Prise en charge";
+    if (amountPaidBefore + amount >= totalAmount) return "Réservation";
+    return "Paiement partiel";
 }
 
 async function initializePaystackCheckout(input: PaystackInitInput) {
@@ -63,6 +72,9 @@ async function initializePaystackCheckout(input: PaystackInitInput) {
         console.error("[Registration] Payment configuration missing");
         return { error: "Le paiement n'a pas pu être lancé pour le moment. Contactez l'administration pour finaliser votre inscription." };
     }
+
+    const paymentPurpose = input.paymentPurpose || "Inscription Prime Language Academy";
+    const preferredMethodLabel = paymentMethodLabel(input.preferredPaymentMethod || "Paiement en ligne");
 
     const paystackResponse = await fetch(PAYSTACK_API_URL, {
         method: "POST",
@@ -91,12 +103,22 @@ async function initializePaystackCheckout(input: PaystackInitInput) {
                     {
                         display_name: "Paiement concerne",
                         variable_name: "paiement_concerne",
-                        value: "Inscription Prime Language Academy",
+                        value: paymentPurpose,
                     },
                     {
                         display_name: "Moyen choisi",
                         variable_name: "moyen_choisi",
-                        value: input.preferredPaymentMethod || "Paiement en ligne",
+                        value: preferredMethodLabel,
+                    },
+                    {
+                        display_name: "Site officiel",
+                        variable_name: "site_officiel",
+                        value: "primelangageacademy.com",
+                    },
+                    {
+                        display_name: "Montant PLA",
+                        variable_name: "montant_pla",
+                        value: input.totalAmount ? `${formatFcfa(input.amount)} sur ${formatFcfa(input.totalAmount)}` : formatFcfa(input.amount),
                     },
                 ],
             },
@@ -120,8 +142,13 @@ async function createRegistrationCheckout(input: {
     amount: number;
     preferredPaymentMethod?: string;
     retry?: boolean;
+    amountPaidBefore?: number;
+    totalAmount?: number;
 }) {
     const refCommand = createPaymentReference(input.retry ? "RPY" : "REG");
+    const totalAmount = input.totalAmount || input.amount;
+    const amountPaidBefore = input.amountPaidBefore || 0;
+    const stageLabel = paymentStageLabel(amountPaidBefore, input.amount, totalAmount);
 
     await prisma.transaction.updateMany({
         where: {
@@ -153,6 +180,8 @@ async function createRegistrationCheckout(input: {
         studentId: input.userId,
         preferredPaymentMethod: input.preferredPaymentMethod,
         callbackPath: `/api/payments/paystack/callback?reference=${encodeURIComponent(refCommand)}`,
+        paymentPurpose: `${stageLabel} - Prime Language Academy`,
+        totalAmount,
     });
 
     if (checkout.error) {
@@ -251,6 +280,8 @@ export async function registerUser(formData: FormData) {
                 amount: amountToPay,
                 preferredPaymentMethod: onboardingParams.paymentMethod,
                 retry: true,
+                amountPaidBefore: paymentPlan.amountPaid,
+                totalAmount: updatedTotalAmount,
             });
 
             if (checkout.error) return { error: checkout.error };
@@ -351,6 +382,8 @@ export async function registerUser(formData: FormData) {
             paymentPlanId: paymentPlan.id,
             amount: amountToPay,
             preferredPaymentMethod: onboardingParams.paymentMethod,
+            amountPaidBefore: 0,
+            totalAmount,
         });
 
         if (checkout.error) {

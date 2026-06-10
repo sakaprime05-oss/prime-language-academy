@@ -463,7 +463,7 @@
     {
       "parameters": {
         "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
-        "text": "=?? *Commandes Prime Academy*\n\n? Programme, offres ou tarifs\n? Rendez-vous\n? Bienvenue\n? Valide le paiement de 52000 pour eleve@email.com\n\nLe bot utilise maintenant le domaine officiel primelangageacademy.com.",
+        "text": "=?? *Commandes Prime Academy*\n\n? Programme, offres ou tarifs\n? Rendez-vous\n? Bienvenue\n? Valide le paiement de 53000 pour eleve@email.com\n\nLe bot utilise maintenant le domaine officiel primelangageacademy.com.",
         "additionalFields": {
           "parse_mode": "Markdown"
         }

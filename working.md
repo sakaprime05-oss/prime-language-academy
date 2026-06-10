@@ -117,5 +117,5 @@ Offrir un écosystème autonome où les étudiants peuvent s'inscrire, payer, su
 - *Status :* Système complet avec pilotage par données et engagement utilisateur renforcé.
 
 - *Date :* [28/04/2026]
-- *Action :* Optimisation du Test de Placement (Chrono + Speech-to-Text), Distinction complète des parcours "English Club" vs "Formation" (Emails, Checkouts, Dashboards), Harmonisation des tarifs (52k-152k), et ajout de Toggles Admin pour la disponibilité des inscriptions.
+- *Action :* Optimisation du Test de Placement (Chrono + Speech-to-Text), Distinction complète des parcours "English Club" vs "Formation" (Emails, Checkouts, Dashboards), Harmonisation des tarifs (53k-155k), et ajout de Toggles Admin pour la disponibilité des inscriptions.
 - *Status :* Parcours utilisateur fluide, différencié et pilotable dynamiquement par l'administration.

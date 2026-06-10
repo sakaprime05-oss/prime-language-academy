@@ -7,8 +7,9 @@ import { revalidatePath } from "next/cache";
 import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 import { put } from "@vercel/blob";
-import { paystackChannels } from "@/lib/payment-methods";
+import { paymentMethodLabel, paystackChannels } from "@/lib/payment-methods";
 import { createPaymentReference } from "@/lib/payment-reference";
+import { formatFcfa } from "@/lib/pla-program";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 
@@ -87,6 +88,8 @@ export async function initiatePayment(formData: FormData) {
         }
 
         const amount = remaining;
+        const stageLabel = paymentStageLabel(plan.amountPaid, amount, plan.totalAmount);
+        const preferredMethodLabel = paymentMethodLabel(paymentMethod || "PAYSTACK");
 
         const refCommand = createPaymentReference("PAY");
 
@@ -133,12 +136,22 @@ export async function initiatePayment(formData: FormData) {
                     {
                         display_name: "Paiement concerne",
                         variable_name: "paiement_concerne",
-                        value: "Solde Prime Language Academy",
+                        value: `${stageLabel} - Prime Language Academy`,
                     },
                     {
                         display_name: "Moyen choisi",
                         variable_name: "moyen_choisi",
-                        value: paymentMethod || "Paiement en ligne",
+                        value: preferredMethodLabel,
+                    },
+                    {
+                        display_name: "Site officiel",
+                        variable_name: "site_officiel",
+                        value: "primelangageacademy.com",
+                    },
+                    {
+                        display_name: "Montant PLA",
+                        variable_name: "montant_pla",
+                        value: `${formatFcfa(amount)} sur ${formatFcfa(plan.totalAmount)}`,
                     },
                 ]
             }

@@ -17,12 +17,12 @@ export const PLA_SESSION = {
 export const PLA_CLUB_CAPACITY = 26;
 
 const PLA_BASE_PLANS = [
-    { id: "loisir", label: "Loisir", freq: "1 séance / semaine", shortFreq: "1x/sem", price: 52000, top: false },
-    { id: "essentiel", label: "Essentiel", freq: "2 séances / semaine", shortFreq: "2x/sem", price: 72000, top: false },
-    { id: "equilibre", label: "Équilibre", freq: "3 séances / semaine", shortFreq: "3x/sem", price: 92000, top: false },
-    { id: "performance", label: "Performance", freq: "4 séances / semaine", shortFreq: "4x/sem", price: 112000, top: false },
-    { id: "intensif", label: "Intensif", freq: "5 séances / semaine", shortFreq: "5x/sem", price: 132000, top: false },
-    { id: "immersion", label: "Immersion", freq: "6 séances / semaine", shortFreq: "6x/sem", price: 152000, top: true },
+    { id: "loisir", label: "Loisir", freq: "1 séance / semaine", shortFreq: "1x/sem", price: 53000, top: false },
+    { id: "essentiel", label: "Essentiel", freq: "2 séances / semaine", shortFreq: "2x/sem", price: 73000, top: false },
+    { id: "equilibre", label: "Équilibre", freq: "3 séances / semaine", shortFreq: "3x/sem", price: 95000, top: false },
+    { id: "performance", label: "Performance", freq: "4 séances / semaine", shortFreq: "4x/sem", price: 115000, top: false },
+    { id: "intensif", label: "Intensif", freq: "5 séances / semaine", shortFreq: "5x/sem", price: 135000, top: false },
+    { id: "immersion", label: "Immersion", freq: "6 séances / semaine", shortFreq: "6x/sem", price: 155000, top: true },
 ] as const;
 
 export const PLA_PLANS = PLA_BASE_PLANS;

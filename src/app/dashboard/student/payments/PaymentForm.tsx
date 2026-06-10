@@ -4,9 +4,9 @@ import { useState } from "react";
 import { initiatePayment } from "@/app/actions/payments";
 
 const paymentMethods = [
-  { id: "WAVE", name: "Wave", detail: "Rapide à Abidjan" },
-  { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov" },
-  { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard" },
+  { id: "WAVE", name: "Wave", detail: "Paiement via checkout sécurisé Paystack" },
+  { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov via Paystack" },
+  { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard via Paystack" },
 ];
 
 export default function PaymentForm({ planId, maxAmount, stageLabel }: { planId: string; maxAmount: number; stageLabel: string }) {
@@ -31,7 +31,7 @@ export default function PaymentForm({ planId, maxAmount, stageLabel }: { planId:
       setError(res.error);
       setLoading(false);
     } else if (res.redirectUrl) {
-      setSuccess(`Ouverture du paiement ${selectedPaymentMethod.name}...`);
+      setSuccess(`Ouverture du paiement sécurisé Paystack pour ${selectedPaymentMethod.name}...`);
       window.location.href = res.redirectUrl;
     }
   }
@@ -41,7 +41,7 @@ export default function PaymentForm({ planId, maxAmount, stageLabel }: { planId:
       <div className="space-y-1">
         <h3 className="text-lg sm:text-xl font-black text-[var(--foreground)]">{stageLabel}</h3>
         <p className="text-xs font-medium text-[var(--foreground)]/50">
-          Choisissez votre moyen de paiement. Le montant reste calculé automatiquement.
+          Vérifiez le récapitulatif avant de quitter la plateforme vers checkout.paystack.com.
         </p>
       </div>
 
@@ -94,6 +94,9 @@ export default function PaymentForm({ planId, maxAmount, stageLabel }: { planId:
         </div>
 
         <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 text-xs font-bold text-[var(--foreground)]/70">
+          <p className="mb-3 leading-5 text-[var(--foreground)]/60">
+            Vous allez payer {stageLabel.toLowerCase()} Prime Language Academy. Le checkout Paystack doit afficher le même montant avant confirmation.
+          </p>
           <div className="flex items-center justify-between gap-3">
             <span>{stageLabel}</span>
             <span>{maxAmount.toLocaleString("fr-FR")} FCFA</span>
@@ -101,6 +104,10 @@ export default function PaymentForm({ planId, maxAmount, stageLabel }: { planId:
           <div className="mt-2 flex items-center justify-between gap-3 text-[var(--foreground)]/50">
             <span>Moyen choisi</span>
             <span>{selectedPaymentMethod.name}</span>
+          </div>
+          <div className="mt-2 flex items-center justify-between gap-3 text-[var(--foreground)]/50">
+            <span>Page suivante</span>
+            <span>checkout.paystack.com</span>
           </div>
         </div>
       </div>
@@ -110,7 +117,7 @@ export default function PaymentForm({ planId, maxAmount, stageLabel }: { planId:
         disabled={loading || !!success}
         className="btn-primary w-full min-h-12 py-4 sm:py-5 text-sm sm:text-lg shadow-xl shadow-primary/20"
       >
-        {loading ? "Traitement..." : `Payer avec ${selectedPaymentMethod.name}`}
+        {loading ? "Ouverture de Paystack..." : `Confirmer et payer avec ${selectedPaymentMethod.name}`}
       </button>
 
       <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 opacity-40">

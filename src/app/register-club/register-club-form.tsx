@@ -16,13 +16,19 @@ const memberships = [
 ];
 
 const paymentMethods = [
-    { id: "WAVE", name: "Wave", detail: "Prioritaire à Abidjan" },
-    { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov" },
-    { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard" },
+    { id: "WAVE", name: "Wave", detail: "Paiement via checkout sécurisé Paystack" },
+    { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov via Paystack" },
+    { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard via Paystack" },
 ];
 
 const levels = ["Intermédiaire (B1/B2)", "Avancé (C1/C2)"];
 const steps = ["Identité", "Profil", "Membership", "Validation"];
+const requiredPasswordLength = 8;
+
+function ErrorHint({ message }: { message?: string }) {
+    if (!message) return null;
+    return <p className="mt-1 text-[11px] font-bold leading-5 text-red-500">{message}</p>;
+}
 
 const communes = [
     "Abobo", "Adjamé", "Attécoubé", "Bingerville", "Cocody", 
@@ -35,6 +41,7 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
     const [formData, setFormData] = useState({
         name: "",
@@ -57,16 +64,32 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
     const immediateAmount = formData.paymentOption === "fractionne" ? selectedMembership.amount * 0.5 : selectedMembership.amount;
     const reservationAmount = selectedMembership.amount - immediateAmount;
     const selectedPaymentMethod = paymentMethods.find((method) => method.id === formData.paymentMethod) || paymentMethods[0];
+    const passwordIsValid = formData.password.length >= requiredPasswordLength && formData.password.length <= 128;
     const shouldShowAccountRecovery =
-        error.toLowerCase().includes("email") ||
-        error.toLowerCase().includes("mot de passe") ||
-        error.toLowerCase().includes("paiement");
+        error.toLowerCase().includes("déjà associé") ||
+        error.toLowerCase().includes("attente de paiement") ||
+        error.toLowerCase().includes("récupérer l'accès");
+
+    const markErrors = (errors: Record<string, string>) => {
+        setFieldErrors(errors);
+        setError(`Corrigez: ${Object.values(errors).join(" ")}`);
+    };
+
+    const fieldStateClass = (field: string) => fieldErrors[field] ? "border-red-500/70 bg-red-500/5 focus:border-red-500" : "";
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const target = e.target as HTMLInputElement | HTMLSelectElement;
         const name = target.name;
         const value = target.value;
         const type = target.type;
+
+        if (fieldErrors[name]) {
+            setFieldErrors(prev => {
+                const next = { ...prev };
+                delete next[name];
+                return next;
+            });
+        }
         
         if (type === "checkbox" && target instanceof HTMLInputElement) {
             setFormData(prev => ({ ...prev, [name]: target.checked }));
@@ -77,32 +100,44 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
 
     const nextStep = () => {
         setError("");
-        if (step === 1 && (!formData.name || !formData.email || !formData.password || !formData.phone)) {
-            setError("Veuillez remplir toutes vos informations.");
-            return;
+        setFieldErrors({});
+        if (step === 1) {
+            const errors: Record<string, string> = {};
+            if (!formData.name.trim()) errors.name = "Nom complet requis.";
+            if (!formData.email.trim()) errors.email = "Email requis.";
+            if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) errors.email = "Email invalide.";
+            if (!formData.phone.trim()) errors.phone = "Téléphone WhatsApp requis.";
+            if (!formData.password) errors.password = "Mot de passe requis.";
+            if (formData.password && formData.password.length < requiredPasswordLength) errors.password = `Mot de passe: ${requiredPasswordLength} caractères minimum.`;
+            if (formData.commune === "Autre" && !formData.communeOther.trim()) errors.communeOther = "Précisez votre commune.";
+            if (Object.keys(errors).length) return markErrors(errors);
         }
-        if (step === 2 && (!formData.profession || !formData.level)) {
-            setError("Veuillez indiquer votre profession et votre niveau.");
-            return;
+        if (step === 2) {
+            const errors: Record<string, string> = {};
+            if (!formData.profession.trim()) errors.profession = "Profession requise.";
+            if (!formData.level) errors.level = "Niveau requis.";
+            if (Object.keys(errors).length) return markErrors(errors);
         }
-        if (step === 3 && !formData.planId) {
-            setError("Veuillez choisir un membership.");
-            return;
-        }
+        if (step === 3 && !formData.planId) return markErrors({ planId: "Choisissez un membership." });
         setStep(prev => prev + 1);
     };
 
     const prevStep = () => {
         setError("");
+        setFieldErrors({});
         setStep(prev => prev - 1);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+        setFieldErrors({});
 
-        if (!formData.agreement || !formData.signature) {
-            setError("Veuillez accepter les conditions et signer.");
+        const submitErrors: Record<string, string> = {};
+        if (!formData.agreement) submitErrors.agreement = "Cochez l'acceptation des règles.";
+        if (!formData.signature.trim()) submitErrors.signature = "Signez avec votre nom complet.";
+        if (Object.keys(submitErrors).length) {
+            markErrors(submitErrors);
             return;
         }
 
@@ -195,19 +230,27 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                 <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Nom Complet</label>
-                        <input type="text" name="name" value={formData.name} onChange={handleChange} className="input-field border-[var(--foreground)]/20" placeholder="John Doe" required />
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} className={`input-field border-[var(--foreground)]/20 ${fieldStateClass("name")}`} placeholder="John Doe" required aria-invalid={Boolean(fieldErrors.name)} />
+                        <ErrorHint message={fieldErrors.name} />
                     </div>
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Email Pro / Personnel</label>
-                        <input type="email" name="email" value={formData.email} onChange={handleChange} className="input-field border-[var(--foreground)]/20" placeholder="john@example.com" required />
+                        <input type="email" name="email" value={formData.email} onChange={handleChange} className={`input-field border-[var(--foreground)]/20 ${fieldStateClass("email")}`} placeholder="john@example.com" required aria-invalid={Boolean(fieldErrors.email)} />
+                        <ErrorHint message={fieldErrors.email} />
                     </div>
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Téléphone (WhatsApp)</label>
-                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="input-field border-[var(--foreground)]/20" placeholder="+225 00 00 00 00 00" required />
+                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={`input-field border-[var(--foreground)]/20 ${fieldStateClass("phone")}`} placeholder="+225 00 00 00 00 00" required aria-invalid={Boolean(fieldErrors.phone)} />
+                        <ErrorHint message={fieldErrors.phone} />
                     </div>
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Mot de passe</label>
-                        <input type="password" name="password" value={formData.password} onChange={handleChange} className="input-field border-[var(--foreground)]/20" placeholder="••••••••" required minLength={8} maxLength={128} autoComplete="new-password" />
+                        <input type="password" name="password" value={formData.password} onChange={handleChange} className={`input-field border-[var(--foreground)]/20 ${fieldStateClass("password")}`} placeholder="8 caractères minimum" required minLength={requiredPasswordLength} maxLength={128} autoComplete="new-password" aria-invalid={Boolean(fieldErrors.password)} />
+                        <div className={`mt-1 flex items-center justify-between gap-3 text-[11px] font-bold ${passwordIsValid ? "text-emerald-600" : "text-[var(--foreground)]/50"}`}>
+                            <span>8 caractères minimum pour sécuriser votre espace.</span>
+                            <span>{Math.min(formData.password.length, requiredPasswordLength)}/{requiredPasswordLength}</span>
+                        </div>
+                        <ErrorHint message={fieldErrors.password} />
                     </div>
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Commune de résidence</label>
@@ -219,7 +262,8 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                     {formData.commune === "Autre" && (
                         <div>
                             <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Précisez la commune</label>
-                            <input type="text" name="communeOther" value={formData.communeOther} onChange={handleChange} className="input-field" placeholder="Votre ville/quartier" />
+                            <input type="text" name="communeOther" value={formData.communeOther} onChange={handleChange} className={`input-field ${fieldStateClass("communeOther")}`} placeholder="Votre ville/quartier" aria-invalid={Boolean(fieldErrors.communeOther)} />
+                            <ErrorHint message={fieldErrors.communeOther} />
                         </div>
                     )}
                 </div>
@@ -229,7 +273,8 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                 <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Profession</label>
-                        <input type="text" name="profession" value={formData.profession} onChange={handleChange} className="input-field" placeholder="Ex: Entrepreneur, Manager..." required />
+                        <input type="text" name="profession" value={formData.profession} onChange={handleChange} className={`input-field ${fieldStateClass("profession")}`} placeholder="Ex: Entrepreneur, Manager..." required aria-invalid={Boolean(fieldErrors.profession)} />
+                        <ErrorHint message={fieldErrors.profession} />
                     </div>
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Entreprise (Optionnel)</label>
@@ -242,16 +287,24 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                         </p>
                         <div className="grid grid-cols-1 gap-2">
                             {levels.map(lvl => (
-                                <button type="button" key={lvl} onClick={() => setFormData({ ...formData, level: lvl })}
+                                <button type="button" key={lvl} onClick={() => {
+                                    setFieldErrors(prev => {
+                                        const next = { ...prev };
+                                        delete next.level;
+                                        return next;
+                                    });
+                                    setFormData({ ...formData, level: lvl });
+                                }}
                                     className={`p-4 rounded-xl border-2 text-left text-sm font-black transition-all ${
                                         formData.level === lvl 
                                         ? 'bg-secondary/10 border-secondary text-secondary shadow-[0_0_15px_rgba(231,22,42,0.15)]' 
-                                        : 'border-[var(--foreground)]/10 text-[var(--foreground)]/70 hover:border-[var(--foreground)]/30'
+                                        : fieldErrors.level ? 'border-red-500/50 bg-red-500/5 text-[var(--foreground)]/70' : 'border-[var(--foreground)]/10 text-[var(--foreground)]/70 hover:border-[var(--foreground)]/30'
                                     }`}>
                                     {lvl}
                                 </button>
                             ))}
                             </div>
+                            <ErrorHint message={fieldErrors.level} />
                         </div>
                     </div>
             )}
@@ -266,17 +319,25 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                     <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Choisissez votre Membership</label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {memberships.map(plan => (
-                            <button type="button" key={plan.id} onClick={() => setFormData({ ...formData, planId: plan.id })}
+                            <button type="button" key={plan.id} onClick={() => {
+                                setFieldErrors(prev => {
+                                    const next = { ...prev };
+                                    delete next.planId;
+                                    return next;
+                                });
+                                setFormData({ ...formData, planId: plan.id });
+                            }}
                                 className={`p-4 rounded-xl border text-center transition-all ${
                                     formData.planId === plan.id 
                                     ? 'bg-secondary/10 border-secondary shadow-[0_0_20px_rgba(231,22,42,0.15)]' 
-                                    : 'border-[var(--foreground)]/10 hover:border-secondary/30'
+                                    : fieldErrors.planId ? 'border-red-500/50 bg-red-500/5' : 'border-[var(--foreground)]/10 hover:border-secondary/30'
                                 }`}>
                                 <div className={`text-xs font-black mb-1 ${formData.planId === plan.id ? 'text-secondary' : 'text-[var(--foreground)]/70'}`}>{plan.name}</div>
                                 <div className={`text-[10px] font-bold ${formData.planId === plan.id ? 'text-secondary/80' : 'text-[var(--foreground)]/40'}`}>{plan.price}</div>
                             </button>
                         ))}
                     </div>
+                    <ErrorHint message={fieldErrors.planId} />
                 </div>
             )}
 
@@ -286,6 +347,9 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                         <>
                             <div className="space-y-3">
                                 <h4 className="text-sm font-black text-[var(--foreground)]">Moyen de paiement</h4>
+                                <p className="rounded-xl border border-[var(--foreground)]/10 bg-white/55 p-3 text-xs font-bold leading-5 text-[var(--foreground)]/60 dark:bg-white/5">
+                                    Après validation, vous serez redirigé vers checkout.paystack.com, la page de paiement sécurisée utilisée par Prime Language Academy. Vérifiez le montant avant de confirmer.
+                                </p>
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                     {paymentMethods.map((method) => (
                                         <label key={method.id} className={`p-4 rounded-xl border cursor-pointer transition-all ${formData.paymentMethod === method.id ? 'bg-secondary/10 border-secondary text-secondary' : 'border-[var(--foreground)]/10 text-[var(--foreground)]/70 hover:border-secondary/30'}`}>
@@ -324,30 +388,35 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                             {!isWaitlistMode && (
                                 <>
                                     <li><span className="opacity-50">Moyen:</span> {selectedPaymentMethod.name}</li>
-                                    <li><span className="opacity-50">Option:</span> {formData.paymentOption === "fractionne" ? "Paiement en 2 fois" : "Paiement total"}</li>
-                                    <li><span className="opacity-50">À payer maintenant:</span> <strong className="text-secondary">{formatFcfa(immediateAmount)}</strong></li>
+                                     <li><span className="opacity-50">Option:</span> {formData.paymentOption === "fractionne" ? "Paiement en 2 fois" : "Paiement total"}</li>
+                                    <li><span className="opacity-50">{formData.paymentOption === "fractionne" ? "Prise en charge maintenant:" : "Paiement total maintenant:"}</span> <strong className="text-secondary">{formatFcfa(immediateAmount)}</strong></li>
                                     {formData.paymentOption === "fractionne" && (
                                         <li><span className="opacity-50">Réservation restante:</span> {formatFcfa(reservationAmount)}</li>
                                     )}
                                     {formData.paymentOption === "fractionne" && (
                                         <li className="leading-5 text-[var(--foreground)]/55">Le solde de réservation doit être réglé avant le début officiel pour confirmer définitivement la place.</li>
                                     )}
+                                    <li className="rounded-lg border border-secondary/15 bg-secondary/10 p-3 leading-5 text-[var(--foreground)]/65">
+                                        Page suivante: checkout.paystack.com. Le paiement sera rattaché à Prime Language Academy et au moyen choisi: {selectedPaymentMethod.name}.
+                                    </li>
                                 </>
                             )}
                         </ul>
                     </div>
 
                     <div className="space-y-4">
-                        <label className="flex items-start gap-3 cursor-pointer group">
+                        <label className={`flex items-start gap-3 cursor-pointer group rounded-xl border p-3 ${fieldErrors.agreement ? "border-red-500/50 bg-red-500/5" : "border-transparent"}`}>
                             <input type="checkbox" name="agreement" checked={formData.agreement} onChange={handleChange} className="mt-1" />
                             <span className="text-xs text-[var(--foreground)]/60 leading-relaxed font-medium group-hover:text-[var(--foreground)]/80 transition-colors">
                                 J'accepte les règles du Club (100% anglais, bienveillance, participation active).
                             </span>
                         </label>
+                        <ErrorHint message={fieldErrors.agreement} />
                         
                         <div>
                             <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Signature (Tapez votre nom)</label>
-                            <input type="text" name="signature" value={formData.signature} onChange={handleChange} className="input-field font-serif italic text-lg text-secondary" placeholder="Votre signature" required />
+                            <input type="text" name="signature" value={formData.signature} onChange={handleChange} className={`input-field font-serif italic text-lg text-secondary ${fieldStateClass("signature")}`} placeholder="Votre signature" required aria-invalid={Boolean(fieldErrors.signature)} />
+                            <ErrorHint message={fieldErrors.signature} />
                         </div>
                     </div>
                 </div>
@@ -370,7 +439,7 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                         ) : isWaitlistMode ? (
                             "Rejoindre la liste d'attente"
                         ) : (
-                            `Reserver ma place (${remainingSeats} restantes)`
+                            `Confirmer et ouvrir Paystack (${remainingSeats} places)`
                         )}
                     </button>
                 )}

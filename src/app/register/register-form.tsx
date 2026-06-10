@@ -43,9 +43,9 @@ const splitTestPlan = {
 };
 
 const paymentMethods = [
-    { id: "WAVE", name: "Wave", detail: "Prioritaire à Abidjan" },
-    { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov" },
-    { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard" },
+    { id: "WAVE", name: "Wave", detail: "Vous payez via le checkout sécurisé Paystack avec votre compte Wave." },
+    { id: "MOBILE_MONEY", name: "Mobile Money", detail: "Orange Money, MTN ou Moov via la passerelle Paystack." },
+    { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard via Paystack. Option secondaire." },
 ];
 
 const availableDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
@@ -69,6 +69,12 @@ const fieldClass = "w-full rounded-lg border border-[var(--foreground)]/15 bg-wh
 const choiceClass = "flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition-colors";
 const actionBarClass = "sticky bottom-[calc(0.5rem+env(safe-area-inset-bottom))] z-20 grid grid-cols-[0.82fr_1.18fr] gap-2 rounded-lg border border-[var(--foreground)]/10 bg-[var(--background)]/95 p-2 shadow-lg shadow-black/10 backdrop-blur sm:static sm:grid-cols-[0.8fr_1.2fr] sm:gap-3 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none";
 const backButtonClass = "min-h-12 rounded-lg bg-[var(--foreground)]/6 px-3 py-3 text-sm font-black text-[var(--foreground)] transition-colors hover:bg-[var(--foreground)]/10";
+const requiredPasswordLength = 8;
+
+function ErrorHint({ message }: { message?: string }) {
+    if (!message) return null;
+    return <p className="px-1 text-[11px] font-bold leading-5 text-red-500">{message}</p>;
+}
 
 function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const searchParams = useSearchParams();
@@ -85,6 +91,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [emailStatus, setEmailStatus] = useState<"idle" | "checking" | "available" | "pending" | "taken">("idle");
     const emailDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const formTopRef = useRef<HTMLDivElement | null>(null);
@@ -130,10 +137,22 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const isSelectedPaystackTestPlan = isSelectedTotalTestPlan || isSelectedSplitTestPlan;
     const immediateAmount = formData.paymentOption === "fractionne" && !isSelectedTotalTestPlan ? selectedPlanAmount * 0.5 : selectedPlanAmount;
     const reservationAmount = selectedPlanAmount - immediateAmount;
+    const paymentStageLabel = formData.paymentOption === "fractionne" ? "Prise en charge" : "Paiement total";
+    const paymentDestination = "checkout.paystack.com";
+    const passwordLength = formData.password.length;
+    const passwordIsValid = passwordLength >= requiredPasswordLength && passwordLength <= 128;
     const shouldShowAccountRecovery =
-        error.toLowerCase().includes("email") ||
-        error.toLowerCase().includes("mot de passe") ||
-        error.toLowerCase().includes("paiement");
+        error.toLowerCase().includes("déjà associé") ||
+        error.toLowerCase().includes("attente de paiement") ||
+        error.toLowerCase().includes("récupérer l'accès");
+
+    const markErrors = (errors: Record<string, string>) => {
+        setFieldErrors(errors);
+        setError(`Corrigez: ${Object.values(errors).join(" ")}`);
+        formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    const fieldStateClass = (field: string) => fieldErrors[field] ? "border-red-500/70 bg-red-500/5 focus:border-red-500 focus:ring-red-500/15" : "";
 
     useEffect(() => {
         formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -144,6 +163,14 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
         const name = target.name;
         const value = target.value;
         const type = target.type;
+
+        if (fieldErrors[name]) {
+            setFieldErrors(prev => {
+                const next = { ...prev };
+                delete next[name];
+                return next;
+            });
+        }
         
         if (type === "checkbox" && target instanceof HTMLInputElement) {
             setFormData(prev => ({ ...prev, [name]: target.checked }));
@@ -204,6 +231,13 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
     const handleDayToggle = (day: string) => {
         const maxSessions = planSessions[formData.planId] || 2;
+        if (fieldErrors.days) {
+            setFieldErrors(prev => {
+                const next = { ...prev };
+                delete next.days;
+                return next;
+            });
+        }
         setFormData(prev => {
             if (prev.days.includes(day)) {
                 return { ...prev, days: prev.days.filter(d => d !== day) };
@@ -219,32 +253,54 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
     const nextStep = () => {
         setError("");
-        if (step === 1 && (!formData.name || !formData.email || !formData.password || !formData.phone)) {
-            setError("Veuillez remplir les informations obligatoires (Nom, Email, Téléphone, Mot de passe).");
-            formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-            return;
+        setFieldErrors({});
+
+        if (step === 1) {
+            const errors: Record<string, string> = {};
+            if (!formData.name.trim()) errors.name = "Nom et prénoms requis.";
+            if (!formData.email.trim()) errors.email = "Email requis.";
+            if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) errors.email = "Email invalide.";
+            if (emailStatus === "taken") errors.email = "Cet email est déjà associé à un compte.";
+            if (!formData.phone.trim()) errors.phone = "Téléphone requis.";
+            if (!formData.password) errors.password = "Mot de passe requis.";
+            if (formData.password && formData.password.length < requiredPasswordLength) errors.password = `Mot de passe: ${requiredPasswordLength} caractères minimum.`;
+            if (formData.password.length > 128) errors.password = "Mot de passe trop long.";
+            if (formData.commune === "Autre" && !formData.communeOther.trim()) errors.communeOther = "Précisez votre commune.";
+
+            if (Object.keys(errors).length) {
+                markErrors(errors);
+                return;
+            }
         }
-        if (step === 1 && emailStatus === "taken") {
-            setError("Cet email est déjà associé à un compte. Veuillez vous connecter ou utiliser un autre email.");
-            formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-            return;
+
+        if (step === 2) {
+            const errors: Record<string, string> = {};
+            if (!formData.objective) errors.objective = "Choisissez un objectif.";
+            if (formData.objective === "Autre" && !formData.objectiveOther.trim()) errors.objectiveOther = "Précisez votre objectif.";
+            if (!formData.level) errors.level = "Choisissez votre niveau.";
+            if (Object.keys(errors).length) {
+                markErrors(errors);
+                return;
+            }
         }
-        if (step === 2 && (!formData.objective || !formData.level)) {
-            setError("Veuillez choisir un objectif et un niveau d'anglais.");
-            formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-            return;
-        }
+
         const requiredDays = planSessions[formData.planId] || 2;
-        if (step === 3 && (formData.days.length !== requiredDays || !formData.timeSlot)) {
-            setError(`Veuillez choisir exactement ${requiredDays} jour(s) de base et un créneau horaire.`);
-            formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-            return;
+        if (step === 3) {
+            const errors: Record<string, string> = {};
+            if (!formData.timeSlot) errors.timeSlot = "Choisissez un créneau horaire.";
+            if (formData.days.length !== requiredDays) errors.days = `Choisissez exactement ${requiredDays} jour(s) de base.`;
+            if (Object.keys(errors).length) {
+                markErrors(errors);
+                return;
+            }
         }
+
         setStep(prev => Math.min(prev + 1, 4));
     };
 
     const prevStep = () => {
         setError("");
+        setFieldErrors({});
         setStep(prev => Math.max(prev - 1, 1));
     };
 
@@ -252,9 +308,13 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
         e.preventDefault();
         setLoading(true);
         setError("");
+        setFieldErrors({});
 
-        if (!formData.agreement || !formData.signature) {
-            setError("Veuillez signer et accepter les conditions d'engagement.");
+        const submitErrors: Record<string, string> = {};
+        if (!formData.agreement) submitErrors.agreement = "Cochez l'acceptation des conditions.";
+        if (!formData.signature.trim()) submitErrors.signature = "Signez avec votre nom complet.";
+        if (Object.keys(submitErrors).length) {
+            markErrors(submitErrors);
             setLoading(false);
             return;
         }
@@ -279,6 +339,12 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
         if (result.error) {
             setError(result.error);
+            if (result.error.toLowerCase().includes("mot de passe")) {
+                setFieldErrors({ password: result.error });
+            }
+            if (result.error.toLowerCase().includes("email")) {
+                setFieldErrors({ email: result.error });
+            }
             setLoading(false);
         } else {
             if (result.redirectUrl) {
@@ -350,7 +416,8 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <div className="space-y-1">
                                 <label className={fieldLabelClass}>Nom et Prénoms *</label>
-                                <input type="text" name="name" required value={formData.name} onChange={handleChange} className={fieldClass} />
+                                <input type="text" name="name" required value={formData.name} onChange={handleChange} className={`${fieldClass} ${fieldStateClass("name")}`} aria-invalid={Boolean(fieldErrors.name)} />
+                                <ErrorHint message={fieldErrors.name} />
                             </div>
                             <div className="space-y-1">
                                 <label className={fieldLabelClass}>Date de naissance</label>
@@ -358,7 +425,8 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
                             <div className="space-y-1">
                                 <label className={fieldLabelClass}>Téléphone *</label>
-                                <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} className={fieldClass} />
+                                <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} className={`${fieldClass} ${fieldStateClass("phone")}`} aria-invalid={Boolean(fieldErrors.phone)} />
+                                <ErrorHint message={fieldErrors.phone} />
                             </div>
                             <div className="space-y-1">
                                 <label className={fieldLabelClass}>Email *</label>
@@ -370,8 +438,9 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                             emailStatus === "taken" ? "border-red-500/70 bg-red-500/5" :
                                             emailStatus === "available" ? "border-green-500/70 bg-green-500/5" :
                                             emailStatus === "pending" ? "border-amber-500/70 bg-amber-500/5" :
-                                            "border-[var(--foreground)]/20"
+                                            fieldErrors.email ? "border-red-500/70 bg-red-500/5" : "border-[var(--foreground)]/20"
                                         }`}
+                                        aria-invalid={Boolean(fieldErrors.email)}
                                     />
                                     {/* Email status indicator */}
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -397,7 +466,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 </div>
                                 {emailStatus === "taken" && (
                                     <p className="text-[11px] text-red-500 font-bold px-1 mt-1 flex items-center gap-1">
-                                        <span>⚠️</span> Email déjà utilisé.
+                                        <span>Email déjà utilisé.</span>
                                         <a href="/login" className="underline hover:text-red-400">Se connecter ?</a>
                                     </p>
                                 )}
@@ -410,6 +479,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                         <Link href="/forgot-password" className="ml-1 underline">Mot de passe oublié ?</Link>
                                     </p>
                                 )}
+                                <ErrorHint message={fieldErrors.email} />
                             </div>
                         </div>
 
@@ -435,14 +505,20 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             {formData.commune === "Autre" && (
                                 <div className="space-y-1">
                                     <label className={fieldLabelClass}>Précisez</label>
-                                    <input type="text" name="communeOther" value={formData.communeOther} onChange={handleChange} className={fieldClass} placeholder="Votre ville/quartier" />
+                                    <input type="text" name="communeOther" value={formData.communeOther} onChange={handleChange} className={`${fieldClass} ${fieldStateClass("communeOther")}`} placeholder="Votre ville/quartier" aria-invalid={Boolean(fieldErrors.communeOther)} />
+                                    <ErrorHint message={fieldErrors.communeOther} />
                                 </div>
                             )}
                         </div>
 
                         <div className="space-y-1 pt-1">
                             <label className={fieldLabelClass}>Mot de passe (Compte) *</label>
-                            <input type="password" name="password" required minLength={8} maxLength={128} autoComplete="new-password" value={formData.password} onChange={handleChange} className={fieldClass} placeholder="••••••••" />
+                            <input type="password" name="password" required minLength={requiredPasswordLength} maxLength={128} autoComplete="new-password" value={formData.password} onChange={handleChange} className={`${fieldClass} ${fieldStateClass("password")}`} placeholder="8 caractères minimum" aria-invalid={Boolean(fieldErrors.password)} />
+                            <div className={`flex items-center justify-between gap-3 px-1 text-[11px] font-bold ${passwordIsValid ? "text-emerald-600" : "text-[var(--foreground)]/50"}`}>
+                                <span>8 caractères minimum pour sécuriser votre espace étudiant.</span>
+                                <span>{Math.min(passwordLength, requiredPasswordLength)}/{requiredPasswordLength}</span>
+                            </div>
+                            <ErrorHint message={fieldErrors.password} />
                         </div>
 
                         <div className="rounded-lg border border-primary/10 bg-primary/5 p-2 shadow-sm shadow-primary/10">
@@ -458,14 +534,18 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             <h3 className="text-lg font-black text-[var(--foreground)]">2. Objectif principal</h3>
                             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                                 {objectives.map(obj => (
-                                    <label key={obj} className={`${choiceClass} ${formData.objective === obj ? 'border-primary bg-primary/10 text-[var(--foreground)]' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
+                                    <label key={obj} className={`${choiceClass} ${formData.objective === obj ? 'border-primary bg-primary/10 text-[var(--foreground)]' : fieldErrors.objective ? 'border-red-500/50 bg-red-500/5' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="objective" value={obj} checked={formData.objective === obj} onChange={handleChange} className="accent-primary" />
                                         <span className="font-bold">{obj}</span>
                                     </label>
                                 ))}
                             </div>
+                            <ErrorHint message={fieldErrors.objective} />
                             {formData.objective === "Autre" && (
-                                <input type="text" name="objectiveOther" placeholder="Précisez votre objectif..." value={formData.objectiveOther} onChange={handleChange} className={`${fieldClass} mt-2`} />
+                                <>
+                                    <input type="text" name="objectiveOther" placeholder="Précisez votre objectif..." value={formData.objectiveOther} onChange={handleChange} className={`${fieldClass} ${fieldStateClass("objectiveOther")} mt-2`} aria-invalid={Boolean(fieldErrors.objectiveOther)} />
+                                    <ErrorHint message={fieldErrors.objectiveOther} />
+                                </>
                             )}
                         </div>
 
@@ -474,12 +554,13 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             <h3 className="text-lg font-black text-[var(--foreground)]">3. Niveau en anglais</h3>
                             <div className="grid grid-cols-1 gap-2">
                                 {levels.map(lvl => (
-                                    <label key={lvl} className={`${choiceClass} ${formData.level === lvl ? 'border-primary bg-primary/10 text-[var(--foreground)]' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
+                                    <label key={lvl} className={`${choiceClass} ${formData.level === lvl ? 'border-primary bg-primary/10 text-[var(--foreground)]' : fieldErrors.level ? 'border-red-500/50 bg-red-500/5' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="level" value={lvl} checked={formData.level === lvl} onChange={handleChange} className="h-4 w-4 accent-primary" />
                                         <span className="font-black">{lvl}</span>
                                     </label>
                                 ))}
                             </div>
+                            <ErrorHint message={fieldErrors.level} />
 
                             {formData.level === "Avancé" && (
                                 <div className="rounded-lg border border-secondary/25 bg-secondary/10 p-4 text-xs font-bold leading-6 text-[var(--foreground)]/70">
@@ -494,7 +575,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             {/* Placement Test CTA */}
                             <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
                                 <p className="mb-2 text-sm font-black text-primary">
-                                    <span className="text-xl">🤔</span> Vous ne connaissez pas votre niveau ?
+                                    Vous ne connaissez pas votre niveau ?
                                 </p>
                                 <p className="mb-3 text-xs font-bold leading-relaxed text-[var(--foreground)]/70">
                                     Passez notre test de placement gratuit pour découvrir votre profil linguistique exact !
@@ -616,12 +697,13 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 {availableTimeSlots.map(slot => (
-                                    <label key={slot.id} className={`${choiceClass} ${formData.timeSlot === slot.id ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
+                                    <label key={slot.id} className={`${choiceClass} ${formData.timeSlot === slot.id ? 'border-primary bg-primary/10 text-primary' : fieldErrors.timeSlot ? 'border-red-500/50 bg-red-500/5' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="timeSlot" value={slot.id} checked={formData.timeSlot === slot.id} onChange={handleChange} className="accent-primary" />
                                         <span className="font-bold">{slot.name}</span>
                                     </label>
                                 ))}
                             </div>
+                            <ErrorHint message={fieldErrors.timeSlot} />
                         </div>
 
                         <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
@@ -629,12 +711,13 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             <p className="text-xs text-[var(--foreground)]/60 mb-2">Choisissez vos jours de base ({planSessions[formData.planId]} jour{planSessions[formData.planId] > 1 ? 's' : ''} requis).</p>
                             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                                 {availableDays.map(day => (
-                                    <label key={day} className={`flex cursor-pointer items-center gap-2 rounded-lg border p-3 text-sm transition-colors ${formData.days.includes(day) ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
+                                    <label key={day} className={`flex cursor-pointer items-center gap-2 rounded-lg border p-3 text-sm transition-colors ${formData.days.includes(day) ? 'border-primary bg-primary/10 text-primary' : fieldErrors.days ? 'border-red-500/50 bg-red-500/5' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="checkbox" checked={formData.days.includes(day)} onChange={() => handleDayToggle(day)} className="rounded border-primary/50 accent-primary" />
                                         <span className="font-bold">{day}</span>
                                     </label>
                                 ))}
                             </div>
+                            <ErrorHint message={fieldErrors.days} />
                         </div>
 
                         <div className={actionBarClass}>
@@ -649,6 +732,9 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                     <div className="space-y-5 animate-in fade-in slide-in-from-right-4">
                         <div className="space-y-3">
                             <h3 className="text-lg font-black text-[var(--foreground)]">Moyen de paiement</h3>
+                            <p className="rounded-lg border border-[var(--foreground)]/10 bg-white/55 p-3 text-xs font-bold leading-5 text-[var(--foreground)]/60 dark:bg-white/5">
+                                Après validation, vous serez redirigé vers {paymentDestination}, la page de paiement sécurisée utilisée par Prime Language Academy. Vérifiez que le montant affiché correspond au récapitulatif ci-dessous avant de confirmer.
+                            </p>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 {paymentMethods.map((method) => (
                                     <label key={method.id} className={`flex cursor-pointer flex-col gap-1 rounded-lg border p-3 transition-colors ${formData.paymentMethod === method.id ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/70 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
@@ -685,7 +771,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         </div>
 
                         <div className="space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-4 sm:p-5">
-                            <h3 className="text-sm font-black text-primary">Récapitulatif avant paiement</h3>
+                            <h3 className="text-sm font-black text-primary">Vous allez payer</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold text-[var(--foreground)]/70">
                                 <div><span className="block opacity-50">Parcours</span>{isHybrid ? "Formation hybride matin" : formData.courseMode === "ONLINE" ? "Formation hybride en ligne" : "Formation hybride soirée"}</div>
                                 <div><span className="block opacity-50">Formule</span>{selectedPlan.name}</div>
@@ -695,13 +781,21 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 <div><span className="block opacity-50">Option</span>{formData.paymentOption === "fractionne" ? "Paiement en 2 fois" : "Paiement total"}</div>
                             </div>
                             <div className="rounded-lg border border-[var(--foreground)]/10 bg-white/70 p-4 dark:bg-white/5">
-                                <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[var(--foreground)]/45">Montant à payer maintenant</div>
+                                <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[var(--foreground)]/45">{paymentStageLabel}</div>
                                 <div className="mt-1 text-2xl font-black text-[var(--foreground)]">{formatFcfa(immediateAmount)}</div>
                                 {formData.paymentOption === "fractionne" && (
                                     <p className="mt-2 text-xs font-medium text-[var(--foreground)]/60">
                                         Cette première moitié correspond à la Prise en charge. La Réservation restante sera de {formatFcfa(reservationAmount)} et devra être réglée avant le début officiel pour confirmer définitivement votre place.
                                     </p>
                                 )}
+                                {formData.paymentOption === "total" && (
+                                    <p className="mt-2 text-xs font-medium text-[var(--foreground)]/60">
+                                        Ce paiement règle la Prise en charge et la Réservation en une seule fois.
+                                    </p>
+                                )}
+                                <div className="mt-3 rounded-lg border border-primary/15 bg-primary/10 p-3 text-xs font-bold leading-5 text-[var(--foreground)]/70">
+                                    Au clic, le site ouvrira {paymentDestination}. Le paiement sera rattaché à Prime Language Academy et au moyen choisi : {selectedPaymentMethod.name}.
+                                </div>
                             </div>
                         </div>
 
@@ -719,7 +813,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 </ul>
                             </div>
 
-                            <label className="group flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--foreground)]/10 bg-white/55 p-3 dark:bg-white/5">
+                            <label className={`group flex cursor-pointer items-start gap-3 rounded-lg border bg-white/55 p-3 dark:bg-white/5 ${fieldErrors.agreement ? "border-red-500/50 bg-red-500/5" : "border-[var(--foreground)]/10"}`}>
                                 <input type="checkbox" name="agreement" checked={formData.agreement} onChange={handleChange} className="accent-primary mt-1" />
                                 <span className="text-xs text-[var(--foreground)]/80 group-hover:text-[var(--foreground)] font-bold transition-colors">
                                     Je confirme mon inscription au programme English Mastery et j'accepte les{" "}
@@ -728,11 +822,13 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                     <Link href="/politique-remboursement" target="_blank" className="text-primary underline underline-offset-4">politique de remboursement</Link>.
                                 </span>
                             </label>
+                            <ErrorHint message={fieldErrors.agreement} />
 
                             <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
                                 <div className="space-y-1">
                                     <label className={fieldLabelClass}>Signature (Nom complet) *</label>
-                                    <input type="text" name="signature" required value={formData.signature} onChange={handleChange} className={fieldClass} placeholder="Ex: Jean Dupont" />
+                                    <input type="text" name="signature" required value={formData.signature} onChange={handleChange} className={`${fieldClass} ${fieldStateClass("signature")}`} placeholder="Ex: Jean Dupont" aria-invalid={Boolean(fieldErrors.signature)} />
+                                    <ErrorHint message={fieldErrors.signature} />
                                 </div>
                                 <div className="space-y-1">
                                     <label className={fieldLabelClass}>Date</label>
@@ -744,7 +840,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         <div className={actionBarClass}>
                             <button type="button" onClick={prevStep} className={backButtonClass}>Retour</button>
                             <button type="submit" className="btn-primary min-h-12 px-3 text-sm" disabled={loading}>
-                                {loading ? "Création..." : "Valider le paiement"}
+                                {loading ? "Ouverture de Paystack..." : "Confirmer et ouvrir Paystack"}
                             </button>
                         </div>
                     </div>

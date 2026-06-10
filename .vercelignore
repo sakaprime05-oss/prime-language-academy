@@ -7,3 +7,9 @@ node_modules
 coverage
 playwright-report
 test-results
+
+# Local document-generation helpers; not needed in the deployed web app.
+scripts/build_pla_word_prototypes.py
+scripts/build_training_pdfs_pro.py
+scripts/harmonize_training_pdfs.py
+scripts/rebuild_training_pdfs_premium.py
