@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, CalendarDays, ClipboardCheck, MonitorPlay, UsersRound } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { PLA_CENTERS, PLA_HYBRID_TIME_SLOT, PLA_SESSION } from "@/lib/pla-program";
+import { PLA_CENTERS, PLA_SESSION, PLA_WEEKEND_TIME_SLOT } from "@/lib/pla-program";
 import { requireInitialPayment } from "@/lib/student-payment-gate";
 import { getStudentPath, parseStudentProfileData } from "@/lib/student-profile";
 
@@ -15,7 +15,7 @@ const HYBRID_STEPS = [
   },
   {
     title: "Pratique guidée",
-    desc: "La vague du matin sert à transformer les notions en expression orale et écrite active.",
+    desc: "La séance de 4h du weekend sert à transformer les notions en expression orale et écrite active.",
     icon: UsersRound,
   },
   {
@@ -43,16 +43,16 @@ export default async function StudentHybridPage() {
   const profile = parseStudentProfileData(user?.onboardingData);
   const path = getStudentPath(user?.registrationType, user?.onboardingData);
   const selectedCenter = PLA_CENTERS.find((center) => center.id === profile.centerId) || PLA_CENTERS[0];
-  const days = profile.days?.length ? profile.days : ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+  const days = profile.days?.length ? profile.days : ["Samedi", "Dimanche"];
 
   if (path !== "HYBRID") {
     return (
       <div className="platform-page animate-in fade-in duration-500">
         <section className="glass-card mx-auto max-w-2xl p-6 text-center sm:p-8">
-          <p className="platform-eyebrow">Espace matin</p>
-          <h1 className="mt-2 text-2xl font-black text-[var(--foreground)]">Cet espace est réservé à la vague 3 du matin.</h1>
+          <p className="platform-eyebrow">Espace weekend</p>
+          <h1 className="mt-2 text-2xl font-black text-[var(--foreground)]">Cet espace est réservé à la Formule Weekend Hybride.</h1>
           <p className="mt-3 text-sm font-bold leading-7 text-[var(--muted-foreground)]">
-            Votre inscription actuelle n'est pas marquée comme Formation Hybride Matin. Vous pouvez continuer avec vos supports ou contacter l'administration pour changer de créneau.
+            Votre inscription actuelle n'est pas marquée comme Formule Weekend Hybride. Vous pouvez continuer avec vos supports ou contacter l'administration pour changer de créneau.
           </p>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <Link href="/dashboard/student/courses" className="rounded-xl border border-[var(--primary)]/25 px-5 py-3 text-xs font-black uppercase tracking-widest text-[var(--primary)]">
@@ -70,8 +70,8 @@ export default async function StudentHybridPage() {
   return (
     <div className="platform-page animate-in fade-in duration-500">
       <header className="platform-page-header">
-        <p className="platform-eyebrow">Formation Hybride Matin</p>
-        <h1 className="platform-title">Votre espace du matin</h1>
+        <p className="platform-eyebrow">Formule Weekend Hybride</p>
+        <h1 className="platform-title">Votre espace weekend</h1>
         <p className="platform-subtitle">
           Un parcours qui combine supports numériques, pratique guidée, suivi et accompagnement visio pour progresser avec plus de rythme.
         </p>
@@ -88,8 +88,8 @@ export default async function StudentHybridPage() {
               </p>
             </div>
             <div className="rounded-2xl bg-primary px-5 py-4 text-center text-primary-foreground">
-              <p className="text-[10px] font-black uppercase tracking-widest">{PLA_HYBRID_TIME_SLOT.label}</p>
-              <p className="mt-1 text-2xl font-black">{PLA_HYBRID_TIME_SLOT.time}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest">{PLA_WEEKEND_TIME_SLOT.label}</p>
+              <p className="mt-1 text-2xl font-black">{PLA_WEEKEND_TIME_SLOT.time}</p>
             </div>
           </div>
 
@@ -97,7 +97,7 @@ export default async function StudentHybridPage() {
             {days.map((day) => (
               <div key={day} className="rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)]/60 px-4 py-3">
                 <p className="text-sm font-black text-[var(--foreground)]">{day}</p>
-                <p className="mt-1 text-[11px] font-bold text-[var(--muted-foreground)]">{PLA_HYBRID_TIME_SLOT.time}</p>
+                <p className="mt-1 text-[11px] font-bold text-[var(--muted-foreground)]">{PLA_WEEKEND_TIME_SLOT.time}</p>
               </div>
             ))}
           </div>
@@ -116,7 +116,7 @@ export default async function StudentHybridPage() {
           <div className="mt-5 space-y-3">
             {[
               "Préparer les supports PDF avant la séance.",
-              "Participer aux exercices oraux pendant la vague 3.",
+              "Participer aux exercices oraux pendant la séance du weekend.",
               "Noter les blocages dans le profil ou la messagerie.",
               "Réserver un rendez-vous si un point bloque la progression.",
             ].map((item) => (

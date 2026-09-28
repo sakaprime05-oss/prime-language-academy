@@ -47,6 +47,6 @@ export function getStudentPath(registrationType?: string | null, onboardingData?
 
 export function getStudentPathLabel(path: StudentPath) {
   if (path === "CLUB") return "English Club";
-  if (path === "HYBRID") return "Formation Hybride";
-  return "Formation Hybride";
+  if (path === "HYBRID") return "Formule Weekend Hybride";
+  return "Formation Régulière";
 }

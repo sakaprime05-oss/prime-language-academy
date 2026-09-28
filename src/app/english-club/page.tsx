@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { LearningPathAdvisor } from "@/components/learning-path-advisor";
-import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, PLA_ESP, formatFcfa, plansFor } from "@/lib/pla-program";
 
 
 const ACTIVITIES = [
@@ -30,13 +30,33 @@ const ACTIVITIES = [
   },
 ];
 
-const MEMBERSHIPS = [
-  { id: "loisir",      freq: "1 session / semaine", price: formatFcfa(PLA_CLUB_PLANS[0].price).replace(" FCFA", ""), label: "Social" },
-  { id: "essentiel",   freq: "2 sessions / semaine", price: formatFcfa(PLA_CLUB_PLANS[1].price).replace(" FCFA", ""), label: "Connect" },
-  { id: "equilibre",   freq: "3 sessions / semaine", price: formatFcfa(PLA_CLUB_PLANS[2].price).replace(" FCFA", ""), label: "Network" },
-  { id: "performance", freq: "4 sessions / semaine", price: formatFcfa(PLA_CLUB_PLANS[3].price).replace(" FCFA", ""), label: "Executive" },
-  { id: "intensif",    freq: "5 sessions / semaine", price: formatFcfa(PLA_CLUB_PLANS[4].price).replace(" FCFA", ""), label: "Elite" },
-  { id: "immersion",   freq: "6 sessions / semaine", price: formatFcfa(PLA_CLUB_PLANS[5].price).replace(" FCFA", ""), label: "Founder", top: true },
+const CLUB_TIERS: Record<number, string> = { 2: "Connect", 3: "Network", 4: "Executive" };
+
+const MEMBERSHIP_GROUPS = [
+  {
+    id: "presentiel",
+    title: "Présentiel",
+    subtitle: "Centre Programme 6 (Angré 8e Tranche) ou Centre Poincaré (2 Plateaux Vallon)",
+    plans: plansFor("CLUB", "PRESENTIEL").map((plan) => ({
+      id: plan.id,
+      label: CLUB_TIERS[plan.sessions] || "Membership",
+      freq: plan.freq,
+      price: formatFcfa(plan.price).replace(" FCFA", ""),
+      top: plan.top,
+    })),
+  },
+  {
+    id: "online",
+    title: "En ligne",
+    subtitle: "Visioconférence, où que vous soyez",
+    plans: plansFor("CLUB", "ONLINE").map((plan) => ({
+      id: plan.id,
+      label: CLUB_TIERS[plan.sessions] || "Membership",
+      freq: plan.freq,
+      price: formatFcfa(plan.price).replace(" FCFA", ""),
+      top: plan.top,
+    })),
+  },
 ];
 
 export default function EnglishClubPublicPage() {
@@ -303,12 +323,12 @@ export default function EnglishClubPublicPage() {
             {/* Formation */}
             <div style={{ border: "1px solid rgba(245,240,232,0.1)", borderRadius: 24, padding: "48px 40px", background: "rgba(20,20,30,0.5)", backdropFilter: "blur(16px)" }}>
               <div style={{ fontSize: 11, color: "rgba(245,240,232,0.4)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 20 }}>Parcours 01</div>
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 900, marginBottom: 16 }}>Formation Hybride</h3>
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 900, marginBottom: 16 }}>Formation Régulière</h3>
               <p style={{ color: "rgba(245,240,232,0.5)", lineHeight: 1.8, marginBottom: 28, fontSize: 15 }}>
-                Programme structuré pour apprendre l'anglais de zéro à un niveau opérationnel. Méthode ISO+ (Input, Structure, Output, Automatisation), pratique guidée, ressources numériques et suivi de progression.
+                Programme structuré pour apprendre l'anglais de zéro à un niveau opérationnel, de 2 à 4 séances par semaine. Méthode ISO+ (Input, Structure, Output, Automatisation), pratique guidée, ressources numériques et suivi de progression.
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 36 }}>
-                {["Débutants → Avancés", "Grammaire, vocabulaire, expression", "Progression par niveau", "Groupes réduits & suivi personnalisé"].map(f => (
+                {["Débutant → Mastery Professionnel", "Grammaire, vocabulaire, expression", "Préparation IELTS & TOEFL", "15 places maximum par salle"].map(f => (
                   <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(245,240,232,0.7)" }}>
                     <span style={{ color: "#E7162A" }}>✓</span> {f}
                   </div>
@@ -323,16 +343,16 @@ export default function EnglishClubPublicPage() {
               <div style={{ fontSize: 11, color: "#E7162A", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 20 }}>Parcours 02 · Exclusif</div>
               <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 900, color: "#E7162A", marginBottom: 16 }}>English Club</h3>
               <p style={{ color: "rgba(245,240,232,0.6)", lineHeight: 1.8, marginBottom: 28, fontSize: 15 }}>
-                Cercle social privé au Centre Poincaré pour anglophones confirmés. Pas de cours magistraux — de l'immersion, du networking et de la vie en anglais. Pour ceux qui maîtrisent et veulent aller plus loin.
+                Cercle privé, en centre ou en visioconférence, pour anglophones confirmés. Pas de cours magistraux — de l'immersion, du networking et de la vie en anglais. Pour ceux qui maîtrisent et veulent aller plus loin.
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 36 }}>
-                {["Niveau B2 minimum requis", "Networking & Social Events", "Guest Talks & Masterclasses", "Adhésion valable 2 mois"].map(f => (
+                {["Niveau Autonome minimum requis", "English Only Environment", "Networking, débats & masterclasses", "Adhésion valable 2 mois"].map(f => (
                   <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(245,240,232,0.8)" }}>
                     <span style={{ color: "#E7162A" }}>✦</span> {f}
                   </div>
                 ))}
               </div>
-              <div style={{ fontSize: 11, color: "#E7162A", opacity: 0.7, textTransform: "uppercase", letterSpacing: "0.12em" }}>Accès direct si niveau B2+ · Ou après Formation</div>
+              <div style={{ fontSize: 11, color: "#E7162A", opacity: 0.7, textTransform: "uppercase", letterSpacing: "0.12em" }}>Accès direct dès le niveau Autonome · Ou après la Formation Régulière</div>
             </div>
           </div>
         </div>
@@ -394,23 +414,46 @@ export default function EnglishClubPublicPage() {
             <p style={{ color: "rgba(245,240,232,0.4)", fontSize: 14 }}>Accès à la plateforme membre inclus pendant les 2 mois d'adhésion</p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(165px, 1fr))", gap: 16 }}>
-            {MEMBERSHIPS.map(p => (
-              <div key={p.id} style={{
-                border: p.top ? "1px solid #E7162A" : "1px solid rgba(231,22,42,0.12)",
-                borderRadius: 20, padding: "30px 20px",
-                background: p.top ? "rgba(231,22,42,0.07)" : "rgba(20,20,30,0.6)",
-                backdropFilter: "blur(16px)",
-                boxShadow: p.top ? "0 0 30px rgba(231,22,42,0.12)" : "none",
-                position: "relative", textAlign: "center",
-              }}>
-                {p.top && <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: "#E7162A", color: "#080808", fontSize: 9, fontWeight: 800, padding: "4px 14px", borderRadius: 100, textTransform: "uppercase", letterSpacing: "0.15em", whiteSpace: "nowrap" }}>Le Plus Exclusif</div>}
-                <div style={{ fontSize: 12, fontWeight: 700, color: p.top ? "#E7162A" : "rgba(245,240,232,0.8)", marginBottom: 6 }}>{p.label}</div>
-                <div style={{ fontSize: 10, color: "rgba(245,240,232,0.35)", marginBottom: 24, letterSpacing: "0.08em" }}>{p.freq}</div>
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 900, color: p.top ? "#E7162A" : "#F5F0E8" }}>{p.price}</div>
-                <div style={{ fontSize: 10, color: "rgba(245,240,232,0.3)", marginTop: 3 }}>FCFA / 2 mois</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
+            {MEMBERSHIP_GROUPS.map(group => (
+              <div key={group.id}>
+                <div style={{ marginBottom: 18 }}>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: "#F5F0E8" }}>{group.title}</div>
+                  <div style={{ fontSize: 12, color: "rgba(245,240,232,0.4)" }}>{group.subtitle}</div>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(165px, 1fr))", gap: 16 }}>
+                  {group.plans.map(p => (
+                    <div key={p.id} style={{
+                      border: p.top ? "1px solid #E7162A" : "1px solid rgba(231,22,42,0.12)",
+                      borderRadius: 20, padding: "30px 20px",
+                      background: p.top ? "rgba(231,22,42,0.07)" : "rgba(20,20,30,0.6)",
+                      backdropFilter: "blur(16px)",
+                      boxShadow: p.top ? "0 0 30px rgba(231,22,42,0.12)" : "none",
+                      position: "relative", textAlign: "center",
+                    }}>
+                      {p.top && <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: "#E7162A", color: "#fff", fontSize: 9, fontWeight: 800, padding: "4px 14px", borderRadius: 100, textTransform: "uppercase", letterSpacing: "0.15em", whiteSpace: "nowrap" }}>Le plus choisi</div>}
+                      <div style={{ fontSize: 12, fontWeight: 700, color: p.top ? "#E7162A" : "rgba(245,240,232,0.8)", marginBottom: 6 }}>{p.label}</div>
+                      <div style={{ fontSize: 10, color: "rgba(245,240,232,0.35)", marginBottom: 24, letterSpacing: "0.08em" }}>{p.freq}</div>
+                      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 900, color: p.top ? "#E7162A" : "#F5F0E8" }}>{p.price}</div>
+                      <div style={{ fontSize: 10, color: "rgba(245,240,232,0.3)", marginTop: 3 }}>FCFA / 2 mois</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
+          </div>
+
+          <div style={{ marginTop: 48, border: "1px solid rgba(231,22,42,0.2)", borderRadius: 24, padding: "36px 32px", background: "rgba(231,22,42,0.04)" }}>
+            <div style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#E7162A", marginBottom: 12 }}>{PLA_ESP.subtitle}</div>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 900, margin: "0 0 12px" }}>Spécialisez votre anglais métier au Club</h3>
+            <p style={{ color: "rgba(245,240,232,0.55)", fontSize: 14, lineHeight: 1.8, marginBottom: 20 }}>{PLA_ESP.access} {PLA_ESP.outro}</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+              {PLA_ESP.modules.map(module => (
+                <span key={module.id} style={{ border: "1px solid rgba(231,22,42,0.25)", borderRadius: 100, padding: "8px 16px", fontSize: 11, fontWeight: 700, color: "rgba(245,240,232,0.75)" }}>
+                  {module.emoji} {module.en}
+                </span>
+              ))}
+            </div>
           </div>
 
           <div style={{ textAlign: "center", marginTop: 48 }}>

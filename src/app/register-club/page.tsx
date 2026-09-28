@@ -4,9 +4,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import RegisterClubForm from "./register-club-form";
 import { prisma } from "@/lib/prisma";
-import { PLA_CLUB_CAPACITY } from "@/lib/pla-program";
+import { PLA_CLUB_CAPACITY, getPlan } from "@/lib/pla-program";
 
-export default async function RegisterClubPage({ searchParams }: { searchParams?: Promise<{ level?: string }> }) {
+export default async function RegisterClubPage({ searchParams }: { searchParams?: Promise<{ level?: string; plan?: string }> }) {
   const session = await auth();
   const params = await searchParams;
 
@@ -22,11 +22,17 @@ export default async function RegisterClubPage({ searchParams }: { searchParams?
   });
   const remainingSeats = Math.max(0, PLA_CLUB_CAPACITY - activeClubMembers);
   const isWaitlistMode = remainingSeats === 0;
-  const initialLevel = params?.level?.toLowerCase().includes("avanc")
-    ? "Avancé (C1/C2)"
-    : params?.level?.toLowerCase().includes("inter")
-      ? "Intermédiaire (B1/B2)"
-      : "";
+  const levelParam = params?.level?.toLowerCase() || "";
+  const initialLevel = levelParam.includes("pro")
+    ? "Mastery Professionnel"
+    : levelParam.includes("mastery") || levelParam.includes("avanc")
+      ? "Mastery"
+      : levelParam.includes("autonome") || levelParam.includes("inter")
+        ? "Autonome"
+        : "";
+
+  const requestedPlan = getPlan(params?.plan || "");
+  const initialPlanId = requestedPlan?.program === "CLUB" ? requestedPlan.id : undefined;
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-start bg-[var(--background)] px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-6 sm:p-6 lg:justify-center relative overflow-x-hidden">
@@ -87,7 +93,7 @@ export default async function RegisterClubPage({ searchParams }: { searchParams?
             </div>
           </div>
 
-          <RegisterClubForm isWaitlistMode={isWaitlistMode} remainingSeats={remainingSeats} initialLevel={initialLevel} />
+          <RegisterClubForm isWaitlistMode={isWaitlistMode} remainingSeats={remainingSeats} initialLevel={initialLevel} initialPlanId={initialPlanId} />
 
           <div className="pt-8 flex flex-col items-center gap-4">
             <p className="text-xs font-bold text-[var(--foreground)]/50">

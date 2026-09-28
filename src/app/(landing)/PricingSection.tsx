@@ -2,247 +2,269 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { PLA_PLANS } from "@/lib/pla-program";
+import {
+  PLA_PRICING_NOTES,
+  PLA_PRICING_TABLE,
+  PLA_SESSION,
+  formatFcfa,
+  type PlaModeId,
+  type PlaPlan,
+} from "@/lib/pla-program";
 
-const levels = [
-  {
-    id: "loisir",
-    name: "Parcours Loisir",
-    price: PLA_PLANS[0].price,
-    emoji: "🌱",
-    tag: "Initiation",
-    tagColor: "emerald",
-    sessionsPerWeek: 1,
-    description: "1 séance par semaine. Idéal pour s'initier ou maintenir un contact léger avec la langue.",
-    fullDescription: "Le Parcours Loisir est la porte d'entrée idéale pour ceux qui souhaitent découvrir l'anglais sans pression. Avec 1 séance par semaine, vous avancez à votre rythme tout en bénéficiant de notre méthode ISO+. Ce parcours est parfait pour les personnes qui souhaitent garder un contact régulier avec la langue, que ce soit pour des voyages, la culture ou une simple curiosité.",
-    features: ["Accès flexible", "Supports numériques inclus", "Attestation de formation"],
-    for: ["Débutants complets", "Personnes très occupées", "Retraités & hobbyistes"],
-    schedule: "1 séance × 2h / semaine",
-    duration: "2 mois (8 séances)",
-  },
-  {
-    id: "essentiel",
-    name: "Parcours Essentiel",
-    price: PLA_PLANS[1].price,
-    emoji: "📘",
-    tag: "Populaire",
-    tagColor: "blue",
-    sessionsPerWeek: 2,
-    description: "2 séances par semaine. Parfait pour construire des bases solides avec régularité.",
-    fullDescription: "Le Parcours Essentiel est notre offre de référence. Avec 2 séances par semaine, vous progressez à un rythme soutenu et construisez des bases linguistiques durables. La régularité des séances permet une meilleure mémorisation et une progression visible dès la première session. Idéal pour les actifs qui souhaitent progresser efficacement sans sacrifier leur emploi du temps.",
-    features: ["Programme structuré", "Suivi personnalisé", "Supports numériques inclus"],
-    for: ["Professionnels actifs", "Étudiants", "Toute personne motivée"],
-    schedule: "2 séances × 2h / semaine",
-    duration: "2 mois (16 séances)",
-  },
-  {
-    id: "equilibre",
-    name: "Parcours Équilibre",
-    price: PLA_PLANS[2].price,
-    emoji: "⚖️",
-    tag: "Recommandé",
-    tagColor: "indigo",
-    sessionsPerWeek: 3,
-    description: "3 séances par semaine. Le juste milieu pour progresser sereinement.",
-    fullDescription: "Le Parcours Équilibre est le choix des apprenants sérieux qui veulent une transformation réelle sans excès. 3 séances par semaine permettent d'appliquer la méthode ISO+ dans toute sa puissance : Input régulier, Structuration claire, Output pratiqué 3x par semaine, et début de l'automatisation. Vous commencerez à penser en anglais bien avant la fin de la session.",
-    features: ["Pratique orale renforcée", "Accès WiFi inclus", "Bilan de progression"],
-    for: ["Apprenants ambitieux", "Entrepreneurs", "Candidats TOEIC/IELTS"],
-    schedule: "3 séances × 2h / semaine",
-    duration: "2 mois (24 séances)",
-  },
-  {
-    id: "performance",
-    name: "Parcours Performance",
-    price: PLA_PLANS[3].price,
-    emoji: "🚀",
-    tag: "Intense",
-    tagColor: "orange",
-    sessionsPerWeek: 4,
-    description: "4 séances par semaine. Pour ceux qui veulent des résultats tangibles rapidement.",
-    fullDescription: "Le Parcours Performance passe à la vitesse supérieure. 4 séances par semaine créent une immersion quasi totale dans la langue. Les apprenants de ce parcours développent des réflexes rapides, une aisance à l'oral notable, et une compréhension nettement améliorée. Idéal avant une expatriation, un entretien international, ou une promotion professionnelle nécessitant l'anglais.",
-    features: ["Immersion dynamique", "Corrections intensives", "Espace breakout accessible"],
-    for: ["Cadres en mobilité", "Avant expatriation", "Objectif promotion professionnelle"],
-    schedule: "4 séances × 2h / semaine",
-    duration: "2 mois (32 séances)",
-  },
-  {
-    id: "intensif",
-    name: "Parcours Intensif",
-    price: PLA_PLANS[4].price,
-    emoji: "🔥",
-    tag: "Transformation",
-    tagColor: "red",
-    sessionsPerWeek: 5,
-    description: "5 séances par semaine. Une transformation radicale de votre anglais.",
-    fullDescription: "5 séances par semaine placent l'anglais au centre de votre semaine. C'est le rythme idéal pour une transformation rapide et profonde. À ce niveau, la méthode ISO+ atteint son plein potentiel : chaque jour apporte de nouveaux automatismes, et le cerveau de l'apprenant commence à « switcher » naturellement vers l'anglais dans les situations de la vie courante.",
-    features: ["Quasi-quotidien", "Objectifs hebdomadaires", "Méthode ISO+ appliquée"],
-    for: ["Personnes disponibles", "Avant un voyage long", "Objectif niveau B2+"],
-    schedule: "5 séances × 2h / semaine",
-    duration: "2 mois (40 séances)",
-  },
-  {
-    id: "immersion",
-    name: "Parcours Immersion",
-    price: PLA_PLANS[5].price,
-    emoji: "🏆",
-    tag: "Élite",
-    tagColor: "amber",
-    sessionsPerWeek: 6,
-    description: "6 séances par semaine. L'élite de la formation pour une maîtrise totale.",
-    fullDescription: "Le Parcours Immersion représente le sommet de notre offre. 6 séances par semaine, c'est une immersion comparable à un séjour linguistique, mais dans votre propre ville. Les apprenants bénéficient de l'attention maximale de nos formateurs, d'un suivi pas-à-pas, et d'une progression extrêmement rapide. En 2 mois, les apprenants passent généralement de A2 à B2, ou de B1 à C1.",
-    features: ["Immersion totale", "Priorité aux séances", "Expertise formateurs premium"],
-    for: ["Dirigeants", "Objectif excellence", "Besoin urgent de maîtrise totale"],
-    schedule: "6 séances × 2h / semaine",
-    duration: "2 mois (48 séances)",
-  },
-];
+type PlanCard = PlaPlan & {
+  programName: string;
+  modeTitle: string;
+  emoji: string;
+  tag: string;
+  tagColor: string;
+  description: string;
+  fullDescription: string;
+  features: string[];
+  audience: string[];
+  schedule: string;
+  duration: string;
+  registerHref: string;
+};
 
 const tagColorMap: Record<string, string> = {
   emerald: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
   blue: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   indigo: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
   orange: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-  red: "bg-red-500/10 text-red-400 border-red-500/20",
   amber: "bg-amber-500/10 text-amber-400 border-amber-500/20",
 };
 
+const MODE_EMOJI: Record<PlaModeId, string> = {
+  PRESENTIEL: "🏢",
+  ONLINE: "💻",
+  WEEKEND: "🗓️",
+};
+
+const REGULAR_FEATURES = [
+  "Méthode ISO+ appliquée à chaque séance",
+  "Documentation pédagogique offerte",
+  "Accès plateforme & suivi de progression",
+];
+
+const CLUB_FEATURES = [
+  "English Only Environment",
+  "Débats, jeux de rôle & storytelling",
+  "Modules ESP (anglais de spécialité)",
+];
+
+const WEEKEND_FEATURES = [
+  "4h de pratique intensive par weekend",
+  "Format hybride: centre ou visioconférence",
+  "Idéal pour les emplois du temps chargés",
+];
+
+function buildCards(): PlanCard[] {
+  const cards: PlanCard[] = [];
+
+  for (const group of PLA_PRICING_TABLE) {
+    for (const row of group.rows) {
+      for (const plan of row.plans) {
+        const isClub = plan.program === "CLUB";
+        const isWeekend = plan.program === "WEEKEND";
+        const weekly = plan.sessions * 2;
+
+        cards.push({
+          ...plan,
+          programName: row.name,
+          modeTitle: group.title,
+          emoji: MODE_EMOJI[plan.mode],
+          tag: isWeekend ? "Weekend" : group.title,
+          tagColor: isWeekend ? "amber" : isClub ? "indigo" : plan.mode === "ONLINE" ? "blue" : "emerald",
+          description: isWeekend
+            ? "Une séance de 4h le samedi ou le dimanche, de 10h00 à 14h00, au Centre Poincaré ou en visioconférence."
+            : `${plan.freq} de 2h, ${group.title.toLowerCase()}, sur le cycle de 2 mois.`,
+          fullDescription: isWeekend
+            ? "La Formule Weekend Hybride condense la semaine en une séance intensive de 4h. Structuration le matin, pratique guidée au format Club ensuite, puis prolongement sur la plateforme entre deux weekends. C'est le format des professionnels qui ne peuvent pas se libérer en semaine."
+            : isClub
+              ? `Le Club d'Anglais est un environnement 100% anglophone réservé aux profils de niveau Autonome et plus. Avec ${plan.freq.toLowerCase()}, vous entretenez et professionnalisez votre anglais par la pratique: débats, simulations professionnelles, storytelling, networking et modules ESP.`
+              : `La Formation Régulière suit la méthode ISO+ (Input, Structuration, Output, Automatisation). Avec ${plan.freq.toLowerCase()} de 2h, vous progressez d'un palier par cycle de 2 mois: Débutant vers Autonome, Autonome vers Mastery, puis Mastery Professionnel.`,
+          features: isWeekend ? WEEKEND_FEATURES : isClub ? CLUB_FEATURES : REGULAR_FEATURES,
+          audience: isWeekend
+            ? ["Professionnels très occupés", "Apprenants hors d'Abidjan", "Reprise en douceur"]
+            : isClub
+              ? ["Niveau Autonome et plus", "Anciens apprenants PLA", "Cadres & entrepreneurs"]
+              : ["Débutants complets", "Faux débutants", "Candidats IELTS / TOEFL"],
+          schedule: isWeekend
+            ? "1 séance × 4h / weekend (samedi ou dimanche, 10h00 - 14h00)"
+            : `${plan.sessions} séances × 2h / semaine (16h-18h ou 18h-20h)`,
+          duration: isWeekend
+            ? "Cycle de 2 mois (8 séances de 4h)"
+            : `Cycle de 2 mois (${plan.sessions * 8} séances, ${weekly}h / semaine)`,
+          registerHref: isClub
+            ? `/register-club?plan=${plan.id}`
+            : `/register?plan=${plan.id}${isWeekend ? "&path=hybrid" : ""}`,
+        });
+      }
+    }
+  }
+
+  return cards;
+}
+
+const CARDS = buildCards();
+const GROUPS = PLA_PRICING_TABLE.map((group) => ({
+  id: group.id,
+  title: group.title,
+  subtitle: group.subtitle,
+  emoji: group.emoji,
+  cards: CARDS.filter((card) => card.mode === group.mode),
+}));
+
 export default function PricingSection() {
-  const [selected, setSelected] = useState<(typeof levels)[0] | null>(null);
+  const [selected, setSelected] = useState<PlanCard | null>(null);
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {levels.map((level) => (
-          <div
-            key={level.id}
-            className="glass-card flex flex-col justify-between group hover:border-primary/50 transition-all border-white/40 dark:border-white/5 relative overflow-hidden backdrop-blur-md"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full pointer-events-none" />
-            <div className="space-y-4 relative z-10">
-              <div className="flex justify-between items-start">
-                <span className="text-3xl">{level.emoji}</span>
-                <span className={`px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${tagColorMap[level.tagColor]}`}>
-                  {level.tag}
-                </span>
-              </div>
+      <div className="flex flex-col gap-12">
+        {GROUPS.map((group) => (
+          <div key={group.id}>
+            <div className="mb-5 flex items-baseline gap-3">
+              <span className="text-2xl">{group.emoji}</span>
               <div>
-                <h3 className="text-xl font-black text-[var(--foreground)]">{level.name}</h3>
-                <div className="mt-1 text-3xl font-black text-primary">
-                  {level.price.toLocaleString()} <span className="text-base font-bold text-[var(--foreground)]/40">FCFA</span>
-                </div>
-                <p className="text-xs text-[var(--foreground)]/50 mt-3 font-medium leading-relaxed">
-                  {level.description}
-                </p>
+                <h3 className="text-lg font-black uppercase tracking-tight text-[var(--foreground)]">{group.title}</h3>
+                <p className="text-xs font-medium text-[var(--foreground)]/50">{group.subtitle}</p>
               </div>
-              <ul className="space-y-2 pt-4 border-t border-[var(--foreground)]/5">
-                {level.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-[10px] font-bold text-[var(--foreground)]/70 uppercase tracking-tight">
-                    <svg className="w-3 h-3 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                    </svg>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
             </div>
-            <div className="pt-6 relative z-10 flex flex-col gap-2">
-              <button
-                onClick={() => setSelected(level)}
-                className="w-full text-center text-[10px] font-black uppercase tracking-widest px-4 py-3 rounded-xl border border-[var(--foreground)]/10 hover:border-primary/40 hover:text-primary transition-all text-[var(--foreground)]/50"
-              >
-                En savoir plus
-              </button>
-              <Link
-                href={`/register?plan=${level.id}`}
-                className="w-full text-center flex items-center justify-center px-8 py-4 rounded-2xl bg-[var(--foreground)]/5 font-black uppercase text-[10px] tracking-widest hover:bg-primary hover:text-white transition-all"
-              >
-                Choisir ce parcours
-              </Link>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {group.cards.map((card) => (
+                <div
+                  key={card.id}
+                  className="glass-card group relative flex flex-col justify-between overflow-hidden border-white/40 backdrop-blur-md transition-all hover:border-primary/50 dark:border-white/5"
+                >
+                  <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 rounded-full bg-primary/5 blur-3xl" />
+                  <div className="relative z-10 space-y-4">
+                    <div className="flex items-start justify-between">
+                      <span className="text-3xl">{card.emoji}</span>
+                      <span className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-widest ${tagColorMap[card.tagColor]}`}>
+                        {card.tag}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary">{card.programName}</p>
+                      <h3 className="mt-1 text-xl font-black text-[var(--foreground)]">{card.label}</h3>
+                      <div className="mt-1 text-3xl font-black text-primary">
+                        {card.price.toLocaleString("fr-FR")} <span className="text-base font-bold text-[var(--foreground)]/40">FCFA</span>
+                      </div>
+                      <p className="mt-3 text-xs font-medium leading-relaxed text-[var(--foreground)]/50">{card.description}</p>
+                    </div>
+                    <ul className="space-y-2 border-t border-[var(--foreground)]/5 pt-4">
+                      {card.features.map((feature) => (
+                        <li key={feature} className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-tight text-[var(--foreground)]/70">
+                          <svg className="h-3 w-3 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                          </svg>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="relative z-10 flex flex-col gap-2 pt-6">
+                    <button
+                      onClick={() => setSelected(card)}
+                      className="w-full rounded-xl border border-[var(--foreground)]/10 px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 transition-all hover:border-primary/40 hover:text-primary"
+                    >
+                      En savoir plus
+                    </button>
+                    <Link
+                      href={card.registerHref}
+                      className="flex w-full items-center justify-center rounded-2xl bg-[var(--foreground)]/5 px-8 py-4 text-center text-[10px] font-black uppercase tracking-widest transition-all hover:bg-primary hover:text-white"
+                    >
+                      Choisir cette formule
+                    </Link>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Modal - En savoir plus */}
+      <ul className="mt-10 grid gap-2 rounded-2xl border border-primary/15 bg-primary/5 p-5">
+        {PLA_PRICING_NOTES.map((note) => (
+          <li key={note} className="flex items-start gap-2 text-xs font-bold leading-5 text-[var(--foreground)]/70">
+            <span className="text-primary">•</span> {note}
+          </li>
+        ))}
+      </ul>
+
       {selected && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
           onClick={() => setSelected(null)}
         >
           <div
-            className="bg-[var(--surface,#1a1a2e)] border border-[var(--glass-border,rgba(255,255,255,0.1))] rounded-3xl p-8 max-w-xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
+            className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-3xl border border-[var(--glass-border,rgba(255,255,255,0.1))] bg-[var(--surface,#1a1a2e)] p-8 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
           >
-            {/* Close */}
             <button
               onClick={() => setSelected(null)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[var(--foreground)]/10 flex items-center justify-center hover:bg-[var(--foreground)]/20 transition-colors text-[var(--foreground)]/60"
+              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--foreground)]/10 text-[var(--foreground)]/60 transition-colors hover:bg-[var(--foreground)]/20"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            {/* Title */}
-            <div className="flex items-center gap-4 mb-6">
+            <div className="mb-6 flex items-center gap-4">
               <span className="text-4xl">{selected.emoji}</span>
               <div>
-                <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded border ${tagColorMap[selected.tagColor]}`}>
-                  {selected.tag}
+                <span className={`rounded border px-2 py-1 text-[10px] font-black uppercase tracking-widest ${tagColorMap[selected.tagColor]}`}>
+                  {selected.programName} · {selected.modeTitle}
                 </span>
-                <h2 className="text-2xl font-black text-[var(--foreground)] mt-1">{selected.name}</h2>
+                <h2 className="mt-1 text-2xl font-black text-[var(--foreground)]">{selected.label}</h2>
               </div>
             </div>
 
-            {/* Price */}
-            <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 mb-6 flex justify-between items-center">
+            <div className="mb-6 flex items-center justify-between rounded-2xl border border-primary/20 bg-primary/5 p-4">
               <div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Investissement / session</div>
-                <div className="text-3xl font-black text-primary">{selected.price.toLocaleString()} FCFA</div>
+                <div className="mb-1 text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40">Investissement / cycle de 2 mois</div>
+                <div className="text-3xl font-black text-primary">{formatFcfa(selected.price)}</div>
               </div>
               <div className="text-right">
-                <div className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Rythme</div>
-                <div className="font-black text-[var(--foreground)]">{selected.sessionsPerWeek}x/semaine</div>
+                <div className="mb-1 text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40">Rythme</div>
+                <div className="font-black text-[var(--foreground)]">{selected.shortFreq}</div>
               </div>
             </div>
 
-            {/* Full description */}
             <div className="mb-6">
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-3">Détail du parcours</h3>
+              <h3 className="mb-3 text-[10px] font-black uppercase tracking-widest text-primary">Détail de la formule</h3>
               <p className="text-sm leading-relaxed text-[var(--foreground)]/70">{selected.fullDescription}</p>
             </div>
 
-            {/* Info Grid */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-[var(--foreground)]/5 rounded-2xl p-4">
-                <div className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2">📅 Organisation</div>
+            <div className="mb-6 grid grid-cols-2 gap-4">
+              <div className="rounded-2xl bg-[var(--foreground)]/5 p-4">
+                <div className="mb-2 text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40">📅 Organisation</div>
                 <div className="text-sm font-bold text-[var(--foreground)]">{selected.schedule}</div>
               </div>
-              <div className="bg-[var(--foreground)]/5 rounded-2xl p-4">
-                <div className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2">⏱️ Durée</div>
+              <div className="rounded-2xl bg-[var(--foreground)]/5 p-4">
+                <div className="mb-2 text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40">⏱️ Durée</div>
                 <div className="text-sm font-bold text-[var(--foreground)]">{selected.duration}</div>
               </div>
             </div>
 
-            {/* For Who */}
             <div className="mb-6">
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-3">Ce parcours est fait pour</h3>
+              <h3 className="mb-3 text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40">Cette formule est faite pour</h3>
               <ul className="space-y-2">
-                {selected.for.map((item, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/70">
+                {selected.audience.map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/70">
                     <span className="text-primary">→</span> {item}
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Features */}
             <div className="mb-8">
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-3">Ce qui est inclus</h3>
+              <h3 className="mb-3 text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40">Ce qui est inclus</h3>
               <ul className="space-y-2">
-                {selected.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-sm font-bold text-[var(--foreground)]/70">
-                    <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {selected.features.map((feature) => (
+                  <li key={feature} className="flex items-center gap-2 text-sm font-bold text-[var(--foreground)]/70">
+                    <svg className="h-4 w-4 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
                     </svg>
                     {feature}
@@ -251,13 +273,16 @@ export default function PricingSection() {
               </ul>
             </div>
 
-            {/* CTA */}
+            <p className="mb-4 text-center text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40">
+              {PLA_SESSION.label} · Frais d&apos;inscription offerts
+            </p>
+
             <Link
-              href={`/register?plan=${selected.id}`}
-              className="w-full flex items-center justify-center py-4 px-6 bg-primary text-white font-black uppercase tracking-widest text-sm rounded-2xl hover:opacity-90 transition-opacity"
+              href={selected.registerHref}
+              className="flex w-full items-center justify-center rounded-2xl bg-primary px-6 py-4 text-sm font-black uppercase tracking-widest text-white transition-opacity hover:opacity-90"
               onClick={() => setSelected(null)}
             >
-              S'inscrire à ce parcours (Inscription Offerte)
+              S&apos;inscrire (inscription offerte)
             </Link>
           </div>
         </div>

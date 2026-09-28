@@ -4,27 +4,45 @@ import { useEffect, useState, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { registerUser } from "@/app/actions/auth-actions";
-import { PLA_CENTERS, PLA_HYBRID_TIME_SLOT, PLA_ONLINE_TIME_SLOT, PLA_PAYSTACK_SPLIT_TEST_PLAN, PLA_PAYSTACK_TEST_PLAN, PLA_PLANS, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
+import {
+    PLA_CENTERS,
+    PLA_LEVEL_NAMES,
+    PLA_PAYSTACK_SPLIT_TEST_PLAN,
+    PLA_PAYSTACK_TEST_PLAN,
+    PLA_TIME_SLOTS,
+    PLA_WEEKEND_TIME_SLOT,
+    formatFcfa,
+    getPlan,
+    plansFor,
+    planSessionsPerWeek,
+    type PlaModeId,
+    type PlaProgramId,
+} from "@/lib/pla-program";
 
-const planSessions: Record<string, number> = {
-    "loisir": 1,
-    "essentiel": 2,
-    "equilibre": 3,
-    "performance": 4,
-    "intensif": 5,
-    "immersion": 6,
-    [PLA_PAYSTACK_TEST_PLAN.id]: 1,
-    [PLA_PAYSTACK_SPLIT_TEST_PLAN.id]: 1,
-};
+type RegisterPlanOption = { id: string; name: string; price: string; amount: number; desc: string };
 
-const plans = [
-    { id: "loisir", name: "Loisir (1 séance/sem)", price: formatFcfa(PLA_PLANS[0].price), amount: PLA_PLANS[0].price, desc: "Initiation ou contact léger" },
-    { id: "essentiel", name: "Essentiel (2 séances/sem)", price: formatFcfa(PLA_PLANS[1].price), amount: PLA_PLANS[1].price, desc: "Construction des bases" },
-    { id: "equilibre", name: "Équilibre (3 séances/sem)", price: formatFcfa(PLA_PLANS[2].price), amount: PLA_PLANS[2].price, desc: "Pratique régulière" },
-    { id: "performance", name: "Performance (4 séances/sem)", price: formatFcfa(PLA_PLANS[3].price), amount: PLA_PLANS[3].price, desc: "Résultats tangibles" },
-    { id: "intensif", name: "Intensif (5 séances/sem)", price: formatFcfa(PLA_PLANS[4].price), amount: PLA_PLANS[4].price, desc: "Transformation radicale" },
-    { id: "immersion", name: "Immersion (6 séances/sem)", price: formatFcfa(PLA_PLANS[5].price), amount: PLA_PLANS[5].price, desc: "Maîtrise totale" }
-];
+const DEFAULT_PLAN_ID = "reg-pres-2";
+
+function planCatalog(program: PlaProgramId, mode: PlaModeId): RegisterPlanOption[] {
+    return plansFor(program, mode).map((plan) => ({
+        id: plan.id,
+        name: program === "WEEKEND" ? `Formule Weekend Hybride (${plan.label})` : plan.label,
+        price: formatFcfa(plan.price),
+        amount: plan.price,
+        desc:
+            program === "WEEKEND"
+                ? "Samedi ou dimanche de 10h00 à 14h00, au Centre Poincaré ou en visioconférence."
+                : `${plan.freq} pendant 2 mois, ${mode === "ONLINE" ? "en visioconférence" : "en centre"}.`,
+    }));
+}
+
+function equivalentPlanId(currentPlanId: string, program: PlaProgramId, mode: PlaModeId) {
+    const catalog = plansFor(program, mode);
+    if (!catalog.length) return currentPlanId;
+    const sessions = planSessionsPerWeek(currentPlanId);
+    const match = catalog.find((plan) => plan.sessions === sessions);
+    return (match || catalog[0]).id;
+}
 
 const testPlan = {
     id: PLA_PAYSTACK_TEST_PLAN.id,
@@ -48,7 +66,8 @@ const paymentMethods = [
     { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard via Paystack. Option secondaire." },
 ];
 
-const availableDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+const weekDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
+const weekendDays = ["Samedi", "Dimanche"];
 
 const objectives = [
     "Travail / carrière", "Voyage", "Études",
@@ -61,7 +80,7 @@ const communes = [
     "Yopougon", "Autre"
 ];
 
-const levels = ["Débutant", "Intermédiaire", "Avancé"];
+const levels = PLA_LEVEL_NAMES;
 
 const steps = ["Profil", "Objectifs", "Formule", "Paiement"];
 const fieldLabelClass = "px-1 text-[10px] font-black uppercase tracking-[0.12em] text-[var(--foreground)]/55";
@@ -81,11 +100,19 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const router = useRouter();
     const paymentTestToken = searchParams.get("paystackTest") || "";
     const isPaymentTestMode = Boolean(paymentTestToken);
-    const availablePlans = isPaymentTestMode ? [testPlan, splitTestPlan, ...plans] : plans;
     const requestedPlanId = searchParams.get("plan") || "";
     const requestedTestPlanIds: string[] = [PLA_PAYSTACK_TEST_PLAN.id, PLA_PAYSTACK_SPLIT_TEST_PLAN.id];
-    const canUseRequestedPlan = Boolean(requestedPlanId) && (!requestedTestPlanIds.includes(requestedPlanId) || isPaymentTestMode);
-    const initialPlanId = canUseRequestedPlan ? requestedPlanId : isPaymentTestMode ? PLA_PAYSTACK_TEST_PLAN.id : "essentiel";
+    const requestedIsTestPlan = requestedTestPlanIds.includes(requestedPlanId);
+    const canUseRequestedPlan = Boolean(requestedPlanId) && (requestedIsTestPlan ? isPaymentTestMode : Boolean(getPlan(requestedPlanId)));
+    const requestedPlan = canUseRequestedPlan && !requestedIsTestPlan ? getPlan(requestedPlanId) : undefined;
+    const isWeekendRequest = searchParams.get("path") === "hybrid" || requestedPlan?.program === "WEEKEND";
+    const initialPlanId = canUseRequestedPlan
+        ? requestedPlanId
+        : isPaymentTestMode
+            ? PLA_PAYSTACK_TEST_PLAN.id
+            : isWeekendRequest
+                ? plansFor("WEEKEND")[0].id
+                : DEFAULT_PLAN_ID;
     const initialPaymentOption = initialPlanId === PLA_PAYSTACK_SPLIT_TEST_PLAN.id ? "fractionne" : "total";
 
     const [step, setStep] = useState(1);
@@ -97,7 +124,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     const formTopRef = useRef<HTMLDivElement | null>(null);
 
     const [formData, setFormData] = useState({
-        type: searchParams.get("path") === "hybrid" ? "HYBRID" : "FORMATION",
+        type: isWeekendRequest ? "HYBRID" : "FORMATION",
         name: "",
         dob: "",
         profession: "",
@@ -113,11 +140,11 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
         level: searchParams.get("level") || "",
 
         planId: initialPlanId,
-        courseMode: "PRESENTIEL", // PRESENTIEL, ONLINE
+        courseMode: requestedPlan?.mode === "ONLINE" ? "ONLINE" : "PRESENTIEL", // PRESENTIEL, ONLINE
         studentType: "INDIVIDUEL", // INDIVIDUEL, ENTREPRISE
         centerId: searchParams.get("center") || "poincare",
         days: [] as string[],
-        timeSlot: searchParams.get("path") === "hybrid" ? PLA_HYBRID_TIME_SLOT.id : "",
+        timeSlot: isWeekendRequest ? PLA_WEEKEND_TIME_SLOT.id : "",
 
         paymentOption: initialPaymentOption,
         paymentMethod: "WAVE",
@@ -127,10 +154,17 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     });
 
     const isHybrid = formData.type === "HYBRID";
-    const availableTimeSlots = (formData.courseMode === "ONLINE" ? [PLA_ONLINE_TIME_SLOT] : isHybrid ? [PLA_HYBRID_TIME_SLOT] : PLA_TIME_SLOTS).map((slot) => ({ id: slot.id, name: `${slot.label} (${slot.time})` }));
-    const selectedPlan = availablePlans.find((plan) => plan.id === formData.planId) || availablePlans[1] || plans[1];
-    const selectedCenter = PLA_CENTERS.find((center) => center.id === formData.centerId) || PLA_CENTERS[1];
-    const selectedPlanAmount = availablePlans.find((plan) => plan.id === formData.planId)?.amount || PLA_PLANS[1].price;
+    const activeProgram: PlaProgramId = isHybrid ? "WEEKEND" : "REGULIERE";
+    const activeMode: PlaModeId = isHybrid ? "WEEKEND" : formData.courseMode === "ONLINE" ? "ONLINE" : "PRESENTIEL";
+    const catalogPlans = planCatalog(activeProgram, activeMode);
+    const availablePlans = isPaymentTestMode ? [testPlan, splitTestPlan, ...catalogPlans] : catalogPlans;
+    const availableCenters = isHybrid ? PLA_CENTERS.filter((center) => center.weekend) : PLA_CENTERS;
+    const availableDays = isHybrid ? weekendDays : weekDays;
+    const availableTimeSlots = (isHybrid ? [PLA_WEEKEND_TIME_SLOT] : PLA_TIME_SLOTS).map((slot) => ({ id: slot.id, name: `${slot.label} (${slot.time})` }));
+    const selectedPlan = availablePlans.find((plan) => plan.id === formData.planId) || availablePlans[0];
+    const selectedCenter = availableCenters.find((center) => center.id === formData.centerId) || availableCenters[0];
+    const selectedPlanAmount = selectedPlan?.amount || catalogPlans[0].amount;
+    const requiredDayCount = planSessionsPerWeek(formData.planId);
     const selectedPaymentMethod = paymentMethods.find((method) => method.id === formData.paymentMethod) || paymentMethods[0];
     const isSelectedTotalTestPlan = formData.planId === PLA_PAYSTACK_TEST_PLAN.id;
     const isSelectedSplitTestPlan = formData.planId === PLA_PAYSTACK_SPLIT_TEST_PLAN.id;
@@ -177,15 +211,19 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
         } else {
             setFormData(prev => {
                 const newData = { ...prev, [name]: value };
-                if (name === "type") {
-                    newData.timeSlot = value === "HYBRID" ? PLA_HYBRID_TIME_SLOT.id : "";
-                    newData.courseMode = value === "HYBRID" ? "PRESENTIEL" : newData.courseMode;
-                }
-                if (name === "courseMode") {
-                    if (value === "ONLINE") {
-                        newData.timeSlot = PLA_ONLINE_TIME_SLOT.id;
-                    } else {
-                        newData.timeSlot = newData.type === "HYBRID" ? PLA_HYBRID_TIME_SLOT.id : "";
+                if (name === "type" || name === "courseMode") {
+                    const nextIsWeekend = newData.type === "HYBRID";
+                    if (name === "type" && value === "HYBRID") {
+                        newData.courseMode = "PRESENTIEL";
+                        newData.centerId = "poincare";
+                    }
+                    newData.timeSlot = nextIsWeekend ? PLA_WEEKEND_TIME_SLOT.id : "";
+                    newData.days = [];
+                    const nextProgram: PlaProgramId = nextIsWeekend ? "WEEKEND" : "REGULIERE";
+                    const nextMode: PlaModeId = nextIsWeekend ? "WEEKEND" : newData.courseMode === "ONLINE" ? "ONLINE" : "PRESENTIEL";
+                    const isTestPlan = newData.planId === PLA_PAYSTACK_TEST_PLAN.id || newData.planId === PLA_PAYSTACK_SPLIT_TEST_PLAN.id;
+                    if (!isTestPlan) {
+                        newData.planId = equivalentPlanId(prev.planId, nextProgram, nextMode);
                     }
                 }
                 if (name === "planId") {
@@ -230,7 +268,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
     };
 
     const handleDayToggle = (day: string) => {
-        const maxSessions = planSessions[formData.planId] || 2;
+        const maxSessions = planSessionsPerWeek(formData.planId);
         if (fieldErrors.days) {
             setFieldErrors(prev => {
                 const next = { ...prev };
@@ -284,7 +322,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
             }
         }
 
-        const requiredDays = planSessions[formData.planId] || 2;
+        const requiredDays = planSessionsPerWeek(formData.planId);
         if (step === 3) {
             const errors: Record<string, string> = {};
             if (!formData.timeSlot) errors.timeSlot = "Choisissez un créneau horaire.";
@@ -562,13 +600,13 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
                             <ErrorHint message={fieldErrors.level} />
 
-                            {formData.level === "Avancé" && (
+                            {(formData.level === "Autonome" || formData.level === "Mastery" || formData.level === "Mastery Professionnel") && (
                                 <div className="rounded-lg border border-secondary/25 bg-secondary/10 p-4 text-xs font-bold leading-6 text-[var(--foreground)]/70">
-                                    Votre niveau semble déjà solide. Si votre objectif principal est la pratique orale, le networking et l'immersion sociale, le{" "}
+                                    Votre niveau est déjà autonome. Si votre objectif principal est la pratique orale, le networking et l'immersion en English Only Environment, le{" "}
                                     <Link href="/register-club" className="font-black text-secondary underline underline-offset-4">
                                         English Club
                                     </Link>{" "}
-                                    peut être plus adapté que la formation de base.
+                                    peut être plus adapté que la Formation Régulière. Les modules ESP (anglais métier) y sont également accessibles.
                                 </div>
                             )}
 
@@ -626,13 +664,13 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                                     <label className={`flex cursor-pointer flex-col rounded-lg border p-3 transition-colors ${formData.type === 'FORMATION' ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/70 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="type" value="FORMATION" checked={formData.type === 'FORMATION'} onChange={handleChange} className="sr-only" />
-                                        <span className="text-sm font-black">Formation hybride soir / en ligne</span>
-                                        <span className="mt-1 text-xs font-medium leading-5 opacity-70">Vagues 1 ou 2 en présentiel, ou visioconférence tous les jours de 17h30 à 20h30.</span>
+                                        <span className="text-sm font-black">Formation Régulière</span>
+                                        <span className="mt-1 text-xs font-medium leading-5 opacity-70">Du lundi au vendredi, vague 1 (16h-18h) ou vague 2 (18h-20h), en centre ou en visioconférence.</span>
                                     </label>
                                     <label className={`flex cursor-pointer flex-col rounded-lg border p-3 transition-colors ${formData.type === 'HYBRID' ? 'border-primary bg-primary/10 text-primary' : 'border-[var(--foreground)]/10 bg-white/55 text-[var(--foreground)]/70 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <input type="radio" name="type" value="HYBRID" checked={formData.type === 'HYBRID'} onChange={handleChange} className="sr-only" />
-                                        <span className="text-sm font-black">Formation hybride matin</span>
-                                        <span className="mt-1 text-xs font-medium leading-5 opacity-70">Vague 3 du matin : cours, pratique guidée, plateforme et accompagnement.</span>
+                                        <span className="text-sm font-black">Formule Weekend Hybride</span>
+                                        <span className="mt-1 text-xs font-medium leading-5 opacity-70">Samedi et dimanche de 10h00 à 14h00 : structuration, pratique guidée format Club et ressources numériques.</span>
                                     </label>
                                 </div>
                             </div>
@@ -670,11 +708,19 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                             </div>
                         </div>
 
+                        {formData.courseMode === "ONLINE" ? (
+                        <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
+                            <h3 className="text-lg font-black text-[var(--foreground)]">Format en ligne</h3>
+                            <div className="rounded-lg border border-primary/15 bg-primary/10 p-3 text-xs leading-6 text-[var(--foreground)]/70">
+                                Vos séances se déroulent en visioconférence, où que vous soyez. Le lien de connexion vous est transmis depuis votre espace étudiant.
+                            </div>
+                        </div>
+                        ) : (
                         <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
                             <h3 className="text-lg font-black text-[var(--foreground)]">Centre de formation</h3>
                             <p className="text-xs text-[var(--foreground)]/60">Choisissez le centre qui correspond le mieux à votre parcours.</p>
                             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-                                {PLA_CENTERS.map((center) => (
+                                {availableCenters.map((center) => (
                                     <label key={center.id} className={`flex cursor-pointer flex-col rounded-lg border p-3 transition-colors ${formData.centerId === center.id ? 'border-primary bg-primary/10' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
                                         <div className="flex items-center gap-3">
                                             <input type="radio" name="centerId" value={center.id} checked={formData.centerId === center.id} onChange={handleChange} className="accent-primary" />
@@ -686,14 +732,15 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                                 ))}
                             </div>
                             <div className="rounded-lg border border-primary/15 bg-primary/10 p-3 text-xs leading-6 text-[var(--foreground)]/65">
-                                <strong className="text-[var(--foreground)]">{selectedCenter.name}:</strong> {selectedCenter.programs.map((program) => `${program.name} (${program.slots.join(", ")})`).join(" · ")}
+                                <strong className="text-[var(--foreground)]">{selectedCenter.name}:</strong> {selectedCenter.schedule.map((entry) => `${entry.days} — ${entry.program} (${entry.slots.join(", ")})`).join(" · ")}
                             </div>
                         </div>
+                        )}
 
                         <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
                             <h3 className="text-lg font-black text-[var(--foreground)]">Créneau horaire</h3>
                             <p className="text-xs text-[var(--foreground)]/60 mb-2">
-                                {formData.courseMode === "ONLINE" ? "La visioconférence se déroule tous les jours de 17h30 à 20h30." : isHybrid ? "Le parcours hybride du matin utilise la vague 3." : "Choisissez votre vague de soirée préférée."}
+                                {isHybrid ? "La Formule Weekend Hybride se déroule le samedi et le dimanche de 10h00 à 14h00." : formData.courseMode === "ONLINE" ? "En visioconférence, choisissez votre vague : 16h-18h ou 18h-20h." : "Choisissez votre vague en centre : 16h-18h ou 18h-20h."}
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 {availableTimeSlots.map(slot => (
@@ -708,7 +755,7 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
 
                         <div className="space-y-3 border-t border-[var(--foreground)]/10 pt-4">
                             <h3 className="text-lg font-black text-[var(--foreground)]">Jours de base</h3>
-                            <p className="text-xs text-[var(--foreground)]/60 mb-2">Choisissez vos jours de base ({planSessions[formData.planId]} jour{planSessions[formData.planId] > 1 ? 's' : ''} requis).</p>
+                            <p className="text-xs text-[var(--foreground)]/60 mb-2">Choisissez vos jours de base ({requiredDayCount} jour{requiredDayCount > 1 ? 's' : ''} requis).</p>
                             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                                 {availableDays.map(day => (
                                     <label key={day} className={`flex cursor-pointer items-center gap-2 rounded-lg border p-3 text-sm transition-colors ${formData.days.includes(day) ? 'border-primary bg-primary/10 text-primary' : fieldErrors.days ? 'border-red-500/50 bg-red-500/5' : 'border-[var(--foreground)]/10 bg-white/55 hover:border-[var(--foreground)]/20 dark:bg-white/5'}`}>
@@ -773,9 +820,9 @@ function RegisterFormContent({ systemSettings }: { systemSettings?: any }) {
                         <div className="space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-4 sm:p-5">
                             <h3 className="text-sm font-black text-primary">Vous allez payer</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold text-[var(--foreground)]/70">
-                                <div><span className="block opacity-50">Parcours</span>{isHybrid ? "Formation hybride matin" : formData.courseMode === "ONLINE" ? "Formation hybride en ligne" : "Formation hybride soirée"}</div>
+                                <div><span className="block opacity-50">Parcours</span>{isHybrid ? "Formule Weekend Hybride" : formData.courseMode === "ONLINE" ? "Formation Régulière en ligne" : "Formation Régulière en présentiel"}</div>
                                 <div><span className="block opacity-50">Formule</span>{selectedPlan.name}</div>
-                                <div><span className="block opacity-50">Centre</span>{selectedCenter.name}</div>
+                                <div><span className="block opacity-50">Centre</span>{formData.courseMode === "ONLINE" ? "Visioconférence" : selectedCenter.name}</div>
                                 <div><span className="block opacity-50">Moyen</span>{selectedPaymentMethod.name}</div>
                                 <div><span className="block opacity-50">Coût total</span>{formatFcfa(selectedPlanAmount)}</div>
                                 <div><span className="block opacity-50">Option</span>{formData.paymentOption === "fractionne" ? "Paiement en 2 fois" : "Paiement total"}</div>

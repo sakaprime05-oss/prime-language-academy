@@ -5,7 +5,7 @@ export const siteConfig = {
   name: "Prime Language Academy",
   shortName: "Prime Academy",
   description:
-    "Formation Hybride d'anglais à Abidjan Cocody avec deux centres, Programme 6 et Poincaré, visioconférence, méthode ISO+, English Club, test de niveau et accompagnement personnalisé.",
+    "Cours d'anglais à Abidjan Cocody: Formation Régulière, Club d'Anglais et Formule Weekend Hybride, en présentiel dans nos deux centres (Angré 8e Tranche et 2 Plateaux Vallon) ou en visioconférence. Méthode ISO+, modules ESP, test de niveau gratuit.",
   url: "https://primelangageacademy.com",
   ogImage: "https://primelangageacademy.com/icon-512x512.png",
   links: {

@@ -5,21 +5,13 @@ import { useState, useEffect } from "react";
 import { Download } from "lucide-react";
 import { LogoMark } from "@/components/logo";
 import ThemeToggle from "@/components/ThemeToggle";
-import { PLA_CENTERS, PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_FAQ, PLA_HYBRID_TIME_SLOT, PLA_ONLINE_TIME_SLOT, PLA_PLANS, PLA_SESSION, PLA_TIME_SLOTS, formatFcfa } from "@/lib/pla-program";
+import { PLA_CENTERS, PLA_CLUB_CAPACITY, PLA_CYCLES, PLA_ESP, PLA_FAQ, PLA_LEVEL_PATH, PLA_LEVEL_PROMISE, PLA_ONLINE_CENTER, PLA_PRICING_TABLE, PLA_SESSION, PLA_TIME_SLOTS, PLA_WEEKEND_TIME_SLOT, formatFcfa } from "@/lib/pla-program";
 
 /* ── tiny helpers ── */
-const PLANS = [
-  ...PLA_PLANS.map((plan) => ({ ...plan, freq: plan.shortFreq, price: formatFcfa(plan.price).replace(" FCFA", "") })),
-];
+const PRICING_TABS = PLA_PRICING_TABLE.map((entry) => ({ id: entry.id, title: entry.title, subtitle: entry.subtitle }));
 
-const CLUB_PLANS = [
-  ...PLA_CLUB_PLANS.map((plan, index) => ({
-    ...plan,
-    freq: plan.shortFreq,
-    price: formatFcfa(plan.price).replace(" FCFA", ""),
-    label: ["Social", "Connect", "Network", "Executive", "Elite", "Founder"][index],
-  })),
-];
+const registerHrefFor = (program: string, planId: string) =>
+  program === "CLUB" ? "/register-club" : program === "WEEKEND" ? "/register?path=hybrid" : `/register?plan=${planId}`;
 
 const MARQUEE_WORDS = ["Speaking","Confidence","Fluency","Excellence","Bilinguisme","Impact","Immersion","Mastery","Progress","Growth","Networking","Community"];
 const SESSION_START_LABEL = PLA_SESSION.dates.split(" - ")[0];
@@ -27,7 +19,7 @@ const SESSION_START_LABEL = PLA_SESSION.dates.split(" - ")[0];
 const WHY = [
   { n:"01", title:"Méthode ISO+", desc:"Input → Structure → Output → Automatisation. Une approche pratique orientée communication — votre cerveau pense directement en anglais." },
   { n:"02", title:"Formateurs experts", desc:"Cadre professionnel et dynamique. Suivi personnalisé, corrections actives, mentorat continu pour chaque apprenant." },
-  { n:"03", title:"Flexibilité totale", desc:"1 à 6 séances par semaine. Possibilité d'accélérer sa progression. Rattrapage possible le même jour sur une autre vague." },
+  { n:"03", title:"Flexibilité totale", desc:"2, 3 ou 4 séances par semaine, en centre, en visioconférence ou en Formule Weekend Hybride. Rattrapage possible sur une autre vague." },
   { n:"04", title:"Immersion 100%", desc:"Environnement 100% immersif. Forte pratique orale dès le début pour parler avec confiance, spontanéité et efficacité." },
 ];
 
@@ -48,8 +40,9 @@ const formatArticleDate = (value: string) =>
 
 export default function ClientLanding({ session, systemSettings, latestArticles = [] }: { session: any, systemSettings?: any, latestArticles?: LandingArticle[] }) {
   const [scrolled, setScrolled] = useState(false);
-  const [activePlan, setActivePlan] = useState("immersion");
-  const [pricingMode, setPricingMode] = useState<"formation"|"club">("formation");
+  const [activePlan, setActivePlan] = useState("reg-pres-3");
+  const [pricingMode, setPricingMode] = useState<string>(PRICING_TABS[0].id);
+  const activePricing = PLA_PRICING_TABLE.find((entry) => entry.id === pricingMode) || PLA_PRICING_TABLE[0];
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 40);
@@ -125,7 +118,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
             </h1>
 
             <p className="landing-hero-copy" style={{ fontSize:17, lineHeight:1.75, color:"var(--muted-foreground)", maxWidth:600, marginBottom:44, marginLeft:"auto", marginRight:"auto" }}>
-              Prime Language Academy accompagne professionnels, étudiants et entrepreneurs francophones vers une maîtrise active de l'anglais grâce à la Formation Hybride, au suivi et à l'immersion.
+              Prime Language Academy accompagne professionnels, étudiants et entrepreneurs francophones vers une maîtrise active de l'anglais grâce à la Formation Régulière, au Club d'Anglais et à la Formule Weekend Hybride.
             </p>
 
             <div className="landing-hero-actions" style={{ display:"flex", gap:16, flexWrap:"wrap", justifyContent:"center" }}>
@@ -229,7 +222,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
               <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px", background:"var(--surface)", backdropFilter:"blur(16px)" }}>
                 <div style={{ width:50, height:50, borderRadius:12, background:"rgba(231,22,42,0.1)", color:"#E7162A", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, marginBottom:24 }}>💻</div>
                 <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>En Ligne (100% Live)</h3>
-                <p style={{ color:"var(--muted-foreground)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Suivez la Formation Hybride en visioconférence, tous les jours de 17h30 à 20h30. Interactivité préservée, corrections en direct et gain de temps dans les transports.</p>
+                <p style={{ color:"var(--muted-foreground)", lineHeight:1.7, fontSize:15, marginBottom:24 }}>Suivez la Formation Régulière ou le Club d'Anglais en visioconférence, du lundi au vendredi de 16h à 18h ou de 18h à 20h, et la Formule Weekend Hybride le samedi et le dimanche de 10h à 14h. Interactivité préservée, corrections en direct et gain de temps dans les transports.</p>
                 <div style={{ fontSize:12, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#1dcaff" }}>Inscriptions ouvertes</div>
               </div>
             )}
@@ -305,7 +298,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
             {[
               { icon:"🧠", t:"Pédagogie claire", d:"Structure progressive et adaptée aux francophones" },
               { icon:"🤝", t:"Accompagnement humain", d:"Formateurs engagés, pas des algorithmes" },
-              { icon:"⚡", t:"Formats flexibles", d:"1 à 6 séances selon votre rythme de vie" },
+              { icon:"⚡", t:"Formats flexibles", d:"2, 3 ou 4 séances par semaine, ou 4h le weekend" },
               { icon:"🌍", t:"Maîtrise active", d:"Priorité à l'expression orale et à la confiance" },
             ].map(({icon,t,d}) => (
               <div key={t} style={{ border:"1px solid rgba(231,22,42,0.1)", borderRadius:16, padding:"24px 20px", background:"var(--surface)" }}>
@@ -324,61 +317,125 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
           <div style={{ textAlign:"center", marginBottom:56 }}>
             <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", marginBottom:16 }}>Tarification</div>
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.2rem,4vw,3.2rem)", fontWeight:900, margin:"0 0 16px" }}>
-              Grille <em style={{ color:"#E7162A" }}>« À la carte »</em>
+              Grille <em style={{ color:"#E7162A" }}>officielle 2026</em>
             </h2>
             <p style={{ color:"var(--muted-foreground)", fontSize:15, marginBottom:40 }}>Frais d'inscription offerts (0 FCFA) pour toutes les offres</p>
 
             {/* Toggle Switch */}
-            <div style={{ display:"inline-flex", background:"var(--surface)", border:"1px solid rgba(231,22,42,0.2)", borderRadius:100, padding:6, position:"relative" }}>
-              <button onClick={() => setPricingMode("formation")}
-                style={{ position:"relative", zIndex:1, padding:"12px 28px", borderRadius:100, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: pricingMode==="formation" ? "#080808" : "var(--muted-foreground)", transition:"color 0.3s" }}>
-                Formation Hybride (2 mois)
-              </button>
-              <button onClick={() => setPricingMode("club")}
-                style={{ position:"relative", zIndex:1, padding:"12px 28px", borderRadius:100, fontSize:13, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: pricingMode==="club" ? "#080808" : "var(--muted-foreground)", transition:"color 0.3s" }}>
-                English Club (2 mois)
-              </button>
-              {/* Highlight Background */}
-              <div style={{
-                position:"absolute", top:6, left:6, bottom:6, width:"calc(50% - 6px)",
-                background:"linear-gradient(135deg,#E7162A,#FF4D5E)", borderRadius:100,
-                transition:"transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                transform: pricingMode==="club" ? "translateX(100%)" : "translateX(0)",
-                boxShadow:"0 0 20px rgba(231,22,42,0.2)"
-              }}/>
+            <div style={{ display:"inline-flex", flexWrap:"wrap", justifyContent:"center", gap:8, background:"var(--surface)", border:"1px solid rgba(231,22,42,0.2)", borderRadius:100, padding:6 }}>
+              {PRICING_TABS.map((tab) => (
+                <button key={tab.id} onClick={() => setPricingMode(tab.id)}
+                  style={{
+                    padding:"12px 24px", borderRadius:100, fontSize:12, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase",
+                    color: pricingMode===tab.id ? "#fff" : "var(--muted-foreground)",
+                    background: pricingMode===tab.id ? "linear-gradient(135deg,#E7162A,#FF4D5E)" : "transparent",
+                    transition:"all 0.3s",
+                  }}>
+                  {tab.title}
+                </button>
+              ))}
             </div>
+            <p style={{ marginTop:14, fontSize:12, color:"var(--muted-foreground)", letterSpacing:"0.06em" }}>{activePricing.subtitle}</p>
           </div>
 
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))", gap:16 }}>
-            {(pricingMode === "formation" ? PLANS : CLUB_PLANS).map(p => (
-              <div key={p.id}
-                onClick={() => setActivePlan(p.id)}
-                style={{
-                  border: activePlan===p.id ? "1px solid #E7162A" : "1px solid rgba(231,22,42,0.12)",
-                  borderRadius:20, padding:"28px 20px", cursor:"pointer",
-                  background: activePlan===p.id ? "rgba(231,22,42,0.08)" : "var(--surface)",
-                  backdropFilter:"blur(16px)",
-                  boxShadow: activePlan===p.id ? "0 0 30px rgba(231,22,42,0.15)" : "none",
-                  transition:"all 0.25s", position:"relative",
-                }}>
-                {p.top && <div style={{ position:"absolute", top:-10, left:"50%", transform:"translateX(-50%)", background:"#E7162A", color:"#080808", fontSize:10, fontWeight:800, padding:"4px 12px", borderRadius:100, textTransform:"uppercase", letterSpacing:"0.12em", whiteSpace:"nowrap" }}>Le Summum</div>}
-                <div style={{ fontSize:13, fontWeight:700, color: activePlan===p.id ? "#E7162A" : "var(--foreground)", marginBottom:6 }}>{p.label}</div>
-                <div style={{ fontSize:11, color:"var(--muted-foreground)", marginBottom:20, letterSpacing:"0.08em" }}>{p.freq}</div>
-                <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:900, color: activePlan===p.id ? "#E7162A" : "var(--foreground)" }}>{p.price}</div>
-                <div style={{ fontSize:11, color:"var(--muted-foreground)", marginTop:2 }}>FCFA / 2 mois</div>
+          <div style={{ display:"flex", flexDirection:"column", gap:40 }}>
+            {activePricing.rows.map((row) => (
+              <div key={row.program}>
+                <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", flexWrap:"wrap", gap:8, marginBottom:18 }}>
+                  <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:900, margin:0 }}>{row.name}</h3>
+                  <Link href={registerHrefFor(row.program, row.plans[0].id)} style={{ fontSize:12, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color:"#E7162A", textDecoration:"underline", textUnderlineOffset:4 }}>
+                    S'inscrire
+                  </Link>
+                </div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))", gap:16 }}>
+                  {row.plans.map(p => (
+                    <div key={p.id}
+                      onClick={() => setActivePlan(p.id)}
+                      style={{
+                        border: activePlan===p.id ? "1px solid #E7162A" : "1px solid rgba(231,22,42,0.12)",
+                        borderRadius:20, padding:"28px 20px", cursor:"pointer",
+                        background: activePlan===p.id ? "rgba(231,22,42,0.08)" : "var(--surface)",
+                        backdropFilter:"blur(16px)",
+                        boxShadow: activePlan===p.id ? "0 0 30px rgba(231,22,42,0.15)" : "none",
+                        transition:"all 0.25s", position:"relative",
+                      }}>
+                      {p.top && <div style={{ position:"absolute", top:-10, left:"50%", transform:"translateX(-50%)", background:"#E7162A", color:"#fff", fontSize:10, fontWeight:800, padding:"4px 12px", borderRadius:100, textTransform:"uppercase", letterSpacing:"0.12em", whiteSpace:"nowrap" }}>Le plus choisi</div>}
+                      <div style={{ fontSize:13, fontWeight:700, color: activePlan===p.id ? "#E7162A" : "var(--foreground)", marginBottom:6 }}>{p.label}</div>
+                      <div style={{ fontSize:11, color:"var(--muted-foreground)", marginBottom:20, letterSpacing:"0.08em" }}>{p.shortFreq}</div>
+                      <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:900, color: activePlan===p.id ? "#E7162A" : "var(--foreground)" }}>{formatFcfa(p.price).replace(" FCFA", "")}</div>
+                      <div style={{ fontSize:11, color:"var(--muted-foreground)", marginTop:2 }}>FCFA / 2 mois</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
 
           <div style={{ textAlign:"center", marginTop:48, display:"flex", flexDirection:"column", alignItems:"center", gap:16 }}>
-            <Link href={pricingMode === "formation" ? "/register" : "/register-club"} className="btn-primary" style={{ textDecoration:"none", display:"inline-block" }}>
-              {pricingMode === "formation" ? "Réserver ma place →" : "Rejoindre le cercle →"}
+            <Link href="/register" className="btn-primary" style={{ textDecoration:"none", display:"inline-block" }}>
+              Réserver ma place →
             </Link>
-            {pricingMode === "club" && (
-              <Link href="/english-club" style={{ color:"var(--muted-foreground)", fontSize:13, letterSpacing:"0.08em", textTransform:"uppercase", fontWeight:600, textDecoration:"underline", textUnderlineOffset:4 }}>
-                Découvrir en détail le Club
-              </Link>
-            )}
+            <Link href="/english-club" style={{ color:"var(--muted-foreground)", fontSize:13, letterSpacing:"0.08em", textTransform:"uppercase", fontWeight:600, textDecoration:"underline", textUnderlineOffset:4 }}>
+              Découvrir en détail le Club d'Anglais
+            </Link>
+            <p style={{ maxWidth:640, fontSize:12, lineHeight:1.8, color:"var(--muted-foreground)" }}>
+              Frais d'inscription offerts (0 FCFA). Le solde doit être réglé avant le début officiel de la session pour verrouiller votre place. Aucun frais caché.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ PROGRESSION & CYCLES ══════════ */}
+      <section style={{ padding:"100px 2rem" }}>
+        <div style={{ maxWidth:1100, margin:"0 auto" }}>
+          <div style={{ textAlign:"center", marginBottom:48 }}>
+            <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", marginBottom:16 }}>Progression</div>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.2rem,4vw,3.2rem)", fontWeight:900, margin:"0 0 16px" }}>
+              De Débutant à <em style={{ color:"#E7162A" }}>Mastery Professionnel</em>
+            </h2>
+            <p style={{ color:"var(--muted-foreground)", fontSize:15, maxWidth:760, margin:"0 auto", lineHeight:1.8 }}>{PLA_LEVEL_PROMISE}</p>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:16, marginBottom:48 }}>
+            {PLA_LEVEL_PATH.map((level, index) => (
+              <div key={level.id} style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"28px 24px", background:"var(--surface)" }}>
+                <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:10 }}>Étape {index + 1}</div>
+                <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:900, marginBottom:10 }}>{level.name}</div>
+                <p style={{ fontSize:13, lineHeight:1.7, color:"var(--muted-foreground)", margin:0 }}>{level.summary}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"32px", background:"var(--surface)" }}>
+            <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:16 }}>6 sessions de 2 mois par an</div>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:10 }}>
+              {PLA_CYCLES.map((cycle) => (
+                <span key={cycle.id} style={{ padding:"8px 16px", borderRadius:100, border:"1px solid rgba(231,22,42,0.2)", fontSize:12, fontWeight:700, color: cycle.id === "nov-dec" ? "#E7162A" : "var(--muted-foreground)" }}>
+                  {cycle.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ ESP ══════════ */}
+      <section style={{ padding:"100px 2rem", background:"rgba(231,22,42,0.02)" }}>
+        <div style={{ maxWidth:1100, margin:"0 auto" }}>
+          <div style={{ textAlign:"center", marginBottom:48 }}>
+            <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#E7162A", marginBottom:16 }}>{PLA_ESP.subtitle}</div>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.2rem,4vw,3.2rem)", fontWeight:900, margin:"0 0 16px" }}>
+              Apprenez à <em style={{ color:"#E7162A" }}>exercer votre métier</em> en anglais
+            </h2>
+            <p style={{ color:"var(--muted-foreground)", fontSize:15, maxWidth:760, margin:"0 auto 10px", lineHeight:1.8 }}>{PLA_ESP.intro}</p>
+            <p style={{ color:"#E7162A", fontSize:13, fontWeight:700 }}>{PLA_ESP.access}</p>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))", gap:14 }}>
+            {PLA_ESP.modules.map((module) => (
+              <div key={module.id} style={{ border:"1px solid rgba(231,22,42,0.12)", borderRadius:16, padding:"20px", background:"var(--surface)" }}>
+                <div style={{ fontSize:22, marginBottom:8 }}>{module.emoji}</div>
+                <div style={{ fontSize:14, fontWeight:800, marginBottom:4 }}>{module.name}</div>
+                <div style={{ fontSize:12, color:"var(--muted-foreground)", fontStyle:"italic" }}>{module.en}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -396,15 +453,15 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
           ))}
           <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px 32px", background:"var(--surface)", backdropFilter:"blur(16px)", overflow:"hidden", position:"relative" }}>
             <div style={{ position:"absolute", top:-20, right:-20, width:100, height:100, borderRadius:"50%", background:"rgba(231,22,42,0.05)", filter:"blur(30px)" }}/>
-            <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:12 }}>{PLA_HYBRID_TIME_SLOT.label}</div>
-            <div style={{ fontFamily:"'Playfair Display',serif", fontSize:36, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>{PLA_HYBRID_TIME_SLOT.time}</div>
-            <div style={{ fontSize:13, color:"var(--muted-foreground)" }}>{PLA_HYBRID_TIME_SLOT.desc}</div>
+            <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:12 }}>{PLA_WEEKEND_TIME_SLOT.label}</div>
+            <div style={{ fontFamily:"'Playfair Display',serif", fontSize:36, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>{PLA_WEEKEND_TIME_SLOT.time}</div>
+            <div style={{ fontSize:13, color:"var(--muted-foreground)" }}>{PLA_WEEKEND_TIME_SLOT.desc}</div>
           </div>
           <div style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"40px 32px", background:"var(--surface)", backdropFilter:"blur(16px)", overflow:"hidden", position:"relative" }}>
             <div style={{ position:"absolute", top:-20, right:-20, width:100, height:100, borderRadius:"50%", background:"rgba(231,22,42,0.05)", filter:"blur(30px)" }}/>
-            <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:12 }}>{PLA_ONLINE_TIME_SLOT.label}</div>
-            <div style={{ fontFamily:"'Playfair Display',serif", fontSize:36, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>{PLA_ONLINE_TIME_SLOT.time}</div>
-            <div style={{ fontSize:13, color:"var(--muted-foreground)" }}>{PLA_ONLINE_TIME_SLOT.desc}</div>
+            <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:12 }}>{PLA_ONLINE_CENTER.name}</div>
+            <div style={{ fontFamily:"'Playfair Display',serif", fontSize:36, fontWeight:900, color:"var(--foreground)", marginBottom:12 }}>{"16h-18h / 18h-20h"}</div>
+            <div style={{ fontSize:13, color:"var(--muted-foreground)" }}>{PLA_ONLINE_CENTER.programs + " Du lundi au vendredi, plus la Formule Weekend Hybride le samedi et le dimanche."}</div>
           </div>
         </div>
       </section>
@@ -455,7 +512,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
               { icon:"📱", title:"Accès plateforme", desc:"Accès immédiat à notre plateforme de formation en ligne" },
               { icon:"📚", title:"Documentation", desc:"Documentation pédagogique complète disponible dès le 1er jour" },
               { icon:"🚀", title:"Préformation", desc:"Une séquence de préformation pour bien démarrer avant le début officiel" },
-              { icon:"💻", title:"Séances Visio", desc:"Accompagnement en visioconférence dès votre inscription et formation en ligne de 17h30 à 20h30" },
+              { icon:"💻", title:"Séances Visio", desc:"Accompagnement en visioconférence dès votre inscription, avec nos consultants et formateurs" },
               { icon:"🤝", title:"Accompagnement", desc:"Nos consultants et formateurs vous accompagnent immédiatement" },
             ].map(({icon,title,desc}) => (
               <div key={title} style={{ border:"1px solid rgba(231,22,42,0.15)", borderRadius:20, padding:"32px 24px", background:"var(--surface)", backdropFilter:"blur(16px)", textAlign:"center" }}>
@@ -555,7 +612,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
             Prêt à débloquer<br/><em style={{ color:"#E7162A" }}>votre potentiel ?</em>
           </h2>
           <p style={{ color:"var(--muted-foreground)", fontSize:16, marginBottom:48, maxWidth:480, marginLeft:"auto", marginRight:"auto", lineHeight:1.7 }}>
-            Présentiel à Programme 6 et Poincaré · En ligne 17h30 - 20h30<br/>
+            Présentiel à Programme 6 et Poincaré · En ligne 16h-18h / 18h-20h · Weekend 10h-14h<br/>
             <a href="https://wa.me/2250161337864?text=Bonjour%20!%20Je%20souhaite%20avoir%20des%20informations%20sur%20Prime%20Language%20Academy%20%F0%9F%8E%93" target="_blank" rel="noopener noreferrer" style={{ color:"#25D366", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:6, marginTop:8 }}>
               <svg width="18" height="18" viewBox="0 0 32 32" fill="none"><path d="M16 3C9.373 3 4 8.373 4 15c0 2.385.668 4.61 1.83 6.5L4 29l7.7-1.81A12.94 12.94 0 0016 28c6.627 0 12-5.373 12-13S22.627 3 16 3z" fill="#25D366"/><path d="M21.04 18.16c-.28-.14-1.664-.82-1.92-.912-.256-.096-.44-.14-.628.14-.188.28-.72.912-.88 1.1-.164.184-.324.208-.604.07-.28-.14-1.18-.436-2.248-1.388-.832-.74-1.392-1.656-1.556-1.936-.164-.28-.016-.432.124-.572.126-.124.28-.324.42-.488.14-.164.188-.28.28-.468.096-.188.048-.352-.024-.492-.068-.14-.628-1.512-.86-2.072-.228-.548-.456-.472-.628-.48l-.536-.008c-.188 0-.492.068-.748.352-.256.284-.98.956-.98 2.332 0 1.376 1.004 2.704 1.14 2.892.14.188 1.968 3.004 4.768 4.212.668.288 1.188.46 1.596.588.668.212 1.276.184 1.756.112.536-.08 1.664-.68 1.896-1.34.236-.656.236-1.22.168-1.34-.072-.12-.252-.188-.532-.328z" fill="white"/></svg>
               +225 01 61 33 78 64 · WhatsApp
@@ -594,7 +651,7 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Left — concept */}
             <div className="lg:row-span-2" style={{ border:"1px solid #E7162A", borderRadius:24, padding:"48px 40px", background:"rgba(231,22,42,0.04)", backdropFilter:"blur(16px)", boxShadow:"0 0 40px rgba(231,22,42,0.08)" }}>
-              <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:20 }}>Cercle prive · {PLA_CLUB_CAPACITY} membres max · B2 → C2</div>
+              <div style={{ fontSize:11, color:"#E7162A", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:20 }}>Cercle privé · {PLA_CLUB_CAPACITY} membres max · Niveau Autonome et +</div>
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:900, color:"#E7162A", marginBottom:20, lineHeight:1.2 }}>Un club social anglophone pour l'élite d'Abidjan</h3>
               <p style={{ color:"var(--muted-foreground)", lineHeight:1.85, fontSize:15, marginBottom:32 }}>
                 Pour ceux qui maîtrisent déjà l'anglais et veulent <strong style={{ color:"var(--foreground)" }}>le vivre au quotidien</strong>. Un cercle chic et connecté — cadres, entrepreneurs, créatifs, profils international — où la langue est un passeport social.
@@ -615,8 +672,8 @@ export default function ClientLanding({ session, systemSettings, latestArticles 
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                 {[
                   { step:"01", label:"Vous avez déjà le niveau B2+", sub:"Accès direct au Club" },
-                  { step:"02", label:"Vous débutez ?", sub:"Formation Hybride 2 mois → puis Club" },
-                  { step:"03", label:"Adhésion valable 2 mois", sub:"1 à 6 sessions / semaine" },
+                  { step:"02", label:"Vous débutez ?", sub:"Formation Régulière 2 mois → puis Club" },
+                  { step:"03", label:"Adhésion valable 2 mois", sub:"2, 3 ou 4 présences / semaine" },
                   { step:"04", label:"Espace membre privé inclus", sub:"Accès à la plateforme & forums" },
                 ].map(({step,label,sub}) => (
                   <div key={step} style={{ display:"flex", alignItems:"flex-start", gap:16, padding:"14px 0", borderBottom:"1px solid rgba(231,22,42,0.07)" }}>

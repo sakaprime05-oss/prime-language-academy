@@ -19,13 +19,13 @@ export async function getStudentPhase() {
     
     let sessionStartStr = settings?.currentSessionStart || PLA_SESSION.startDate;
     
-    if (sessionStartStr.toLowerCase().includes("juillet") || sessionStartStr.toLowerCase().includes("juin")) {
+    // Les anciennes sessions (avant le cycle courant) ou les valeurs non exploitables
+    // retombent systématiquement sur le cycle publié dans le livret des offres.
+    let startDate = new Date(sessionStartStr);
+    if (Number.isNaN(startDate.getTime()) || startDate < new Date(PLA_SESSION.startDate)) {
         sessionStartStr = PLA_SESSION.startDate;
-    } else if (sessionStartStr.toLowerCase().includes("avril")) {
-        sessionStartStr = "2026-04-11";
+        startDate = new Date(sessionStartStr);
     }
-
-    const startDate = new Date(sessionStartStr);
     
     if (isNaN(startDate.getTime())) {
         return "TRAINING"; // Sécurité par défaut

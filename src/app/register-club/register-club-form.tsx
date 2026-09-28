@@ -4,16 +4,25 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { registerUser } from "@/app/actions/auth-actions";
-import { PLA_CLUB_PLANS, formatFcfa } from "@/lib/pla-program";
+import { formatFcfa, getPlan, planSessionsPerWeek, plansFor, type PlaModeId } from "@/lib/pla-program";
 
-const memberships = [
-    { id: "loisir", name: "Social (1x/sem)", price: formatFcfa(PLA_CLUB_PLANS[0].price), amount: PLA_CLUB_PLANS[0].price },
-    { id: "essentiel", name: "Connect (2x/sem)", price: formatFcfa(PLA_CLUB_PLANS[1].price), amount: PLA_CLUB_PLANS[1].price },
-    { id: "equilibre", name: "Network (3x/sem)", price: formatFcfa(PLA_CLUB_PLANS[2].price), amount: PLA_CLUB_PLANS[2].price },
-    { id: "performance", name: "Executive (4x/sem)", price: formatFcfa(PLA_CLUB_PLANS[3].price), amount: PLA_CLUB_PLANS[3].price },
-    { id: "intensif", name: "Elite (5x/sem)", price: formatFcfa(PLA_CLUB_PLANS[4].price), amount: PLA_CLUB_PLANS[4].price },
-    { id: "immersion", name: "Founder (6x/sem)", price: formatFcfa(PLA_CLUB_PLANS[5].price), amount: PLA_CLUB_PLANS[5].price }
-];
+const CLUB_TIERS: Record<number, string> = { 2: "Connect", 3: "Network", 4: "Executive" };
+
+function clubMemberships(mode: PlaModeId) {
+    return plansFor("CLUB", mode).map((plan) => ({
+        id: plan.id,
+        name: `${CLUB_TIERS[plan.sessions] || "Membership"} (${plan.shortFreq})`,
+        price: formatFcfa(plan.price),
+        amount: plan.price,
+        detail: plan.freq,
+    }));
+}
+
+function equivalentMembership(currentPlanId: string, mode: PlaModeId) {
+    const catalog = plansFor("CLUB", mode);
+    const sessions = planSessionsPerWeek(currentPlanId);
+    return (catalog.find((plan) => plan.sessions === sessions) || catalog[0]).id;
+}
 
 const paymentMethods = [
     { id: "WAVE", name: "Wave", detail: "Paiement via checkout sécurisé Paystack" },
@@ -21,7 +30,7 @@ const paymentMethods = [
     { id: "CARD", name: "Carte bancaire", detail: "Visa ou Mastercard via Paystack" },
 ];
 
-const levels = ["Intermédiaire (B1/B2)", "Avancé (C1/C2)"];
+const levels = ["Autonome", "Mastery", "Mastery Professionnel"];
 const steps = ["Identité", "Profil", "Membership", "Validation"];
 const requiredPasswordLength = 8;
 
@@ -36,7 +45,9 @@ const communes = [
     "Yopougon", "Autre"
 ];
 
-export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initialLevel = "" }: { isWaitlistMode: boolean; remainingSeats: number; initialLevel?: string }) {
+export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initialLevel = "", initialPlanId }: { isWaitlistMode: boolean; remainingSeats: number; initialLevel?: string; initialPlanId?: string }) {
+    const initialPlan = initialPlanId ? getPlan(initialPlanId) : undefined;
+    const initialMode: PlaModeId = initialPlan?.mode === "ONLINE" ? "ONLINE" : "PRESENTIEL";
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -53,14 +64,16 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
         level: initialLevel,
         commune: "",
         communeOther: "",
-        planId: "essentiel",
+        courseMode: initialMode as PlaModeId,
+        planId: initialPlan?.id || clubMemberships(initialMode)[0].id,
         paymentOption: "fractionne",
         paymentMethod: "WAVE",
         agreement: false,
         signature: ""
     });
 
-    const selectedMembership = memberships.find((plan) => plan.id === formData.planId) || memberships[1];
+    const memberships = clubMemberships(formData.courseMode);
+    const selectedMembership = memberships.find((plan) => plan.id === formData.planId) || memberships[0];
     const immediateAmount = formData.paymentOption === "fractionne" ? selectedMembership.amount * 0.5 : selectedMembership.amount;
     const reservationAmount = selectedMembership.amount - immediateAmount;
     const selectedPaymentMethod = paymentMethods.find((method) => method.id === formData.paymentMethod) || paymentMethods[0];
@@ -145,6 +158,7 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
 
         const onboardingData = {
             type: "CLUB",
+            courseMode: formData.courseMode,
             profession: formData.profession,
             company: formData.company,
             level: formData.level,
@@ -283,7 +297,7 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/70 mb-2">Niveau actuel</label>
                         <p className="mb-3 rounded-xl border border-secondary/15 bg-secondary/10 p-3 text-xs font-bold leading-6 text-[var(--foreground)]/65">
-                            Le Club est pensé pour les profils déjà autonomes en anglais. Si vous êtes débutant ou encore hésitant, la Formation Hybride reste le meilleur point d'entrée.
+                            Le Club est pensé pour les profils déjà autonomes en anglais (English Only Environment). Si vous êtes débutant ou encore hésitant, la Formation Régulière reste le meilleur point d'entrée.
                         </p>
                         <div className="grid grid-cols-1 gap-2">
                             {levels.map(lvl => (
@@ -316,6 +330,27 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                             Le Club est complet. Vous pouvez continuer pour rejoindre la liste d'attente, sans paiement immédiat.
                         </div>
                     )}
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Format des sessions</label>
+                    <div className="grid grid-cols-2 gap-3">
+                        {([
+                            { id: "PRESENTIEL" as PlaModeId, name: "Présentiel", detail: "Angré 8e Tranche ou Poincaré" },
+                            { id: "ONLINE" as PlaModeId, name: "En ligne", detail: "Visioconférence" },
+                        ]).map((mode) => (
+                            <button type="button" key={mode.id} onClick={() => setFormData(prev => ({
+                                ...prev,
+                                courseMode: mode.id,
+                                planId: equivalentMembership(prev.planId, mode.id),
+                            }))}
+                                className={`p-4 rounded-xl border text-center transition-all ${
+                                    formData.courseMode === mode.id
+                                    ? 'bg-secondary/10 border-secondary text-secondary'
+                                    : 'border-[var(--foreground)]/10 text-[var(--foreground)]/70 hover:border-secondary/30'
+                                }`}>
+                                <span className="block text-xs font-black">{mode.name}</span>
+                                <span className="mt-1 block text-[10px] font-bold opacity-60">{mode.detail}</span>
+                            </button>
+                        ))}
+                    </div>
                     <label className="block text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/50 mb-2">Choisissez votre Membership</label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {memberships.map(plan => (
@@ -334,6 +369,7 @@ export default function RegisterClubForm({ isWaitlistMode, remainingSeats, initi
                                 }`}>
                                 <div className={`text-xs font-black mb-1 ${formData.planId === plan.id ? 'text-secondary' : 'text-[var(--foreground)]/70'}`}>{plan.name}</div>
                                 <div className={`text-[10px] font-bold ${formData.planId === plan.id ? 'text-secondary/80' : 'text-[var(--foreground)]/40'}`}>{plan.price}</div>
+                                <div className="mt-1 text-[10px] font-medium text-[var(--foreground)]/40">{plan.detail}</div>
                             </button>
                         ))}
                     </div>

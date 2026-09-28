@@ -49,7 +49,7 @@ export default async function RegisterPage() {
                   Session {PLA_SESSION.dates}
                 </p>
                 <h1 className="font-[var(--font-lexend)] text-[2.4rem] font-black leading-[0.98] tracking-normal sm:text-5xl">
-                  Rejoignez la formation hybride qui vous fait parler anglais.
+                  Rejoignez la formation qui vous fait parler anglais.
                 </h1>
                 <p className="mt-4 text-sm font-medium leading-7 text-white/68 sm:text-base">
                   Créez votre compte, choisissez votre rythme, puis sécurisez votre place en quelques minutes.
@@ -62,8 +62,8 @@ export default async function RegisterPage() {
                   <p className="mt-1 text-[10px] font-black uppercase leading-4 tracking-[0.12em] text-white/55">semaines</p>
                 </div>
                 <div className="rounded-lg border border-white/10 bg-white/[0.08] p-3">
-                  <p className="text-2xl font-black text-primary">6</p>
-                  <p className="mt-1 text-[10px] font-black uppercase leading-4 tracking-[0.12em] text-white/55">formules</p>
+                  <p className="text-2xl font-black text-primary">3</p>
+                  <p className="mt-1 text-[10px] font-black uppercase leading-4 tracking-[0.12em] text-white/55">rythmes</p>
                 </div>
                 <div className="rounded-lg border border-white/10 bg-white/[0.08] p-3">
                   <p className="text-2xl font-black text-primary">0</p>
@@ -108,7 +108,7 @@ export default async function RegisterPage() {
             </Link>
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary">Session {PLA_SESSION.dates}</p>
             <p className="mt-1 text-sm font-bold leading-6 text-[var(--foreground)]/70">
-              Inscrivez-vous à la Formation Hybride et sécurisez votre place en quelques minutes.
+              Inscrivez-vous à la Formation Régulière ou à la Formule Weekend Hybride et sécurisez votre place en quelques minutes.
             </p>
           </div>
 
@@ -127,16 +127,16 @@ export default async function RegisterPage() {
 
           <div className="mb-4 grid grid-cols-1 gap-2 sm:mb-6 sm:grid-cols-3 sm:gap-3">
             <div className="rounded-lg border border-primary/25 bg-primary/10 p-3">
-              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary">Formation Hybride</p>
-              <p className="mt-1 text-xs font-bold leading-5 text-[var(--foreground)]/70">Soirée en centre ou visioconférence.</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary">Formation Régulière</p>
+              <p className="mt-1 text-xs font-bold leading-5 text-[var(--foreground)]/70">16h-18h ou 18h-20h, en centre ou en visio.</p>
             </div>
             <Link href="/register?path=hybrid" className="rounded-lg border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-3 transition-colors hover:border-primary/30 hover:bg-primary/10">
-              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[var(--foreground)]/60">Matin</p>
-              <p className="mt-1 text-xs font-bold leading-5 text-[var(--foreground)]/60">Vague 3, pratique guidée et suivi.</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[var(--foreground)]/60">Weekend Hybride</p>
+              <p className="mt-1 text-xs font-bold leading-5 text-[var(--foreground)]/60">Samedi & dimanche, 10h-14h · 50 000 FCFA.</p>
             </Link>
             <Link href="/register-club" className="rounded-lg border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-3 transition-colors hover:border-primary/30 hover:bg-primary/10">
-              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[var(--foreground)]/60">English Club</p>
-              <p className="mt-1 text-xs font-bold leading-5 text-[var(--foreground)]/60">Pratique orale pour niveau fort.</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[var(--foreground)]/60">Club d'Anglais</p>
+              <p className="mt-1 text-xs font-bold leading-5 text-[var(--foreground)]/60">Pratique orale dès le niveau Autonome.</p>
             </Link>
           </div>
 

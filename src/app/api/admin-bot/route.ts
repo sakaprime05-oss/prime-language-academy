@@ -6,9 +6,11 @@ import {
     PLA_CENTERS,
     PLA_CLUB_CAPACITY,
     PLA_CLUB_PLANS,
-    PLA_HYBRID_TIME_SLOT,
-    PLA_ONLINE_TIME_SLOT,
+    PLA_CYCLES,
+    PLA_ESP,
+    PLA_ONLINE_CENTER,
     PLA_PLANS,
+    PLA_WEEKEND_TIME_SLOT,
     PLA_REGULAR_TIME_SLOTS,
     PLA_SESSION,
 } from "@/lib/pla-program";
@@ -63,14 +65,20 @@ function publicLinks() {
     };
 }
 
-function planSummary() {
-    return PLA_PLANS.map((plan) => ({
+function planSummary(plans: typeof PLA_PLANS | typeof PLA_CLUB_PLANS) {
+    return plans.map((plan) => ({
         id: plan.id,
         label: plan.label,
+        mode: plan.mode,
         frequency: plan.freq,
         price: plan.price,
         price_label: formatFcfa(plan.price),
     }));
+}
+
+function priceRangeOf(plans: typeof PLA_PLANS | typeof PLA_CLUB_PLANS) {
+    const prices = plans.map((plan) => plan.price);
+    return `${formatFcfa(Math.min(...prices))} - ${formatFcfa(Math.max(...prices))}`;
 }
 
 async function getClubSeatStats() {
@@ -93,18 +101,20 @@ async function getClubSeatStats() {
 
 async function buildProgramInfo() {
     const clubSeats = await getClubSeatStats();
-    const plans = planSummary();
-    const priceRange = `${formatFcfa(PLA_PLANS[0].price)} - ${formatFcfa(PLA_PLANS[PLA_PLANS.length - 1].price)}`;
+    const regularPlans = PLA_PLANS.filter((plan) => plan.program === "REGULIERE");
+    const weekendPlans = PLA_PLANS.filter((plan) => plan.program === "WEEKEND");
+    const regularRange = priceRangeOf(regularPlans);
+    const clubRange = priceRangeOf(PLA_CLUB_PLANS);
     const centers = PLA_CENTERS.map((center) => ({
         name: center.name,
         place: center.place,
         address: center.address,
         highlight: center.highlight,
         map_url: center.mapUrl,
-        programs: center.programs.map((program) => ({
-            name: program.name,
-            slots: program.slots,
-            schedule: program.schedule,
+        schedule: center.schedule.map((entry) => ({
+            days: entry.days,
+            program: entry.program,
+            slots: entry.slots,
         })),
     }));
 
@@ -116,33 +126,42 @@ async function buildProgramInfo() {
             start_date: PLA_SESSION.startDate,
             end_date: PLA_SESSION.endDate,
             duration: PLA_SESSION.duration,
+            cycles: PLA_CYCLES.map((cycle) => cycle.label),
         },
         offers: {
-            formation_hybride: {
-                label: "Formation Hybride",
-                description: "Parcours principal pour apprendre, structurer l'anglais et progresser avec supports, plateforme, suivi et pratique guidée.",
-                price_range: priceRange,
-                plans,
+            formation_reguliere: {
+                label: "Formation Régulière",
+                description:
+                    "Parcours structuré pour tous les niveaux: grammaire, vocabulaire, compréhension orale et écrite, expression orale. Base solide pour l'IELTS et le TOEFL.",
+                price_range: regularRange,
+                plans: planSummary(regularPlans),
                 schedules: {
-                    evening: PLA_REGULAR_TIME_SLOTS.map((slot) => `${slot.label}: ${slot.time}`),
-                    morning: `${PLA_HYBRID_TIME_SLOT.label}: ${PLA_HYBRID_TIME_SLOT.time}`,
-                    online: `${PLA_ONLINE_TIME_SLOT.label}: ${PLA_ONLINE_TIME_SLOT.time}`,
+                    presentiel: PLA_REGULAR_TIME_SLOTS.map((slot) => `${slot.label}: ${slot.time}`),
+                    online: PLA_ONLINE_CENTER.schedule.map((entry) => `${entry.days}: ${entry.slots.join(" / ")}`),
                 },
             },
             english_club: {
-                label: "English Club",
-                description: "Espace de pratique pour les profils déjà autonomes. Les débutants doivent d'abord passer par la Formation Hybride.",
+                label: "Club d'Anglais",
+                description:
+                    "English Only Environment réservé aux profils Autonome et plus: débats, jeux de rôle, storytelling, simulations professionnelles et networking. Les débutants passent d'abord par la Formation Régulière.",
                 capacity: PLA_CLUB_CAPACITY,
                 seats: clubSeats,
-                price_range: priceRange,
-                plans: PLA_CLUB_PLANS.map((plan) => ({
-                    id: plan.id,
-                    label: plan.label,
-                    frequency: plan.freq,
-                    price: plan.price,
-                    price_label: formatFcfa(plan.price),
-                })),
-                center: "Centre Poincaré",
+                price_range: clubRange,
+                plans: planSummary(PLA_CLUB_PLANS),
+                centers: ["Centre Programme 6", "Centre Poincaré", "En ligne"],
+            },
+            weekend_hybride: {
+                label: "Formule Weekend Hybride",
+                description:
+                    "4h le samedi ou le dimanche (10h00 - 14h00): structuration, pratique guidée format Club et ressources numériques. Au Centre Poincaré ou en visioconférence.",
+                price_range: priceRangeOf(weekendPlans),
+                plans: planSummary(weekendPlans),
+                schedules: { weekend: `${PLA_WEEKEND_TIME_SLOT.label}: ${PLA_WEEKEND_TIME_SLOT.time}` },
+            },
+            esp: {
+                label: PLA_ESP.title,
+                description: `${PLA_ESP.intro} ${PLA_ESP.access}`,
+                modules: PLA_ESP.modules.map((module) => `${module.name} (${module.en})`),
             },
         },
         centers,
@@ -155,9 +174,11 @@ async function buildProgramInfo() {
         bot_reply: [
             `Prime Language Academy - ${PLA_SESSION.dates}`,
             "",
-            `Formation Hybride: ${priceRange}`,
-            `Horaires: 16h00-18h00, 18h00-20h00, matin 09h00-12h00, en ligne 17h30-20h30.`,
-            "Centres: Programme 6 et Poincaré. Le English Club est disponible à Poincaré.",
+            `Formation Régulière: ${regularRange} (présentiel ou en ligne, 2 à 4 séances/semaine)`,
+            `Club d'Anglais: ${clubRange} (présentiel ou en ligne, 2 à 4 présences/semaine)`,
+            `Formule Weekend Hybride: ${priceRangeOf(weekendPlans)} (samedi & dimanche, 10h00-14h00)`,
+            "Horaires en semaine: 16h00-18h00 et 18h00-20h00. Weekend: 10h00-14h00.",
+            "Centres: Programme 6 (Angré 8e Tranche) et Poincaré (2 Plateaux Vallon), plus la visioconférence.",
             `English Club: ${PLA_CLUB_CAPACITY} places maximum, ${clubSeats.available_seats} place(s) disponible(s) selon les paiements et activations.`,
             "",
             `Programme: ${appLink("/programme")}`,
@@ -579,7 +600,7 @@ export async function POST(req: Request) {
                         appointments_count: todayAppointments.length,
                         club_available_seats: program.offers.english_club.seats.available_seats,
                         session: program.session.dates,
-                        price_range: program.offers.formation_hybride.price_range,
+                        price_range: program.offers.formation_reguliere.price_range,
                         programme_link: program.links.programme,
                         brochure_link: program.links.brochure,
                         appointments_details: todayAppointments.map(a => ({
