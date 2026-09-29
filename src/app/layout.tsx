@@ -34,10 +34,14 @@ export const metadata: Metadata = {
   keywords: [
     "formation anglais Abidjan",
     "cours anglais Cocody",
-    "anglais Programme 6",
-    "anglais Poincaré",
+    "anglais Angré 8e Tranche",
+    "anglais 2 Plateaux Vallon",
     "Prime Language Academy",
-    "English Club Abidjan",
+    "Club d'Anglais Abidjan",
+    "cours d'anglais en ligne Côte d'Ivoire",
+    "anglais weekend Abidjan",
+    "English for Specific Purposes Abidjan",
+    "préparation IELTS TOEFL Abidjan",
     "test niveau anglais Côte d'Ivoire",
   ],
   alternates: {

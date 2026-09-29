@@ -2,7 +2,7 @@
   "id": "/dashboard",
   "name": "Prime Language Academy",
   "short_name": "Prime Academy",
-  "description": "Plateforme d'excellence Prime Language Academy. Parlez anglais. Vivez des opportunites.",
+  "description": "Plateforme Prime Language Academy. Parlez anglais. Devenez Vraiment Bon en Anglais.",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
