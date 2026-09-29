@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Clock, MapPin, MessageCircle, Moon, Sparkles, SunMedium } from "lucide-react";
-import { PLA_CENTERS, PLA_HYBRID_TIME_SLOT, PLA_ONLINE_TIME_SLOT, PLA_TIME_SLOTS } from "@/lib/pla-program";
+import { PLA_CENTERS, PLA_TIME_SLOTS, PLA_WEEKEND_TIME_SLOT } from "@/lib/pla-program";
 
 const programme6 = PLA_CENTERS.find((center) => center.id === "programme-6") || PLA_CENTERS[0];
 const poincare = PLA_CENTERS.find((center) => center.id === "poincare") || PLA_CENTERS[1] || programme6;
@@ -9,11 +9,11 @@ const PATHS = [
   {
     id: "regular",
     icon: Moon,
-    eyebrow: "Je debute ou je veux progresser",
-    title: "Formation Hybride Soir / En ligne",
+    eyebrow: "Je débute ou je veux progresser",
+    title: "Formation Régulière",
     center: programme6,
-    schedule: `${PLA_TIME_SLOTS[0].label} ou ${PLA_TIME_SLOTS[1].label} · ${PLA_ONLINE_TIME_SLOT.label} ${PLA_ONLINE_TIME_SLOT.time}`,
-    text: "Le choix le plus simple pour apprendre avec un cadre clair, des bases solides, des ressources numériques et un rythme compatible avec la journée.",
+    schedule: `${PLA_TIME_SLOTS[0].time} ou ${PLA_TIME_SLOTS[1].time} · en centre ou en visio`,
+    text: "Le choix le plus simple pour apprendre avec un cadre clair, des bases solides, des ressources numériques et un rythme compatible avec la journée. 2, 3 ou 4 séances par semaine.",
     href: "/register?center=programme-6",
     cta: "Reserver ce parcours",
     featured: true,
@@ -21,11 +21,11 @@ const PATHS = [
   {
     id: "club",
     icon: MessageCircle,
-    eyebrow: "J'ai deja un bon niveau",
+    eyebrow: "J'ai déjà un bon niveau",
     title: "Club d'Anglais",
     center: poincare,
-    schedule: `${poincare.name} · pratique, réseau, immersion`,
-    text: "Pour parler plus naturellement, garder le rythme, rencontrer d'autres profils et pratiquer dans un cadre premium.",
+    schedule: "English Only Environment · pratique, réseau, immersion",
+    text: "À partir du niveau Autonome: parler plus naturellement, garder le rythme, réseauter et accéder aux modules ESP (anglais métier).",
     href: "/register-club?center=poincare",
     cta: "Demander l'acces Club",
     featured: false,
@@ -33,13 +33,13 @@ const PATHS = [
   {
     id: "hybrid",
     icon: SunMedium,
-    eyebrow: "Je suis disponible le matin",
-    title: "Formation Hybride",
+    eyebrow: "Je ne suis libre que le weekend",
+    title: "Formule Weekend Hybride",
     center: poincare,
-    schedule: `${PLA_HYBRID_TIME_SLOT.label} · ${PLA_HYBRID_TIME_SLOT.time}`,
-    text: "Un format intensif pour avancer le matin avec ressources numeriques, suivi et pratique accompagnee.",
+    schedule: `Samedi & dimanche · ${PLA_WEEKEND_TIME_SLOT.time}`,
+    text: "4 heures condensées: structuration, pratique guidée au format Club et ressources numériques. 50 000 FCFA la session de 2 mois.",
     href: "/register?path=hybrid&center=poincare",
-    cta: "Choisir l'hybride",
+    cta: "Choisir le weekend",
     featured: false,
   },
 ];
@@ -55,10 +55,10 @@ export function LearningPathAdvisor({ className = "" }: { className?: string }) 
           </p>
           <h2 className="text-2xl font-black leading-tight sm:text-3xl">Choisissez le bon parcours sans vous tromper.</h2>
           <p className="text-sm leading-7 text-[var(--muted-foreground)]">
-            Trois chemins simples: Formation Hybride soir/en ligne, English Club pour les profils forts, ou Formation Hybride du matin.
+            Trois chemins simples: la Formation Régulière pour construire, le Club d'Anglais pour pratiquer, la Formule Weekend Hybride pour avancer sans toucher à votre semaine.
           </p>
           <div className="rounded-2xl border border-[var(--primary)]/15 bg-[var(--primary)]/10 p-4 text-sm leading-7 text-[var(--muted-foreground)]">
-            <strong className="text-[var(--foreground)]">Conseil:</strong> si vous hésitez, commencez par la Formation Hybride. Le test de niveau permet ensuite d'ajuster le groupe et de vérifier si le Club est plus adapté.
+            <strong className="text-[var(--foreground)]">Conseil:</strong> si vous hésitez, commencez par la Formation Régulière. Le test de niveau permet ensuite d'ajuster le groupe et de vérifier si le Club est plus adapté.
           </div>
         </div>
 

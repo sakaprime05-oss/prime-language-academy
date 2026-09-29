@@ -190,8 +190,8 @@ model Appointment {
 
 model SystemSettings {
   id                     String   @id @default("default")
-  currentSessionName     String   @default("SESSION DE LANCEMENT : 11 JUILLET - 12 SEPTEMBRE 2026")
-  currentSessionStart    String   @default("2026-07-11")
+  currentSessionName     String   @default("CYCLE NOVEMBRE - DÉCEMBRE 2026")
+  currentSessionStart    String   @default("2026-11-02")
   currentSessionDuration String   @default("2 mois / 8 semaines")
   enableOnlineRegistration Boolean @default(true)
   enableCorporateRegistration Boolean @default(true)

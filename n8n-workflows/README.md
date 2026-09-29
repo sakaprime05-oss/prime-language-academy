@@ -42,4 +42,4 @@ Une fois le workflow `Bot_Commands` active, vous pouvez envoyer :
 - `Tarifs`
 - `Aide`
 
-Les commandes `Programme`, `Offres` et `Tarifs` appellent l'action `get_program_info`, qui utilise les memes donnees que le site : Formation Hybride, English Club, session du 11 juillet au 12 septembre 2026, tarifs de 53 000 a 155 000 FCFA, centres Programme 6 et Poincare.
+Les commandes `Programme`, `Offres` et `Tarifs` appellent l'action `get_program_info`, qui utilise les memes donnees que le site : Formation Reguliere (70 000 a 120 000 FCFA), Club d'Anglais (50 000 a 100 000 FCFA), Formule Weekend Hybride (50 000 FCFA), modules ESP, cycle Novembre - Decembre 2026, centres Programme 6 (Angre 8e Tranche) et Poincare (2 Plateaux Vallon) plus la visioconference.

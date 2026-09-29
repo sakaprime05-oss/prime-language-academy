@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getStudentProgressData } from "@/app/actions/student-progress";
 import { getDictionary } from "@/lib/i18n";
 import Link from "next/link";
-import { PLA_CENTERS, PLA_CLUB_CAPACITY, PLA_HYBRID_TIME_SLOT, PLA_ONLINE_TIME_SLOT, PLA_SESSION, PLA_TIME_SLOTS } from "@/lib/pla-program";
+import { PLA_CENTERS, PLA_CLUB_CAPACITY, PLA_SESSION, PLA_TIME_SLOTS, PLA_WEEKEND_TIME_SLOT } from "@/lib/pla-program";
 import { getStudentPath, parseStudentProfileData } from "@/lib/student-profile";
 
 function daysUntil(date: Date) {
@@ -59,9 +59,9 @@ export default async function StudentDashboardPage() {
     const studentPath = getStudentPath(user?.registrationType, user?.onboardingData);
     const isClub = studentPath === "CLUB";
     const isHybrid = studentPath === "HYBRID";
-    const selectedSlot = isHybrid ? PLA_HYBRID_TIME_SLOT : profile.timeSlot === PLA_ONLINE_TIME_SLOT.id ? PLA_ONLINE_TIME_SLOT : PLA_TIME_SLOTS.find((slot) => slot.id === profile.timeSlot);
+    const selectedSlot = isHybrid ? PLA_WEEKEND_TIME_SLOT : PLA_TIME_SLOTS.find((slot) => slot.id === profile.timeSlot);
     const selectedCenter = PLA_CENTERS.find((center) => center.id === profile.centerId) || PLA_CENTERS[0];
-    const formationLabel = isHybrid ? "Formation Hybride Matin" : profile.courseMode === "ONLINE" ? "Formation Hybride en ligne" : "Formation Hybride Soirée";
+    const formationLabel = isHybrid ? "Formule Weekend Hybride" : profile.courseMode === "ONLINE" ? "Formation Régulière en ligne" : "Formation Régulière en présentiel";
     const isWaitlisted = user?.status === "WAITLIST";
     const memberSince = user?.createdAt
         ? new Date(user.createdAt).toLocaleDateString('fr-FR')
@@ -100,7 +100,7 @@ export default async function StudentDashboardPage() {
                         {isClub ? `Welcome back, ${session.user.name?.split(' ')[0]} 🥂` : isHybrid ? `Bienvenue en hybride, ${session.user.name?.split(' ')[0]} 👋` : `${dict.welcome}, ${session.user.name?.split(' ')[0]} 👋`}
                     </p>
                     <p className="text-sm text-[var(--foreground)]/50 font-medium leading-tight">
-                        {isClub ? dict.ready_club : isHybrid ? "Votre parcours du matin combine supports, pratique guidée et suivi." : profile.courseMode === "ONLINE" ? "Votre parcours en visioconférence combine supports, pratique guidée et suivi." : "Votre Formation Hybride combine supports, pratique guidée et suivi."}
+                        {isClub ? dict.ready_club : isHybrid ? "Votre Formule Weekend Hybride combine supports, pratique guidée et suivi." : profile.courseMode === "ONLINE" ? "Votre parcours en visioconférence combine supports, pratique guidée et suivi." : "Votre Formation Régulière combine supports, pratique guidée et suivi."}
                     </p>
                 </div>
                 <div className="w-11 h-11 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-black shadow-lg shadow-primary/20 text-lg border-2 border-white/20 flex-shrink-0">

@@ -201,14 +201,14 @@ export async function sendEmail({ to, subject, html, attachments }: SendEmailInp
 export async function sendWelcomeEmail(to: string, name: string, type: string = "FORMATION") {
     const isClub = type === "CLUB";
     const isHybrid = type === "HYBRID";
-    const title = isClub ? "Bienvenue au English Club" : isHybrid ? "Bienvenue en Formation Hybride Matin" : "Bienvenue en Formation Hybride";
+    const title = isClub ? "Bienvenue au Club d'Anglais" : isHybrid ? "Bienvenue en Formule Weekend Hybride" : "Bienvenue en Formation Régulière";
     const body = `
         ${paragraph(`Bonjour ${escapeHtml(name || "cher apprenant")},`)}
         ${paragraph(isClub
-            ? "Votre inscription au English Club a bien été enregistrée. Nous sommes heureux de vous compter parmi nos membres."
+            ? "Votre inscription au Club d'Anglais a bien été enregistrée. Nous sommes heureux de vous compter parmi nos membres, dans un environnement 100% anglophone."
             : isHybrid
-                ? "Votre inscription en Formation Hybride du matin a bien été enregistrée. Vous aurez accès aux supports, à la plateforme, au suivi et au créneau de la vague 3."
-            : "Votre inscription en Formation Hybride a bien été enregistrée. Vous aurez accès aux supports, à la plateforme, au suivi et au parcours choisi.")}
+                ? "Votre inscription en Formule Weekend Hybride a bien été enregistrée. Vous aurez accès aux supports, à la plateforme, au suivi et à votre séance de 4h le samedi ou le dimanche de 10h00 à 14h00."
+            : "Votre inscription en Formation Régulière a bien été enregistrée. Vous aurez accès aux supports, à la plateforme, au suivi et au parcours choisi. Votre formation commence dès aujourd'hui : test de niveau, documentation complète et préformation sont déjà disponibles.")}
         ${paragraph("Vous pouvez vous connecter à votre espace avec l'email et le mot de passe utilisés lors de l'inscription.")}
         ${button("Accéder à mon espace", `${appUrl()}/login`)}
         ${paragraph("Si vous avez une question, répondez directement à ce message ou contactez l'administration.")}

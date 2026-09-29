@@ -15,14 +15,25 @@ const DEFAULT_SYSTEM_SETTINGS = {
 
 function hasObsoleteSessionSettings(settings: { currentSessionName: string; currentSessionStart: string; currentSessionDuration: string }) {
     const value = `${settings.currentSessionName} ${settings.currentSessionStart} ${settings.currentSessionDuration}`.toLowerCase();
-    return value.includes("18 juin")
-        || value.includes("19 aout")
-        || value.includes("19 août")
-        || value.includes("11 avril")
-        || value.includes("avril - juin")
-        || value.includes("2026-04-11")
-        || value.includes("2026-06-18")
-        || value.includes("2026-08-19");
+    const OBSOLETE_MARKERS = [
+        "18 juin",
+        "19 aout",
+        "19 août",
+        "11 avril",
+        "avril - juin",
+        "11 juillet",
+        "12 septembre",
+        "juillet - septembre",
+        "2026-04-11",
+        "2026-06-18",
+        "2026-07-11",
+        "2026-08-19",
+        "2026-09-12",
+    ];
+    if (OBSOLETE_MARKERS.some((marker) => value.includes(marker))) return true;
+    // Toute session dont la date de début est antérieure au cycle courant est obsolète.
+    const start = new Date(settings.currentSessionStart);
+    return !Number.isNaN(start.getTime()) && start < new Date(PLA_SESSION.startDate);
 }
 
 export async function getSystemSettings() {

@@ -47,7 +47,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: SystemSetti
             defaultValue={initialSettings.currentSessionName}
             required
             className={fieldClassName}
-            placeholder="Ex: Session de lancement : 11 juillet - 12 septembre 2026"
+            placeholder="Ex: Cycle Novembre - Décembre 2026"
           />
         </Field>
 

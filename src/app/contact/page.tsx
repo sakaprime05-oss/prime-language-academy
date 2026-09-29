@@ -59,7 +59,7 @@ export default function ContactPage() {
                         <p className="mb-2 text-xs font-black uppercase tracking-[0.2em] text-[#E7162A]">Adresse</p>
                         <h2 className="text-2xl font-black">Deux lieux</h2>
                         <p className="mt-3 text-sm leading-7 text-[#F5F0E8]/55">
-                            Programme 6 accueille la Formation Hybride en matinée et en soirée. Poincaré ajoute le English Club pour les profils déjà autonomes.
+                            Programme 6 accueille la Formation Régulière et le Club d'Anglais de 16h à 18h et de 18h à 20h. Poincaré ajoute la Formule Weekend Hybride le samedi et le dimanche de 10h à 14h.
                         </p>
                         <div className="mt-6 flex flex-wrap gap-3">
                             {centers.map((center) => (
@@ -165,7 +165,7 @@ export default function ContactPage() {
                     <h2 className="mb-4 text-2xl font-black">Avant de nous contacter</h2>
                     <div className="grid gap-4 text-sm leading-7 text-[#F5F0E8]/60 md:grid-cols-3">
                         <p><strong className="text-[#F5F0E8]">Test gratuit:</strong> utile si vous ne connaissez pas encore votre niveau.</p>
-                        <p><strong className="text-[#F5F0E8]">Programme:</strong> la session 2026 dure {PLA_SESSION.duration}: {PLA_SESSION.dates}.</p>
+                        <p><strong className="text-[#F5F0E8]">Programme:</strong> le cycle en cours dure {PLA_SESSION.duration} ({PLA_SESSION.dates}), et 6 cycles de 2 mois se succèdent chaque année.</p>
                         <p><strong className="text-[#F5F0E8]">Email:</strong> {siteConfig.contact.email}</p>
                     </div>
                     <div className="mt-7 flex flex-wrap gap-3">
