@@ -119,3 +119,15 @@ Offrir un écosystème autonome où les étudiants peuvent s'inscrire, payer, su
 - *Date :* [28/04/2026]
 - *Action :* Optimisation du Test de Placement (Chrono + Speech-to-Text), Distinction complète des parcours "English Club" vs "Formation" (Emails, Checkouts, Dashboards), Harmonisation des tarifs (53k-155k), et ajout de Toggles Admin pour la disponibilité des inscriptions.
 - *Status :* Parcours utilisateur fluide, différencié et pilotable dynamiquement par l'administration.
+
+- *Date :* [30/09/2026]
+- *Action :* Traitement du plan d'action « immédiat » de `ANALYSE_PROJET_2026-09-28.md` :
+  quota par IP sur `evaluateTranscriptAction` (S1), suppression de `create-admins.js` et de ses
+  mots de passe en clair au profit de `scripts/create-admins.mjs` piloté par l'environnement (S2),
+  mise à jour de `next` 16.2.7 → 16.3.7 et `next-auth` beta.30 → beta.32 + rafraîchissement des
+  `overrides` (26 vulnérabilités dont 3 critiques → 5 dont 0 critique) (S4), `.env.example` complet
+  et validation `npm run check:env` (S5), allow-list de domaines pour les callbacks Paystack via
+  `PAYMENT_ALLOWED_ORIGINS` (S6), CI GitHub Actions (lint + typecheck + build + audit), scripts npm
+  (`typecheck`, `db:*`, `check:env`), README réel, nettoyage des scripts jetables et de `scratch/`.
+- *Status :* Posture de sécurité et outillage remis à niveau. Restent ouverts : migrations Prisma
+  versionnées, rate limiting distribué, PDF de cours servis publiquement, absence de tests.
