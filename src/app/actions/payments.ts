@@ -10,6 +10,7 @@ import { put } from "@vercel/blob";
 import { paymentMethodLabel, paystackChannels } from "@/lib/payment-methods";
 import { createPaymentReference } from "@/lib/payment-reference";
 import { formatFcfa } from "@/lib/pla-program";
+import { getPaymentBaseUrl } from "@/lib/payment-base-url";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 
@@ -59,11 +60,7 @@ export async function initiatePayment(formData: FormData) {
     }
 
     const secretKey = process.env.PAYSTACK_SECRET_KEY;
-    const configuredBaseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL;
-    const baseUrl =
-        configuredBaseUrl && /^https:\/\/(www\.)?primelangageacademy\.com$/.test(configuredBaseUrl.replace(/\/$/, ""))
-            ? configuredBaseUrl.replace(/\/$/, "")
-            : "https://primelangageacademy.com";
+    const baseUrl = getPaymentBaseUrl();
 
     if (!secretKey) {
         console.error("Payment configuration missing");

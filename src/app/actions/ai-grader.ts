@@ -1,8 +1,16 @@
 "use server";
 
+import { headers } from "next/headers";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
 
 let cachedModel: ReturnType<GoogleGenerativeAI["getGenerativeModel"]> | null = null;
+
+// Le test de placement comporte un petit nombre de questions orales.
+// On laisse de la marge pour les reprises (micro coupé, re-enregistrement)
+// tout en empêchant l'abus de l'API Gemini depuis l'extérieur.
+const AI_GRADER_LIMIT = 20;
+const AI_GRADER_WINDOW_MS = 15 * 60 * 1000;
 
 function getModel() {
     if (!process.env.GEMINI_API_KEY) return null;
@@ -11,6 +19,13 @@ function getModel() {
         cachedModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     }
     return cachedModel;
+}
+
+async function getClientIp() {
+    const headerList = await headers();
+    const forwardedFor = headerList.get("x-forwarded-for");
+    if (forwardedFor) return forwardedFor.split(",")[0].trim();
+    return headerList.get("x-real-ip") || "unknown";
 }
 
 export async function evaluateTranscriptAction(transcript: string, question: string, maxPoints: number) {
@@ -25,6 +40,16 @@ export async function evaluateTranscriptAction(transcript: string, question: str
     const safeMaxPoints = Math.max(0, Math.min(Number(maxPoints) || 0, 100));
 
     if (!safeTranscript) return 0;
+
+    // L'action est appelée depuis la page publique du test de placement :
+    // pas de session à exiger, mais un quota par IP est indispensable
+    // (sinon l'action est un proxy Gemini gratuit et ouvert).
+    const ip = await getClientIp();
+    const limited = rateLimit(rateLimitKey("ai-grader-ip", ip), AI_GRADER_LIMIT, AI_GRADER_WINDOW_MS);
+    if (!limited.ok) {
+        console.warn(`AI grader rate limit reached for ${ip}. Falling back to heuristic scoring.`);
+        return null; // Bascule sur la notation heuristique côté client
+    }
 
     const prompt = `
     As an expert English teacher, evaluate the following student response for a placement test.
@@ -49,7 +74,7 @@ export async function evaluateTranscriptAction(transcript: string, question: str
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
-        
+
         // Extract JSON from the response (sometimes models wrap it in markdown blocks)
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (jsonMatch) {

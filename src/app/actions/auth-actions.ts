@@ -8,6 +8,7 @@ import { PLA_CLUB_CAPACITY, PLA_CLUB_PLANS, PLA_PAYSTACK_SPLIT_TEST_PLAN, PLA_PA
 import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
 import { paymentMethodLabel, paystackChannels } from "@/lib/payment-methods";
 import { createPaymentReference } from "@/lib/payment-reference";
+import { getPaymentBaseUrl } from "@/lib/payment-base-url";
 
 const PAYSTACK_API_URL = "https://api.paystack.co/transaction/initialize";
 const formationPlanPrices = Object.fromEntries(PLA_PLANS.map((plan) => [plan.id, plan.price])) as Record<string, number>;
@@ -62,11 +63,7 @@ function paymentStageLabel(amountPaidBefore: number, amount: number, totalAmount
 
 async function initializePaystackCheckout(input: PaystackInitInput) {
     const secretKey = process.env.PAYSTACK_SECRET_KEY;
-    const configuredBaseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL;
-    const baseUrl =
-        configuredBaseUrl && /^https:\/\/(www\.)?primelangageacademy\.com$/.test(configuredBaseUrl.replace(/\/$/, ""))
-            ? configuredBaseUrl.replace(/\/$/, "")
-            : "https://primelangageacademy.com";
+    const baseUrl = getPaymentBaseUrl();
 
     if (!secretKey) {
         console.error("[Registration] Payment configuration missing");
